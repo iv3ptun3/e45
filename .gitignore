@@ -4,6 +4,7 @@
 *.swp
 *.pyc
 *.dev
+*.root
 build/
 bin/
 lib/
