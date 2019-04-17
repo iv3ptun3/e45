@@ -7,5 +7,6 @@
 *.root
 build/
 bin/
+rootfiles/
 lib/
 !.gitkeep
