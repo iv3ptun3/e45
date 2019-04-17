@@ -1,0 +1,30 @@
+#
+#       prerun.mac
+#
+/vis/open OGLIX
+#/vis/open HepRepFile
+#/vis/open OGLSX
+#/vis/open DAWNFILE
+#/vis/open VRML1FILE
+#
+#
+#/vis/viewer/reset
+#
+#/vis/viewer/set/style surface
+#/vis/viewer/set/style wireframe
+#beam visible
+#/vis/viewer/set/hiddenEdge 1
+#
+/vis/drawVolume 
+/vis/viewer/set/autoRefresh
+#
+/vis/viewer/set/viewpointThetaPhi   90.00 90.00
+#/vis/viewer/set/viewpointThetaPhi   89.99 270.00
+#/vis/viewer/set/viewpointThetaPhi 60.00 270.00
+#/vis/viewer/zoom 1.15
+/tracking/storeTrajectory 1
+#/run/beamOn 1
+/vis/viewer/refresh
+/vis/scene/endOfEventAction accumulate 10
+#
+#

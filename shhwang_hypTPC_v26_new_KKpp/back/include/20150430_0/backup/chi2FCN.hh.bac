@@ -1,0 +1,17 @@
+#ifndef CHI2FCN_H
+#define CHI2FCN_H 1
+
+#include "minuit2.hh"
+#include "track.h"
+#include <cmath>
+class chi2FCN:public ROOT::Minuit2::FCNBase
+{
+  chi2FCN(Track* atrack);
+  ~chi2FCN();
+public:
+  double operator()(int npar, double *input_par, double *output_par, int *iflag);
+
+};
+
+
+#endif

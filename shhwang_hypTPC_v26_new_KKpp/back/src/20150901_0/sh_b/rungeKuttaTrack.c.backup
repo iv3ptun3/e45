@@ -1,0 +1,519 @@
+#include "rungeKuttaTrack.h"
+#include "minuitFit.h"
+#include "switch.h"
+
+#include <stdio.h>
+//#include <math.h>
+//#include <arraySize.h>
+//#include <float.h>
+//#include <error.h>
+//#include <tpcGeometry.h>
+
+/*
+ * Global variables for runge-kutta fitting
+*/
+int RKNumHitTmp = 0;               /* Number of hits in the track       */
+double RKPadHitTmp[MAX_HIT_IN_TRACK+1][3] = {{0.}}; /* x,y,z of hits in the track*/
+double RKPadHitlocalTmp[MAX_HIT_IN_TRACK+1][3] = {{0.}}; /* x,y,z of hits in the track*/
+double RKPadErrTmp[MAX_HIT_IN_TRACK+1][3] = {{0.}}; /* error of hit pos in the track*/
+int    RKPadSector[MAX_HIT_IN_TRACK+1] = {0.}; /* Pad sector of hits in the track */
+int    RKPadLay[MAX_HIT_IN_TRACK+1] = {0.};    /* Pad layer of hits in the track  */
+
+double RKResXYZ[MAX_HIT_IN_TRACK+1][4] = {{0.}};/* residual in (x,y,z,sqrt(x^2+y^2+z^2)) 
+						 !!! in LOCAL sector !!! */
+double RKInitRes[MAX_HIT_IN_TRACK+1][3] = {{0.}};/* residual in (r,phi,z,sqrt(x^2+y^2+z^2)) */
+/* 1st
+double RKResRPhiZ[MAX_HIT_IN_TRACK+1][4] = {{0.}};/ * residual in (r,phi,z,sqrt(x^2+y^2+z^2)) * /
+double RKInitRes[MAX_HIT_IN_TRACK+1][3] = {{0.}};/ * residual in (r,phi,z,sqrt(x^2+y^2+z^2)) * /
+*/
+
+int    RKNumIter=0;
+
+double RKChi2[MAX_ITERATION] = {0.};
+double RKPara[MAX_ITERATION][NUM_PARA_RK] = {{0.}};
+Track* ATrack;
+
+Plane RKVirtualPlane;
+
+#define SQ(a) ((a)*(a))
+
+extern int chi2prb_(float* chi2, int* ndf, float* prb);
+extern int eveNum;
+/*
+extern int trkNum;
+*/
+/*NTPC*/
+extern float B_FIELD;
+/*Hit tmphit;*/
+
+int shiftHits(Track* aTrack, int sw);
+
+/***************************************
+ ***************************************/
+int  rungeKuttaTrack(Track* aTrack, Switch *sw)
+{
+  /*
+  int j, k, sector, lay;
+
+  int dumpFile = 0;
+
+  //  int ndf = 3*aTrack->numHits-5;
+
+  int ndf = 2*(aTrack->numHits-aTrack->nout)-5;
+
+  FILE *fp1;
+  int setInitialPara(Track* aTrack, double* initPara);
+
+  ATrack = aTrack;
+  shiftHits(aTrack, 1);
+
+  setInitialPara(aTrack, aTrack->rKInitPara);
+
+
+
+  if( dumpFile == 1 ){
+    if((fp1=fopen("dat1","w")) == NULL){
+      fprintf(stderr,"Can't open dat1\n");
+      fflush(stdout);
+      exit(1);
+    }
+
+    for(j=0; j < aTrack->numHits; j++){
+      fprintf(fp1,"%f %f %f %f %f\n",
+              aTrack->x[j][0],aTrack->x[j][1], aTrack->x[j][2],0.,
+              sqrt(SQ(aTrack->x[j][0])+SQ(aTrack->x[j][1])));
+    }
+    fclose(fp1);
+  }
+  
+  aTrack->RKPFinal[0] = -100;
+  aTrack->RKPFinal[1] = -100;
+  aTrack->RKPFinal[2] = -100;
+
+  if(sw->resolution==0){//normal analysis mode//
+  
+    RKNumIter = 0;
+    aTrack->chi2Prob = -1.;
+    if(ndf>0){
+      minuitFit( aTrack->rKInitPara , &(aTrack->chi2),
+		 aTrack->rKFinalPara, aTrack, sector, lay, sw); 
+      //ndf = 2*(aTrack->numHits-aTrack->nout)-5;
+      ndf = 2*(aTrack->ngood-aTrack->nout)-5;
+      //ndf = ndf - 2*aTrack->nout;
+      //aTrack->chi2 = aTrack->chi2*ndf;
+      if( ndf < 1){
+	aTrack->chi2Prob = -1.;
+      }else{
+	chi2prb_( &(aTrack->chi2), &ndf, &(aTrack->chi2Prob));
+	for(j=0; j < RKNumIter && j < MAX_ITERATION; j++){
+	  aTrack->rKChi2[j] = RKChi2[j];
+	  aTrack->rKNumIter = RKNumIter;
+	}
+      }
+      
+      
+      
+      aTrack->mom[0] = aTrack->rKFinalPara[2]*sin(aTrack->rKFinalPara[3])
+      *cos(aTrack->rKFinalPara[4]);
+      aTrack->mom[1] = aTrack->rKFinalPara[2]*sin(aTrack->rKFinalPara[3])
+	*sin(aTrack->rKFinalPara[4]);
+      aTrack->mom[2] = aTrack->rKFinalPara[2]*cos(aTrack->rKFinalPara[3]);
+      aTrack->mom[3] = aTrack->rKFinalPara[2];
+      for( j=0; j<3; j++){
+	aTrack->xOnTrack[j] = RKVirtualPlane.origin[j]
+        +aTrack->rKFinalPara[0]*RKVirtualPlane.e1[j]
+        +aTrack->rKFinalPara[1]*RKVirtualPlane.e2[j];
+      }
+      //
+      //      aTrack->xOnTrack[2] = aTrack->rKFinalPara[1];
+      //      aTrack->xOnTrack[0] = 60*cos(aTrack->rKFinalPara[0]);
+      //      aTrack->xOnTrack[1] = 60*sin(aTrack->rKFinalPara[0]);
+      //
+      
+      for(j=0; j< aTrack->numHits;j++){
+	aTrack->rKresXYZ[j][0] = RKResXYZ[j][0];
+	aTrack->rKresXYZ[j][1] = RKResXYZ[j][1];
+	aTrack->rKresXYZ[j][2] = RKResXYZ[j][2];
+	aTrack->rKresXYZ[j][3] = RKResXYZ[j][3];
+	
+	aTrack->initRes[j][0] = RKInitRes[j][0];
+	aTrack->initRes[j][1] = RKInitRes[j][1];
+	aTrack->initRes[j][2] = RKInitRes[j][2];
+      }
+      
+      for( j = 0; j < 4; j++){
+	aTrack->resVirtual[j] =  RKResXYZ[0][j];
+	aTrack->rKresXYZ[0][j] =  RKResXYZ[0][j];
+      }
+    }
+  
+    if( dumpFile == 1){
+      printf("eveNum %d numiter %d numstep %d chi2 %f numHits %d getchar\n",
+	     eveNum,RKNumIter, aTrack->numStep ,aTrack->chi2,aTrack->numHits);
+      getchar();
+    }
+  
+}else if(aTrack->numHits>5){  // resolution check mode //
+    RKPadLay[0] = aTrack->lay[0];
+    RKPadSector[0] = aTrack->sector[0];
+
+    for( j=0; j < MAX_HIT_IN_TRACK+1; j++){
+      RKPadHitTmp[j][0] = aTrack->x[j][0];
+      RKPadHitTmp[j][1] = aTrack->x[j][1];
+      RKPadHitTmp[j][2] = aTrack->x[j][2];
+
+      RKPadHitlocalTmp[j][0] = aTrack->xlocal[j][0];
+      RKPadHitlocalTmp[j][1] = aTrack->xlocal[j][1];
+      RKPadHitlocalTmp[j][2] = aTrack->xlocal[j][2];
+
+      RKPadErrTmp[j][0] = aTrack->err[j][0];
+      RKPadErrTmp[j][1] = aTrack->err[j][1];
+      RKPadErrTmp[j][2] = aTrack->err[j][2];
+    }
+  
+    RKNumHitTmp = aTrack->numHits;
+    ndf = 2*(aTrack->numHits-aTrack->nout)-5;
+    // resolution check  -- from TPCana0.47.res //
+    for( lay=0 ; lay<NUM_LAY ; lay++ ){
+      int flag;
+      int match = 0;
+
+      for(j=0; j < aTrack->numHits; j++){
+	if( lay == aTrack->lay[j] )
+	  match = 1;
+      }
+      if( match == 0) continue;
+
+      RKNumIter = 0;
+  
+      flag = 0;
+      flag = minuitFit( aTrack->rKInitPara , &(aTrack->chi2),
+		 aTrack->rKFinalPara, aTrack, sector, lay, sw); 
+      if( flag==1 ){ 
+	continue;
+      }
+
+      //aTrack->chi2 = aTrack->chi2*ndf;
+      if( ndf < 1){
+	aTrack->chi2Prob = -1.;
+      }else{
+	chi2prb_( &(aTrack->chi2), &ndf, &(aTrack->chi2Prob));
+	for(j=0; j < RKNumIter && j < MAX_ITERATION; j++){
+	  aTrack->rKChi2[j] = RKChi2[j];
+	}
+      }
+    
+      aTrack->rKNumIter = RKNumIter;
+  
+  
+      aTrack->mom[0] = aTrack->rKFinalPara[2]*sin(aTrack->rKFinalPara[3])
+	*cos(aTrack->rKFinalPara[4]);
+      aTrack->mom[1] = aTrack->rKFinalPara[2]*sin(aTrack->rKFinalPara[3])
+	*sin(aTrack->rKFinalPara[4]);
+      aTrack->mom[2] = aTrack->rKFinalPara[2]*cos(aTrack->rKFinalPara[3]);
+      aTrack->mom[3] = aTrack->rKFinalPara[2];
+  
+      for( j=0; j<3; j++){
+    
+	aTrack->xOnTrack[j] = RKVirtualPlane.origin[j]
+	  +aTrack->rKFinalPara[0]*RKVirtualPlane.e1[j]
+	  +aTrack->rKFinalPara[1]*RKVirtualPlane.e2[j];
+      }
+
+      for(j=0; j< aTrack->numHits;j++){
+	if(aTrack->lay[j]==lay){ //residual check mode
+	  aTrack->rKresXYZ[j][0] = RKResXYZ[j][0];
+	  aTrack->rKresXYZ[j][1] = RKResXYZ[j][1];
+	  aTrack->rKresXYZ[j][2] = RKResXYZ[j][2];
+	  aTrack->rKresXYZ[j][3] = RKResXYZ[j][3];
+      
+	  aTrack->initRes[j][0] = RKInitRes[j][0];
+	  aTrack->initRes[j][1] = RKInitRes[j][1];
+	  aTrack->initRes[j][2] = RKInitRes[j][2];
+	}
+      }
+  
+      for( j = 0; j < 4; j++){
+	aTrack->resVirtual[j] =  RKResXYZ[0][j];
+	aTrack->rKresXYZ[0][j] =  RKResXYZ[0][j];
+      }
+  
+      if( dumpFile == 1){
+	printf("eveNum %d numiter %d numstep %d chi2 %f numHits %d getchar\n",
+	       eveNum,RKNumIter, aTrack->numStep ,aTrack->chi2,aTrack->numHits);
+	getchar();
+      }
+  
+    }  //loop on layer residual check mode
+  
+  }
+
+  
+  shiftHits(aTrack, -1);
+*/
+  return 0;
+  
+}
+/***************************************
+ ***************************************/
+
+
+
+/***************************************
+ ***************************************/
+int shiftHits(Track* aTrack, int sw){
+
+  int i,j;
+
+  if( sw == 1){
+    aTrack->numHits++; 
+
+    for(i=aTrack->numHits-1; i >0; i-- ){
+      if( i>= MAX_HIT_IN_TRACK){
+        reportErr(0,"err: setInitialPara hit%d >= MAX\n",i);
+        exit(-1);
+      }
+
+      RKPadSector[i] = aTrack->sector[i-1];
+      RKPadLay[i] = aTrack->lay[i-1];
+
+      aTrack->sector[i] = aTrack->sector[i-1];
+      aTrack->lay[i] = aTrack->lay[i-1];
+      aTrack->hit[i] = aTrack->hit[i-1];
+      aTrack->arcLen[i] = aTrack->arcLen[i-1];
+      aTrack->resPad[i] = aTrack->resPad[i-1];
+      aTrack->resPady[i] = aTrack->resPady[i-1]; /*NTPC*/
+      aTrack->resZ[i]   = aTrack->resZ[i-1];
+      aTrack->phi_local[i]   = aTrack->phi_local[i-1];
+      for(j = 0; j < 3; j++){
+        aTrack->x[i][j]   = aTrack->x[i-1][j];
+        aTrack->xlocal[i][j]   = aTrack->xlocal[i-1][j];
+        aTrack->err[i][j] = aTrack->err[i-1][j];
+      }
+    }
+  }else if (sw == -1){
+
+    aTrack->numHits--; 
+
+    for(i=0; i < aTrack->numHits; i++ ){
+      if( i>= MAX_HIT_IN_TRACK){
+        reportErr(0,"err: setInitialPara hit%d >= MAX\n",i);
+        exit(-1);
+      }
+
+      RKPadSector[i] = aTrack->sector[i+1];
+      RKPadLay[i] = aTrack->lay[i+1];
+
+      aTrack->sector[i] = aTrack->sector[i+1];
+      aTrack->lay[i] = aTrack->lay[i+1];
+      aTrack->hit[i] = aTrack->hit[i+1];
+      aTrack->arcLen[i] = aTrack->arcLen[i+1];
+      aTrack->resPad[i] = aTrack->resPad[i+1];
+      aTrack->resPady[i] = aTrack->resPady[i+1]; /*NTPC*/
+      aTrack->resZ[i]   = aTrack->resZ[i+1];
+      aTrack->ydist[i]   = aTrack->ydist[i+1];
+      aTrack->whilet[i]   = aTrack->whilet[i+1];
+      aTrack->phi_local[i]   = aTrack->phi_local[i+1];
+      for(j = 0; j < 3; j++){
+        aTrack->x[i][j]   = aTrack->x[i+1][j];
+        aTrack->xlocal[i][j]   = aTrack->xlocal[i+1][j];
+        aTrack->err[i][j] = aTrack->err[i+1][j];
+        aTrack->xEvaluate[i][j]   = aTrack->xEvaluate[i+1][j];
+        aTrack->rKresXYZ[i][j]  = aTrack->rKresXYZ[i+1][j];
+        aTrack->initRes[i][j]  = aTrack->initRes[i+1][j];
+      }
+      aTrack->rKresXYZ[i][3]  = aTrack->rKresXYZ[i+1][3];
+    }
+  }
+
+  return aTrack->numHits;
+
+}
+/***************************************
+ ***************************************/
+
+
+
+/***************************************
+ ***************************************/
+int setInitialPara(Track* aTrack, double* initPara){
+
+  int i,j;
+  int setVirtualPlane(Track* aTrack);
+
+  setVirtualPlane(aTrack);
+
+  initPara[0] = initPara[1] = 0;
+  initPara[2] = aTrack->mom[3]; 
+  /* theta */
+  initPara[3] = atan2(sqrt(aTrack->mom[0]*aTrack->mom[0]
+                           +aTrack->mom[1]*aTrack->mom[1]),aTrack->mom[2]);
+  /* phi */
+  initPara[4] =           
+    atan2(aTrack->mom[1], aTrack->mom[0]);
+
+  if(initPara[4]<0.0){
+    initPara[4] += 2.0*M_PI;
+  }
+
+  for( i=0 ; i < NUM_PARA_RK; i++){
+    aTrack->rKInitPara[i] = initPara[i];
+  }
+
+  for (i = 0; i < MAX_HIT_IN_TRACK; i++){
+    for(j=0;j<4; j++){
+      RKResXYZ[i][j] = -1000.;
+      /* 1st     RKResRPhiZ[i][j] = -1000.;*/
+      RKInitRes[i][j] = -1000.;
+    }
+  }
+  /*
+  double dcl  = sqrt(aTrack->center[0]*aTrack->center[0]+aTrack->center[1]*aTrack->center[1]);
+  double t    = (-aTrack->radius*aTrack->radius+60*60+dcl*dcl)/(2*dcl);
+  double a0   = atan2(aTrack->center[1],aTrack->center[0]);
+  if(a0<0) a0 = a0 + 2*M_PI;
+  double disr = sqrt(aTrack->x[1][0]*aTrack->x[1][0]+aTrack->x[1][1]*aTrack->x[1][1])-60;
+  initPara[1] = aTrack->x[1][2]-aTrack->parRZFit[1]*disr;
+  //if(60+aTrack->radius<dcl){
+  if(fabs(t/60)<1&&60+aTrack->radius>dcl){
+    //double at   = acos(t/aTrack->radius);
+    double at   = acos(t/60.);
+    double lphi = atan2(aTrack->x[1][1],aTrack->x[1][0]);
+    if(lphi<0) lphi = lphi + 2*M_PI;
+    double dphi = lphi-a0;
+    if(dphi>M_PI)    dphi = -2*M_PI + dphi;
+    if(dphi<-1*M_PI) dphi = 2*M_PI  + dphi;
+    initPara[0]             = a0 + at;
+    if(dphi<0) initPara[0]  = a0 - at;
+    //printf("a0,at,t::%f, %f %f\n",a0,at,t);
+  }else{
+    initPara[0] =a0;
+  }
+  aTrack->x[0][0] = 60*cos(initPara[0]);
+  aTrack->x[0][1] = 60*sin(initPara[0]);
+  aTrack->x[0][2] = initPara[1];
+  */
+  //printf("\n initial xyz::%f %f %f, pxyz::%f %f %f \n",aTrack->x[0][0],aTrack->x[0][1],aTrack->x[0][2],aTrack->mom[0],aTrack->mom[1],aTrack->mom[2]);
+
+  return 0;
+
+}
+/***************************************
+ ***************************************/
+
+
+
+/***************************************
+ ***************************************/
+int setVirtualPlane(Track* aTrack){
+
+  double delta   = 5.0/aTrack->radius; 
+
+  double norm = sqrt(SQ(aTrack->x[1][0]-aTrack->x[2][0])
+                    +SQ(aTrack->x[1][1]-aTrack->x[2][1])
+                    +SQ(aTrack->x[1][2]-aTrack->x[2][2]));
+
+  double pT = sqrt( SQ(aTrack->mom[0])+SQ(aTrack->mom[1]));
+
+  double phi = atan2(aTrack->x[1][1]-aTrack->center[1],
+                     aTrack->x[1][0]-aTrack->center[0]);
+ /*NTPC*/
+  int sector = aTrack->sector[1];
+  /*  Hit tmphit;*/
+  int i;
+
+  /*  if (aTrack->charge > 0){*/
+  if ( B_FIELD*aTrack->charge < 0){ /*NTPC*/
+    delta  *= -1.;
+  }
+
+  aTrack->x[0][0] = aTrack->radius*cos(phi+delta)+aTrack->center[0];
+  aTrack->x[0][1] = aTrack->radius*sin(phi+delta)+aTrack->center[1];
+  aTrack->x[0][2] = 
+    aTrack->x[1][2]- aTrack->parRZFit[1]*fabs(delta)*aTrack->radius;
+
+  /*NTPC*/
+  if( SectorRotation(sector,aTrack->xlocal[0],aTrack->x[0],3,G2L) ){
+    reportErr(0,"EXIT at setVirtualPlane\n");
+    exit(1);
+  }
+  /*aTrack->xlocal[0][2] =  aTrack->x[0][2];*/
+
+  RKVirtualPlane.origin[0] = aTrack->radius*cos(phi+2.*delta)+aTrack->center[0];
+  RKVirtualPlane.origin[1] = aTrack->radius*sin(phi+2.*delta)+aTrack->center[1];
+
+  RKVirtualPlane.origin[2] = 
+    aTrack->x[1][2]- aTrack->parRZFit[1]*2.*fabs(delta)*aTrack->radius;
+
+  if(fabs(pT) < DBL_EPSILON){
+    reportErr(0," transverse mom %f == 0\n",pT);
+    exit(0);
+  }
+
+  if( fabs(aTrack->mom[2])/pT > 1.) {
+    RKVirtualPlane.e1[0] = aTrack->mom[1] / pT;
+    RKVirtualPlane.e1[1] = - aTrack->mom[0] / pT;
+    RKVirtualPlane.e1[2] = 0.;
+  }else{
+
+    norm = sqrt(SQ(aTrack->mom[0])+SQ(aTrack->mom[2]));
+
+    RKVirtualPlane.e1[0] = aTrack->mom[2]/norm;
+    RKVirtualPlane.e1[1] = 0.;
+    RKVirtualPlane.e1[2] = - aTrack->mom[0]/norm;
+
+  }
+
+  RKVirtualPlane.e2[0] = aTrack->mom[1]*RKVirtualPlane.e1[2]
+    -aTrack->mom[2]*RKVirtualPlane.e1[1];
+
+  RKVirtualPlane.e2[1] = aTrack->mom[2]*RKVirtualPlane.e1[0]
+    -aTrack->mom[0]*RKVirtualPlane.e1[2];
+
+  RKVirtualPlane.e2[2] = aTrack->mom[0]*RKVirtualPlane.e1[1]
+    -aTrack->mom[1]*RKVirtualPlane.e1[0];
+  
+  norm = sqrt(SQ(RKVirtualPlane.e2[0])+
+              SQ(RKVirtualPlane.e2[1])+
+              SQ(RKVirtualPlane.e2[2]));
+
+  RKVirtualPlane.e2[0] /= norm;
+  RKVirtualPlane.e2[1] /= norm;
+  RKVirtualPlane.e2[2] /= norm;
+
+  aTrack->err[0][0] = 
+    aTrack->err[0][1] = 
+    aTrack->err[0][2] = 1000.; /*org;all =10.*/
+
+  /*NTPC* 
+  tmphit.sector = sector;
+  for(i=0;i<3;i++){
+    tmphit.x[i]      = aTrack->x[0][i];
+    tmphit.xlocal[i] = aTrack->xlocal[0][i];
+    tmphit.err[i]    = aTrack->err[0][i];
+  }
+  */
+  /*NTPC*/
+  virtualFirstHit.sector = sector;
+  virtualFirstHit.layer = -1;
+  for(i=0;i<3;i++){
+    virtualFirstHit.x[i]      = aTrack->x[0][i];
+    virtualFirstHit.xlocal[i] = aTrack->xlocal[0][i];
+    virtualFirstHit.err[i]    = aTrack->err[0][i];
+  }
+
+  aTrack->sector[0] = sector;       /*NTPC*/
+  aTrack->lay[0] = -1;
+  aTrack->hit[0] = &virtualFirstHit;
+  /*  aTrack->hit[0] = NULL;*/
+  aTrack->resPad[0] = -10000.;
+  aTrack->resPady[0] = -10000.; /*NTPC*/
+  aTrack->resZ[0] = -10000.;
+  aTrack->arcLen[0] = -10000.;
+
+  return 0;
+
+}
+/***************************************
+ ***************************************/
+

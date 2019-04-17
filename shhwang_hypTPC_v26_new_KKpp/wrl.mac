@@ -1,0 +1,38 @@
+#-------------------------------
+# 1 complete set for drawing
+#	for GEANT 4.4.1patch01 + vrmlview
+# store track for visualize
+#/tracking/storeTrajectory 1
+
+# open file
+/vis/open VRML2FILE
+
+# create scene
+/vis/scene/create
+
+# add track to scene
+/vis/scene/add/trajectories
+
+# accumulate track 
+/vis/scene/endOfEventAction accumulate
+
+# ?
+/vis/open VRML2FILE
+/vis/viewer/set/viewpointThetaPhi   45 45
+
+# draw scene 
+/vis/drawVolume
+
+# draw detector and track
+/vis/viewer/flush
+
+/vis/viewer/set/viewpointThetaPhi   45 45
+# beam one
+/run/beamOn 1
+
+
+
+
+
+
+
