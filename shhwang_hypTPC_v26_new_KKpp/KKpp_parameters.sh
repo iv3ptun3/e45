@@ -26,8 +26,8 @@
 
 ##=====KKpp Generator========
 #export Generator=3001 #### KKpp -> LL -> p pi p pi
-export Generator=3002 #### KKpp -> LL 
-#export Generator=3003 #### KKpp -> LSmPip
+#export Generator=3002 #### KKpp -> LL 
+export Generator=3003 #### KKpp -> LSmPip
 #export Generator=3004 #### KKpp -> LSpPim
 
 export Experiment_NUM=45 ####dedx test

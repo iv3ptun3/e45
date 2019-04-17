@@ -179,7 +179,7 @@ void TPCAnaManager::BeginOfRunAction(int runnum)
 	}else {
 	  pad_in[i]=10.+(pad_length_in+pad_gap)*pad_in_num+(pad_length_out+pad_gap)*(i-pad_in_num);
 	  pad_out[i]=10.+(pad_length_in+pad_gap)*pad_in_num+(pad_length_out+pad_gap)*(i-pad_in_num) + pad_length_out;
-	  angle[i]=180.-acos((pow(pad_out[i],2)+pow(cen_diff,2)-pow(tpc_rad,2))/(2*pad_out[i]*cen_diff))*180./3.141592654;
+	  angle[i]=180.-acos((pow(pad_out[i],2)+pow(cen_diff,2)-pow(tpc_rad,2))/(2*pad_out[i]*cen_diff))*180./acos(-1.);
 	}
       //      G4cout<<angle[i]<<G4endl;
       //      G4cout<<pad_in[i]<<G4endl;
@@ -260,12 +260,12 @@ void TPCAnaManager::BeginOfRunAction(int runnum)
 	  num_pad_check=angle[i]/seg_angle[i];
 	}else if(i>=pad_in_num){
 	  seg_angle[i]=(180.-angle[i])*2/double(numpads[i]);
-	  seg_width[i]=pad_in[i]*(180-angle[i])*2.*3.141592654/180./numpads[i];
+	  seg_width[i]=pad_in[i]*(180-angle[i])*2.*acos(-1.)/180./numpads[i];
 	  num_pad_check=(180.-angle[i])*2/seg_angle[i];
 	}
 
 	G4cout<<i<<" degree :"<<seg_angle[i]<<G4endl;
-	G4cout<<i<<" width :"<<seg_angle[i]*3.141592/180.*pad_in[i]<<G4endl;
+	G4cout<<i<<" width :"<<seg_angle[i]*acos(-1.)/180.*pad_in[i]<<G4endl;
 
 	all_channels=all_channels+numpads[i];
 	all_channels2=all_channels2+num_pad_check;
@@ -428,6 +428,8 @@ int TPCAnaManager::EndOfEventAction()
     G4double a_fory[MAX_TRACK]={-9999.9999};
     G4double b_fory[MAX_TRACK]={-9999.9999};
     G4double theta0_fory[MAX_TRACK]={-9999.9999};
+    G4int vtx_flag[MAX_TRACK]={-1};
+
     for(G4int i=0;i<MAX_TRACK;i++){
       cir_r[i]=-9999.9999;
       cir_x[i]=-9999.9999;
@@ -450,11 +452,39 @@ int TPCAnaManager::EndOfEventAction()
 
       }
     }
+    G4double mom_theta[MAX_TRACK]={0.};
+    
+    // calcute vtx with production points
+    for(G4int i=0;i<MAX_TRACK;i++){
+      G4double rho1 = rad[i];
+      G4double cx1 = cx[i];
+      G4double cz1 = cz[i];
+      G4double cx2 = primaryParticle.x0[0][0];
+      G4double cz2 = primaryParticle.x0[0][2];
+      G4double theta12=atan2(cz2-cz1, cx2-cx1);
+      G4double ca1=a_fory[i];
+      G4double cb1=b_fory[i];
+      G4double ct01=theta0_fory[i];
+      
+
+      G4double cent_dist=sqrt(pow(cx1-cx2,2)+pow(cz1-cz2,2));
+
+      vtxxfit[i]=cos(theta12)*cent_dist+cx1;
+      vtxzfit[i]=sin(theta12)*cent_dist+cz1;
+      vtxyfit[i]=-1.*tpcData[i].tpcqq*ca1*rho1*(theta12-ct01)+cb1;
+
+      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
+     
+      vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+      vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+
+      vtx_flag[i]=1;
+    }
 
     ////think about parent ID
     ////--> find the track with same parent ID
     //// sh_
-    G4double mom_theta[MAX_TRACK]={0.};
+
     for(G4int i=0;i<MAX_TRACK;i++){
       for(G4int j=i;j<MAX_TRACK;j++){
 	if(i!=j && (test[i]>0 && test[j]>0) ){
@@ -504,6 +534,8 @@ int TPCAnaManager::EndOfEventAction()
 	      vtxxfit[j]=point2[0];
 	      vtxzfit[j]=point2[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
+	      vtx_flag[i]=2;
+	      vtx_flag[j]=2;
 	      //
 	    }else  if((cent_dist+fmin(rho1,rho2))<fmax(rho1,rho2)){
 	      if(rho1>=rho2){ //rho1>rho2
@@ -543,7 +575,9 @@ int TPCAnaManager::EndOfEventAction()
 	      vtxxfit[j]=point2[0];
 	      vtxzfit[j]=point2[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
-
+	      
+	      vtx_flag[i]=3;
+	      vtx_flag[j]=3;
 	    } else {
 	      
 	      //k = CircleIntersect(cx1,cz1,rho1,cx2,cz2,rho2,point1,point2);
@@ -573,10 +607,12 @@ int TPCAnaManager::EndOfEventAction()
 		  vtxzfit[j]=point2[1];
 		  vtxyfit[j]=point2[2];
 		}
+		vtx_flag[i]=4;
+		vtx_flag[j]=4;
 	      }
 
-	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-3.141592/2;
-	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-3.141592/2;
+	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
+	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-acos(-1.)/2;
 
 	      
 	      // std::cout<<"x01="<<x[i][0]<<", x2="<<x[j][0]<<std::endl;
@@ -644,6 +680,9 @@ int TPCAnaManager::EndOfEventAction()
 	      vtxxfit[j]=point1[0];
 	      vtxzfit[j]=point1[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
+	      
+	      vtx_flag[i]=5;
+	      vtx_flag[j]=5;	      
 	    }else  if((cent_dist+fmin(rho1,rho2))<fmax(rho1,rho2)){
 
 	      if(rho1>=rho2){ //rho1>rho2
@@ -659,7 +698,7 @@ int TPCAnaManager::EndOfEventAction()
 		point2[1]=sin(theta21)*centr1+cz2;
 		point2[2]=-1.*tpcData[j].tpcqq*ca2*rho2*(theta21-ct02)+cb2;
 		//		G4cout<<"test1"<<G4endl;
-
+		
 	      }else if(rho2>rho1){ //rho1<rho2
 		G4double theta12=atan2(cz1-cz2,cx1-cx2);
 		G4double centr=rho2-(rho2-cent_dist-rho1)/2; //rho1<rho2
@@ -680,6 +719,8 @@ int TPCAnaManager::EndOfEventAction()
 	      vtxxfit[j]=point2[0];
 	      vtxzfit[j]=point2[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
+	      vtx_flag[i]=6;
+	      vtx_flag[j]=6;
 	    } else {
 
 	      //k = CircleIntersect(cx1,cz1,rho1,cx2,cz2,rho2,point1,point2);
@@ -708,10 +749,12 @@ int TPCAnaManager::EndOfEventAction()
 		  vtxzfit[j]=point2[1];
 		  vtxyfit[j]=point2[2];
 		}
+		vtx_flag[i]=7;
+		vtx_flag[j]=7;
 	      }
 
-	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-3.141592/2;
-	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-3.141592/2;
+	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
+	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-acos(-1.)/2;
 
 	      vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
 	      vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
@@ -803,8 +846,8 @@ int TPCAnaManager::EndOfEventAction()
 		  }
 		  }
 
-		  mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-3.141592/2;
-		  mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-3.141592/2;
+		  mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
+		  mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-acos(-1.)/2;
 
 		  vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
 		  vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
@@ -1072,7 +1115,8 @@ int TPCAnaManager::EndOfEventAction()
 			  tpcData[i].tpcvtxx,tpcData[i].tpcvtxy,tpcData[i].tpcvtxz,
 			  vtxxfit[i],vtxyfit[i],vtxzfit[i],
 			  vtxpxfit[i],Pz[i],vtxpzfit[i],cir_r[i]*(0.299792458)*fabs(env_helm_field),
-			  cir_r[i],cir_x[i],cir_z[i],test[i]
+			  cir_r[i],cir_x[i],cir_z[i],test[i],
+			  vtx_flag[i], a_fory[i], b_fory[i]
 			  );
     }
 
@@ -1269,8 +1313,8 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     G4double ang_sh=atan2(sh_pos.getY(),sh_pos.getX());
     G4double ang_check=0;
-    if(ang_sh>3.141592654){
-      ang_sh=ang_sh-2*3.141592654;
+    if(ang_sh>acos(-1.)){
+      ang_sh=ang_sh-2*acos(-1.);
       ang_check=-1;
     }else{
       ang_check=1.;
@@ -1392,7 +1436,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     if( env_pad_config ==2 ){
     //    G4bool pass_check=false;
       G4bool pass_check=true;
-      G4double cur_angle= (3.141592654-atan2(sh_x,sh_z))*180./3.141592654;
+      G4double cur_angle= (acos(-1.)-atan2(sh_x,sh_z))*180./acos(-1.);
     //    G4cout<<"--------------------"<<G4endl;
     //    G4cout<<"currrent angle:"<<cur_angle<<G4endl;
     //    G4cout<<"layer angle:"<<angle[iLay]<<G4endl;

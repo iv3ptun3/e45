@@ -161,6 +161,9 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
   tree->Branch("cir_x",tree1ev.cir_x,"cir_x[ntrtpc]/D");
   tree->Branch("cir_z",tree1ev.cir_z,"cir_z[ntrtpc]/D");
   tree->Branch("cir_fit",tree1ev.cir_fit,"cir_fit[ntrtpc]/D");
+  tree->Branch("vtx_flag",tree1ev.vtx_flag,"vtx_flag[ntrtpc]/I");
+  tree->Branch("a_fory",tree1ev.a_fory,"a_fory[ntrtpc]/D");
+  tree->Branch("b_fory",tree1ev.b_fory,"b_fory[ntrtpc]/D");
 
   //
   // Scinti
@@ -304,7 +307,10 @@ void TPCAnaRoot::BeginOfEventAction()
     tree1ev.cir_x[i]  = -9999.9999;
     tree1ev.cir_z[i]  = -9999.9999;
     tree1ev.cir_fit[i]  = -9999.9999;
-
+    
+    tree1ev.vtx_flag[i]  = -1;
+    tree1ev.a_fory[i]  = -9999.9999;
+    tree1ev.b_fory[i]  = -9999.9999;
   }
   
   for(int i = 0; i< 4;i++){
@@ -570,7 +576,8 @@ void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
 			     G4double tpcvtxx,G4double tpcvtxy,G4double tpcvtxz, 
 			     G4double tpcvtxxfit,G4double tpcvtxyfit,G4double tpcvtxzfit, 
 			     G4double tpcpxfit,G4double tpcpyfit,G4double tpcpzfit,G4double tpcptfit,
-			     G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit)//--> should be changed
+			     G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit,
+			     G4int vtx_flag, G4double a_fory, G4double b_fory)//--> should be changed
 
 {
   tree1ev.trpidtpc[tree1ev.ntrtpc] = tpcpid;
@@ -624,6 +631,10 @@ void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
   tree1ev.cir_x[tree1ev.ntrtpc] = cir_x;
   tree1ev.cir_z[tree1ev.ntrtpc] = cir_z;
   tree1ev.cir_fit[tree1ev.ntrtpc] = cir_fit;
+
+  tree1ev.vtx_flag[tree1ev.ntrtpc] = vtx_flag;
+  tree1ev.a_fory[tree1ev.ntrtpc] = a_fory;
+  tree1ev.b_fory[tree1ev.ntrtpc] = b_fory;
 
   tree1ev.ntrtpc++;
 

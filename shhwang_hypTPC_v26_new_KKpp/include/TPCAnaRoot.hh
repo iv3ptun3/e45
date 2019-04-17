@@ -154,7 +154,9 @@ struct Tree1Ev {
   G4double cir_x[MaxTrack];   // fit center x
   G4double cir_z[MaxTrack];   // fit center z
   G4double cir_fit[MaxTrack];   // fit center fit
-
+  G4int vtx_flag[MaxTrack]; // flag, how to estimate vtx 
+  G4double a_fory[MaxTrack]; // co-efficient a for linear track (y, theta) 
+  G4double b_fory[MaxTrack]; // co-efficient b for linear track (y, theta) 
 
 
   G4int ntsc;                 // Number of Hit in Scint.
@@ -429,7 +431,8 @@ public:
 		   G4double tpcvtxx1,G4double tpcvtxy1, G4double tpcvtxz1,
 		   G4double tpcvtxx1fit,G4double tpcvtxy1fit, G4double tpcvtxz1fit,
 		   G4double tpcpxfit1,G4double tpcpyfit1,G4double tpcpzfit1,G4double tpcptfit1,
-		   G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit
+		   G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit,
+		   G4int vtx_flag, G4double a_fory, G4double b_fory
 		   );
 
   void FillScintData(G4double time, G4double* pos, G4double* mom,
