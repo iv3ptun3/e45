@@ -92,7 +92,7 @@ export Target_Pos_z=-143.
 #export Target_Pos_z -103.
 
 export Out_ROOT_File_Name=./grun1.root
-export Out_GEN_File_Name=./gen1.root
+#export Out_GEN_File_Name=./gen1.root
 #It should be added some code.
 
 #### Magnet field for Helmholtz coil 
