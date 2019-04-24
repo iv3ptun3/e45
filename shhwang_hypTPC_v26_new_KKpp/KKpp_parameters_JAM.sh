@@ -4,11 +4,15 @@
 ##=====KKpp Generator========
 #export Generator=3001 #### KKpp -> LL -> p pi p pi
 #export Generator=3002 #### KKpp -> LL 
-#export Generator=3101 #### JAM input 
-export Generator=3103 #### JAM input K0
+export Generator=3101 #### JAM input 
+#export Generator=3103 #### JAM input K0
 #export Generator=3104 #### JAM input K0bar
 export Input_JAM_File_Name=JAM_rootfile/rot_KKpp_ut0.root
 export Nbeam_first=0
+
+export Lambda_decay=0 ###1: L->p pi- 100%, 0:defalt decay
+export Ks_decay=0 ###1: Ks->pi+ pi- 100%, 0:defalt decay 
+
 
 export Experiment_NUM=45 ####dedx test
 #export With_KURAMA=1 ### 1: w/, 0: w/o

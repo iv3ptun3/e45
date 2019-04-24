@@ -30,6 +30,10 @@
 export Generator=3003 #### KKpp -> LSmPip
 #export Generator=3004 #### KKpp -> LSpPim
 
+export Lambda_decay=1 ###1: L->p pi- 100%, 0:defalt decay
+export Ks_decay=1 ###1: Ks->pi+ pi- 100%, 0:defalt decay 
+
+
 export Experiment_NUM=45 ####dedx test
 #export With_KURAMA=1 ### 1: w/, 0: w/o
 export With_KURAMA=0 ### 1: w/, 0: w/o

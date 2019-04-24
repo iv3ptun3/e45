@@ -32,6 +32,9 @@ export Generator=3102 #### K- beam through gaus
 export Input_JAM_File_Name=JAM_rootfile/rot_KKpp_ut0.root
 export Nbeam_first=0
 
+export Lambda_decay=0 ###1: L->p pi- 100%, 0:defalt decay
+export Ks_decay=0 ###1: Ks->pi+ pi- 100%, 0:defalt decay 
+
 export Experiment_NUM=45 ####dedx test
 #export With_KURAMA=1 ### 1: w/, 0: w/o
 export With_KURAMA=0 ### 1: w/, 0: w/o

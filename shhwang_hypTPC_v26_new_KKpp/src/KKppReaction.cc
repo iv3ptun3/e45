@@ -798,7 +798,10 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
   t1->SetBranchAddress("py", py);
   t1->SetBranchAddress("pz", pz);
 
-  t1->GetEntry(Nbeam_JAMInput%ev_max);
+  //  t1->GetEntry(Nbeam_JAMInput%ev_max);
+  if(Nbeam_JAMInput<=ev_max){
+    
+  t1->GetEntry(Nbeam_JAMInput);
   G4int np_JAM = np;
   
   //  G4int np_JAM = Getnp_JAM(Nbeam_JAMInput);
@@ -866,7 +869,7 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
 
     //delete ptmp;
   }
-  
+  }
 
   ++Nbeam_JAM;
 }

@@ -376,27 +376,34 @@ void TPCPhysicsList::ConstructGeneral()
 
 
     ////shhwang; include decay process
-    //comment out ichikawa
- 
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4VDecayChannel* mode;
-    G4DecayTable* Table = new G4DecayTable();
-    particle=particleTable->FindParticle("lambda");
-    mode = new G4PhaseSpaceDecayChannel("lambda",1.0000,2,"proton","pi-");
-    Table->Insert(mode);
-    particle->SetDecayTable(Table);
+    
+    G4String Lambda_decay_env = getenv("Lambda_decay");
+    G4int Lambda_decay = atoi(Lambda_decay_env.c_str());
+
+    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();    
+
+    if(Lambda_decay==1){
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+      particle=particleTable->FindParticle("lambda");
+      mode = new G4PhaseSpaceDecayChannel("lambda",1.0000,2,"proton","pi-");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+    }
     //////
 
 
     ////k0
-    //comment out ichikawa
-    G4VDecayChannel* mode1;
-    G4DecayTable* Table1 = new G4DecayTable();
-    particle=particleTable->FindParticle("kaon0S");
-    mode1 = new G4PhaseSpaceDecayChannel("kaon0S",1.0000,2,"pi+","pi-");
-    Table1->Insert(mode1);
-    particle->SetDecayTable(Table1);
-
+    G4String Ks_decay_env = getenv("Ks_decay");
+    G4int Ks_decay = atoi(Ks_decay_env.c_str());
+    if(Ks_decay==1){
+      G4VDecayChannel* mode1;
+      G4DecayTable* Table1 = new G4DecayTable();
+      particle=particleTable->FindParticle("kaon0S");
+      mode1 = new G4PhaseSpaceDecayChannel("kaon0S",1.0000,2,"pi+","pi-");
+      Table1->Insert(mode1);
+      particle->SetDecayTable(Table1);
+    }
     /*
   ////Decay mode control of lambda 1405. L1405 --> Lambda + gamma
   //    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();

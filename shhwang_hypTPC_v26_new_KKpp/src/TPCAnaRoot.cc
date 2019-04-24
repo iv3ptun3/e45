@@ -89,29 +89,29 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
 
   ///////shhwang tpc hit step
   
-  tree->Branch("nttpc",&tree1ev.nttpc,"nttpc/I");
-  tree->Branch("ntrk",tree1ev.ntrk,"ntrk[nttpc]/I");
-  tree->Branch("ititpc",tree1ev.ititpc,"ititpc[nttpc]/I");
-  tree->Branch("idtpc",tree1ev.idtpc,"idtpc[nttpc]/I");
-  tree->Branch("xtpc",tree1ev.xtpc,"xtpc[nttpc]/D");
-  tree->Branch("ytpc",tree1ev.ytpc,"ytpc[nttpc]/D");
-  tree->Branch("ztpc",tree1ev.ztpc,"ztpc[nttpc]/D");
-  tree->Branch("x0tpc",tree1ev.x0tpc,"x0tpc[nttpc]/D");
-  tree->Branch("y0tpc",tree1ev.y0tpc,"y0tpc[nttpc]/D");
-  tree->Branch("z0tpc",tree1ev.z0tpc,"z0tpc[nttpc]/D");
-  tree->Branch("resoX",tree1ev.resoX,"resoX[nttpc]/D");
-  tree->Branch("pxtpc",tree1ev.pxtpc,"pxtpc[nttpc]/D");
-  tree->Branch("pytpc",tree1ev.pytpc,"pytpc[nttpc]/D");
-  tree->Branch("pztpc",tree1ev.pztpc,"pztpc[nttpc]/D");
-  tree->Branch("pptpc",tree1ev.pptpc,"pptpc[nttpc]/D");   // total mometum 
-  tree->Branch("masstpc",tree1ev.masstpc,"masstpc[nttpc]/D");   // mass TPC
-  //  tree->Branch("betatpc",tree1ev.betatpc,"betatpc[nttpc]/D");
-  // tree->Branch("edeptpc",tree1ev.edeptpc,"edeptpc[nttpc]/D");
-  //tree->Branch("dedxtpc",tree1ev.dedxtpc,"dedxtpc[nttpc]/D");
-  //tree->Branch("slengthtpc",tree1ev.slengthtpc,"slengthtpc[nttpc]/D");
-  tree->Branch("laytpc",tree1ev.laytpc,"laytpc[nttpc]/I");
-  tree->Branch("rowtpc",tree1ev.rowtpc,"rowtpc[nttpc]/I");
-  tree->Branch("parentID",tree1ev.parentID,"parentID[nttpc]/I");
+  // tree->Branch("nttpc",&tree1ev.nttpc,"nttpc/I");
+  // tree->Branch("ntrk",tree1ev.ntrk,"ntrk[nttpc]/I");
+  // tree->Branch("ititpc",tree1ev.ititpc,"ititpc[nttpc]/I");
+  // tree->Branch("idtpc",tree1ev.idtpc,"idtpc[nttpc]/I");
+  // tree->Branch("xtpc",tree1ev.xtpc,"xtpc[nttpc]/D");
+  // tree->Branch("ytpc",tree1ev.ytpc,"ytpc[nttpc]/D");
+  // tree->Branch("ztpc",tree1ev.ztpc,"ztpc[nttpc]/D");
+  // tree->Branch("x0tpc",tree1ev.x0tpc,"x0tpc[nttpc]/D");
+  // tree->Branch("y0tpc",tree1ev.y0tpc,"y0tpc[nttpc]/D");
+  // tree->Branch("z0tpc",tree1ev.z0tpc,"z0tpc[nttpc]/D");
+  // tree->Branch("resoX",tree1ev.resoX,"resoX[nttpc]/D");
+  // tree->Branch("pxtpc",tree1ev.pxtpc,"pxtpc[nttpc]/D");
+  // tree->Branch("pytpc",tree1ev.pytpc,"pytpc[nttpc]/D");
+  // tree->Branch("pztpc",tree1ev.pztpc,"pztpc[nttpc]/D");
+  // tree->Branch("pptpc",tree1ev.pptpc,"pptpc[nttpc]/D");   // total mometum 
+  // tree->Branch("masstpc",tree1ev.masstpc,"masstpc[nttpc]/D");   // mass TPC
+  // //  tree->Branch("betatpc",tree1ev.betatpc,"betatpc[nttpc]/D");
+  // // tree->Branch("edeptpc",tree1ev.edeptpc,"edeptpc[nttpc]/D");
+  // //tree->Branch("dedxtpc",tree1ev.dedxtpc,"dedxtpc[nttpc]/D");
+  // //tree->Branch("slengthtpc",tree1ev.slengthtpc,"slengthtpc[nttpc]/D");
+  // tree->Branch("laytpc",tree1ev.laytpc,"laytpc[nttpc]/I");
+  // tree->Branch("rowtpc",tree1ev.rowtpc,"rowtpc[nttpc]/I");
+  // tree->Branch("parentID",tree1ev.parentID,"parentID[nttpc]/I");
   
   //// study on multiplicity
   // tree->Branch("nthlay",tree1ev.nthlay,"nthlay[nttpc]/I");
