@@ -5,8 +5,11 @@
 *.pyc
 *.dev
 *.root
+backup/
 build/
 bin/
-rootfiles/
+fieldmap
 lib/
+rootfiles/
+tmp/
 !.gitkeep
