@@ -70,7 +70,7 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
   auto postStepPoint = theStep->GetPostStepPoint();
   auto process = postStepPoint->GetProcessDefinedStep()->GetProcessName();
 
-#if 0
+#ifdef DEBUG
   if( process != "eIoni" &&
       process != "hIoni" &&
       process != "msc" &&

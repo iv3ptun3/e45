@@ -135,6 +135,6 @@ void TPCVisManager::RegisterGraphicsSystems()
 	   << "You have successfully chosen to use "
 	   << "the following graphics systems."
 	   << G4endl;
-PrintAvailableGraphicsSystems(G4VisManager::all);
+    PrintAvailableGraphicsSystems( G4VisManager::all );
   }
 }

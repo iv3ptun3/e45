@@ -1,7 +1,6 @@
 #!/bin/sh
 
 script_dir=$(dirname `readlink -f $0`)
-bin_dir=$script_dir/../bin/Linux-g++
 g4macro_dir=$script_dir/../g4macro
 
 echo $script_dir
@@ -14,8 +13,8 @@ export Lambda_decay=1
 export Ks_decay=1
 export Out_ROOT_File_Name=./grun_e45_elastic_08_pip.root
 export Out_GEN_File_Name=./gen_e45_elastic_08_pip.root
-#$bin_dir/hyptpc1 $g4macro_dir/vis.mac
-$bin_dir/hyptpc1 $g4macro_dir/run.mac
+# hyptpc1 $g4macro_dir/vis.mac
+hyptpc1 param/conf/default.conf tmp.root $g4macro_dir/run.mac
 
 # export Beam_mom 1.0
 # export Out_ROOT_File_Name ./grun_e45_elastic_10_pip.root

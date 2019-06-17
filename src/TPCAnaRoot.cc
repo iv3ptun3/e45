@@ -43,7 +43,7 @@ TPCAnaRoot::BeginOfRunAction( int runnum )
   //  filename= Filename;
 
   /* output file */
-  rootfile = new TFile(filename,"RECREATE","Output file of TPC for E42");
+  rootfile = gFile; // new TFile(filename,"RECREATE","Output file of TPC for E42");
 
   /* Time */
   htime = new TH1F("Time","Time",400, 0.0, 10.0);

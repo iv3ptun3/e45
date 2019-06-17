@@ -1,9 +1,13 @@
 // -*- C++ -*-
 
-#include "G4RunManager.hh"
-#include "G4UIterminal.hh"
-#include "G4UItcsh.hh"
+#include <G4RunManager.hh>
+#include <G4UIterminal.hh>
+#include <G4UItcsh.hh>
 #include <QGSP_BERT.hh>
+
+#include <TFile.h>
+
+#include "ConfMan.hh"
 
 #include "TPCDetectorConstruction.hh"
 #include "TPCPhysicsList.hh"
@@ -19,71 +23,64 @@
 //#include "G4VisExecutive.hh"
 #endif
 
-#include <fstream>
-std::ofstream ofs;
+enum EArgv { kProcess, kConfFile, kOutputName, kG4Macro, kArgc };
 
-// ====================================================================
-//     main
-// ====================================================================
-int main(int argc, char** argv)
+//_____________________________________________________________________________
+int
+main( int argc, char** argv )
 {
-  // run manager
-  G4RunManager* runManager= new G4RunManager;
-  // set mandatory user initialization classes...
-  // detector setup
-  runManager-> SetUserInitialization( new TPCDetectorConstruction );
-  // particles and physics processes
-  // runManager-> SetUserInitialization( new QGSP_BERT );
-  runManager-> SetUserInitialization( new TPCPhysicsList );
-  TPCAnaManager* AnaManager = new TPCAnaManager();
-  TPCPrimaryGeneratorAction* PrimaryGenerator =
-    new TPCPrimaryGeneratorAction(AnaManager);
-  TPCRunAction* RunAct = new TPCRunAction(AnaManager);
-  TPCEventAction* EventAct = new TPCEventAction(AnaManager);
-  TPCSteppingAction* StepAct = new TPCSteppingAction;
-
-  // primary generator
-  runManager-> SetUserAction(PrimaryGenerator);
-  // user action classes... (optional)
-  runManager-> SetUserAction(RunAct);
-  runManager-> SetUserAction(StepAct);
-  runManager-> SetUserAction(EventAct);
-
-#ifdef G4VIS_USE
-  // initialize visualization package
-  G4VisManager* visManager= new TPCVisManager;
-  //  G4VisManager* visManager= new G4VisExecutive;
-  visManager-> Initialize();
-  //  G4cout << G4endl;
-#endif
-
-  // user session...
-  runManager-> Initialize();
-
-
-
-
-  if(argc==1) { // interactive session, if no arguments given
-    // tcsh-like
-    G4UItcsh* tcsh= new G4UItcsh("hypTPC(%s)[%/][%h]:");
-    G4UIterminal* session= new G4UIterminal(tcsh);
-    tcsh-> SetLsColor(GREEN, CYAN);
-    session-> SessionStart();
-    delete session;
-
-  } else { // batch mode
-    G4UImanager* UImanager= G4UImanager::GetUIpointer();
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager-> ApplyCommand(command+fileName);
+  if( argc != kArgc-1 && argc != kArgc ){
+    G4cout << "Usage: " << argv[kProcess]
+	   << " [ConfFile] [OutputName] (G4Macro)" << G4endl;
+    return EXIT_SUCCESS;
   }
 
-  // terminating...
+  ConfMan& gConf = ConfMan::GetInstance();
+  if( !gConf.Initialize( argv[kConfFile] ) ||
+      !gConf.InitializeParameterFiles() ){
+    return EXIT_FAILURE;
+  }
+
+  new TFile( argv[kOutputName], "RECREATE" );
+
+  auto runManager= new G4RunManager;
+  runManager->SetUserInitialization( new TPCDetectorConstruction );
+  // runManager-> SetUserInitialization( new QGSP_BERT );
+  runManager->SetUserInitialization( new TPCPhysicsList );
+  auto AnaManager = new TPCAnaManager;
+  runManager->SetUserAction( new TPCPrimaryGeneratorAction( AnaManager ) );
+  runManager->SetUserAction( new TPCRunAction( AnaManager ) );
+  runManager->SetUserAction( new TPCSteppingAction );
+  runManager->SetUserAction( new TPCEventAction( AnaManager ) );
+
+#ifdef G4VIS_USE
+  auto visManager = new TPCVisManager;
+  // auto visManager = new G4VisExecutive;
+  visManager->Initialize();
+#endif
+
+  runManager->Initialize();
+
+  // interactive session, if no arguments given
+  if( argc == kArgc-1 ) {
+    auto tcsh = new G4UItcsh( "HypTPC(%s)[%/][%h]: " );
+    auto session = new G4UIterminal( tcsh );
+    tcsh->SetLsColor( GREEN, CYAN );
+    session->SessionStart();
+    delete session;
+  }
+  // batch mode
+  else if( argc == kArgc ) {
+    auto uiManager= G4UImanager::GetUIpointer();
+    G4String command("/control/execute ");
+    G4String fileName( argv[kG4Macro] );
+    uiManager->ApplyCommand( command + fileName );
+  }
+
 #ifdef G4VIS_USE
   delete visManager;
 #endif
-
   delete runManager;
   G4cout << "finished" << G4endl;
-  return 0;
+  return EXIT_SUCCESS;
 }
