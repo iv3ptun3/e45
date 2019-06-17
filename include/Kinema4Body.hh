@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 #ifndef __KINEMA4BODY_HH__
 #define __KINEMA4BODY_HH__
 

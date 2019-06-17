@@ -1,26 +1,31 @@
+// -*- C++ -*-
+
 #ifndef RUNGEKUTTATRACKER_H
 #define RUNGEKUTTATRACKER_H 1
+
 #include "track.hh"
 #include "ThreeVector.hh"
 #include "kmf.h"
 //#include "filter.h"
-class RungeKuttaTracker {
+
+//_____________________________________________________________________________
+class RungeKuttaTracker
+{
 public:
   RungeKuttaTracker(int c_use, Track* aTrack);
 
-  //  double rk_par0[5];
-  //  double rk_par1[5];
-
 private:
   void RungeKuttaTracking(int c_use, Track* aTrack);
-  void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par, ThreeVector &B);
-  void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par, ThreeVector &B, ThreeVector &dBdY, ThreeVector &dBdZ);
-  int RungeKuttaFit(int c_use, int iteration, Track* aTrack,double *rk_par0, double *rk_par, double rk_hit[20][24]);
-
+  void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par,
+			       ThreeVector &B);
+  void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par,
+			       ThreeVector &B,
+			       ThreeVector &dBdY, ThreeVector &dBdZ);
+  int RungeKuttaFit(int c_use, int iteration, Track* aTrack,double *rk_par0,
+		    double *rk_par, double rk_hit[20][24]);
   void RungeKuttaStep(int c_use, double qp0,double h,
-		      double z0,double *u0,double *dudz0,double dudw0[2][5],double ddudw0[2][5] 
-		      );
-
+		      double z0,double *u0,double *dudz0,
+		      double dudw0[2][5],double ddudw0[2][5]);
   double z;
   double u[2];
   double dudz[2];
@@ -42,12 +47,12 @@ private:
   double K[2];
   double f[2];
 
-  double A1[2][2],A2[2][2],A3[2][2],A4[2][2];
+  // double A1[2][2],A2[2][2],A3[2][2],A4[2][2];
   double C1[2][2],C2[2][2],C3[2][2],C4[2][2];
 
   ///calculation of deviation
   void dKdw0(int c_use, double h,double *dudv0, double *ddudv0, double A1[2][2],double A2[2][2],double A3[2][2],double A4[2][2]);
-  void dKdp0(int c_use, double h,double *dudv0, double *ddudv0, 
+  void dKdp0(int c_use, double h,double *dudv0, double *ddudv0,
 	     double *f1,double *f2,double *f3,double *f4, double A1[2][2],double A2[2][2],double A3[2][2],double A4[2][2]);
 
   double dK1[2],dK2[2],dK3[2],dK4[2];
@@ -60,7 +65,7 @@ private:
   //  double F[5][5];
 
   double kmf_par[30][5];
-  
+
   /////kmf function
   int KMFinit1();
   int KMFinit2();
@@ -75,23 +80,21 @@ private:
   double pGeV;
   double c30,s30,c45,s45;
 
-  int filter_Q(int iplane0);
-  int filter_C0(int iplane0);//FC?? strange
-  //  int filter_C0_v2(int iplane0);//FCFt 
-  int filter_C0_1(int iplane0);
-  int filter_C1(int iplane0);
-  int filter_par1(int iplane0);
-  int filter_resi(int iplane0);
-  int filter_chi2(int iplane0);
+  int filter_Q( int ip );
+  int filter_C0( int ip );//FC?? strange
+  // int filter_C0_v2( int i );//FCFt
+  int filter_C0_1( int ip );
+  int filter_C1( int ip );
+  int filter_par1( int ip );
+  int filter_resi( int i );
+  int filter_chi2( int i );
 
   int KMFilter();
 
-///libs        
+///libs
 #define PARASIZE 5
 #define PLANESIZE 20
-#define RESISIZE 2                                                       
-
-
+#define RESISIZE 2
 
 double KMFpar0[PARASIZE][PLANESIZE];
 double KMFpar1[PARASIZE][PLANESIZE];
@@ -113,7 +116,7 @@ double SMTchi2new[PLANESIZE];
 
 int iplane;
 
-  
+
   int ab_tc(double INmat1[PARASIZE][PARASIZE][PLANESIZE],
           double INmat2[PARASIZE][PARASIZE][PLANESIZE],
           double INmat3[PARASIZE][PARASIZE][PLANESIZE],

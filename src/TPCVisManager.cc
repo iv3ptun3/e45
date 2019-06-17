@@ -59,19 +59,19 @@
 
 
 //////////////////////////////
-TPCVisManager::TPCVisManager() 
+TPCVisManager::TPCVisManager()
 //////////////////////////////
 {
 }
 
 ///////////////////////////////
-TPCVisManager::~TPCVisManager() 
+TPCVisManager::~TPCVisManager()
 ///////////////////////////////
 {
 }
 
 /////////////////////////////////////////////
-void TPCVisManager::RegisterGraphicsSystems() 
+void TPCVisManager::RegisterGraphicsSystems()
 /////////////////////////////////////////////
 {
   RegisterGraphicsSystem (new G4ASCIITree);
@@ -131,11 +131,10 @@ void TPCVisManager::RegisterGraphicsSystems()
 #endif
 
   if(fVerbose> 0) {
-    G4cout << G4endl 
+    G4cout << G4endl
 	   << "You have successfully chosen to use "
 	   << "the following graphics systems."
 	   << G4endl;
-    PrintAvailableGraphicsSystems ();
+PrintAvailableGraphicsSystems(G4VisManager::all);
   }
 }
-

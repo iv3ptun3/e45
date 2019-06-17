@@ -1,45 +1,77 @@
-// ====================================================================
-//   TPCPhysicsList.cc
-//
-// ====================================================================
+// -*- C++ -*-
+
 #include "TPCPhysicsList.hh"
 
-#include "G4ParticleTable.hh"
-#include "G4IonTable.hh"
+#include <G4ComptonScattering.hh>
+#include <G4Decay.hh>
+#include <G4DecayTable.hh>
+#include <G4eBremsstrahlung.hh>
+#include <G4eIonisation.hh>
+#include <G4eMultipleScattering.hh>
+#include <G4eplusAnnihilation.hh>
+#include <G4GammaConversion.hh>
+#include <G4hIonisation.hh>
+#include <G4hMultipleScattering.hh>
+#include <G4IonTable.hh>
+#include <G4MuBremsstrahlung.hh>
+#include <G4MuIonisation.hh>
+#include <G4MuMultipleScattering.hh>
+#include <G4MuPairProduction.hh>
+#include <G4ParticleTable.hh>
+#include <G4PhaseSpaceDecayChannel.hh>
+#include <G4PhotoElectricEffect.hh>
+#include <G4ProcessManager.hh>
+// Particle Constructor
+#include <G4BaryonConstructor.hh>
+#include <G4BosonConstructor.hh>
+#include <G4IonConstructor.hh>
+#include <G4LeptonConstructor.hh>
+#include <G4MesonConstructor.hh>
+#include <G4ShortLivedConstructor.hh>
+// Phycics Process
+#include <G4EmStandardPhysics.hh>
+#include <G4EmExtraPhysics.hh>
+#include <G4HadronElasticPhysics.hh>
+#include <G4StoppingPhysics.hh>
+#include <G4IonPhysics.hh>
+#include <G4NeutronTrackingCut.hh>
+#include <G4HadronPhysicsQGSP_BERT.hh>
 
-#include "TPCEMPhysics.hh"
-#include "TPCIonPhysics.hh"
-#include "TPCGeneralPhysics.hh"
-#include "G4BaryonConstructor.hh"
-#include "G4ProcessManager.hh"
-
-#include "G4PhaseSpaceDecayChannel.hh"
 #include "common.hh"
 
-////////////////////////////////
-TPCPhysicsList::TPCPhysicsList(): G4VUserPhysicsList()
-////////////////////////////////
+namespace
 {
-  defaultCutValue = 0.001*mm;
-  SetVerboseLevel(1);
+  using CLHEP::eplus;
+  using CLHEP::GeV;
+  using CLHEP::keV;
+  using CLHEP::MeV;
+  using CLHEP::ns;
 }
-/////////////////////////////////
-//TPCPhysicsList::TPCPhysicsList(): G4VUserPhysicsList()
-//{
 
-//}
-/////////////////////////////////
-TPCPhysicsList::~TPCPhysicsList()
-/////////////////////////////////
-{;}
-
-void TPCPhysicsList::ConstructParticle()
+//_____________________________________________________________________________
+TPCPhysicsList::TPCPhysicsList( void )
+  : G4VUserPhysicsList(),
+    m_em_physics_list(),
+    m_hadron_physics_list()
 {
-  // In this method, static member functions should be called
-  // for all particles which you want to use.
-  // This ensures that objects of these particle types will be
-  // created in the program. 
+  SetDefaultCutValue( 0.001*CLHEP::mm );
+  SetVerboseLevel( 1 );
+  m_em_physics_list = new G4EmStandardPhysics( verboseLevel );
+}
 
+//_____________________________________________________________________________
+TPCPhysicsList::~TPCPhysicsList( void )
+{
+  delete m_em_physics_list;
+  for( auto&& phys : m_hadron_physics_list ){
+    delete phys;
+  }
+}
+
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructParticle( void )
+{
   ConstructBosons();
   ConstructLeptons();
   ConstructMesons();
@@ -49,122 +81,72 @@ void TPCPhysicsList::ConstructParticle()
   ConstructIons();
 }
 
-//////////////////////////////////////
-void TPCPhysicsList::ConstructBosons()
-//////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructBosons( void )
 {
-  // pseudo-particles
-  //  G4Geantino::GeantinoDefinition();
-  //  G4ChargedGeantino::ChargedGeantinoDefinition();
-  // gamma
-  G4Gamma::GammaDefinition();
+  G4BosonConstructor pBosonConstructor;
+  pBosonConstructor.ConstructParticle();
+  // G4Geantino::GeantinoDefinition();
+  // G4ChargedGeantino::ChargedGeantinoDefinition();
 }
 
-///////////////////////////////////////
-void TPCPhysicsList::ConstructLeptons()
-///////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructLeptons( void )
 {
-  // leptons
-  G4Electron::ElectronDefinition();
-  G4Positron::PositronDefinition();
-  G4MuonPlus::MuonPlusDefinition();
-  G4MuonMinus::MuonMinusDefinition();
-
-  G4NeutrinoE::NeutrinoEDefinition();
-  G4AntiNeutrinoE::AntiNeutrinoEDefinition();
-  G4NeutrinoMu::NeutrinoMuDefinition();
-  G4AntiNeutrinoMu::AntiNeutrinoMuDefinition();
+  G4LeptonConstructor pLeptonConstructor;
+  pLeptonConstructor.ConstructParticle();
 }
 
-
-//////////////////////////////////////
-void TPCPhysicsList::ConstructMesons()
-//////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructMesons( void )
 {
-  //  mesons
-  G4PionPlus::PionPlusDefinition();
-  G4PionMinus::PionMinusDefinition();
-  G4PionZero::PionZeroDefinition();
-  G4Eta::EtaDefinition();
-  G4EtaPrime::EtaPrimeDefinition();
-  G4KaonPlus::KaonPlusDefinition();
-  G4KaonMinus::KaonMinusDefinition();
-  G4KaonZero::KaonZeroDefinition();
-  G4AntiKaonZero::AntiKaonZeroDefinition();
-  G4KaonZeroLong::KaonZeroLongDefinition();
-  G4KaonZeroShort::KaonZeroShortDefinition();
+  G4MesonConstructor pMesonConstructor;
+  pMesonConstructor.ConstructParticle();
 }
 
-///////////////////////////////////////
-void TPCPhysicsList::ConstructBaryons()
-///////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructBaryons( void )
 {
-//  barions
   G4BaryonConstructor pBaryonConstructor;
   pBaryonConstructor.ConstructParticle();
 }
 
-#include "G4ShortLivedConstructor.hh"
-
-///////////////////////////////////////
-void TPCPhysicsList::ConstructShortLived()
-///////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructShortLived( void )
 {
-//  short lived particles
   G4ShortLivedConstructor pShortLivedConstructor;
-  pShortLivedConstructor.ConstructParticle();  
+  pShortLivedConstructor.ConstructParticle();
 }
 
-void TPCPhysicsList::ConstructProcess()
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructProcess( void )
 {
-  // Define transportation process
-
   AddTransportation();
-  //ConstructEM();
-  ConstructGeneral(); //for test
-  // ConstructHadron();
+  ConstructEM();
+  // ConstructGeneral(); // for test
+  ConstructHadron();
 }
 
-#include "G4ComptonScattering.hh"
-#include "G4GammaConversion.hh"
-#include "G4PhotoElectricEffect.hh"
-
-#include "G4eMultipleScattering.hh"
-#include "G4MuMultipleScattering.hh"
-#include "G4hMultipleScattering.hh"
-
-#include "G4eIonisation.hh"
-#include "G4eBremsstrahlung.hh"
-#include "G4eplusAnnihilation.hh"
-
-#include "G4MuIonisation.hh"
-#include "G4MuBremsstrahlung.hh"
-#include "G4MuPairProduction.hh"
-
-#include "G4hIonisation.hh"
 
 
-
-
-///////////////////////////////////////
-void TPCPhysicsList::ConstructIons()
-///////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructIons( void )
 {
-//  short lived particles
   G4IonConstructor pIonConstructor;
-  pIonConstructor.ConstructParticle();  
+  pIonConstructor.ConstructParticle();
 
-
-  G4DecayTable* decayTable;
-  G4VDecayChannel* mode;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* Carbon12;
-  G4int Z = 6, A = 12;
-  G4double ionCharge   = 0.*eplus;
-  G4double excitEnergy = 0.*keV;
-  Carbon12
-    = G4ParticleTable::GetParticleTable()->GetIon(Z,A,excitEnergy);
+  // G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  // G4int Z = 6, A = 12;
+  // G4double ionCharge   = 0.*eplus;
+  // G4double excitEnergy = 0.*keV;
+  // auto Carbon12 = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
   //  Carbon12->DumpTable();
   //  C12->DumpTable();
   //  G4double rmC12=G4IonTable::GetNucleusMass( 6,12,0);
@@ -205,182 +187,52 @@ void TPCPhysicsList::ConstructIons()
 				      "ion",        0,            +0,        101060120,
 				      false,  0.*ns,          NULL);
 
-  decayTable =  new G4DecayTable();
-  mode = new G4PhaseSpaceDecayChannel("phaseLL", 1.0,4,"lambda","lambda","Li8[0.0]","kaon+");
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
-
-
-
-
+  G4DecayTable* decayTable =  new G4DecayTable;
+  auto mode = new G4PhaseSpaceDecayChannel("phaseLL", 1.0,4,"lambda","lambda","Li8[0.0]","kaon+");
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
 }
 
-
-//////////////////////////////////
-void TPCPhysicsList::ConstructEM()
-//////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructEM( void )
 {
-  theParticleIterator-> reset();
-  
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
-    G4ProcessManager* pmanager = particle->GetProcessManager();
-    G4String particleName = particle->GetParticleName();
-    
-    if (particleName == "gamma") {
-      // gamma
-      pmanager->AddDiscreteProcess(new G4GammaConversion());
-      pmanager->AddDiscreteProcess(new G4ComptonScattering());      
-      pmanager->AddDiscreteProcess(new G4PhotoElectricEffect());
-      
-    } 
-    else if (particleName == "e-") {
-      //electron
-      G4VProcess* theeminusMultipleScattering = new G4eMultipleScattering();
-      G4VProcess* theeminusIonisation         = new G4eIonisation();
-      G4VProcess* theeminusBremsstrahlung     = new G4eBremsstrahlung();
-      //
-      // add processes
-      pmanager->AddProcess(theeminusMultipleScattering);
-      pmanager->AddProcess(theeminusIonisation);
-      pmanager->AddProcess(theeminusBremsstrahlung);
-      //      
-      // set ordering for AlongStepDoIt
-      pmanager->SetProcessOrdering(theeminusMultipleScattering, 
-				   idxAlongStep,1);
-      pmanager->SetProcessOrdering(theeminusIonisation,         
-					 idxAlongStep,2);
-      //
-      // set ordering for PostStepDoIt
-      pmanager->SetProcessOrdering(theeminusMultipleScattering, idxPostStep,1);
-      pmanager->SetProcessOrdering(theeminusIonisation,         idxPostStep,2);
-      pmanager->SetProcessOrdering(theeminusBremsstrahlung,     idxPostStep,3);
-      
-    }
-    else if (particleName == "e+") {
-      //positron
-      G4VProcess* theeplusMultipleScattering = new G4eMultipleScattering();
-      G4VProcess* theeplusIonisation         = new G4eIonisation();
-      G4VProcess* theeplusBremsstrahlung     = new G4eBremsstrahlung();
-      G4VProcess* theeplusAnnihilation       = new G4eplusAnnihilation();
-      //
-      // add processes
-      pmanager->AddProcess(theeplusMultipleScattering);
-      pmanager->AddProcess(theeplusIonisation);
-      pmanager->AddProcess(theeplusBremsstrahlung);
-      pmanager->AddProcess(theeplusAnnihilation);
-      //
-      // set ordering for AtRestDoIt
-      pmanager->SetProcessOrderingToFirst(theeplusAnnihilation, idxAtRest);
-      //
-      // set ordering for AlongStepDoIt
-      pmanager->SetProcessOrdering(theeplusMultipleScattering, idxAlongStep,1);
-      pmanager->SetProcessOrdering(theeplusIonisation,         idxAlongStep,2);
-      //
-      // set ordering for PostStepDoIt
-      pmanager->SetProcessOrdering(theeplusMultipleScattering, idxPostStep,1);
-      pmanager->SetProcessOrdering(theeplusIonisation,         idxPostStep,2);
-      pmanager->SetProcessOrdering(theeplusBremsstrahlung,     idxPostStep,3);
-      pmanager->SetProcessOrdering(theeplusAnnihilation,       idxPostStep,4);
-  
-    }
-    else if( particleName == "mu+" || 
-               particleName == "mu-"    ) {
-      //muon  
-      G4VProcess* aMultipleScattering = new G4MuMultipleScattering();
-      G4VProcess* aBremsstrahlung     = new G4MuBremsstrahlung();
-      G4VProcess* aPairProduction     = new G4MuPairProduction();
-      G4VProcess* anIonisation        = new G4MuIonisation();
-      //
-      // add processes
-      pmanager->AddProcess(anIonisation);
-      pmanager->AddProcess(aMultipleScattering);
-      pmanager->AddProcess(aBremsstrahlung);
-      pmanager->AddProcess(aPairProduction);
-      //
-      // set ordering for AlongStepDoIt
-      pmanager->SetProcessOrdering(aMultipleScattering, idxAlongStep,1);
-      pmanager->SetProcessOrdering(anIonisation,        idxAlongStep,2);
-      //
-      // set ordering for PostStepDoIt
-      pmanager->SetProcessOrdering(aMultipleScattering, idxPostStep,1);
-      pmanager->SetProcessOrdering(anIonisation,        idxPostStep,2);
-      pmanager->SetProcessOrdering(aBremsstrahlung,     idxPostStep,3);
-      pmanager->SetProcessOrdering(aPairProduction,     idxPostStep,4);
-
-     }
-    
-    else if ((!particle->IsShortLived()) &&
-	       (particle->GetPDGCharge() != 0.0) && 
-	       (particle->GetParticleName() != "chargedgeantino")) {
-     // all others charged particles except geantino     
-     G4VProcess* aMultipleScattering = new G4hMultipleScattering();
-     G4VProcess* anIonisation        = new G4hIonisation();
-     //
-     // add processes
-     
-
-     pmanager->AddProcess(anIonisation);
-     pmanager->AddProcess(aMultipleScattering);
-     //
-     // set ordering for AlongStepDoIt
-     // pmanager->SetProcessOrdering(aMultipleScattering, idxAlongStep,1);
-     // pmanager->SetProcessOrdering(anIonisation,        idxAlongStep,2);
-     pmanager->SetProcessOrderingToLast(anIonisation, idxAlongStep);
-     //
-     // set ordering for PostStepDoIt
-     // pmanager->SetProcessOrdering(aMultipleScattering, idxPostStep,1);
-     // pmanager->SetProcessOrdering(anIonisation,        idxPostStep,2);
-     pmanager->SetProcessOrderingToLast(anIonisation, idxPostStep);
-
-          
-    }
-
-    
-  }
-
-  
+  m_em_physics_list->ConstructProcess();
 }
 
-#include "G4Decay.hh"
-
-///////////////////////////////////////
-void TPCPhysicsList::ConstructGeneral()
-///////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::ConstructGeneral( void )
 {
-  // Add Decay Process
-  G4Decay* theDecayProcess = new G4Decay();
+  auto theParticleIterator = GetParticleIterator();
   theParticleIterator->reset();
-
-
+  auto theDecayProcess = new G4Decay;
   while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
-    G4ProcessManager* pmanager = particle->GetProcessManager();
-
+    auto particle = theParticleIterator->value();
+    auto pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
     if(particleName != "kaon+"){
-      if (theDecayProcess->IsApplicable(*particle)) { 
+      if (theDecayProcess->IsApplicable(*particle)) {
 	pmanager ->AddProcess(theDecayProcess);
 	// set ordering for PostStepDoIt and AtRestDoIt
 	pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
 	pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
       }
     }
-    else if (theDecayProcess->IsApplicable(*particle)) { 
+    else if (theDecayProcess->IsApplicable(*particle)) {
       pmanager ->AddProcess(theDecayProcess);
       // set ordering for PostStepDoIt and AtRestDoIt
       pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
       pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
-    }   
+    }
 
 
     ////shhwang; include decay process
-    
+
     G4String Lambda_decay_env = getenv("Lambda_decay");
     G4int Lambda_decay = atoi(Lambda_decay_env.c_str());
 
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();    
+    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
     if(Lambda_decay==1){
       G4VDecayChannel* mode;
@@ -435,195 +287,21 @@ void TPCPhysicsList::ConstructGeneral()
   }
 }
 
-
-void TPCPhysicsList::ConstructHadron()
+//_____________________________________________________________________________
+void TPCPhysicsList::ConstructHadron( void )
 {
-  G4ProcessManager * pManager = 0;
-  
-  // Elastic Process
-  theElasticModel = new G4LElastic();
-  theElasticProcess.RegisterMe(theElasticModel);
-
-  // PionPlus
-  pManager = G4PionPlus::PionPlus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEPionPlusModel = new G4LEPionPlusInelastic();
-  thePionPlusInelastic.RegisterMe(theLEPionPlusModel);
-  pManager->AddDiscreteProcess(&thePionPlusInelastic);
-
-  // PionMinus
-  pManager = G4PionMinus::PionMinus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEPionMinusModel = new G4LEPionMinusInelastic();
-  thePionMinusInelastic.RegisterMe(theLEPionMinusModel);
-  pManager->AddDiscreteProcess(&thePionMinusInelastic);
-
-  //KaonPlus
-   pManager = G4KaonPlus::KaonPlus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEKaonPlusModel = new G4LEKaonPlusInelastic();
-  theHEKaonPlusModel = new G4HEKaonPlusInelastic();
-  theKaonPlusInelastic.RegisterMe(theLEKaonPlusModel);
-  theKaonPlusInelastic.RegisterMe(theHEKaonPlusModel);
-  pManager->AddDiscreteProcess(&theKaonPlusInelastic);
-
-  //  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  //  G4ParticleDefinition* particle = particleTable->FindParticle("kaon+");
-
-  //KaonMinus
-  pManager = G4KaonMinus::KaonMinus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEKaonMinusModel = new G4LEKaonMinusInelastic();
-  theHEKaonMinusModel = new G4HEKaonMinusInelastic();
-  theKaonMinusInelastic.RegisterMe(theLEKaonMinusModel);
-  theKaonMinusInelastic.RegisterMe(theHEKaonMinusModel);
-  pManager->AddDiscreteProcess(&theKaonMinusInelastic);
-
-  // KaonZeroL
-  pManager = G4KaonZeroLong::KaonZeroLong()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEKaonZeroLModel = new G4LEKaonZeroLInelastic();
-  theHEKaonZeroLModel = new G4HEKaonZeroInelastic();
-  theKaonZeroLInelastic.RegisterMe(theLEKaonZeroLModel);
-  theKaonZeroLInelastic.RegisterMe(theHEKaonZeroLModel);
-  pManager->AddDiscreteProcess(&theKaonZeroLInelastic);
- 
-  // KaonZeroS
-  pManager = G4KaonZeroShort::KaonZeroShort()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEKaonZeroSModel = new G4LEKaonZeroSInelastic();
-  theHEKaonZeroSModel = new G4HEKaonZeroInelastic();
-  theKaonZeroSInelastic.RegisterMe(theLEKaonZeroSModel);
-  theKaonZeroSInelastic.RegisterMe(theHEKaonZeroSModel);
-  pManager->AddDiscreteProcess(&theKaonZeroSInelastic);
-
-  // Proton
-  pManager = G4Proton::Proton()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEProtonModel = new G4LEProtonInelastic();
-  theHEProtonModel = new G4HEProtonInelastic();
-  theProtonInelastic.RegisterMe(theLEProtonModel);
-  theProtonInelastic.RegisterMe(theHEProtonModel);
-  pManager->AddDiscreteProcess(&theProtonInelastic);
-
-  // Neutron
-  pManager = G4Neutron::Neutron()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLENeutronModel = new G4LENeutronInelastic();
-  theHENeutronModel = new G4HENeutronInelastic();
-  theNeutronInelastic.RegisterMe(theLENeutronModel);
-  theNeutronInelastic.RegisterMe(theHENeutronModel);
-  pManager->AddDiscreteProcess(&theNeutronInelastic);
-
-  // anti-Proton
-  pManager = G4AntiProton::AntiProton()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEAntiProtonModel = new G4LEAntiProtonInelastic();
-  theHEAntiProtonModel = new G4HEAntiProtonInelastic();
-  theAntiProtonInelastic.RegisterMe(theLEAntiProtonModel);
-  theAntiProtonInelastic.RegisterMe(theHEAntiProtonModel);
-  pManager->AddDiscreteProcess(&theAntiProtonInelastic);
-
-  // AntiNeutron
-  pManager = G4AntiNeutron::AntiNeutron()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEAntiNeutronModel = new G4LEAntiNeutronInelastic();
-  theHEAntiNeutronModel = new G4HEAntiNeutronInelastic();
-  theAntiNeutronInelastic.RegisterMe(theLEAntiNeutronModel);
-  theAntiNeutronInelastic.RegisterMe(theHEAntiNeutronModel);
-  pManager->AddDiscreteProcess(&theAntiNeutronInelastic);
-
-  // Lambda
-  pManager = G4Lambda::Lambda()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-
-  theLELambdaModel = new G4LELambdaInelastic();
-  theHELambdaModel = new G4HELambdaInelastic();
-  theLambdaInelastic.RegisterMe(theLELambdaModel);
-  theLambdaInelastic.RegisterMe(theHELambdaModel);
-  pManager->AddDiscreteProcess(&theLambdaInelastic);
-
-
-  
-  // AntiLambda
-  pManager = G4AntiLambda::AntiLambda()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEAntiLambdaModel = new G4LEAntiLambdaInelastic();
-  theHEAntiLambdaModel = new G4HEAntiLambdaInelastic();
-  theAntiLambdaInelastic.RegisterMe(theLEAntiLambdaModel);
-  theAntiLambdaInelastic.RegisterMe(theHEAntiLambdaModel);
-  pManager->AddDiscreteProcess(&theAntiLambdaInelastic);
-    
-  // SigmaMinus
-  pManager = G4SigmaMinus::SigmaMinus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLESigmaMinusModel = new G4LESigmaMinusInelastic();
-  theHESigmaMinusModel = new G4HESigmaMinusInelastic();
-  theSigmaMinusInelastic.RegisterMe(theLESigmaMinusModel);
-  theSigmaMinusInelastic.RegisterMe(theHESigmaMinusModel);
-  pManager->AddDiscreteProcess(&theSigmaMinusInelastic);
-
-  // anti-SigmaMinus
-  pManager = G4AntiSigmaMinus::AntiSigmaMinus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEAntiSigmaMinusModel = new G4LEAntiSigmaMinusInelastic();
-  theHEAntiSigmaMinusModel = new G4HEAntiSigmaMinusInelastic();
-  theAntiSigmaMinusInelastic.RegisterMe(theLEAntiSigmaMinusModel);
-  theAntiSigmaMinusInelastic.RegisterMe(theHEAntiSigmaMinusModel);
-  pManager->AddDiscreteProcess(&theAntiSigmaMinusInelastic);
-
-  // SigmaPlus
-  pManager = G4SigmaPlus::SigmaPlus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLESigmaPlusModel = new G4LESigmaPlusInelastic();
-  theHESigmaPlusModel = new G4HESigmaPlusInelastic();
-  theSigmaPlusInelastic.RegisterMe(theLESigmaPlusModel);
-  theSigmaPlusInelastic.RegisterMe(theHESigmaPlusModel);
-  pManager->AddDiscreteProcess(&theSigmaPlusInelastic);
-
-  // anti-SigmaPlus
-  pManager = G4AntiSigmaPlus::AntiSigmaPlus()->GetProcessManager();
-  // add process
-  pManager->AddDiscreteProcess(&theElasticProcess);
-
-  theLEAntiSigmaPlusModel = new G4LEAntiSigmaPlusInelastic();
-  theHEAntiSigmaPlusModel = new G4HEAntiSigmaPlusInelastic();
-  theAntiSigmaPlusInelastic.RegisterMe(theLEAntiSigmaPlusModel);
-  theAntiSigmaPlusInelastic.RegisterMe(theHEAntiSigmaPlusModel);
-  pManager->AddDiscreteProcess(&theAntiSigmaPlusInelastic);
-
+  m_hadron_physics_list.push_back( new G4EmExtraPhysics );
+  m_hadron_physics_list.push_back( new G4HadronElasticPhysics );
+  m_hadron_physics_list.push_back( new G4StoppingPhysics );
+  m_hadron_physics_list.push_back( new G4IonPhysics );
+  m_hadron_physics_list.push_back( new G4NeutronTrackingCut );
+  m_hadron_physics_list.push_back( new G4HadronPhysicsQGSP_BERT );
+  for( auto&& phys : m_hadron_physics_list ){
+    phys->ConstructProcess();
+  }
 }
 
+//_____________________________________________________________________________
 void TPCPhysicsList::ConstructStableHyperons()
 {
   G4DecayTable* decayTable;
@@ -632,21 +310,21 @@ void TPCPhysicsList::ConstructStableHyperons()
 
   // ssigma+ non-decay sigma+
   particle = new G4ParticleDefinition(
-           "ssigma+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-                    1,              +1,             0,
-                    2,              +2,             0,
-             "baryon",               0,            +1,        3222,
-	   true,                0,          NULL);
+				      "ssigma+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
+				      1,              +1,             0,
+				      2,              +2,             0,
+				      "baryon",               0,            +1,        3222,
+				      true,                0,          NULL);
 
 
   // sigma1+  decay only to sigma+ -> pi+ neutron channel
   particle = new G4ParticleDefinition(
-           "sigma1+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-                    1,              +1,             0,
-                    2,              +2,             0,
-             "baryon",               0,            +1,        3222,
-	   false,                0.0799*ns,          NULL);
-  
+				      "sigma1+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
+				      1,              +1,             0,
+				      2,              +2,             0,
+				      "baryon",               0,            +1,        3222,
+				      false,                0.0799*ns,          NULL);
+
   decayTable =  new G4DecayTable();
   // sigma+ -> neutron + pi+
   mode = new G4PhaseSpaceDecayChannel("sigma1+",1.0,2,"neutron","pi+");
@@ -655,39 +333,39 @@ void TPCPhysicsList::ConstructStableHyperons()
 
   // sigma2+  decay only to sigma+ -> pi0 proton channel
   particle = new G4ParticleDefinition(
-           "sigma2+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-                    1,              +1,             0,
-                    2,              +2,             0,
-             "baryon",               0,            +1,        3222,
-	   false,                0.0799*ns,          NULL);
-  
+				      "sigma2+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
+				      1,              +1,             0,
+				      2,              +2,             0,
+				      "baryon",               0,            +1,        3222,
+				      false,                0.0799*ns,          NULL);
+
   decayTable =  new G4DecayTable();
   // sigma+ -> proton + pi0
   mode = new G4PhaseSpaceDecayChannel("sigma2+", 1.0,2,"proton","pi0");
   decayTable->Insert(mode);
   particle->SetDecayTable(decayTable);
 
-  /// Lambda1405 radioactive decay  
+  /// Lambda1405 radioactive decay
   particle = new G4ParticleDefinition(
-           "lambda1405r",    1.4051*GeV, 50.*MeV,       0,
-                    1,              -1,             0,
-                    0,              +0,             0,
-             "baryon",               0,            +1,        13122,
-	   false,                0.*ns,          NULL);
-  
+				      "lambda1405r",    1.4051*GeV, 50.*MeV,       0,
+				      1,              -1,             0,
+				      0,              +0,             0,
+				      "baryon",               0,            +1,        13122,
+				      false,                0.*ns,          NULL);
+
   decayTable =  new G4DecayTable();
   mode = new G4PhaseSpaceDecayChannel("lambda1405r", 1.0,2,"lambda","gamma");
   decayTable->Insert(mode);
   particle->SetDecayTable(decayTable);
 
-  /// Sigma1385 radioactive decay  
+  /// Sigma1385 radioactive decay
   particle = new G4ParticleDefinition(
-           "sigma1385r",    1.3837*GeV, 36.*MeV,       0,
-                    3,              +1,             0,
-                    1,              +0,             0,
-             "baryon",               0,            +1,        3214,
-	   false,                0.*ns,          NULL);
-  
+				      "sigma1385r",    1.3837*GeV, 36.*MeV,       0,
+				      3,              +1,             0,
+				      1,              +0,             0,
+				      "baryon",               0,            +1,        3214,
+				      false,                0.*ns,          NULL);
+
   decayTable =  new G4DecayTable();
   mode = new G4PhaseSpaceDecayChannel("sigma1385r", 1.0,2,"lambda","gamma");
   decayTable->Insert(mode);
@@ -702,31 +380,31 @@ void TPCPhysicsList::ConstructStableHyperons()
   //		G4bool  	shortlived = false,
   //		const G4String &  	subType = "",
   //		G4int  	anti_encoding = 0,
-  //		G4double  	magneticMoment = 0.0	 
+  //		G4double  	magneticMoment = 0.0
   /*
-G4ParticleDefinition::G4ParticleDefinition 	( 	const G4String &  	aName,
-		G4double  	mass,
-		G4double  	width,
-		G4double  	charge,
-		G4int  	iSpin,
-		G4int  	iParity,
-		G4int  	iConjugation,
-		G4int  	iIsospin,
-		G4int  	iIsospinZ,
-		G4int  	gParity,
-		const G4String &  	pType,
-		G4int  	lepton,
-		G4int  	baryon,
-		G4int  	encoding,
-		G4bool  	stable,
-		G4double  	lifetime,
-		G4DecayTable *  	decaytable,
-		G4bool  	shortlived = false,
-		const G4String &  	subType = "",
-		G4int  	anti_encoding = 0,
-		G4double  	magneticMoment = 0.0	 
-	) 	
-*/
+    G4ParticleDefinition::G4ParticleDefinition 	( 	const G4String &  	aName,
+    G4double  	mass,
+    G4double  	width,
+    G4double  	charge,
+    G4int  	iSpin,
+    G4int  	iParity,
+    G4int  	iConjugation,
+    G4int  	iIsospin,
+    G4int  	iIsospinZ,
+    G4int  	gParity,
+    const G4String &  	pType,
+    G4int  	lepton,
+    G4int  	baryon,
+    G4int  	encoding,
+    G4bool  	stable,
+    G4double  	lifetime,
+    G4DecayTable *  	decaytable,
+    G4bool  	shortlived = false,
+    const G4String &  	subType = "",
+    G4int  	anti_encoding = 0,
+    G4double  	magneticMoment = 0.0
+    )
+  */
 
 
   //hybrid baryon mode
@@ -751,7 +429,7 @@ G4ParticleDefinition::G4ParticleDefinition 	( 	const G4String &  	aName,
   G4String h_decaytime = getenv("H_decaytime");
   G4String h_mass = getenv("H_mass");
   G4String h_width = getenv("H_width");
-  //  atof(weak_decay_time.c_str())                                          
+  //  atof(weak_decay_time.c_str())
 
   particle = new G4ParticleDefinition(
 				      "hdibaryon",  atof(h_mass.c_str())*GeV, atof(h_width.c_str())*GeV, 0,
@@ -783,23 +461,18 @@ G4ParticleDefinition::G4ParticleDefinition 	( 	const G4String &  	aName,
 				      "baryon",        0,            +2,        9225,
 				      false,  atof(h_decaytime.c_str())*ns,          NULL);
   decayTable =  new G4DecayTable();
-  mode = new G4PhaseSpaceDecayChannel("hdibaryonLL", 1.0,2,"lambda","lambda"); 
+  mode = new G4PhaseSpaceDecayChannel("hdibaryonLL", 1.0,2,"lambda","lambda");
   decayTable->Insert(mode);
   particle->SetDecayTable(decayTable);
+}
 
-
-
-
-
-}     
-
-
-
-//////////////////////////////
-void TPCPhysicsList::SetCuts()
-//////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPhysicsList::SetCuts( void )
 {
-  // G4VUserPhysicsList::SetCutsWithDefault" method sets
-  // the default cut value for all particle types
+  /*
+    G4VUserPhysicsList::SetCutsWithDefault" method sets
+    the default cut value for all particle types
+  */
   SetCutsWithDefault();
 }

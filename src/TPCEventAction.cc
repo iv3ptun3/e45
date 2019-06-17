@@ -27,6 +27,10 @@
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
 
+namespace
+{
+  using CLHEP::MeV;
+}
 
 extern std::ofstream ofs;
 
@@ -81,12 +85,10 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
   G4HCofThisEvent* HCTE= anEvent-> GetHCofThisEvent();
   if(! HCTE) return;  // no hits in this events. nothing to do!
 
-
   static G4int idcounter= -1;
   if(idcounter<0) idcounter= SDManager-> GetCollectionID("TPC/hit");
   G4THitsCollection<TPCPadHit>* padHC = 0;
   padHC = (G4THitsCollection<TPCPadHit>*)HCTE-> GetHC(idcounter);
-
   if(padHC){
     G4int nhits= padHC -> entries();
     G4int pidtr[MaxTrackTPC]={0};
@@ -132,7 +134,6 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4int charge = (*padHC)[i]-> GetCharge();
       // std::cout<<"pid="<<pid<<", mass="<<mass<<", charge="<<charge<<std::endl;
       // getchar();
-
       G4int ilay = (*padHC)[i]-> GetPadLay();
       //      G4double mass = (*padHC)[i]-> GetPDGMass(); //mass(GeV)
       G4int parentid = (*padHC)[i]-> GetParentID();
@@ -144,7 +145,6 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4double slength = (*padHC)[i]-> GetsLength();
       //      G4VTrajectoryPoint *tp -> padHC->GetPoint(i);
       //    G4int nhits= padHC -> entries();
-
 
       if( nparticle==0 ){
 	qqtpc[nparticle]=charge;
@@ -176,9 +176,10 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	ptidtpc[nparticle]=ptid;
 	ptidtpc_pid[nparticle]=ptid_pid;
 	nparticle=nparticle+1;
-	
-      }else if( nparticle>0 )
+
+      }else if( nparticle>0 ){
 	//	G4cout<<nparticle<<G4endl;
+      }
       if( (pidtr[nparticle-1] != pid) || (pidtr[nparticle-1] == pid && vtxpxtpc[nparticle-1] != vtxmom[0] && vtxpytpc[nparticle-1] != vtxmom[1] && vtxpztpc[nparticle-1] != vtxmom[2])){
 	  qqtpc[nparticle]=charge;
 	  pmtpc[nparticle]=mass;
@@ -244,14 +245,13 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	    lentpc[nparticle-1]=tlength;
 	  }
 	}
-
       //      if(ilay>-1){ //--> ilay 1 : target ilay 0 : TPC, layer is from 2 to 38.
-      if(ilay>-1){ //-->  -1 : TPC, layer is from 0 to 38. 2012.10.30 
+      if(ilay>-1){ //-->  -1 : TPC, layer is from 0 to 38. 2012.10.30
 	AnaManager->SetCounterData(nparticle-1,tof, xyz, mom, tid, pid,ilay,irow,beta,edep/MeV,parentid,tlength,slength);
       }
     }
     for(G4int i=0;i<nparticle;i++){
-      AnaManager->SetTPCData(i, pidtr[i], ptidtpc[i], ptidtpc_pid[i], pxtpc[i],pytpc[i],pztpc[i],pptpc[i], qqtpc[i], pmtpc[i], detpc[i], lentpc[i],laytpc[i], 
+      AnaManager->SetTPCData(i, pidtr[i], ptidtpc[i], ptidtpc_pid[i], pxtpc[i],pytpc[i],pztpc[i],pptpc[i], qqtpc[i], pmtpc[i], detpc[i], lentpc[i],laytpc[i],
 			     vtxpxtpc[i],vtxpytpc[i],vtxpztpc[i],
 			     vtxxtpc[i],vtxytpc[i],vtxztpc[i], vtxenetpc[i]);
     }
@@ -299,7 +299,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4ThreeVector vtxpos = (*acHC)[i]-> GetVtxPosition();
 	G4ThreeVector vtxmom = (*acHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*acHC)[i]-> GetVtxEnergy();
-	
+
 	G4ThreeVector xyz = (*acHC)[i]-> GetPosition();
 	G4ThreeVector mom = (*acHC)[i]-> GetMomentum();
 	G4int ptid = (*acHC)[i]-> GetParentID();
@@ -317,8 +317,6 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
     }
   }
 
-
-
   if(n_bar_use==1.){
     static G4int idnbar = -1;
     if(idnbar < 0) idnbar = SDManager-> GetCollectionID("NBAR/hit");
@@ -332,7 +330,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4ThreeVector vtxpos = (*nbarHC)[i]-> GetVtxPosition();
 	G4ThreeVector vtxmom = (*nbarHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*nbarHC)[i]-> GetVtxEnergy();
-	
+
 	G4ThreeVector xyz = (*nbarHC)[i]-> GetPosition();
 	G4ThreeVector mom = (*nbarHC)[i]-> GetMomentum();
 	G4int ptid = (*nbarHC)[i]-> GetParentID();
@@ -370,10 +368,10 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4ThreeVector vtxpos = (*targetHC)[i]-> GetVtxPosition();
 	G4ThreeVector vtxmom = (*targetHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*targetHC)[i]-> GetVtxEnergy();
-	
+
 	G4ThreeVector xyz = (*targetHC)[i]-> GetPosition();
 
-	
+
 	G4double tof= (*targetHC)[i]-> GetTOF();
 	G4int tid = (*targetHC)[i]-> GetTrackID();
 	G4int ptid = (*targetHC)[i]-> GetParentID();
@@ -383,20 +381,19 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	//      G4double mass = (*targetHC)[i]-> GetPDGMass(); //mass(GeV)
 	G4int parentid = (*targetHC)[i]-> GetParentID();
 	G4double tlength = (*targetHC)[i]-> GettLength();
-	
+
 	G4int irow=0.;
 	G4double beta = (*targetHC)[i]-> GetBeta();
 	G4double edep = (*targetHC)[i]-> GetEdep();
 	AnaManager->SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
-	//  void SetTargetData(G4ThreeVector pos, G4ThreeVector mom, 
+	//  void SetTargetData(G4ThreeVector pos, G4ThreeVector mom,
 	//		     G4int track, G4int particle,
-	//		     G4int parentid, G4ThreeVector vtxpos, 
+	//		     G4int parentid, G4ThreeVector vtxpos,
 	//		     G4ThreeVector vtxmom, G4double vtxene);
       }
     //    G4cout<<target
     }
   }
-
 
   if(experiment_num==42||experiment_num==27){
   ////////////////DCs
@@ -460,8 +457,6 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
     }
   }
 
-
-
   ////////////////FTOF
   static G4int idftof = -1;
   if(idftof < 0) idftof = SDManager-> GetCollectionID("FTOF/hit");
@@ -494,7 +489,6 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
   }
 
 
-
   G4TrajectoryContainer* trajectoryContainer = anEvent->GetTrajectoryContainer();
   G4int n_trajectories = 0;
   if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
@@ -506,15 +500,14 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
             G4Trajectory* trj = (G4Trajectory*)
               ((*(anEvent->GetTrajectoryContainer()))[i]);
             G4String particleName = trj->GetParticleDefinition()->GetParticleName();
-	  trj->DrawTrajectory(50);      }
+	    trj->DrawTrajectory();
+	  }
       }
-  // Hits                                                                       
-    //      if( HCTE ){                                                              
-    //        if( padHC )  padHC->DrawAllHits();                                    
-    //      }                                                                       
+  // Hits
+    //      if( HCTE ){
+    //        if( padHC )  padHC->DrawAllHits();
+    //      }
   }
-
 
   AnaManager->EndOfEventAction();
 }
-

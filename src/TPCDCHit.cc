@@ -1,10 +1,9 @@
-// ====================================================================
-//   TPCDCHit.cc
-//
-// ====================================================================
+// -*- C++ -*-
+
 #include "TPCDCHit.hh"
 
-// allocator
+#include <CLHEP/Units/PhysicalConstants.h>
+
 G4Allocator<TPCDCHit> TPCDCHitAllocator;
 
 //////////////////////////////
@@ -46,8 +45,6 @@ void TPCDCHit::Print()
 ///////////////////////////
 {
   // (global cordinate!!)
-  G4cout << "Hit in Counter:" << xyz*(1./cm) << " cm, " 
-	 << tof/ns << " ns" << G4endl;
+  G4cout << "Hit in Counter:" << xyz*(1./CLHEP::cm) << " cm, "
+	 << tof/CLHEP::ns << " ns" << G4endl;
 }
-
-

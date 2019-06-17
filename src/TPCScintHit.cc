@@ -1,10 +1,8 @@
-// ====================================================================
-//   TPCScintHit.cc
-//
-// ====================================================================
-#include "TPCScintHit.hh"
+// -*- C++ -*-
 
-// allocator
+#include "TPCScintHit.hh"
+#include <CLHEP/Units/PhysicalConstants.h>
+
 G4Allocator<TPCScintHit> TPCScintHitAllocator;
 
 //////////////////////////////
@@ -46,8 +44,6 @@ void TPCScintHit::Print()
 ///////////////////////////
 {
   // (global cordinate!!)
-  G4cout << "Hit in Counter:" << xyz*(1./cm) << " cm, " 
-	 << tof/ns << " ns" << G4endl;
+  G4cout << "Hit in Counter:" << xyz*(1./CLHEP::cm) << " cm, "
+	 << tof/CLHEP::ns << " ns" << G4endl;
 }
-
-

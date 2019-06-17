@@ -1,7 +1,5 @@
-// ====================================================================
-//   TPCDetectorConstruction.cc
-//
-// ====================================================================
+// -*- C++ -*-
+
 #include "TPCDetectorConstruction.hh"
 
 #include "G4Element.hh"
@@ -40,6 +38,20 @@
 
 #include "common.hh"
 
+namespace
+{
+  using CLHEP::cm;
+  using CLHEP::cm3;
+  using CLHEP::deg;
+  using CLHEP::g;
+  using CLHEP::kelvin;
+  using CLHEP::m;
+  using CLHEP::mg;
+  using CLHEP::mm;
+  using CLHEP::mole;
+  using CLHEP::STP_Temperature;
+  using CLHEP::universe_mean_density;
+}
 
 //////////////////////////////////////////////////
 TPCDetectorConstruction::TPCDetectorConstruction()
@@ -150,34 +162,34 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 
 
 
-  ///////////lets select target material from setenv                           
+  ///////////lets select target material from setenv
   char* env_target_material = getenv("Target_Material");
-  //  G4cout<<vars()['env_target_material']<<G4endl;                            
+  //  G4cout<<vars()['env_target_material']<<G4endl;
   G4cout<<"<---------- target material ------------->"<<G4endl;
   G4cout<<"Target material : "<<env_target_material<<G4endl;
   G4cout<<"<---------------------------------------->"<<G4endl;
   G4Material* target_mat;
   if(strcmp(env_target_material, "C")==0){
-    //----------------Carbon                                                   
+    //----------------Carbon
     A = 12.0107*g/mole;
-    density = 3.34*g/cm3; //--> from  H. Takahashi thesis 
+    density = 3.34*g/cm3; //--> from  H. Takahashi thesis
     target_mat = new G4Material(name="Carbon", Z=6., A, density);
     G4cout<<"Target material : "<<env_target_material<<G4endl;
   }else if(strcmp(env_target_material, "Cu")==0){
-    //----------------Copper                                                   
+    //----------------Copper
     A = 63.546*g/mole;
     density = 8.96*g/cm3;
     target_mat = new G4Material(name="Copper", Z=29., A, density);
     G4cout<<"Target material : "<<env_target_material<<G4endl;
   }else if(strcmp(env_target_material, "LH2")==0){
     //----------------LH2
-    A = 1.008*g/mole;                     
+    A = 1.008*g/mole;
     density = 70.99*mg/cm3; //--> shogun geant4
     target_mat = new G4Material(name="LH2", Z=1., A, density);
     G4cout<<"Target material : "<<env_target_material<<G4endl;
   }else if(strcmp(env_target_material, "LD2")==0){
     //----------------LD2
-    A = 2.0141*g/mole;                     
+    A = 2.0141*g/mole;
     density = 166.0*mg/cm3; //--> shogun geant4
     target_mat = new G4Material(name="LD2", Z=1., A, density);
     G4cout<<"Target material : "<<env_target_material<<G4endl;
@@ -199,7 +211,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   // ethane (C2H6)
   const G4double denEthane= 1.356e-3 *g/cm3 * STP_Temperature/expTemp;
   G4Material* Ethane= new G4Material(name="Ethane", denEthane, nel=2,
-                                     kStateGas, expTemp); 
+                                     kStateGas, expTemp);
   Ethane-> AddElement(elC, natoms=2);
   Ethane-> AddElement(elH, natoms=6);
 
@@ -244,7 +256,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // CH2 Polyethelene
-  // 
+  //
   density = 0.95 *g/cm3;
   G4Material* CH2 = new G4Material(name="CH2", density, nel=2);
   CH2->AddElement(elC,natoms=1);
@@ -325,10 +337,11 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       sprintf(fnam, "champosE42_wo_kurama.d");
     }
   }
-    if ((fchampos = fopen(fnam, "r")) == NULL) {
-      fprintf(stderr, "Cannot open parameter(posE42) file: %s\n", fnam);
-      exit(-1);
-    }
+  /*
+  if ((fchampos = fopen(fnam, "r")) == NULL) {
+    fprintf(stderr, "Cannot open parameter(posE42) file: %s\n", fnam);
+    exit(-1);
+  }
 
   printf("Let's read the parameters of each position ... \n");
   for (i=0;;) {
@@ -337,7 +350,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       break;
     if (dummy[0] == '#' || dummy[0] == '\n')
       continue;
-    /* orginal position */ 
+    // orginal position
     tokennum = sscanf(dummy, "%s %d %s %lf %lf %lf",
 		      cham, &id, namedet, &orgn[0], &orgn[1], &orgn[2]);
     printf("<------- %s %d ------->\n",cham,id);
@@ -347,7 +360,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       fprintf(stderr, "%s\n", dummy);
       exit(-1);
     }
-    /* position shift */
+    // position shift
     //example "%s %d %s %lf %lf %lf",  DC 1 origin:    11.0000000      1.05000000      782.9000000
     fgets(dummy, sizeof(dummy), fchampos);
     sscanf(dummy, "%s %d %s %lf %lf %lf",
@@ -359,7 +372,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       exit(-1);
     }
 
-    /* rotation */
+    // rotation
     fgets(dummy, sizeof(dummy), fchampos);
     sscanf(dummy, "%s %d %s %lf %lf %lf",
 	   cham, &id, namedet, &rotangle[0], &rotangle[1], &rotangle[2]);
@@ -394,9 +407,9 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 	  rotangle_DC3[kk]=rotangle[kk];
 	}
       }
-      //      G4cout<<"shhwang:"<<pos_DC1<<":"<<shift_DC1<<":"<<G4endl;      
+      //      G4cout<<"shhwang:"<<pos_DC1<<":"<<shift_DC1<<":"<<G4endl;
       //      G4cout<<"shhwang:"<<id<<G4endl;
-      
+
       if (id < 1 || id > 4) {
 	fprintf(stderr, "ChamPOSinit::no such DC:id=%d\n", id);
 	exit(-1);
@@ -469,9 +482,10 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   //  pos_DC3[ZCOORD]=  pos_DC3[ZCOORD];
   //  pos_CH[ZCOORD]=  pos_CH[ZCOORD];
   //  pos_FTOF[ZCOORD]=  pos_FTOF[ZCOORD];
+  */
 
   printf("done !\n");
-  fclose(fchampos);
+  // fclose(fchampos);
   // ==============================================================
   // geometry
   // ==============================================================
@@ -495,20 +509,20 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4VisAttributes* expHallVisAtt=
     new G4VisAttributes(false, G4Colour(1., 1., 1.));
   expHallLV-> SetVisAttributes(expHallVisAtt);
-  
+
   G4PVPlacement* expHall= new G4PVPlacement(0, G4ThreeVector(), "EXP_HALL_PV",
                                             expHallLV, 0, false, 0);
 
   // ==============================================================
   //  Time projection chamber
-  // ==============================================================  
+  // ==============================================================
   ///check experiment
 
-  // ==============================================================  
+  // ==============================================================
   // Frame
   // ==============================================================
 
-  
+
   //  const G4double ROUT_TPC=  260.*mm;// previous design
 
   const G4double ROUT_TPC=  574./2.*mm;//real design
@@ -538,7 +552,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 		      "TPC_PV", TPCLV, expHall, FALSE, -2);
   G4VisAttributes* TPCVisAtt= new G4VisAttributes(true, G4Colour(1.,1.,1.));
   TPCLV-> SetVisAttributes(TPCVisAtt);
-  
+
   // ==============================================================
   // Field cage
   // ==============================================================
@@ -574,7 +588,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4VisAttributes* FCVisAtt= new G4VisAttributes(true, G4Colour(1.,0.0,0.0));
   FCLV-> SetVisAttributes(FCVisAtt);
 
-  
+
   // ==============================================================
   // Virtual pads
   // ==============================================================
@@ -707,7 +721,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 	  numpads[31]=90.;
 	  //	  G4cout<<pad_in[i]<<G4endl;
 	  //	  G4cout<<pad_out[i]<<G4endl;
-      
+
   }
     //    G4cout<<i<<":"<<angle[i]<<G4endl;
       //  }else if( atoi(env_pad_configure.c_str()) ==2 ){
@@ -743,8 +757,8 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 				 200./2.*mm, 0., angle[i]*deg);
       }
       padLV[i]  = new G4LogicalVolume(padSolid[i],P10,name6);
-      //    G4cout<<"1-------------"<<G4endl;    
-      
+      //    G4cout<<"1-------------"<<G4endl;
+
     }else{
 
       padSolid[i] = new G4Tubs("TPC pad", pad_in[i]*mm, pad_out[i]*mm,
@@ -767,9 +781,9 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
     }else{
       padPV[i] =
 	new G4PVPlacement(rotPad, G4ThreeVector(0.,fabs(pad_center)*mm,-25.*mm),padLV[i],name7,TPCLV, true, i);
-      //	G4cout<<"333-------------:"<<i<<G4endl;         
-      //        G4cout<<angle[i]<<G4endl;         
-      //        G4cout<<numpads[i]<<G4endl;         
+      //	G4cout<<"333-------------:"<<i<<G4endl;
+      //        G4cout<<angle[i]<<G4endl;
+      //        G4cout<<numpads[i]<<G4endl;
     }
 
   }
@@ -781,9 +795,9 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   //  rotpad.rotateZ(-90.*deg);
   //  G4VisAttributes* padVisAtt1= new G4VisAttributes(false, G4Colour(1.,0.5,0.));
   G4VisAttributes* padVisAtt1= new G4VisAttributes(false, G4Colour(1.,0.5,0.));
-  //	G4cout<<"1234-------------:"<<G4endl;         
-	//        G4cout<<angle[i]<<G4endl;         
-	//        G4cout<<numpads[i]<<G4endl;         
+  //	G4cout<<"1234-------------:"<<G4endl;
+	//        G4cout<<angle[i]<<G4endl;
+	//        G4cout<<numpads[i]<<G4endl;
 
   for(G4int i=pad_in_num;i<(pad_in_num+pad_out_num);i++ ){
     sprintf(name5, "padSolid[%d]", i);
@@ -797,15 +811,15 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       new G4PVPlacement(rotPad, padpos, padLV[i],name7,TPCLV, true, i);
 
 
-    //	G4cout<<"123-------------:"<<i<<G4endl;         
-    //        G4cout<<angle[i]<<G4endl;         
-    //        G4cout<<numpads[i]<<G4endl;         
+    //	G4cout<<"123-------------:"<<i<<G4endl;
+    //        G4cout<<angle[i]<<G4endl;
+    //        G4cout<<numpads[i]<<G4endl;
 
 
   }
 
   //////////////// dead layers
-  G4Box* Deadlayer_solid = new G4Box("Deadlayer_solid", 5*mm,250*mm,0.001*mm); // 30 x 10 x 10 
+  G4Box* Deadlayer_solid = new G4Box("Deadlayer_solid", 5*mm,250*mm,0.001*mm); // 30 x 10 x 10
   G4LogicalVolume* DeadlayerLV=
     new G4LogicalVolume(Deadlayer_solid, C, "DeadlayerLV1");
   G4RotationMatrix *rotdead = new G4RotationMatrix();
@@ -869,7 +883,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4LogicalVolume* TargetHolderLV;
   G4PVPlacement* TargetHolderPV;
   if(experiment_num==42){
-  //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5 
+  //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5
 
   G4String env_target_size_x = getenv("Target_Size_x");
   G4String env_target_size_y = getenv("Target_Size_y");
@@ -882,7 +896,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   char* env_target_material = getenv("Target_Material");
   //  G4cout<<env_target_material<<G4endl;
 
-  G4Box* TargetSolid = new G4Box("target", Target_x/2*mm,Target_z/2*mm,Target_y/2*mm); // 30 x 10 x 15 
+  G4Box* TargetSolid = new G4Box("target", Target_x/2*mm,Target_z/2*mm,Target_y/2*mm); // 30 x 10 x 15
   TargetLV=
     new G4LogicalVolume(TargetSolid, target_mat, "TargetLV");
     //    new G4LogicalVolume(TargetSolid, *env_target_material, "TargetLV");
@@ -905,7 +919,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4VisAttributes* TargetHolderVisAtt= new G4VisAttributes(true, G4Colour(0.1,0.1,0.));
   TargetHolderLV-> SetVisAttributes(TargetHolderVisAtt);
   }else if(experiment_num==45||experiment_num==27){
-  //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5 
+  //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5
 
     G4String env_target_size_r = getenv("Target_Size_x");//r
     G4String env_target_size_z = getenv("Target_Size_z");//z
@@ -914,7 +928,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4double Target_z=atof( env_target_size_z.c_str() );
 
   //  G4cout<<env_target_material<<G4endl;
-  G4Tubs* TargetSolid = new G4Tubs("TargetSolid", 0.*mm, 
+  G4Tubs* TargetSolid = new G4Tubs("TargetSolid", 0.*mm,
 					 Target_r*mm,Target_z*mm, 0., 360*deg);
   //  G4Box* TargetSolid = new G4Box("target", 1.*cm,0.25*cm,1.*cm);
   TargetLV=
@@ -993,8 +1007,8 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
     //    G4cout<<DZ_SCINT1<<" "<<num_one_plane<<" "<<plane_width<<G4endl;
     G4int m=0;
   for(G4int k=0;k<8; k++){
-    for(G4int m=0;m<num_one_plane;m++){ 
-      G4ThreeVector posMOut1(337.*mm,0.*mm,+plane_width/2-DZ_SCINT1-DZ_SCINT1*2*m); //x,z,y??    
+    for(G4int m=0;m<num_one_plane;m++){
+      G4ThreeVector posMOut1(337.*mm,0.*mm,+plane_width/2-DZ_SCINT1-DZ_SCINT1*2*m); //x,z,y??
     G4RotationMatrix* rotMOutP = new G4RotationMatrix;
     G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut*(k)), posMOut1.rotateY(dangleOut*(k)));
 
@@ -1018,8 +1032,8 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
       //    scintLV[k*2+1]-> SetVisAttributes(scintVisAtt[k*2+1]);
       //      rotMOutP->rotateY(dangleOut);
       //      posMOut1.rotateY(dangleOut*(k));
-      //      posMOut1.rotateY(dangleOut); 
-      //      posMOut1.rotateY(dangleOut); 
+      //      posMOut1.rotateY(dangleOut);
+      //      posMOut1.rotateY(dangleOut);
           }
   }
 
@@ -1048,7 +1062,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 				DY_TOFLG1, DY_TOFLG1, DZ_TOFLG1);
   TOFLGLV = new G4LogicalVolume(scintSolid1, Scinti, name1);
   // 16 side TOFLG.
-  
+
   const G4double dangleTOFLG = 22.5*2*deg;
   G4ThreeVector posTOFLG1(520.*mm,0.*mm,(-DZ_TOFLG1)); //x,z,y??
   G4ThreeVector posTOFLG2(520.*mm,0.*mm,(+DZ_TOFLG1)); //x,z,y??
@@ -1064,8 +1078,8 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
     G4Transform3D transformMP2(*rotTOFLGP, posTOFLG2);
     TOFLGPV[k*2+1] = new G4PVPlacement(transformMP2,"TOFLGPV", TOFLGLV, expHall, FALSE, 0);
     rotTOFLGP->rotateY(dangleTOFLG);
-    posTOFLG1.rotateY(dangleTOFLG); 
-    posTOFLG2.rotateY(dangleTOFLG); 
+    posTOFLG1.rotateY(dangleTOFLG);
+    posTOFLG2.rotateY(dangleTOFLG);
   }
 
 
@@ -1111,7 +1125,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
                                      DY_PVC2,  DZ_PVC2);
 
   // 16 PVC
-  
+
   const G4double dangleOut_pvc = 22.5*2*deg;
   G4ThreeVector posMOut1_pvc(340.*mm,0.*mm,(-DZ_PVC2)); //x,z,y??
   G4ThreeVector posMOut2_pvc(340.*mm,0.*mm,(+DZ_PVC2)); //x,z,y??
@@ -1140,8 +1154,8 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
     pvcLV[k*2+1]-> SetVisAttributes(pvcVisAtt[k*2+1]);
 
     rotMOutP_pvc->rotateY(dangleOut);
-    posMOut1_pvc.rotateY(dangleOut); 
-    posMOut2_pvc.rotateY(dangleOut); 
+    posMOut1_pvc.rotateY(dangleOut);
+    posMOut2_pvc.rotateY(dangleOut);
   }
   }
 
@@ -1177,10 +1191,10 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 
     posMOut1_nbar.rotateY(dangleOut_nbar*0.5-22.5*deg);
     posMOut2_nbar.rotateY(dangleOut_nbar*0.5-22.5*deg);
-    
+
     for(G4int k=0;k<8; k++){
-      for(G4int m=0;m<num_one_plane;m++){   
-	G4ThreeVector posMOut1(n_bar_radius*mm,0.*mm,+plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*m); //x,z,y??    
+      for(G4int m=0;m<num_one_plane;m++){
+	G4ThreeVector posMOut1(n_bar_radius*mm,0.*mm,+plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*m); //x,z,y??
 	G4RotationMatrix* rotMOutP = new G4RotationMatrix;
 	G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut_nbar*(k)), posMOut1.rotateY(dangleOut*(k)));
 
@@ -1204,7 +1218,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   // ==============================================================
   // helmholtz coil
   // ==============================================================
-  
+
   G4Tubs* HelmSolid_t =
     new G4Tubs("HelmSolid_t",45.*cm,80.*cm,135./2.*cm,0.*deg,DPHI_TPC);
 
@@ -1213,7 +1227,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4ThreeVector HTrans(0, -60.*cm, 0);
   G4RotationMatrix* yRot = new G4RotationMatrix;  // Rotates X and Z axes only
 
-  G4Transform3D transform(*yRot, HTrans); 
+  G4Transform3D transform(*yRot, HTrans);
 
 
   G4SubtractionSolid* HelmSolid= new G4SubtractionSolid("HelmSolid",HelmSolid_t,HelmDHole,transform);
@@ -1240,7 +1254,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4VisAttributes* HelmVisAtt= new G4VisAttributes(true, G4Colour(1.,0.5,0));
   HelmLV-> SetVisAttributes(HelmVisAtt);
 
-  
+
 
 
   /*  /////// supporter (from bottom to helmholtz)
@@ -1299,10 +1313,10 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 
 
  if(experiment_num==42||experiment_num==27){
-   
+
   // ==============================================================
   // ==============================================================
-  // spectrometrr --> consist of kurama, SC, DCs  
+  // spectrometrr --> consist of kurama, SC, DCs
   // ==============================================================
   // ==============================================================
 
@@ -1542,7 +1556,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   G4double maxStep;
 
 
-  /////////////  
+  /////////////
   // Construct KURAMA Magnet
   //////////////coil1U
   G4Box* Coil1_box = new G4Box("Coil1_box",
@@ -1680,7 +1694,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil6rd->rotateY(-fSpectrometerAngle);
 
   rotcoil6lu->rotateZ(0.*deg);
-  G4PVPlacement* Coil6LU_phys 
+  G4PVPlacement* Coil6LU_phys
     = new G4PVPlacement(rotcoil6lu,
 			G4ThreeVector(pos_COIL6LU[XCOORD],
 				      pos_COIL6LU[YCOORD],
@@ -1691,7 +1705,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			false,
 			0);
     rotcoil6ru->rotateZ(-90.*deg);
-  G4PVPlacement* Coil6RU_phys 
+  G4PVPlacement* Coil6RU_phys
     = new G4PVPlacement(rotcoil6ru,
 			G4ThreeVector(pos_COIL6RU[XCOORD],
 				      pos_COIL6RU[YCOORD],
@@ -1703,7 +1717,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			0);
 
   rotcoil6ld->rotateZ(-180.*deg);
-  G4PVPlacement* Coil6RD_phys 
+  G4PVPlacement* Coil6RD_phys
     = new G4PVPlacement(rotcoil6ld,
 			G4ThreeVector(pos_COIL6RD[XCOORD],
 				      pos_COIL6RD[YCOORD],
@@ -1714,7 +1728,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			false,
 			0);
   rotcoil6rd->rotateZ(-270.*deg);
-  G4PVPlacement* Coil6LD_phys 
+  G4PVPlacement* Coil6LD_phys
     = new G4PVPlacement(rotcoil6rd,
 			G4ThreeVector(pos_COIL6LD[XCOORD],
 				      pos_COIL6LD[YCOORD],
@@ -1779,7 +1793,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil8rd->rotateY(-fSpectrometerAngle);
 
   rotcoil8lu->rotateZ(0.*deg);
-  G4PVPlacement* Coil8LU_phys 
+  G4PVPlacement* Coil8LU_phys
     = new G4PVPlacement(rotcoil8lu,
 			G4ThreeVector(pos_COIL8LU[XCOORD],
 				      pos_COIL8LU[YCOORD],
@@ -1790,7 +1804,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			false,
 			0);
     rotcoil8ru->rotateZ(-90.*deg);
-  G4PVPlacement* Coil8RU_phys 
+  G4PVPlacement* Coil8RU_phys
     = new G4PVPlacement(rotcoil8ru,
 			G4ThreeVector(pos_COIL8RU[XCOORD],
 				      pos_COIL8RU[YCOORD],
@@ -1802,7 +1816,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			0);
 
   rotcoil8ld->rotateZ(-180.*deg);
-  G4PVPlacement* Coil8RD_phys 
+  G4PVPlacement* Coil8RD_phys
     = new G4PVPlacement(rotcoil8ld,
 			G4ThreeVector(pos_COIL8RD[XCOORD],
 				      pos_COIL8RD[YCOORD],
@@ -1813,7 +1827,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
 			false,
 			0);
   rotcoil8rd->rotateZ(-270.*deg);
-  G4PVPlacement* Coil8LD_phys 
+  G4PVPlacement* Coil8LD_phys
     = new G4PVPlacement(rotcoil8rd,
 			G4ThreeVector(pos_COIL8LD[XCOORD],
 				      pos_COIL8LD[YCOORD],
@@ -1913,7 +1927,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7ulu->rotateZ(0.*deg);
   rotcoil7ulu->rotateX(180.*deg);
   rotcoil7ulu->rotateY(90.*deg);
-  G4PVPlacement* Coil7ULU_phys 
+  G4PVPlacement* Coil7ULU_phys
     = new G4PVPlacement(rotcoil7ulu,
 			G4ThreeVector(pos_COIL7ULU[XCOORD],
 				      pos_COIL7ULU[YCOORD],
@@ -1928,7 +1942,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7uru->rotateZ(0.*deg);
   rotcoil7uru->rotateX(180.*deg);
   rotcoil7uru->rotateY(90.*deg);
-  G4PVPlacement* Coil7URU_phys 
+  G4PVPlacement* Coil7URU_phys
     = new G4PVPlacement(rotcoil7uru,
 			G4ThreeVector(pos_COIL7URU[XCOORD],
 				      pos_COIL7URU[YCOORD],
@@ -1942,7 +1956,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7urd->rotateZ(0.*deg);
   rotcoil7urd->rotateX(90.*deg);
   rotcoil7urd->rotateY(90.*deg);
-  G4PVPlacement* Coil7URD_phys 
+  G4PVPlacement* Coil7URD_phys
     = new G4PVPlacement(rotcoil7urd,
 			G4ThreeVector(pos_COIL7URD[XCOORD],
 				      pos_COIL7URD[YCOORD],
@@ -1956,7 +1970,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7uld->rotateZ(0.*deg);
   rotcoil7uld->rotateX(90.*deg);
   rotcoil7uld->rotateY(90.*deg);
-  G4PVPlacement* Coil7ULD_phys 
+  G4PVPlacement* Coil7ULD_phys
     = new G4PVPlacement(rotcoil7uld,
 			G4ThreeVector(pos_COIL7ULD[XCOORD],
 				      pos_COIL7ULD[YCOORD],
@@ -1974,7 +1988,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7dlu->rotateZ(0.*deg);
   rotcoil7dlu->rotateX(-90.*deg);
   rotcoil7dlu->rotateY(90.*deg);
-  G4PVPlacement* Coil7DLU_phys 
+  G4PVPlacement* Coil7DLU_phys
     = new G4PVPlacement(rotcoil7dlu,
 			G4ThreeVector(pos_COIL7DLU[XCOORD],
 				      pos_COIL7DLU[YCOORD],
@@ -1989,7 +2003,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7dru->rotateZ(0.*deg);
   rotcoil7dru->rotateX(-90.*deg);
   rotcoil7dru->rotateY(90.*deg);
-  G4PVPlacement* Coil7DRU_phys 
+  G4PVPlacement* Coil7DRU_phys
     = new G4PVPlacement(rotcoil7dru,
 			G4ThreeVector(pos_COIL7DRU[XCOORD],
 				      pos_COIL7DRU[YCOORD],
@@ -2003,7 +2017,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7drd->rotateZ(0.*deg);
   rotcoil7drd->rotateX(0.*deg);
   rotcoil7drd->rotateY(90.*deg);
-  G4PVPlacement* Coil7DRD_phys 
+  G4PVPlacement* Coil7DRD_phys
     = new G4PVPlacement(rotcoil7drd,
 			G4ThreeVector(pos_COIL7DRD[XCOORD],
 				      pos_COIL7DRD[YCOORD],
@@ -2017,7 +2031,7 @@ G4VPhysicalVolume* TPCDetectorConstruction::Construct()
   rotcoil7dld->rotateZ(0.*deg);
   rotcoil7dld->rotateX(0.*deg);
   rotcoil7dld->rotateY(90.*deg);
-  G4PVPlacement* Coil7DLD_phys 
+  G4PVPlacement* Coil7DLD_phys
     = new G4PVPlacement(rotcoil7dld,
 			G4ThreeVector(pos_COIL7DLD[XCOORD],
 				      pos_COIL7DLD[YCOORD],
@@ -2155,7 +2169,7 @@ G4PVPlacement* upGuard_L_phys = new G4PVPlacement(rotForwardSp,
 				     expHallLV,
 				     false,
 				     0);
-  
+
 G4LogicalVolume*  upGuard_R_log = new G4LogicalVolume(upGuard_LR_box, Fe, "upGuard_R_log",0,0,0);
   upGuard_R_log->SetVisAttributes(blue);
   maxStep=0.00001*mm;
@@ -2168,9 +2182,9 @@ G4PVPlacement* upGuard_R_phys = new G4PVPlacement(rotForwardSp,
 				     false,
 				     0);
   }
-  
 
-  
+
+
   //-------------------- Yoke
   G4Box* Yoke_UD_box = new G4Box("Yoke_UD_box",
 				 size_YOKE_UD[XCOORD],size_YOKE_UD[YCOORD],size_YOKE_UD[ZCOORD]);
@@ -2186,7 +2200,7 @@ G4PVPlacement* Yoke_U_phys = new G4PVPlacement(rotForwardSp,
 				  expHallLV,
 				  false,
 				  0);
-  
+
 G4LogicalVolume*  Yoke_D_log = new G4LogicalVolume(Yoke_UD_box, Fe, "Yoke_D_log",0,0,0);
   Yoke_D_log->SetVisAttributes(blue);
   maxStep=0.00001*mm;
@@ -2198,7 +2212,7 @@ G4PVPlacement* Yoke_D_phys = new G4PVPlacement(rotForwardSp,
 				  expHallLV,
 				  false,
 				  0);
-  
+
   G4Box* Yoke_LR_box = new G4Box("Yoke_LR_box",
 				 size_YOKE_LR[XCOORD],size_YOKE_LR[YCOORD],size_YOKE_LR[ZCOORD]);
 G4LogicalVolume*  Yoke_L_log = new G4LogicalVolume(Yoke_LR_box, Fe, "Yoke_L_log",0,0,0);
@@ -2212,7 +2226,7 @@ G4PVPlacement* Yoke_L_phys = new G4PVPlacement(rotForwardSp,
 				  expHallLV,
 				  false,
 				  0);
-  
+
 G4LogicalVolume*  Yoke_R_log = new G4LogicalVolume(Yoke_LR_box, Fe, "Yoke_R_log",0,0,0);
   Yoke_R_log->SetVisAttributes(blue);
   maxStep=0.00001*mm;
@@ -2240,7 +2254,7 @@ G4PVPlacement* downGuard_U_phys = new G4PVPlacement(rotForwardSp,
 				       expHallLV,
 				       false,
 				       0);
-  
+
 G4LogicalVolume*  downGuard_D_log = new G4LogicalVolume(downGuard_UD_box, Fe, "downGuard_D_log",0,0,0);
   downGuard_D_log->SetVisAttributes(blue);
   maxStep=0.00001*mm;
@@ -2252,7 +2266,7 @@ G4PVPlacement* downGuard_D_phys = new G4PVPlacement(rotForwardSp,
 				       expHallLV,
 				       false,
 				       0);
-  
+
   G4Box* downGuard_LR_box = new G4Box("downGuard_LR_box",
 				      size_DGUARD_LR[XCOORD],size_DGUARD_LR[YCOORD],size_DGUARD_LR[ZCOORD]);
 G4LogicalVolume*  downGuard_L_log = new G4LogicalVolume(downGuard_LR_box, Fe, "downGuard_L_log",0,0,0);
@@ -2266,7 +2280,7 @@ G4PVPlacement* downGuard_L_phys = new G4PVPlacement(rotForwardSp,
 				       expHallLV,
 				       false,
 				       0);
-  
+
 G4LogicalVolume*  downGuard_R_log = new G4LogicalVolume(downGuard_LR_box, Fe, "downGuard_R_log",0,0,0);
   downGuard_R_log->SetVisAttributes(blue);
   maxStep=0.00001*mm;
@@ -2279,9 +2293,9 @@ G4PVPlacement*  downGuard_R_phys = new G4PVPlacement(rotForwardSp,
 				       false,
 				       0);
 
-  
 
-  ///////////////////end kurama magnet 
+
+  ///////////////////end kurama magnet
 
   //--------------DC1
  G4Box* DC1_box = new G4Box("DC1_box",size_DC1[XCOORD]/2.,size_DC1[YCOORD]/2,size_DC1[ZCOORD]/2);
@@ -2495,7 +2509,7 @@ G4PVPlacement* DC2_phys = new G4PVPlacement(rotForwardSp,
 			       expHallLV,
 			       false,
 			       0);
-  
+
   //---------DC2 Planes
   G4Box* DC2Plane_box = new G4Box("DC2Plane_box",
 				  size_DC2Plane[XCOORD],size_DC2Plane[YCOORD],size_DC2Plane[ZCOORD]);
@@ -2562,7 +2576,7 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
 			       expHallLV,
 			       false,
 			       0);
-  
+
   //---------DC3 Planes
   G4Box* DC3Plane_box = new G4Box("DC3Plane_box",
 				  size_DC3Plane[XCOORD],size_DC3Plane[YCOORD],size_DC3Plane[ZCOORD]);
@@ -2667,7 +2681,7 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
 
     }//with or w/o Kurama spectrometer
     else if(with_kurama==0){
-      
+
   G4double size_CH[3];
   size_CH[XCOORD] = 11.5*mm;
   size_CH[YCOORD] = 400.0*mm;
@@ -2764,7 +2778,7 @@ G4PVPlacement* DC2_phys = new G4PVPlacement(rotForwardSp,
 			       expHallLV,
 			       false,
 			       0);
-  
+
   //---------DC2 Planes
   G4Box* DC2Plane_box = new G4Box("DC2Plane_box",
 				  size_DC2Plane[XCOORD],size_DC2Plane[YCOORD],size_DC2Plane[ZCOORD]);
@@ -2831,7 +2845,7 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
 			       expHallLV,
 			       false,
 			       0);
-  
+
   //---------DC3 Planes
   G4Box* DC3Plane_box = new G4Box("DC3Plane_box",
 				  size_DC3Plane[XCOORD],size_DC3Plane[YCOORD],size_DC3Plane[ZCOORD]);
@@ -2939,24 +2953,24 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
 
   }///E42 kurama setup
 
- 
+
   TPCField* myfield = new TPCField("helmholtz_field.dat","KuramaMap80cm.dat");
   myfield->TPCField_Set();
  // myfield->TPCField_Set(on_off, on_off2, spectrometer_angle,k_gap,k_move_x, h_field, k_field);
 
   G4FieldManager* fieldMgr =
     G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  
-  
+
+
   fieldMgr->SetDetectorField(myfield);
   fieldMgr->CreateChordFinder(myfield);
 
 
   //  G4cout << "test shhwang" << G4endl;
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   // ==============================================================
-  // define detector sensitivity 
+  // define detector sensitivity
   // ==============================================================
   // sensitive Detectors
 
@@ -3029,7 +3043,7 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
 
 
   if(experiment_num==42 || experiment_num==27){
-  
+
   ////////dc
   TPCDCSD* dcSD= new TPCDCSD(SDname="/DC");
   SDman-> AddNewDetector(dcSD);
@@ -3065,7 +3079,7 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
   // ==============================================================
 
 
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // ==============================================================
   // finally return the world volume
   // ==============================================================
@@ -3073,4 +3087,3 @@ G4PVPlacement* DC3_phys = new G4PVPlacement(rotForwardSp,
   return expHall;
 
 }
-

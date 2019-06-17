@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 #include "TPCAnaManager.hh"
 #include "G4ThreeVector.hh"
 //#include "common.hh"
@@ -27,6 +29,12 @@
 //#include "getenv.hh"
 
 #define	MAX_DIM_FOR_RKF 3
+
+namespace
+{
+  using CLHEP::mm;
+}
+
 //void chi2(int *npar, double *grad, double *fval,
 //	  double *xval, int *iflag, void (*futil)() );
 
@@ -39,7 +47,7 @@ extern double RKChi2[MAX_ITERATION];
 extern double RKPara[MAX_ITERATION][NUM_PARA_RK];
 //void rungeKuttaFehlberg(int n, double x[],
 //			  void diff(int, double *, double, double *),
-//			  double *pt, double *ph, double timeEnd, 
+//			  double *pt, double *ph, double timeEnd,
 //			  int kcnt, double hmin, double hmax, double TOL);
 
 
@@ -68,7 +76,9 @@ TPCAnaManager::TPCAnaManager()
 TPCAnaManager::~TPCAnaManager()
 {}
 
-void TPCAnaManager::BeginOfRunAction(int runnum)
+//_____________________________________________________________________________
+void
+TPCAnaManager::BeginOfRunAction( int runnum )
 {
 
   //  G4String env_target_pos_z = getenv("Target_Pos_z");
@@ -83,34 +93,34 @@ void TPCAnaManager::BeginOfRunAction(int runnum)
   if(getenv("Truncated_mean_cut")){
 
   }else{
-    std::cout<<"!======================================!"<<std::endl;    
+    std::cout<<"!======================================!"<<std::endl;
     std::cout<<"getenv error: Truncated_mean_cut"<<std::endl;
-    std::cout<<"!======================================!"<<std::endl;    
+    std::cout<<"!======================================!"<<std::endl;
     exit(1);
   }
     */
 
   if(getenv("test_cut")){
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
     std::cout<<"test getenv"<<std::endl;
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
     //    exit(1);
   }else{
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"test getenv no"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
-    std::cout<<"======================================"<<std::endl;    
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"test getenv no"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
+    std::cout<<"======================================"<<std::endl;
   }
 
   G4String env_experiment_num = getenv("Experiment_NUM");
@@ -120,10 +130,10 @@ void TPCAnaManager::BeginOfRunAction(int runnum)
   trigger_env = atof( env_trigger.c_str() );
 
   G4String env_pad_length_in = getenv("pad_length_in");
-  pad_length_in=atof( env_pad_length_in.c_str() );//out side less 100 mm. 10+5*x < 100 mm is pad_in_num                                     
-  
+  pad_length_in=atof( env_pad_length_in.c_str() );//out side less 100 mm. 10+5*x < 100 mm is pad_in_num
+
   G4String env_pad_length_out = getenv("pad_length_out");
-  pad_length_out=atof( env_pad_length_out.c_str() );//gap 1mm     
+  pad_length_out=atof( env_pad_length_out.c_str() );//gap 1mm
   G4String env_pad_gap = getenv("pad_gap");
   pad_gap=atof( env_pad_gap.c_str() );
 
@@ -270,10 +280,10 @@ void TPCAnaManager::BeginOfRunAction(int runnum)
 	all_channels=all_channels+numpads[i];
 	all_channels2=all_channels2+num_pad_check;
       }
-      G4cout<<"------------------------"<<G4endl;      
-      G4cout<<"Total pads:"<<all_channels<<G4endl;      
-      G4cout<<"Total pads(check):"<<all_channels<<G4endl;      
-      G4cout<<"------------------------"<<G4endl;      
+      G4cout<<"------------------------"<<G4endl;
+      G4cout<<"Total pads:"<<all_channels<<G4endl;
+      G4cout<<"Total pads(check):"<<all_channels<<G4endl;
+      G4cout<<"------------------------"<<G4endl;
     }
 
 
@@ -327,18 +337,18 @@ void TPCAnaManager::BeginOfEventAction()
 
 int TPCAnaManager::EndOfEventAction()
 {
-  // Fill kaon minus energy distribution 
+  // Fill kaon minus energy distribution
 
   anaRoot.FillBeam(primaryBeam.pg[0], primaryBeam.pg[1], primaryBeam.pg[2]);
 
   anaRoot.FillGenMode(primaryBeam.gen, primaryBeam.mode);
 
-  // anaRoot.FillNumOfK(HitNum_K, HitNumAC_K, HitNumNBAR_K, 
-  // 		     HitNumDC_K, HitNumCH_K, HitNumFTOF_K, 
+  // anaRoot.FillNumOfK(HitNum_K, HitNumAC_K, HitNumNBAR_K,
+  // 		     HitNumDC_K, HitNumCH_K, HitNumFTOF_K,
   // 		     HitNumScint_K, HitNumTarget_K);
   //  std::cout<<"HitNumDC_K="<<HitNumDC_K<<", HitNumFTOF_K="<<HitNumFTOF_K<<std::endl;
-  // anaRoot.FillNumOfp(HitNum_p, HitNumAC_p, HitNumNBAR_p, 
-  // 		     HitNumDC_p, HitNumCH_p, HitNumFTOF_p, 
+  // anaRoot.FillNumOfp(HitNum_p, HitNumAC_p, HitNumNBAR_p,
+  // 		     HitNumDC_p, HitNumCH_p, HitNumFTOF_p,
   // 		     HitNumScint_p, HitNumTarget_p);
   // std::cout<<"HitNumDC_p="<<HitNumDC_p<<", HitNumFTOF_p="<<HitNumFTOF_p<<std::endl;
 
@@ -348,16 +358,14 @@ int TPCAnaManager::EndOfEventAction()
     				&primaryParticle.p0[id][0], primaryParticle.pid0[id]);
   }
 
-  std::cout<<"HitNumScint="<<HitNumScint<<std::endl;
-
-  //Fill Primary Infomation for E27 
+  //Fill Primary Infomation for E27
   if(env_Experiment_num ==27 ||env_Experiment_num ==45)
     anaRoot.FillPrimaryInfo(primaryInfo.mm_d, primaryInfo.mm_p, primaryInfo.theta, primaryInfo.theta_scat, primaryInfo.theta_CM);
   else
     anaRoot.FillPrimaryInfo(0., 0., 0., 0., 0.);
 
-  
-  
+
+
 
 
   //  if( HitNumScint > 0 ){
@@ -401,7 +409,7 @@ int TPCAnaManager::EndOfEventAction()
     G4double ede[MAX_TRACK][MAXtpctrhitNum]={{0.},{0.}};
 
     ////// shhwang position read
-    ///shhwang code                                                          
+    ///shhwang code
 
 
     if(tpctrNum>9){
@@ -453,7 +461,7 @@ int TPCAnaManager::EndOfEventAction()
       }
     }
     G4double mom_theta[MAX_TRACK]={0.};
-    
+
     // calcute vtx with production points
     for(G4int i=0;i<MAX_TRACK;i++){
       G4double rho1 = rad[i];
@@ -465,7 +473,7 @@ int TPCAnaManager::EndOfEventAction()
       G4double ca1=a_fory[i];
       G4double cb1=b_fory[i];
       G4double ct01=theta0_fory[i];
-      
+
 
       G4double cent_dist=sqrt(pow(cx1-cx2,2)+pow(cz1-cz2,2));
 
@@ -474,7 +482,7 @@ int TPCAnaManager::EndOfEventAction()
       vtxyfit[i]=-1.*tpcData[i].tpcqq*ca1*rho1*(theta12-ct01)+cb1;
 
       mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
-     
+
       vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
       vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
 
@@ -514,10 +522,10 @@ int TPCAnaManager::EndOfEventAction()
 
 	    if((cent_dist-(rho1+rho2))>0.){
 
-	      
+
 	      G4double theta12=atan2(cz2-cz1,cx2-cx1);
 	      G4double centr=rho1+(cent_dist-(rho1+rho2))/2;
-	      
+
 	      point1[0]=cos(theta12)*centr+cx1;
 	      point1[1]=sin(theta12)*centr+cz1;
 	      point1[2]=-1.*tpcData[i].tpcqq*ca1*rho1*(theta12-ct01)+cb1;
@@ -544,7 +552,7 @@ int TPCAnaManager::EndOfEventAction()
 		point1[0]=cos(theta12)*centr+cx1;
 		point1[1]=sin(theta12)*centr+cz1;
 		point1[2]=-1.*tpcData[i].tpcqq*ca1*rho1*(theta12-ct01)+cb1;
-		
+
 		G4double theta21=atan2(cz2-cz1,cx2-cx1);
 		G4double centr1=rho2+(rho1-cent_dist-rho2)/2.; //rho1>rho2
 		point2[0]=cos(theta21)*centr1+cx2;
@@ -575,26 +583,26 @@ int TPCAnaManager::EndOfEventAction()
 	      vtxxfit[j]=point2[0];
 	      vtxzfit[j]=point2[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
-	      
+
 	      vtx_flag[i]=3;
 	      vtx_flag[j]=3;
 	    } else {
-	      
+
 	      //k = CircleIntersect(cx1,cz1,rho1,cx2,cz2,rho2,point1,point2);
 	      k = CircleIntersect(cx1,cz1,rho1,cx2,cz2,rho2,ca1,cb1,ct01,tpcData[i].tpcqq,ca2,cb2,ct02,tpcData[j].tpcqq,point1,point2);
 	      if(k == 0) {
 		G4cout << "no solution" << G4endl;
 	      }else if(k>0){
-		
-	
+
+
 		G4double dist1=sqrt(pow(point1[0]-tpcData[i].tpcvtxx,2)+pow(point1[1]-tpcData[i].tpcvtxz,2));
 		G4double dist2=sqrt(pow(point2[0]-tpcData[i].tpcvtxx,2)+pow(point2[1]-tpcData[i].tpcvtxz,2));
-		
+
 		if(dist1<=dist2){//point1 is correct
 		  vtxxfit[i]=point1[0];
 		  vtxzfit[i]=point1[1];
 		  vtxyfit[i]=point1[2];
-		  
+
 		  vtxxfit[j]=point1[0];
 		  vtxzfit[j]=point1[1];
 		  vtxyfit[j]=point1[2];
@@ -614,11 +622,11 @@ int TPCAnaManager::EndOfEventAction()
 	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
 	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-acos(-1.)/2;
 
-	      
+
 	      // std::cout<<"x01="<<x[i][0]<<", x2="<<x[j][0]<<std::endl;
 	      // std::cout<<"y01="<<y[i][0]<<", y2="<<y[j][0]<<std::endl;
 	      // std::cout<<"z01="<<z[i][0]<<", z2="<<z[j][0]<<std::endl;
-	      
+
 	      // std::cout<<"vtx fit="<<vtxxfit[i]<<", true vtx="<<tpcData[i].tpcvtxx<<std::endl;
 	      // std::cout<<"vty fit="<<vtxyfit[i]<<", true vty="<<tpcData[i].tpcvtxy<<std::endl;
 	      // std::cout<<"vtz fit="<<vtxzfit[i]<<", true vtz="<<tpcData[i].tpcvtxz<<std::endl;
@@ -660,10 +668,10 @@ int TPCAnaManager::EndOfEventAction()
 
 	    if((cent_dist-(rho1+rho2))>0.){
 
-	      
+
 	      G4double theta12=atan2(cz2-cz1,cx2-cx1);
 	      G4double centr=rho1+(cent_dist-(rho1+rho2))/2;
-	      
+
 	      point1[0]=cos(theta12)*centr+cx1;
 	      point1[1]=sin(theta12)*centr+cz1;
 	      point1[2]=-1.*tpcData[i].tpcqq*ca1*rho1*(theta12-ct01)+cb1;
@@ -673,16 +681,16 @@ int TPCAnaManager::EndOfEventAction()
 	      point2[0]=cos(theta21)*centr1+cx2;
 	      point2[1]=sin(theta21)*centr1+cz2;
 	      point2[2]=-1.*tpcData[j].tpcqq*ca2*rho2*(theta21-ct02)+cb2;
-	      
+
 	      vtxxfit[i]=point1[0];
 	      vtxzfit[i]=point1[1];
 	      vtxyfit[i]=(point1[2]+point2[2])/2.;
 	      vtxxfit[j]=point1[0];
 	      vtxzfit[j]=point1[1];
 	      vtxyfit[j]=(point1[2]+point2[2])/2.;
-	      
+
 	      vtx_flag[i]=5;
-	      vtx_flag[j]=5;	      
+	      vtx_flag[j]=5;
 	    }else  if((cent_dist+fmin(rho1,rho2))<fmax(rho1,rho2)){
 
 	      if(rho1>=rho2){ //rho1>rho2
@@ -698,7 +706,7 @@ int TPCAnaManager::EndOfEventAction()
 		point2[1]=sin(theta21)*centr1+cz2;
 		point2[2]=-1.*tpcData[j].tpcqq*ca2*rho2*(theta21-ct02)+cb2;
 		//		G4cout<<"test1"<<G4endl;
-		
+
 	      }else if(rho2>rho1){ //rho1<rho2
 		G4double theta12=atan2(cz1-cz2,cx1-cx2);
 		G4double centr=rho2-(rho2-cent_dist-rho1)/2; //rho1<rho2
@@ -736,7 +744,7 @@ int TPCAnaManager::EndOfEventAction()
 		  vtxxfit[i]=point1[0];
 		  vtxzfit[i]=point1[1];
 		  vtxyfit[i]=point1[2];
-		  
+
 		  vtxxfit[j]=point1[0];
 		  vtxzfit[j]=point1[1];
 		  vtxyfit[j]=point1[2];
@@ -744,7 +752,7 @@ int TPCAnaManager::EndOfEventAction()
 		  vtxxfit[i]=point2[0];
 		  vtxzfit[i]=point2[1];
 		  vtxyfit[i]=point2[2];
-		  
+
 		  vtxxfit[j]=point2[0];
 		  vtxzfit[j]=point2[1];
 		  vtxyfit[j]=point2[2];
@@ -775,10 +783,10 @@ int TPCAnaManager::EndOfEventAction()
 
 		  if((cent_dist-(rho1+rho2))>0.){
 
-	      
+
 		  G4double theta12=atan2(cz2-cz1,cx2-cx1);
 		  G4double centr=rho1+(cent_dist-(rho1+rho2))/2;
-	      
+
 		  point1[0]=cos(theta12)*centr+cx1;
 		  point1[1]=sin(theta12)*centr+cz1;
 
@@ -875,7 +883,7 @@ int TPCAnaManager::EndOfEventAction()
     int sector, lay;
     //    cir_r[kk]=rad[kk];
     //    cir_x[kk]=cx[kk];
-    //    cir_z[kk]=cz[kk];    
+    //    cir_z[kk]=cz[kk];
     double rkpar[5]={0};
     int iflag=0.;
 
@@ -909,8 +917,8 @@ int TPCAnaManager::EndOfEventAction()
 
     ///////////////////////vertex momentum for P_t
     G4int trn[MAX_TRACK];
-    //// trancated mean --> now mean 
-    for(G4int i=0;i<tpctrNum;i++){   
+    //// trancated mean --> now mean
+    for(G4int i=0;i<tpctrNum;i++){
       trn[i]=c[i]*(truncated_mean_cut);
       G4double trtmp[MAX_TRACK]={0.000000000};
       for(G4int iii=0;iii<MAX_TRACK;iii++){
@@ -930,7 +938,7 @@ int TPCAnaManager::EndOfEventAction()
 	      }
 	    }
 	  }
-	  
+
 	}//--loop end
       }
       for(G4int j=0;j<c[i];j++){
@@ -947,7 +955,7 @@ int TPCAnaManager::EndOfEventAction()
 	}else if(trn[i]==0.){
 	  trmean[i]=trmean[i]+ede[i][j]/(c[i]-trn[i]);
 	}
-	
+
       }
       //      }
     }
@@ -955,8 +963,8 @@ int TPCAnaManager::EndOfEventAction()
 
       // std::cout<<"hoge!!!"<<std::endl;
       // getchar();
-      anaRoot.FillNtrk(counterData[i].ntrk);  
-      anaRoot.FillTime(counterData[i].time);  
+      anaRoot.FillNtrk(counterData[i].ntrk);
+      anaRoot.FillTime(counterData[i].time);
       anaRoot.FillPos(counterData[i].pos);
       anaRoot.FillPos0(counterData[i].pos0,counterData[i].resoX);
       anaRoot.FillMom(counterData[i].mom);
@@ -978,7 +986,7 @@ int TPCAnaManager::EndOfEventAction()
     //
     // Scinti.
     //
-  
+
     for( G4int i=0; i<HitNumScint; i++){
       anaRoot.FillScintData(scintData[i].time, scintData[i].pos,
 			    scintData[i].mom,
@@ -987,7 +995,7 @@ int TPCAnaManager::EndOfEventAction()
 			    scintData[i].scintvtxpx,scintData[i].scintvtxpy,scintData[i].scintvtxpz,
 			    scintData[i].scintvtxx,scintData[i].scintvtxy,scintData[i].scintvtxz,
 			    scintData[i].length
-			    );  
+			    );
 
     }
 
@@ -1004,7 +1012,7 @@ int TPCAnaManager::EndOfEventAction()
 			 acData[i].acvtxpx,acData[i].acvtxpy,acData[i].acvtxpz,
 			 acData[i].acvtxx,acData[i].acvtxy,acData[i].acvtxz,
 			 acData[i].length
-			 );  
+			 );
 
     }
 
@@ -1022,7 +1030,7 @@ int TPCAnaManager::EndOfEventAction()
 			   nbarData[i].nbarvtxpx,nbarData[i].nbarvtxpy,nbarData[i].nbarvtxpz,
 			   nbarData[i].nbarvtxx,nbarData[i].nbarvtxy,nbarData[i].nbarvtxz,
 			   nbarData[i].length
-			   );  
+			   );
 
     }
 
@@ -1039,7 +1047,7 @@ int TPCAnaManager::EndOfEventAction()
 			 dcData[i].vtxpx,dcData[i].vtxpy,dcData[i].vtxpz,
 			 dcData[i].vtxx,dcData[i].vtxy,dcData[i].vtxz,
 			 dcData[i].length
-			 );  
+			 );
 
     }
 
@@ -1056,7 +1064,7 @@ int TPCAnaManager::EndOfEventAction()
 			 chData[i].vtxpx,chData[i].vtxpy,chData[i].vtxpz,
 			 chData[i].vtxx,chData[i].vtxy,chData[i].vtxz,
 			 chData[i].length
-			 );  
+			 );
 
     }
 
@@ -1077,7 +1085,7 @@ int TPCAnaManager::EndOfEventAction()
 			   ftofData[i].vtxpx,ftofData[i].vtxpy,ftofData[i].vtxpz,
 			   ftofData[i].vtxx,ftofData[i].vtxy,ftofData[i].vtxz,
 			   ftofData[i].length
-			   );  
+			   );
 
     }
 
@@ -1093,7 +1101,7 @@ int TPCAnaManager::EndOfEventAction()
 			     targetData[i].targettrackid,
 			     targetData[i].targetpos,
 			     targetData[i].targetvtx
-			     );  
+			     );
     }
 
 
@@ -1232,9 +1240,9 @@ int TPCAnaManager::EndOfEventAction()
 	  }
 	}
       }
-    
+
       //    std::cout<<num_cand_track<<std::endl;
-    
+
       for( G4int kk=0; kk<num_cand_track; kk++){
 	//      std::cout<<"number of hits in a track:"<<kurama_tr[kk].numHits<<std::endl;
 	//      if(kurama_tr[kk].numHits>9){
@@ -1242,7 +1250,7 @@ int TPCAnaManager::EndOfEventAction()
 	  //	RungeKuttaTracker rungekuttatrack(0, kurama_tr+kk);// 1 is C matrix usage.
 	}
       }
-    
+
     }
     //anaRoot.FillTree();
   }//trigger parts
@@ -1253,14 +1261,13 @@ int TPCAnaManager::EndOfEventAction()
 
 /////shhwang TPC
 void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
-				   G4ThreeVector mom, 
+				   G4ThreeVector mom,
 				   G4int track, G4int particle,
 				   G4int iLay,  G4int iRow, G4double beta,
-				   G4double edep, G4int parentid,G4double tlength, G4double slength){
-
+				   G4double edep, G4int parentid,G4double tlength, G4double slength)
+{
   G4int hitnum = HitNum;
   G4bool flag=true;
-
   if (hitnum >= MaxTrack) {
     fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
 	    hitnum);
@@ -1268,7 +1275,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
   }
 
   //  G4ThreeVector tar_pos(0.,0.*mm,-150.*mm);
-  
+
   G4ThreeVector tar_pos(0.,0.,target_pos_z);
   G4ThreeVector sh_pos(0.,0.,0.);
   sh_pos=pos-tar_pos;
@@ -1281,7 +1288,6 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
   G4double sh_y = sh_r*sin(sh_theta)*sin(sh_phi);
   G4double sh_z = sh_r*cos(sh_theta);
 
-
   counterData[hitnum].particleID = particle;
   ////shhwang check, check a multiplicity of layers
   for(G4int i=0;i<hitnum;i++){
@@ -1291,7 +1297,6 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     }
   }
   flag=true;
-  
   if(flag == true){
     counterData[hitnum].ntrk = ntrk;
     counterData[hitnum].time = time;
@@ -1299,7 +1304,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     counterData[hitnum].dedx = edep/slength;
     counterData[hitnum].edep = edep;
     counterData[hitnum].slength = slength;
-    
+
     //////shhwang position smearing////
 
 
@@ -1308,8 +1313,6 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     //    G4double sh_dalpha = 0.300*mm/sh_rho; // rho * theta = arc --> sigma=300 um
     //    G4double sh_smear_alpha = CLHEP::RandGauss::shoot(sh_alpha, sh_dalpha);
     G4double sh_sigmaY = 0.500*mm; //--> smearing : 400 um
-
-
 
     G4double ang_sh=atan2(sh_pos.getY(),sh_pos.getX());
     G4double ang_check=0;
@@ -1322,7 +1325,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     G4double arc_sh=pad_in[iLay]*ang_sh;
     G4int ith_pad_in=arc_sh/pad_in_width;
     G4int ith_pad_out=arc_sh/pad_out_width;
- 
+
 
     // G4double delta_x=0.;
 
@@ -1348,7 +1351,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     // 	}
 
     //   }else if(iLay>=pad_in_num){
-    // 	ith_pad_out=arc_sh/seg_width[iLay];	
+    // 	ith_pad_out=arc_sh/seg_width[iLay];
     // 	delta_x=arc_sh-ith_pad_out*seg_width[iLay];
     // 	if(delta_x<0){
     // 	  delta_x=delta_x+seg_width[iLay];
@@ -1356,13 +1359,13 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     //   }
     // }
-    
-    
-    ///include saho-san's code 
-    
+
+
+    ///include saho-san's code
+
     G4double compy=0.;
     G4double compx=0.;
-    
+
     // G4int n_electron=0; //output
     // G4int n_pad=0;//output
     // G4double x_rms=0;//output
@@ -1379,7 +1382,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     // G4double dydz_track=0;
 
-    // if( env_pad_config ==1){    
+    // if( env_pad_config ==1){
     //   if(iLay<pad_in_num){
     // 	ResHypTPC reshyptpc(pad_in_width, pad_length_in, 0.1,0.18, 0);
     // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
@@ -1391,7 +1394,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     //   }
 
 
-    // }else if( env_pad_config ==2){    
+    // }else if( env_pad_config ==2){
     //   if(iLay<pad_in_num){
     // 	ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_in, 0.1,0.18, 0);
     // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
@@ -1402,7 +1405,6 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     // 	compy = reshyptpc.getYDeviation(pos.getY());
     //   }
     // }
-        
     compx = GetTransverseRes(sh_y);
     double s_compx = CLHEP::RandGauss::shoot(0.,compx);
 
@@ -1421,7 +1423,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     counterData[hitnum].pos0[XCOORD] = pos.getX();
     counterData[hitnum].pos0[YCOORD] = pos.getY();
-    counterData[hitnum].pos0[ZCOORD] = pos.getZ();    
+    counterData[hitnum].pos0[ZCOORD] = pos.getZ();
 
     counterData[hitnum].mom[XCOORD] = mom.getX();
     counterData[hitnum].mom[YCOORD] = mom.getY();
@@ -1431,7 +1433,6 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     counterData[hitnum].particleID = particle;
     counterData[hitnum].iLay = iLay;
     G4int iPad=0.;
-
 
     if( env_pad_config ==2 ){
     //    G4bool pass_check=false;
@@ -1444,7 +1445,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
       if(iLay<pad_in_num){
 	G4double check_num_pads=(cur_angle)/seg_angle[iLay];
       //      G4cout<<check_num_pads<<G4endl;
-	iPad=int(check_num_pads);      
+	iPad=int(check_num_pads);
       }else if(iLay>=pad_in_num){
 	G4double check_num_pads=(cur_angle-angle[iLay])/seg_angle[iLay];
       //      G4cout<<check_num_pads<<G4endl;
@@ -1478,7 +1479,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 }
 
 
-void TPCAnaManager::SetTPCData(G4int tpctr2, G4int tpcpid2, G4int tpcparentid2, G4int tpcparentid_pid2, G4double tpcpx2, G4double tpcpy2,G4double tpcpz2,G4double tpcpp2,  G4int tpcqq2, G4double tpcpm2, G4double tpcde2, G4double tpclen2, G4int tpclay2, 
+void TPCAnaManager::SetTPCData(G4int tpctr2, G4int tpcpid2, G4int tpcparentid2, G4int tpcparentid_pid2, G4double tpcpx2, G4double tpcpy2,G4double tpcpz2,G4double tpcpp2,  G4int tpcqq2, G4double tpcpm2, G4double tpcde2, G4double tpclen2, G4int tpclay2,
 			       G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
 			       G4double vtxxtpc2,G4double vtxytpc2,G4double vtxztpc2, G4double vtxene2){
 
@@ -1504,10 +1505,10 @@ void TPCAnaManager::SetTPCData(G4int tpctr2, G4int tpcpid2, G4int tpcparentid2, 
 
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
-  G4double totalmom=sqrt(pow(vtxene2+tpcpm2,2)-pow(tpcpm2,2)); 
-  tpcData[hitnum].tpcvtxpx = totalmom*vtxpxtpc2; 
-  tpcData[hitnum].tpcvtxpy = totalmom*vtxpytpc2; 
-  tpcData[hitnum].tpcvtxpz = totalmom*vtxpztpc2; 
+  G4double totalmom=sqrt(pow(vtxene2+tpcpm2,2)-pow(tpcpm2,2));
+  tpcData[hitnum].tpcvtxpx = totalmom*vtxpxtpc2;
+  tpcData[hitnum].tpcvtxpy = totalmom*vtxpytpc2;
+  tpcData[hitnum].tpcvtxpz = totalmom*vtxpztpc2;
 
   tpcData[hitnum].tpcvtxx = vtxxtpc2;
   tpcData[hitnum].tpcvtxy = vtxytpc2;
@@ -1523,7 +1524,7 @@ void TPCAnaManager::SetTPCData(G4int tpctr2, G4int tpcpid2, G4int tpcparentid2, 
   tpcData[hitnum].tpcqq = tpcqq2;
   tpcData[hitnum].tpcpm = tpcpm2;
   tpcData[hitnum].tpclen = tpclen2;
-  tpcData[hitnum].tpcdedx = tpcde2;    
+  tpcData[hitnum].tpcdedx = tpcde2;
   tpcData[hitnum].tpclay = tpclay2;
   tpctrNum++;
   return;
@@ -1536,7 +1537,7 @@ void TPCAnaManager::SetPrimaryInfo(G4double mm_d, G4double mm_p, G4double theta,
   primaryInfo.mm_p = mm_p;
   primaryInfo.theta = theta;
   primaryInfo.theta_scat = theta_scat;
-  primaryInfo.theta_CM = theta_CM;  
+  primaryInfo.theta_CM = theta_CM;
 }
 
 
@@ -1552,7 +1553,7 @@ void TPCAnaManager::SetPrimaryParticle(G4double px, G4double py, G4double pz)
   primaryParticle.p0[id][0] = px;
   primaryParticle.p0[id][1] = py;
   primaryParticle.p0[id][2] = pz;
-  primaryParticle.p0[id][3] = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0));  
+  primaryParticle.p0[id][3] = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0));
   primaryParticle.p0[id][4] = 0.0;
 }
 
@@ -1619,7 +1620,7 @@ void TPCAnaManager::SetPrimaryBeam(G4double px, G4double py, G4double pz)
 }
 
 
-void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
 
@@ -1649,10 +1650,10 @@ void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  scintData[hitnum].scintvtxpx = totalmom*double(vtxmom.getX()); 
-  scintData[hitnum].scintvtxpy = totalmom*double(vtxmom.getY()); 
-  scintData[hitnum].scintvtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  scintData[hitnum].scintvtxpx = totalmom*double(vtxmom.getX());
+  scintData[hitnum].scintvtxpy = totalmom*double(vtxmom.getY());
+  scintData[hitnum].scintvtxpz = totalmom*double(vtxmom.getZ());
   scintData[hitnum].scintvtxx = double(vtxpos.getX());
   scintData[hitnum].scintvtxy = double(vtxpos.getY());
   scintData[hitnum].scintvtxz = double(vtxpos.getZ());
@@ -1663,7 +1664,7 @@ void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector
 }
 
 
-void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
 
@@ -1692,17 +1693,17 @@ void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mo
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  acData[hitnum].acvtxpx = totalmom*double(vtxmom.getX()); 
-  acData[hitnum].acvtxpy = totalmom*double(vtxmom.getY()); 
-  acData[hitnum].acvtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  acData[hitnum].acvtxpx = totalmom*double(vtxmom.getX());
+  acData[hitnum].acvtxpy = totalmom*double(vtxmom.getY());
+  acData[hitnum].acvtxpz = totalmom*double(vtxmom.getZ());
   acData[hitnum].acvtxx = double(vtxpos.getX());
   acData[hitnum].acvtxy = double(vtxpos.getY());
   acData[hitnum].acvtxz = double(vtxpos.getZ());
 
   //  G4cout<<"particle:parentid :"<<particle<<":"<<parentid<<G4endl;
   HitNumAC++;
-  
+
   if(particle==321)//kaon
     HitNumAC_K++;
 
@@ -1714,7 +1715,7 @@ void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mo
 
 
 
-void TPCAnaManager::SetNBARData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetNBARData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
 
@@ -1743,30 +1744,30 @@ void TPCAnaManager::SetNBARData(G4double time, G4ThreeVector pos, G4ThreeVector 
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  nbarData[hitnum].nbarvtxpx = totalmom*double(vtxmom.getX()); 
-  nbarData[hitnum].nbarvtxpy = totalmom*double(vtxmom.getY()); 
-  nbarData[hitnum].nbarvtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  nbarData[hitnum].nbarvtxpx = totalmom*double(vtxmom.getX());
+  nbarData[hitnum].nbarvtxpy = totalmom*double(vtxmom.getY());
+  nbarData[hitnum].nbarvtxpz = totalmom*double(vtxmom.getZ());
   nbarData[hitnum].nbarvtxx = double(vtxpos.getX());
   nbarData[hitnum].nbarvtxy = double(vtxpos.getY());
   nbarData[hitnum].nbarvtxz = double(vtxpos.getZ());
 
   //  G4cout<<"particle:parentid :"<<particle<<":"<<parentid<<G4endl;
   HitNumNBAR++;
-  
+
   if(particle==321)//kaon
     HitNumNBAR_K++;
 
   if(particle==2212)//proton
     HitNumNBAR_p++;
-  
+
   return;
 }
 
 
 
 
-void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 			      G4int track, G4int particle, G4int detector, G4double mass,G4int qq,
 			      G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
@@ -1798,10 +1799,10 @@ void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mo
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  dcData[hitnum].vtxpx = totalmom*double(vtxmom.getX()); 
-  dcData[hitnum].vtxpy = totalmom*double(vtxmom.getY()); 
-  dcData[hitnum].vtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  dcData[hitnum].vtxpx = totalmom*double(vtxmom.getX());
+  dcData[hitnum].vtxpy = totalmom*double(vtxmom.getY());
+  dcData[hitnum].vtxpz = totalmom*double(vtxmom.getZ());
   dcData[hitnum].vtxx = double(vtxpos.getX());
   dcData[hitnum].vtxy = double(vtxpos.getY());
   dcData[hitnum].vtxz = double(vtxpos.getZ());
@@ -1819,7 +1820,7 @@ void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mo
 }
 
 
-void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,
 			      G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
@@ -1851,17 +1852,17 @@ void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mo
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  chData[hitnum].vtxpx = totalmom*double(vtxmom.getX()); 
-  chData[hitnum].vtxpy = totalmom*double(vtxmom.getY()); 
-  chData[hitnum].vtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  chData[hitnum].vtxpx = totalmom*double(vtxmom.getX());
+  chData[hitnum].vtxpy = totalmom*double(vtxmom.getY());
+  chData[hitnum].vtxpz = totalmom*double(vtxmom.getZ());
   chData[hitnum].vtxx = double(vtxpos.getX());
   chData[hitnum].vtxy = double(vtxpos.getY());
   chData[hitnum].vtxz = double(vtxpos.getZ());
 
   //  G4cout<<"particle:parentid :"<<particle<<":"<<parentid<<G4endl;
   HitNumCH++;
-  
+
   if(particle==321)//kaon
     HitNumCH_K++;
 
@@ -1872,7 +1873,7 @@ void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mo
 }
 
 
-void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector mom, 
+void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,
 				G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
@@ -1904,10 +1905,10 @@ void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector 
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
-  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2)); 
-  ftofData[hitnum].vtxpx = totalmom*double(vtxmom.getX()); 
-  ftofData[hitnum].vtxpy = totalmom*double(vtxmom.getY()); 
-  ftofData[hitnum].vtxpz = totalmom*double(vtxmom.getZ()); 
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  ftofData[hitnum].vtxpx = totalmom*double(vtxmom.getX());
+  ftofData[hitnum].vtxpy = totalmom*double(vtxmom.getY());
+  ftofData[hitnum].vtxpz = totalmom*double(vtxmom.getZ());
   ftofData[hitnum].vtxx = double(vtxpos.getX());
   ftofData[hitnum].vtxy = double(vtxpos.getY());
   ftofData[hitnum].vtxz = double(vtxpos.getZ());
@@ -1924,14 +1925,13 @@ void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector 
   return;
 }
 
-
-
-
-//    AnaManager->SetTargetData(tof, xyz, mom, tid, pid,mass,parentid);
-void TPCAnaManager::SetTargetData(G4int nhits, G4ThreeVector xyz, G4ThreeVector mom, 
-				 G4int track, G4int particle, 
-				  G4int parentid,G4ThreeVector vtxpos, 
-				  G4ThreeVector vtxmom, G4double vtxene)
+//_____________________________________________________________________________
+// AnaManager->SetTargetData(tof, xyz, mom, tid, pid,mass,parentid);
+void
+TPCAnaManager::SetTargetData( G4int nhits, G4ThreeVector xyz, G4ThreeVector mom,
+			      G4int track, G4int particle,
+			      G4int parentid,G4ThreeVector vtxpos,
+			      G4ThreeVector vtxmom, G4double )
 {
   G4int hitnum = HitNumTarget;
 
@@ -2000,7 +2000,7 @@ void initTrack(Track* tracks){
       =tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
     tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
       = tracks[i].xOnTrack[2] = 1000.0;
-    tracks[i].RKPFinal[0] = 
+    tracks[i].RKPFinal[0] =
       tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
     //    for( j=0 ; j<NUM_SECTOR ; j++ ){
     //      tracks[i].numLayersinSec[j] = 0;
@@ -2030,11 +2030,11 @@ void initTrack(Track* tracks){
       tracks[i].err[j][0] = tracks[i].err[j][1]
         = tracks[i].err[j][2] = 1000.;
       tracks[i].arcLen[j] = -1.0;
-      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] = 
-        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] = 
+      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
+        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
         tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
-        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] = 
-        tracks[i].initRes[j][2] = tracks[i].phi_local[j] 
+        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
+        tracks[i].initRes[j][2] = tracks[i].phi_local[j]
         = -10000.;
 
     }
@@ -2073,7 +2073,7 @@ void initTrack_ku(Track* tracks){
       =tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
     tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
       = tracks[i].xOnTrack[2] = 1000.0;
-    tracks[i].RKPFinal[0] = 
+    tracks[i].RKPFinal[0] =
       tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
     //    for( j=0 ; j<NUM_SECTOR ; j++ ){
     //      tracks[i].numLayersinSec[j] = 0;
@@ -2104,11 +2104,11 @@ void initTrack_ku(Track* tracks){
       tracks[i].err[j][0] = tracks[i].err[j][1]
         = tracks[i].err[j][2] = 1000.;
       tracks[i].arcLen[j] = -1.0;
-      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] = 
-        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] = 
+      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
+        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
         tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
-        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] = 
-        tracks[i].initRes[j][2] = tracks[i].phi_local[j] 
+        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
+        tracks[i].initRes[j][2] = tracks[i].phi_local[j]
         = -10000.;
 
     }
@@ -2132,9 +2132,3 @@ void initTrack_ku(Track* tracks){
 */
 /*************************************
  *************************************/
-
-
-
-
-
-

@@ -55,7 +55,7 @@ G4double ResHypTPC::getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_r
   n_electron = (int)(f_n_drift_electron->GetRandom()*path_length/10.+0.5);
   //  n_electron = (int)(CLHEP::RandLandau::shoot(nmpv,nsigma)*path_length/10.+0.5);
   //  n_electron = (int)(f_n_drift_electron->CLHEP::RandFlat::shoot()*path_length/10.+0.5);
-  //  G4cout<<"test random:"<<CLHEP::RandLandau::shoot()<<G4endl;  
+  //  G4cout<<"test random:"<<CLHEP::RandLandau::shoot()<<G4endl;
   //  G4cout<<"f_n_drift_electron:"<<f_n_drift_electron->GetRandom()<<G4endl;
   //  G4cout<<"n_electron:"<<n_electron<<G4endl;
 
@@ -107,7 +107,7 @@ G4double ResHypTPC::getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_r
       n_pad ++;
     }
   }
-    
+
   x_rms = 0;
 
   if (n_sum>0) {
@@ -140,21 +140,21 @@ G4double ResHypTPC::getYDeviation(G4double y_track) {
   return y_resolution;
 }
 
-G4double GetTransverseRes(G4double y_pos){
-  
-  // double s0 = 0.204;// mm HIMAC result
-  // double Dt = 0.18;//mm/sqrt(cm) at 1T
-  G4String sigma0x=getenv("sigma0x");
-  double s0=atof( sigma0x.c_str()  );
-  
-  G4String D_t=getenv("Dt");
-  double Dt=atof( D_t.c_str()  );
-  
+G4double GetTransverseRes(G4double y_pos)
+{
+  double s0 = 0.204;// mm HIMAC result
+  double Dt = 0.18;//mm/sqrt(cm) at 1T
+  // G4String sigma0x=getenv("sigma0x");
+  // double s0=atof( sigma0x.c_str()  );
+
+  // G4String D_t=getenv("Dt");
+  // double Dt=atof( D_t.c_str()  );
+
   double L_D = 30.+(y_pos*0.1);//cm
   double N_eff = 42.8;
-  double A = 0.0582*0.01;//m-1 -> cm-1 
+  double A = 0.0582*0.01;//m-1 -> cm-1
   double e_ALD = exp(-1.*A*L_D);
-  double sT2 = s0*s0 + (Dt*Dt*L_D/(N_eff*e_ALD)); 
+  double sT2 = s0*s0 + (Dt*Dt*L_D/(N_eff*e_ALD));
   double sT = sqrt(sT2);
   return sT;
 }

@@ -1,8 +1,19 @@
+// -*- C++ -*-
+
 #include "TPCField.hh"
 #include "globals.hh"
 #include <stdlib.h>
 #include <fstream>
-//#include "TPCParameters_getenv.hh"
+#include <CLHEP/Units/PhysicalConstants.h>
+
+namespace
+{
+  using CLHEP::deg;
+  using CLHEP::mm;
+  using CLHEP::tesla;
+}
+
+
 const G4double Deg2Rad = acos(-1.)/180.;
 const G4double Rad2Deg = 180./acos(-1.);
 
@@ -24,11 +35,11 @@ TPCField::TPCField(char* file1, char* file2)
 	  bOPERA3D[1][ix][iy][iz] *=tesla;
 	  bOPERA3D[2][ix][iy][iz] *=tesla;
 	}
-      }	
+      }
     }
      printf("Finish reading OPERA3D file\n");
   }
-  //  G4cout<<TPCParameters_getenv::env_Generator<<G4endl; 
+  //  G4cout<<TPCParameters_getenv::env_Generator<<G4endl;
   //  G4String kurama_on_off=getenv("Kurama_fieldmap_on_off");
   //  G4int on_off2=atoi( kurama_on_off.c_str()  );
   if(TPCField::env_kurama_on_off==1 && env_with_kurama==1){
@@ -43,12 +54,12 @@ TPCField::TPCField(char* file1, char* file2)
 	  bOPERA3D[1][ix][iy][iz] *=tesla;
 	  bOPERA3D[2][ix][iy][iz] *=tesla;
 	}
-      }	
+      }
     }
      printf("Finish reading OPERA3D file\n");
   }
 
-}  
+}
 
 //void TPCField::TPCField_Set(G4int on_off, G4int on_off2,G4double spec_ang, G4double k_gap, G4double k_move, G4double h_field, G4double k_field){
 void TPCField::TPCField_Set(){
@@ -86,16 +97,16 @@ void TPCField::TPCField_Set(){
   env_k_field=k_field;
   env_k_pos_z=kurama_pos_z;
 
-  G4cout<<"Kurama_gap:"<<env_k_gap<<G4endl;  
-  G4cout<<"with KURAMA:"<<env_with_kurama<<G4endl;  
-  G4cout<<"Kurama shift to X axis:"<<env_k_move<<G4endl;  
+  G4cout<<"Kurama_gap:"<<env_k_gap<<G4endl;
+  G4cout<<"with KURAMA:"<<env_with_kurama<<G4endl;
+  G4cout<<"Kurama shift to X axis:"<<env_k_move<<G4endl;
 
-  G4cout<<"B field turn on/off of Helmholtz coil:"<<env_helmholtz_on_off<<G4endl;  
-  G4cout<<"B field turn on/off of Kurama:"<<env_kurama_on_off<<G4endl;  
-  G4cout<<"B field strength of Helmholtz coil:"<<env_h_field<<G4endl;  
-  G4cout<<"B field strength of Kurama magent:"<<env_k_field<<G4endl;  
-  G4cout<<"Angle of the K+ spectrometer:"<<env_spec_angle/deg<<G4endl;  
-  G4cout<<"Position of the K+ spectrometer:"<<env_k_pos_z<<G4endl;  
+  G4cout<<"B field turn on/off of Helmholtz coil:"<<env_helmholtz_on_off<<G4endl;
+  G4cout<<"B field turn on/off of Kurama:"<<env_kurama_on_off<<G4endl;
+  G4cout<<"B field strength of Helmholtz coil:"<<env_h_field<<G4endl;
+  G4cout<<"B field strength of Kurama magent:"<<env_k_field<<G4endl;
+  G4cout<<"Angle of the K+ spectrometer:"<<env_spec_angle/deg<<G4endl;
+  G4cout<<"Position of the K+ spectrometer:"<<env_k_pos_z<<G4endl;
   G4cout<<"-------------T____T-------------"<<G4endl;
   G4cout<<"!!!!!!!!!!!!!!!E42!!!!!!!!!!!!!!"<<G4endl;
 }
@@ -133,7 +144,7 @@ void TPCField::GetFieldValue(const G4double Point[3], G4double Bfield[3]) const
   if(on_off==0){
     //        G4String kurama_gap=getenv("Kurama_gap");
     //        G4double k_gap=atof( kurama_gap.c_str())*mm;
-    //    
+    //
     //    G4String kurama_move_x=getenv("Kurama_move_x");
     //    G4double k_move_x=atof( kurama_move_x.c_str());
 
@@ -144,14 +155,14 @@ void TPCField::GetFieldValue(const G4double Point[3], G4double Bfield[3]) const
       Bfield[0]=0.*tesla;
       Bfield[1]=h_field*tesla;
       Bfield[2]=0.*tesla;
-      
-      // G4cout<<"Bfield(y) ="<<Bfield[1]<<", "<<h_field<<G4endl;      
+
+      // G4cout<<"Bfield(y) ="<<Bfield[1]<<", "<<h_field<<G4endl;
       // G4cout<<"x, y, z ="<<xp*mm<<", "<<yp*mm<<", "<<zp*mm<<std::endl;
 
 
     }
     else if( env_with_kurama==1 && (rot_zp >= (env_k_pos_z-400.)*mm &&  rot_zp <= (env_k_pos_z+400.)*mm) &&
-	     (rot_xp >= (k_move_x-500.)*mm && rot_xp <= (k_move_x+500.)*mm) && 
+	     (rot_xp >= (k_move_x-500.)*mm && rot_xp <= (k_move_x+500.)*mm) &&
 	     (yp < k_gap && yp > -k_gap)  ){
       //    G4cout<<k_gap<<G4endl;
       //            G4cout<<"------------------------------------"<<G4endl;
@@ -164,7 +175,7 @@ void TPCField::GetFieldValue(const G4double Point[3], G4double Bfield[3]) const
       Bfield[2]=0.*tesla;
 
       //getchar();
-      //      G4cout<<"test2:"<<yp<<":"<<k_field<<G4endl;      
+      //      G4cout<<"test2:"<<yp<<":"<<k_field<<G4endl;
     }
     else {
       Bfield[0]=0.*tesla;
@@ -178,18 +189,18 @@ void TPCField::GetFieldValue(const G4double Point[3], G4double Bfield[3]) const
     const G4double zmax = 250.0*mm;
     //    const G4double zmin = -300.0*mm;
     G4int iX,iY,iZ;
-    
+
     //    Bfield[0] = 0.;
     //    Bfield[1] = 0.;
-    //    Bfield[2] = 1.0*tesla; 
+    //    Bfield[2] = 1.0*tesla;
     //    return;
-    
+
     iX = (int) ((Point[0]-xOPERA3D[0])/BFIELD_GRID_X);
     iY = (int) ((Point[1]-yOPERA3D[0])/BFIELD_GRID_Y);
     iZ = (int) ((Point[2]-zOPERA3D[0])/BFIELD_GRID_Z);
     G4cout<<"iX,iY,iZ"<<iX<<","<<iY<<","<<iZ<<G4endl;
-    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-    
+    // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     if(fabs(Point[2])<zmax && fabs(Point[1])<ymax && fabs(Point[0])<xmax ) {
       G4double s,t,u;
       G4double sp, tp, up;
@@ -204,29 +215,28 @@ void TPCField::GetFieldValue(const G4double Point[3], G4double Bfield[3]) const
       s = (Point[0] - xOPERA3D[iX]) / BFIELD_GRID_X;
       t = (Point[1] - yOPERA3D[iY]) / BFIELD_GRID_Y;
       u = (Point[2] - zOPERA3D[iZ]) / BFIELD_GRID_Z;
-      sp = 1.0-s; tp = 1.0-t;  up = 1.0-u; 
-      
+      sp = 1.0-s; tp = 1.0-t;  up = 1.0-u;
+
       for (int i=0; i<3; i++){
 	G4double b[8]= {
 	  bOPERA3D[i][iX][iY][iZ],       bOPERA3D[i][iX+1][iY][iZ],
 	  bOPERA3D[i][iX+1][iY][iZ+1],   bOPERA3D[i][iX][iY][iZ+1],
 	  bOPERA3D[i][iX][iY+1][iZ],     bOPERA3D[i][iX+1][iY+1][iZ],
 	  bOPERA3D[i][iX+1][iY+1][iZ+1], bOPERA3D[i][iX][iY+1][iZ+1] };
-	
+
 	G4double bTmp  = up*b[0] + u*b[3]; /* up*(iX,  iY,  iZ) + u*(iX,  iY,  iZ+1) */
 	G4double bTmp1 = up*b[1] + u*b[2]; /* up*(iX+1,iY,  iZ) + u*(iX+1,iY,  iZ+1) */
 	G4double bTmp2 = up*b[4] + u*b[7]; /* up*(iX,  iY+1,iZ) + u*(iX,  iY+1,iZ+1) */
 	G4double bTmp3 = up*b[5] + u*b[6]; /* up*(iX+1,iY+1,iZ) + u*(iX+1,iY+1,iZ+1) */
-	
+
 	Bfield[i] =  sp * (tp * bTmp + t * bTmp2) + s * (tp * bTmp1 + t * bTmp3) ;
 	G4cout<<Bfield[i]<<G4endl;
       }
     } else {  //othere case
       Bfield[0] = 0.;
       Bfield[1] = 0.;
-      Bfield[2] = 0.; 
+      Bfield[2] = 0.;
     }
-  }  
+  }
   return;
 }
-

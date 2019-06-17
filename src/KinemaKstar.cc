@@ -1,21 +1,24 @@
+// -*- C++ -*-
+
+#include "KinemaKstar.hh"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "KinemaKstar.hh"
 #include "Randomize.hh"
 #include "G4ios.hh"
 
-#define PI 3.141592654
-
-KinemaKstar::KinemaKstar(double m1, double m2, double m3, double m4, double p1, double p2)
+//_____________________________________________________________________________
+KinemaKstar::KinemaKstar( double m1, double m2, double m3, double m4,
+			  double p1, double p2 )
 {
   double ECM;
   double vx3, vy3, vz3;            /* unit vector */
   double vx4, vy4, vz4;            /* unit vector */
   double theta3, theta4;
-  double phi3;                     /* 2phi(CM system)*/ 
+  double phi3;                     /* 2phi(CM system)*/
   double Theta3,Phi3;              /*heta,Ph*/
   double Theta4,Phi4;              /* eta,Ph*/
 
@@ -44,7 +47,7 @@ KinemaKstar::KinemaKstar(double m1, double m2, double m3, double m4, double p1, 
   //    kin3.M_res = CLHEP::RandBreitWigner::shoot(m_res, width);
   //  } while (kin3.M_3+kin3.M_4 > kin3.M_res || kin3.M_res > ECM-kin3.M_5);
   //  kin3.M_res = m_res;
-  //  G4cout<<"ecm:m3+m4:       "<<ECM<<"  :  "<<m3+m4<<G4endl;  
+  //  G4cout<<"ecm:m3+m4:       "<<ECM<<"  :  "<<m3+m4<<G4endl;
   if(ECM<m3+m4){
     G4cout<<"Center of energy less than the mass sum for the produced particles"<<G4endl;
     return;
@@ -101,17 +104,19 @@ double KinemaKstar::p2E(double p,double m)
   return sqrt(p*p + m*m);
 }
 
-void KinemaKstar::CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi)
+//_____________________________________________________________________________
+void KinemaKstar::CalcDistoribution( double unitx, double unity, double ,
+				     double *theta, double *phi )
 {
   *theta = rag2deg(acos(unitx));
   *phi=rag2deg(atan2(unity,unitx));
-  /*  if (unity>=0.0 && unitz>0.0) 
+  /*  if (unity>=0.0 && unitz>0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<0.0 && unitz>=0.0) 
+  else if (unity<0.0 && unitz>=0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<=0.0 && unitz<0.0) 
+  else if (unity<=0.0 && unitz<0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity>0.0 && unitz<=0.0) 
+  else if (unity>0.0 && unitz<=0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
   else {
     fprintf(stderr,
@@ -134,7 +139,7 @@ double KinemaKstar::rag2deg(double rag)
   return 360.0 * rag/ (2.0 * 3.141592654);
 }
 
-    
+
 double KinemaKstar::RandSin(void)
 {
   int success=0;
@@ -341,4 +346,3 @@ void KinemaKstar::RotateMom(int i, double deg, double *mom)
     exit(1);
   }
 }
-

@@ -43,7 +43,10 @@ TPCSteppingAction::~TPCSteppingAction()
 
 void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
 {
-  G4Track * theTrack = theStep->GetTrack();
+  auto theTrack = theStep->GetTrack();
+  auto particle = theTrack->GetParticleDefinition();
+  auto particleName = particle->GetParticleName();
+
 
   // check if it is alive
   //  if(theTrack->GetTrackStatus()!=fAlive) { return; }
@@ -64,6 +67,18 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
   //  G4cout<<"start stepping action:"<<thePrePVname<<G4endl;
 
   G4Material * material =  thePrePoint -> GetMaterial();
+  auto postStepPoint = theStep->GetPostStepPoint();
+  auto process = postStepPoint->GetProcessDefinedStep()->GetProcessName();
+
+#if 0
+  if( process != "eIoni" &&
+      process != "hIoni" &&
+      process != "msc" &&
+      process != "eBeam" &&
+      process != "Transportation" ){
+    G4cout << particleName << " " << process << G4endl;
+  }
+#endif
 
   G4String m_name=material->GetName();
   if(m_name=="Iron" ){
@@ -71,8 +86,8 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
     return;
   }
 
-  if(thePrePVname=="HelmPV"){ 
-    theTrack->SetTrackStatus( fStopAndKill );  
+  if(thePrePVname=="HelmPV"){
+    theTrack->SetTrackStatus( fStopAndKill );
     return;
   }
   //  G4cout<<"end stepping action:"<<thePrePVname<<G4endl;
@@ -83,5 +98,3 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
   // then suspend the track
   //  theTrack->SetTrackStatus(fSuspend);
 }
-
-

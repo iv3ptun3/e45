@@ -1,18 +1,32 @@
+// -*- C++ -*-
+
 #include "TPCAnaRoot.hh"
+
+#include <CLHEP/Units/PhysicalConstants.h>
 #include "Randomize.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
 
+namespace
+{
+  using CLHEP::GeV;
+  using CLHEP::cm;
+  using CLHEP::mm;
+}
 
-TPCAnaRoot::TPCAnaRoot()
+//_____________________________________________________________________________
+TPCAnaRoot::TPCAnaRoot( void )
 {
 }
 
-TPCAnaRoot::~TPCAnaRoot()
+//_____________________________________________________________________________
+TPCAnaRoot::~TPCAnaRoot( void )
 {
 }
 
-void TPCAnaRoot::BeginOfRunAction(int runnum)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::BeginOfRunAction( int runnum )
 {
   //  char filename[30];
 
@@ -59,7 +73,7 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
 
   tree->Branch("ev",&tree1ev.ev,"ev/I");
   tree->Branch("pg",tree1ev.pg,"pg[4]/D");
-  tree->Branch("npid",&tree1ev.npid,"npid/I");  
+  tree->Branch("npid",&tree1ev.npid,"npid/I");
   tree->Branch("pid0",tree1ev.pid0,"pid0[npid]/I");
   tree->Branch("x0",tree1ev.x0,"x0[npid][3]/D");
   tree->Branch("p0",tree1ev.p0,"p0[npid][5]/D");
@@ -67,15 +81,15 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
   tree->Branch("mass0",tree1ev.mass0,"mass0[npid]/D");
   tree->Branch("theta0",tree1ev.theta0,"theta0[npid]/D");
 
-  tree->Branch("mm_d",&tree1ev.mm_d,"mm_d/D");  
+  tree->Branch("mm_d",&tree1ev.mm_d,"mm_d/D");
   // tree->Branch("mm_p",&tree1ev.mm_p,"mm_p/D");
-  tree->Branch("theta",&tree1ev.theta,"theta/D");    
-  tree->Branch("theta_scat",&tree1ev.theta_scat,"theta_scat/D");    
-  tree->Branch("theta_CM",&tree1ev.theta_CM,"theta_CM/D");    
-  
-  // tree->Branch("mm",&tree1ev.mm,"mm/D");  
+  tree->Branch("theta",&tree1ev.theta,"theta/D");
+  tree->Branch("theta_scat",&tree1ev.theta_scat,"theta_scat/D");
+  tree->Branch("theta_CM",&tree1ev.theta_CM,"theta_CM/D");
 
-  
+  // tree->Branch("mm",&tree1ev.mm,"mm/D");
+
+
 
   //generator mode
   tree->Branch("gen",&tree1ev.gen,"gen/I");
@@ -88,7 +102,7 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
 
 
   ///////shhwang tpc hit step
-  
+
   // tree->Branch("nttpc",&tree1ev.nttpc,"nttpc/I");
   // tree->Branch("ntrk",tree1ev.ntrk,"ntrk[nttpc]/I");
   // tree->Branch("ititpc",tree1ev.ititpc,"ititpc[nttpc]/I");
@@ -103,7 +117,7 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
   // tree->Branch("pxtpc",tree1ev.pxtpc,"pxtpc[nttpc]/D");
   // tree->Branch("pytpc",tree1ev.pytpc,"pytpc[nttpc]/D");
   // tree->Branch("pztpc",tree1ev.pztpc,"pztpc[nttpc]/D");
-  // tree->Branch("pptpc",tree1ev.pptpc,"pptpc[nttpc]/D");   // total mometum 
+  // tree->Branch("pptpc",tree1ev.pptpc,"pptpc[nttpc]/D");   // total mometum
   // tree->Branch("masstpc",tree1ev.masstpc,"masstpc[nttpc]/D");   // mass TPC
   // //  tree->Branch("betatpc",tree1ev.betatpc,"betatpc[nttpc]/D");
   // // tree->Branch("edeptpc",tree1ev.edeptpc,"edeptpc[nttpc]/D");
@@ -112,13 +126,13 @@ void TPCAnaRoot::BeginOfRunAction(int runnum)
   // tree->Branch("laytpc",tree1ev.laytpc,"laytpc[nttpc]/I");
   // tree->Branch("rowtpc",tree1ev.rowtpc,"rowtpc[nttpc]/I");
   // tree->Branch("parentID",tree1ev.parentID,"parentID[nttpc]/I");
-  
+
   //// study on multiplicity
   // tree->Branch("nthlay",tree1ev.nthlay,"nthlay[nttpc]/I");
   // tree->Branch("nthpad",tree1ev.nthpad,"nthpad[nttpc]/I");
   // tree->Branch("laypad",tree1ev.laypad,"laytpadpc[nttpc][40][250]/I");
-  
-  
+
+
   //shhwang ntrtpc --> number of trak in tpc
   tree->Branch("ntrtpc",&tree1ev.ntrtpc,"ntrtpc/I");
   tree->Branch("trpmtpc",tree1ev.trpmtpc,"trpmtpc[ntrtpc]/D");
@@ -271,7 +285,7 @@ void TPCAnaRoot::BeginOfEventAction()
     tree1ev.trpidtpc[i]  = -1;
     tree1ev.trparentidtpc[i]  = -1;
     tree1ev.trparentid_pid_tpc[i]  = -1;
-    
+
 
     tree1ev.trpptpc[i]  = -9999.9999;
     tree1ev.trpttpc[i]  = -9999.9999;
@@ -307,12 +321,12 @@ void TPCAnaRoot::BeginOfEventAction()
     tree1ev.cir_x[i]  = -9999.9999;
     tree1ev.cir_z[i]  = -9999.9999;
     tree1ev.cir_fit[i]  = -9999.9999;
-    
+
     tree1ev.vtx_flag[i]  = -1;
     tree1ev.a_fory[i]  = -9999.9999;
     tree1ev.b_fory[i]  = -9999.9999;
   }
-  
+
   for(int i = 0; i< 4;i++){
     tree1ev.pg[i]  = -9999.9;
   }
@@ -363,7 +377,7 @@ void TPCAnaRoot::BeginOfEventAction()
     tree1ev.betatpc[i] = -9999.9;
 
     tree1ev.edeptpc[i] = -9999.9;
-    
+
     tree1ev.ititpc[i] = -1;
     tree1ev.idtpc[i] = -1;
     tree1ev.laytpc[i] = -1;
@@ -567,14 +581,14 @@ void TPCAnaRoot::FillLayerPad(G4int nlay,G4int npad)
 
 
 void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
-			     G4double tpcpz,G4double tpcpp, 
-			     G4int tpcpid, G4int tpcparentid, G4int tpcparentid_pid, 
-			     G4int tpcqq, 
-			     G4double tpcpm, G4double tpcde, G4double tpclen, 
-			     G4double tpcdedx,G4double tpcdedxtr, G4int tpclay, 
+			     G4double tpcpz,G4double tpcpp,
+			     G4int tpcpid, G4int tpcparentid, G4int tpcparentid_pid,
+			     G4int tpcqq,
+			     G4double tpcpm, G4double tpcde, G4double tpclen,
+			     G4double tpcdedx,G4double tpcdedxtr, G4int tpclay,
 			     G4double tpcvtxpx,G4double tpcvtxpy,G4double tpcvtxpz,
-			     G4double tpcvtxx,G4double tpcvtxy,G4double tpcvtxz, 
-			     G4double tpcvtxxfit,G4double tpcvtxyfit,G4double tpcvtxzfit, 
+			     G4double tpcvtxx,G4double tpcvtxy,G4double tpcvtxz,
+			     G4double tpcvtxxfit,G4double tpcvtxyfit,G4double tpcvtxzfit,
 			     G4double tpcpxfit,G4double tpcpyfit,G4double tpcpzfit,G4double tpcptfit,
 			     G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit,
 			     G4int vtx_flag, G4double a_fory, G4double b_fory)//--> should be changed
@@ -583,7 +597,7 @@ void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
   tree1ev.trpidtpc[tree1ev.ntrtpc] = tpcpid;
   tree1ev.trparentidtpc[tree1ev.ntrtpc] = tpcparentid;
   tree1ev.trparentid_pid_tpc[tree1ev.ntrtpc] = tpcparentid_pid;
-  
+
   tree1ev.trpxtpc[tree1ev.ntrtpc] = tpcpx/GeV;
   tree1ev.trpytpc[tree1ev.ntrtpc] = tpcpy/GeV;
   tree1ev.trpztpc[tree1ev.ntrtpc] = tpcpz/GeV;
@@ -725,7 +739,7 @@ void TPCAnaRoot::FillPrimaryParticle(int id, double* x0, double* p0, int pid)
   }
 
   for(int i=0;i<4;i++){
-    tree1ev.p0[id][i] = p0[i];  
+    tree1ev.p0[id][i] = p0[i];
   }
   tree1ev.pid0[id] = pid;
 
@@ -749,7 +763,7 @@ void TPCAnaRoot::FillBeam(double px, double py, double pz)
 }
 
 
-void TPCAnaRoot::FillPrimaryInfo(double mm_d, double mm_p, double theta, 
+void TPCAnaRoot::FillPrimaryInfo(double mm_d, double mm_p, double theta,
 				 double theta_scat, double theta_CM)
 {
 
@@ -762,8 +776,8 @@ void TPCAnaRoot::FillPrimaryInfo(double mm_d, double mm_p, double theta,
   tree1ev.mm = mm;
 }
 
-void TPCAnaRoot::FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K, 
-			    int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K, 
+void TPCAnaRoot::FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
+			    int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
 			    int HitNumScint_K, int HitNumTarget_K)
 {
   tree1ev.HitNum_K = HitNum_K;
@@ -778,8 +792,8 @@ void TPCAnaRoot::FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
 
 
 
-void TPCAnaRoot::FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p, 
-			    int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p, 
+void TPCAnaRoot::FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
+			    int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
 			    int HitNumScint_p, int HitNumTarget_p)
 {
   tree1ev.HitNum_p = HitNum_p;
@@ -796,7 +810,7 @@ void TPCAnaRoot::FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
 void TPCAnaRoot::FillScintData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double scintvtxpx,G4double scintvtxpy,G4double scintvtxpz,
-			       G4double scintvtxx,G4double scintvtxy,G4double scintvtxz, G4double tlength 
+			       G4double scintvtxx,G4double scintvtxy,G4double scintvtxz, G4double tlength
 )
 {
 
@@ -838,7 +852,7 @@ void TPCAnaRoot::FillScintData(G4double time, G4double *pos, G4double *mom,
 void TPCAnaRoot::FillACData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double acvtxpx,G4double acvtxpy,G4double acvtxpz,
-			       G4double acvtxx,G4double acvtxy,G4double acvtxz, G4double tlength 
+			       G4double acvtxx,G4double acvtxy,G4double acvtxz, G4double tlength
 )
 {
 
@@ -881,7 +895,7 @@ void TPCAnaRoot::FillACData(G4double time, G4double *pos, G4double *mom,
 void TPCAnaRoot::FillNBARData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double nbarvtxpx,G4double nbarvtxpy,G4double nbarvtxpz,
-			       G4double nbarvtxx,G4double nbarvtxy,G4double nbarvtxz, G4double tlength 
+			       G4double nbarvtxx,G4double nbarvtxy,G4double nbarvtxz, G4double tlength
 )
 {
 
@@ -923,7 +937,7 @@ void TPCAnaRoot::FillNBARData(G4double time, G4double *pos, G4double *mom,
 void TPCAnaRoot::FillDCData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength 
+			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
 )
 {
 
@@ -963,7 +977,7 @@ void TPCAnaRoot::FillDCData(G4double time, G4double *pos, G4double *mom,
 void TPCAnaRoot::FillCHData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength 
+			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
 )
 {
 
@@ -1004,7 +1018,7 @@ void TPCAnaRoot::FillCHData(G4double time, G4double *pos, G4double *mom,
 void TPCAnaRoot::FillFTOFData(G4double time, G4double *pos, G4double *mom,
 			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
 			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength 
+			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
 )
 {
 
@@ -1058,13 +1072,13 @@ void TPCAnaRoot::FillFTOFData(G4double time, G4double *pos, G4double *mom,
   tree1ev.tidfdc[tree1ev.ntfdc] = tid;
   tree1ev.pidfdc[tree1ev.ntfdc] = pid;
   tree1ev.didfdc[tree1ev.ntfdc] = did;
-  
+
   tree1ev.ntfdc++;
 
 }
 */
 
-void TPCAnaRoot::FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4int trackid, G4ThreeVector pos, G4ThreeVector vtx) 
+void TPCAnaRoot::FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4int trackid, G4ThreeVector pos, G4ThreeVector vtx)
 {
   //  tree1ev.targethits[tree1ev.ntfdc] = nhit;
   tree1ev.targetpid[tree1ev.targethits] = particleid;
@@ -1081,4 +1095,3 @@ void TPCAnaRoot::FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4
   //  G4cout<<tree1ev.targethits<<G4endl;
 
 }
-

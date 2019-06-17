@@ -4,7 +4,7 @@
 // ====================================================================
 #ifndef TPC_AC_HIT_H
 #define TPC_AC_HIT_H
- 
+
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
@@ -16,7 +16,7 @@ private:
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
   G4double tof;
-  G4double edep; 
+  G4double edep;
   G4int trackID;
   G4int particleID;
   G4int detectorID;
@@ -40,11 +40,11 @@ public:
   // copy constructor & assignment operator
   TPCACHit(const TPCACHit& right);
   const TPCACHit& operator=(const TPCACHit& right);
-  
+
   // new/delete operators
   void* operator new(size_t);
   void operator delete(void* aHit);
-  
+
   const G4ThreeVector& GetVtxPosition() const { return vtxposi; }
   const G4ThreeVector& GetVtxMomentum() const { return vtxmome; }
   G4double GetVtxEnergy() const { return vtxene; }
@@ -92,7 +92,7 @@ inline const TPCACHit& TPCACHit::operator=
 }
 
 // externally instanciated.
-extern G4Allocator<TPCACHit> TPCACHitAllocator; 
+extern G4Allocator<TPCACHit> TPCACHitAllocator;
 
 inline void* TPCACHit::operator new(size_t)
 {

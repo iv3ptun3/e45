@@ -24,7 +24,7 @@ protected:
 
 class AGSWave : public AngDisGenerator
 {
-  // D(x)=1/2 
+  // D(x)=1/2
 public:
   AGSWave( double cost1=1.0, double cost2=-1.0 );
   ~AGSWave() {};
@@ -33,7 +33,7 @@ public:
 
   double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
-  inline double Dfunc( double x ) const { return 0.5; }
+  inline double Dfunc( double ) const { return 0.5; }
 
 };
 
@@ -63,7 +63,7 @@ public:
   ~AGPWaveBP() {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  
+
   double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
   inline double Dfunc( double x ) const { return 0.5*(1.-x); }
@@ -80,7 +80,7 @@ public:
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
 
-  
+
 private:
   inline double Dfunc( double x ) const { return 0.5*(x*x+1.); }
 };
@@ -94,10 +94,10 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
-    return 
+  inline double Dfunc( double x ) const {
+    return
       (6.1+
        1.2*x+
        (-5.2)/2.*(3*x*x-1))/10.;
@@ -114,10 +114,10 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
-    return 
+  inline double Dfunc( double x ) const {
+    return
       (30.6394+
        (11.7159)*x+
        (-9.52849)/2.*(3*x*x-1)+
@@ -125,8 +125,8 @@ private:
        (-7.13241)/8.*(35*x*x*x*x-30*x*x+3)+
        (-3.61133)/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
        (-2.21394)/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5))/51.;
-    
- 
+
+
   }
 };
 
@@ -141,18 +141,18 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
+  inline double Dfunc( double x ) const {
     return
-      
+
       (1.64+
       1.02*x+
       1.54/2.*(3*x*x-1)+
       0.96/2.*(5*x*x*x-3*x)+
       0.55/8.*(35*x*x*x*x-30*x*x+3)+
        (-0.56)/8.*(63*x*x*x*x*x-70*x*x*x+15*x))/6.;
-    
+
   }
 };
 
@@ -166,17 +166,17 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
+  inline double Dfunc( double x ) const {
     return
-      
+
       (13.9+
        9.8*x+
        20.1/2.*(3*x*x-1)-
        1.3/2.*(5*x*x*x-3*x)+
        12.8/8.*(35*x*x*x*x-30*x*x+3))/53.;
-    
+
   }
 };
 
@@ -192,11 +192,11 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
+  inline double Dfunc( double x ) const {
     return
-      
+
       (9.6+
        5.3*x+
        8.0/2.*(3*x*x-1)+
@@ -218,11 +218,11 @@ public:
 
   G4ThreeVector GenerateDirection( void ) const;
   double GetDfuncVal( double x) const{ return Dfunc(x);}
-  
+
 private:
-  inline double Dfunc( double x ) const { 
+  inline double Dfunc( double x ) const {
     return
-      
+
       (37.5+
        7.5*x+
        19.0/2.*(3*x*x-1)+

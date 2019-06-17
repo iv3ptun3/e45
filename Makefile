@@ -24,30 +24,20 @@ CXXFLAGS        = -O -Wall -fPIC
 CXXFLAGS       += $(ROOTCFLAGS)
 CPPFLAGS       += $(ROOTCFLAGS)
 
-#include $(G4INSTALL)/config/binmake.gmk
-
-ifndef G4INSTALL
-#  G4INSTALL = /sw/packages/Geant4/geant4.9.4.p03
-#  G4INSTALL = /sw/packages/geant4/9.6.4/share/Geant4-9.6.4/geant4make
-  G4INSTALL = /sw/packages/geant4/9.5.2/share/Geant4-9.5.2/geant4make	
-#  G4INSTALL = /sw/packages/geant4/10.2.2/share/Geant4-10.2.2/geant4make
-endif
-
-
 include $(G4INSTALL)/config/binmake.gmk
 
 CERN_ROOT = /sw
 CLIB = -L$(CERN_ROOT)/lib -lpawlib -lgraflib -lgrafX11 \
         -lpacklib -lphtools -lmathlib -lkernlib -lnsl
-XLIB = -L/usr/lib -lXt  -lX11 -lXp -lXext -lm -lc
+#XLIB = -L/usr/lib -lXt  -lX11 -lXp -lXext -lm -lc
 
 FC = gfortran -m32
-FLAGS = -O -fno-automatic -ffixed-line-length-132
+FLAGS = -Wall -O2 #-fno-automatic -ffixed-line-length-132
 FFLAGS +=  -c ./include
 
 CXXFLAGS += $(ROOTCFLAGS)
-CPPFLAGS += -I$(ROOTSYS)/include 
-LDLIBS   += $(ROOTLIBS) 
+CPPFLAGS += -I$(ROOTSYS)/include
+LDLIBS   += $(ROOTLIBS)
 CPPFLAGS += -I/sw/include
 LDLIBS   += -L/sw/lib
 
@@ -56,6 +46,3 @@ LDLIBS   += -L/sw/lib
 #ifndef G4INSTALL
 #  G4INSTALL = ../
 #endif
-
-
-

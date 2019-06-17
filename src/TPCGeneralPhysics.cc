@@ -1,9 +1,8 @@
-// ====================================================================
-//   TPCGeneralPhysicsList.cc
-//
-// ====================================================================
+// -*- C++ -*-
+
 #include "TPCGeneralPhysics.hh"
-#include "G4ProcessManager.hh"
+
+#include <G4ProcessManager.hh>
 
 //////////////////////////////////////////////////////////
 TPCGeneralPhysics::TPCGeneralPhysics(const G4String& name)
@@ -39,7 +38,8 @@ void TPCGeneralPhysics::ConstructProcess()
   G4Decay* decayProcess= new G4Decay();
 
   // add decay process...
-  theParticleIterator-> reset();
+  auto* theParticleIterator = GetParticleIterator();
+  theParticleIterator->reset();
   while ((*theParticleIterator)()) {
     G4ParticleDefinition* particle= theParticleIterator-> value();
     G4ProcessManager* pManager= particle-> GetProcessManager();
@@ -50,4 +50,3 @@ void TPCGeneralPhysics::ConstructProcess()
     }
   }
 }
-

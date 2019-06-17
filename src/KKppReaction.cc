@@ -1,8 +1,11 @@
+// -*- C++ -*-
+
 //-----------------------------------------------------------
-// KKppReaction.cc 
+// KKppReaction.cc
 // for the EventGeneration for the KKpp reaction
 //-----------------------------------------------------------
 #include "KKppReaction.hh"
+
 #include "TPCPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "Kinema3Resonance.hh"
@@ -26,66 +29,67 @@
 #include "AngDisGenerator.hh"
 #include <TTree.h>
 
-const int MaxTry=1000;
-const double AtomicMassUnit = 0.9314932;
+namespace
+{
+  using CLHEP::GeV;
+  const int MaxTry=1000;
+}
 
-//reactio No #3001 K- d -> K0 K-K-pp, K-K-pp -> LL -> p pi p pi reaction
-void KKppReaction::KKpp_LL1(G4Event* anEvent){
+//_____________________________________________________________________________
+// reaction #3001 K- d -> K0 K-K-pp, K-K-pp -> LL -> p pi p pi reaction
+void
+KKppReaction::KKpp_LL1( G4Event* anEvent )
+{
+  G4double Mp   = G4Proton::Definition()->GetPDGMass();
+  G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
+  G4double Mpip = G4PionPlus::Definition()->GetPDGMass();
+  // G4double Mn   = G4Neutron::Definition()->GetPDGMass();
+  // G4double Mpiz = G4PionZero::Definition()->GetPDGMass();
+  G4double ML   = G4Lambda::Definition()->GetPDGMass();
+  G4double MKz  = G4KaonZero::Definition()->GetPDGMass();
+  G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
+  G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-
-  G4double Mp=G4Proton::Definition()->GetPDGMass();
-  G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
-  G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
-  G4double Mn=G4Neutron::Definition()->GetPDGMass();
-  G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
-  G4double ML=G4Lambda::Definition()->GetPDGMass();
-  G4double MKz=G4KaonZero::Definition()->GetPDGMass();
-
-  G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
-  G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
- 
- 
-  
   G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(), 
+					     pGen->Get_env_Beam_y0(),
 					     pGen->Get_env_target_pos_z(),
 					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(), 
+					     pGen->Get_env_Beam_dy(),
 					     pGen->Get_env_target_size_x(),
 					     pGen->Get_env_target_width());
   //Note!! env_target_width = Target_Size_z (height of target)
-					     
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(), 
-						pGen->Get_env_Beam_v0(), 
-						pGen->Get_env_Beam_du(), 
-						pGen->Get_env_Beam_dv()); 
-  
+
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
+						pGen->Get_env_Beam_v0(),
+						pGen->Get_env_Beam_du(),
+						pGen->Get_env_Beam_dv());
+
   G4double pb = pGen->Get_env_Beam_mom()*GeV;
   G4double dpb = 0.;
   if(pGen->Get_env_Beam_mom()!=0.)
     dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
   pb += dpb;
-  
+
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
   double KKpp_G0 = 0.1; //assumption
   G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
-  
+
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL1, LPL2, LPf1, LPf2, LPf3, LPf4, LPf5, LPf6;
-  
+
   AGUniform gen1;
   AGUniform gen2;
   AGUniform gen3;
   AGUniform gen4;
 
   G4ThreeVector LPini2=G4ThreeVector(0.,0.,0.);
-  
+
   bool status = false;
   bool status2 = false;
   bool status3 = false;
   bool status4 = false;
   bool status5 = false;
-  
+
 
   G4int n=0;
   while(1){
@@ -95,8 +99,8 @@ void KKppReaction::KKpp_LL1(G4Event* anEvent){
 		  RunMustBeAborted,
 		  "KKppReaction::Production under Threshold!!");
      }
-  
-    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1, 
+
+    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
 				  pb*LBeamDir,LPini2,
 				  LPKz, LPm1,theta_CM, gen1);
     theta_CM = theta_CM*(180./(acos(-1.)));
@@ -113,14 +117,14 @@ void KKppReaction::KKpp_LL1(G4Event* anEvent){
 	 status4=Decay2Body( ML, Mp, Mpim, LPL1, LPf3, LPf4, gen2 );
 	 //L -> p pi-
 	 status5=Decay2Body( ML, Mp, Mpim, LPL2, LPf5, LPf6, gen2 );
-	 
+
 	 if(status4 == true && status5 == true)
 	   break;
        }
        else
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
-     
+
      pb = pGen->Get_env_Beam_mom()*GeV;
      dpb = 0.;
      if(pGen->Get_env_Beam_mom()!=0.)
@@ -141,7 +145,7 @@ void KKppReaction::KKpp_LL1(G4Event* anEvent){
   double theta_scat;
   double cos_theta_scat;
   G4ThreeVector beam_mom = pb*LBeamDir;
-  
+
   cos_theta_scat = (beam_mom.x()*LPKz.x()+beam_mom.y()*LPKz.y()+beam_mom.z()*LPKz.z())/(beam_mom.mag()*LPKz.mag());
   theta_scat = acos(cos_theta_scat)*(180./acos(-1.));
 
@@ -161,7 +165,7 @@ void KKppReaction::KKpp_LL1(G4Event* anEvent){
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* PionPlus;
   PionPlus = particleTable->FindParticle("pi+");
-  
+
   pGen->particleGun->SetParticleDefinition(PionPlus);
   pGen->particleGun->SetParticlePosition(LPos);
   pGen->particleGun->SetParticleMomentum(LPf1);
@@ -223,66 +227,62 @@ void KKppReaction::KKpp_LL1(G4Event* anEvent){
 
 }
 
+//_____________________________________________________________________________
+// reaction #3002 K- d -> K0 K-K-pp, K-K-pp -> LL reaction
+//  K0S and Lambda is directory gunned
+void
+KKppReaction::KKpp_LL2( G4Event* anEvent )
+{
+  G4double Mp   = G4Proton::Definition()->GetPDGMass();
+  // G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
+  // G4double Mpip = G4PionPlus::Definition()->GetPDGMass();
+  // G4double Mn   = G4Neutron::Definition()->GetPDGMass();
+  // G4double Mpiz = G4PionZero::Definition()->GetPDGMass();
+  G4double ML   = G4Lambda::Definition()->GetPDGMass();
+  G4double MKz  = G4KaonZero::Definition()->GetPDGMass();
+  G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
+  G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-//reactio No #3002 K- d -> K0 K-K-pp, K-K-pp -> LL reaction
-//K0S and Lambda is directory gunned
-void KKppReaction::KKpp_LL2(G4Event* anEvent){
-
-
-  G4double Mp=G4Proton::Definition()->GetPDGMass();
-  G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
-  G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
-  G4double Mn=G4Neutron::Definition()->GetPDGMass();
-  G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
-  G4double ML=G4Lambda::Definition()->GetPDGMass();
-  G4double MKz=G4KaonZero::Definition()->GetPDGMass();
-
-  G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
-  G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
- 
- 
-  
   G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(), 
+					     pGen->Get_env_Beam_y0(),
 					     pGen->Get_env_target_pos_z(),
 					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(), 
+					     pGen->Get_env_Beam_dy(),
 					     pGen->Get_env_target_size_x(),
 					     pGen->Get_env_target_width());
   //Note!! env_target_width = Target_Size_z (height of target)
-					     
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(), 
-						pGen->Get_env_Beam_v0(), 
-						pGen->Get_env_Beam_du(), 
-						pGen->Get_env_Beam_dv()); 
-  
+
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
+						pGen->Get_env_Beam_v0(),
+						pGen->Get_env_Beam_du(),
+						pGen->Get_env_Beam_dv());
+
   G4double pb = pGen->Get_env_Beam_mom()*GeV;
   G4double dpb = 0.;
   if(pGen->Get_env_Beam_mom()!=0.)
     dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
   pb += dpb;
-  
+
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
   double KKpp_G0 = 0.1; //assumption
   G4double Mm1= BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
 
-  
+
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL1, LPL2, LPf1, LPf2, LPf3, LPf4, LPf5, LPf6;
-  
+
   AGUniform gen1;
   AGUniform gen2;
   AGUniform gen3;
   AGUniform gen4;
 
   G4ThreeVector LPini2=G4ThreeVector(0.,0.,0.);
-  
+
   bool status = false;
-  bool status2 = false;
+  // bool status2 = false;
   bool status3 = false;
-  bool status4 = false;
-  bool status5 = false;
-  
+  // bool status4 = false;
+  // bool status5 = false;
 
   G4int n=0;
   while(1){
@@ -292,8 +292,8 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
 		  RunMustBeAborted,
 		  "KKppReaction::Production under Threshold!!");
      }
-  
-    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1, 
+
+    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
 				  pb*LBeamDir,LPini2,
 				  LPKz, LPm1,theta_CM, gen1);
     theta_CM = theta_CM*(180./(acos(-1.)));
@@ -314,12 +314,12 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
 	 //status4=Decay2Body( ML, Mp, Mpim, LPL1, LPf3, LPf4, gen2 );
 	 //L -> p pi-
 	 //status5=Decay2Body( ML, Mp, Mpim, LPL2, LPf5, LPf6, gen2 );
-	 
+
 	 //if(status4 == true && status5 == true)
-       else 
+       else
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
-     
+
      pb = pGen->Get_env_Beam_mom()*GeV;
      dpb = 0.;
      if(pGen->Get_env_Beam_mom()!=0.)
@@ -327,7 +327,7 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
-  
+
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
   std::cout<<"BE_KKpp="<<BE_KKpp<<", p_K0="<<LPKz.mag()
 	   <<", p_L1="<<LPL1.mag()<<", p_L2="<<LPL2.mag()<<std::endl;
@@ -340,7 +340,7 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
   double theta_scat;
   double cos_theta_scat;
   G4ThreeVector beam_mom = pb*LBeamDir;
-  
+
   cos_theta_scat = (beam_mom.x()*LPKz.x()+beam_mom.y()*LPKz.y()+beam_mom.z()*LPKz.z())/(beam_mom.mag()*LPKz.mag());
   theta_scat = acos(cos_theta_scat)*(180./acos(-1.));
 
@@ -378,7 +378,7 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
   pGen->particleGun->SetParticleMomentum(LPL2);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
- 
+
 
   pGen->anaManager->SetNumberOfPrimaryParticle(3);
 
@@ -389,74 +389,71 @@ void KKppReaction::KKpp_LL2(G4Event* anEvent){
 				       Lambda->GetPDGMass()/GeV, Lambda->GetPDGEncoding());
   pGen->anaManager->SetPrimaryParticle(2,LPL2.x(),LPL2.y(),LPL2.z(),
 				       Lambda->GetPDGMass()/GeV, Lambda->GetPDGEncoding());
- 
+
   pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
 
 }
 
+//_____________________________________________________________________________
+// reaction #3003 K- d -> K0 K-K-pp, K-K-pp -> LS-pi+ reaction
+//  K0S, Lambda, Sigma is directory gunned
+void
+KKppReaction::KKpp_LSmPip( G4Event* anEvent )
+{
+  G4double Mp   = G4Proton::Definition()->GetPDGMass();
+  // G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
+  G4double Mpip = G4PionPlus::Definition()->GetPDGMass();
+  // G4double Mn   = G4Neutron::Definition()->GetPDGMass();
+  // G4double Mpiz = G4PionZero::Definition()->GetPDGMass();
+  G4double ML   = G4Lambda::Definition()->GetPDGMass();
+  G4double MSm  = G4SigmaMinus::Definition()->GetPDGMass();
+  // G4double MSp  = G4SigmaPlus::Definition()->GetPDGMass();
+  G4double MKz  = G4KaonZero::Definition()->GetPDGMass();
+  G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
+  G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-//reactio No #3003 K- d -> K0 K-K-pp, K-K-pp -> LS-pi+ reaction
-//K0S, Lambda, Sigma is directory gunned
-void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
-
-
-  G4double Mp=G4Proton::Definition()->GetPDGMass();
-  G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
-  G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
-  G4double Mn=G4Neutron::Definition()->GetPDGMass();
-  G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
-  G4double ML=G4Lambda::Definition()->GetPDGMass();
-  G4double MSm=G4SigmaMinus::Definition()->GetPDGMass();
-  G4double MSp=G4SigmaPlus::Definition()->GetPDGMass();
-  G4double MKz=G4KaonZero::Definition()->GetPDGMass();
-
-  G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
-  G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
- 
- 
-  
   G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(), 
+					     pGen->Get_env_Beam_y0(),
 					     pGen->Get_env_target_pos_z(),
 					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(), 
+					     pGen->Get_env_Beam_dy(),
 					     pGen->Get_env_target_size_x(),
 					     pGen->Get_env_target_width());
   //Note!! env_target_width = Target_Size_z (height of target)
-					     
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(), 
-						pGen->Get_env_Beam_v0(), 
-						pGen->Get_env_Beam_du(), 
-						pGen->Get_env_Beam_dv()); 
-  
+
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
+						pGen->Get_env_Beam_v0(),
+						pGen->Get_env_Beam_du(),
+						pGen->Get_env_Beam_dv());
+
   G4double pb = pGen->Get_env_Beam_mom()*GeV;
   G4double dpb = 0.;
   if(pGen->Get_env_Beam_mom()!=0.)
     dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
   pb += dpb;
-  
+
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
   double KKpp_G0 = 0.1; //assumption
   G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
-  
+
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL, LPS, LPpi;
-  
+
   AGUniform gen1;
   AGUniform gen2;
   AGUniform gen3;
   AGUniform gen4;
 
   G4ThreeVector LPini2=G4ThreeVector(0.,0.,0.);
-  
+
   bool status = false;
-  bool status2 = false;
+  // bool status2 = false;
   bool status3 = false;
-  bool status4 = false;
-  bool status5 = false;
-  
+  // bool status4 = false;
+  // bool status5 = false;
+
 
   G4int n=0;
   while(1){
@@ -466,12 +463,12 @@ void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
 		  RunMustBeAborted,
 		  "KKppReaction::Production under Threshold!!");
      }
-  
-    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1, 
+
+    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
 				  pb*LBeamDir,LPini2,
 				  LPKz, LPm1,theta_CM, gen1);
     theta_CM = theta_CM*(180./(acos(-1.)));
-    
+
      if(status ==true&&Mm1>0.){
        std::cout<<"Mm1="<<Mm1<<", ML+MS+Mpi="<<ML+MSm+Mpip<<std::endl;
        thetaK = LPKz.theta()*(180./(acos(-1.)));
@@ -489,12 +486,12 @@ void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
 	 //status4=Decay2Body( ML, Mp, Mpim, LPL1, LPf3, LPf4, gen2 );
 	 //L -> p pi-
 	 //status5=Decay2Body( ML, Mp, Mpim, LPL2, LPf5, LPf6, gen2 );
-	 
+
 	 //if(status4 == true && status5 == true)
-       else 
+       else
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
-     
+
      pb = pGen->Get_env_Beam_mom()*GeV;
      dpb = 0.;
      if(pGen->Get_env_Beam_mom()!=0.)
@@ -502,7 +499,7 @@ void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
-  
+
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
   std::cout<<"BE_KKpp="<<BE_KKpp<<", p_K0="<<LPKz.mag()
 	   <<", p_L="<<LPL.mag()<<", p_S="<<LPS.mag()<<", p_pi="<<LPpi.mag()<<std::endl;
@@ -515,7 +512,7 @@ void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
   double theta_scat;
   double cos_theta_scat;
   G4ThreeVector beam_mom = pb*LBeamDir;
-  
+
   cos_theta_scat = (beam_mom.x()*LPKz.x()+beam_mom.y()*LPKz.y()+beam_mom.z()*LPKz.z())/(beam_mom.mag()*LPKz.mag());
   theta_scat = acos(cos_theta_scat)*(180./acos(-1.));
 
@@ -575,73 +572,70 @@ void KKppReaction::KKpp_LSmPip(G4Event* anEvent){
 				       Sigma->GetPDGMass()/GeV, Sigma->GetPDGEncoding());
   pGen->anaManager->SetPrimaryParticle(3,LPpi.x(),LPpi.y(),LPpi.z(),
 				       Pi->GetPDGMass()/GeV, Pi->GetPDGEncoding());
- 
+
   pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
 }
 
-//reactio No #3004 K- d -> K0 K-K-pp, K-K-pp -> LS+pi- reaction
-//K0S, Lambda, Sigma is directory gunned
-void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
+//_____________________________________________________________________________
+// reaction #3004 K- d -> K0 K-K-pp, K-K-pp -> LS+pi- reaction
+// K0S, Lambda, Sigma is directory gunned
+void
+KKppReaction::KKpp_LSpPim( G4Event* anEvent )
+{
+  G4double Mp   = G4Proton::Definition()->GetPDGMass();
+  G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
+  // G4double Mpip = G4PionPlus::Definition()->GetPDGMass();
+  // G4double Mn   = G4Neutron::Definition()->GetPDGMass();
+  // G4double Mpiz = G4PionZero::Definition()->GetPDGMass();
+  G4double ML   = G4Lambda::Definition()->GetPDGMass();
+  // G4double MSm  = G4SigmaMinus::Definition()->GetPDGMass();
+  G4double MSp  = G4SigmaPlus::Definition()->GetPDGMass();
+  G4double MKz  = G4KaonZero::Definition()->GetPDGMass();
+  G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
+  G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-
-  G4double Mp=G4Proton::Definition()->GetPDGMass();
-  G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
-  G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
-  G4double Mn=G4Neutron::Definition()->GetPDGMass();
-  G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
-  G4double ML=G4Lambda::Definition()->GetPDGMass();
-  G4double MSm=G4SigmaMinus::Definition()->GetPDGMass();
-  G4double MSp=G4SigmaPlus::Definition()->GetPDGMass();
-  G4double MKz=G4KaonZero::Definition()->GetPDGMass();
-
-  G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
-  G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
- 
- 
-  
   G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(), 
+					     pGen->Get_env_Beam_y0(),
 					     pGen->Get_env_target_pos_z(),
 					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(), 
+					     pGen->Get_env_Beam_dy(),
 					     pGen->Get_env_target_size_x(),
 					     pGen->Get_env_target_width());
   //Note!! env_target_width = Target_Size_z (height of target)
-					     
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(), 
-						pGen->Get_env_Beam_v0(), 
-						pGen->Get_env_Beam_du(), 
-						pGen->Get_env_Beam_dv()); 
-  
+
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
+						pGen->Get_env_Beam_v0(),
+						pGen->Get_env_Beam_du(),
+						pGen->Get_env_Beam_dv());
+
   G4double pb = pGen->Get_env_Beam_mom()*GeV;
   G4double dpb = 0.;
   if(pGen->Get_env_Beam_mom()!=0.)
     dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
   pb += dpb;
-  
+
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
   double KKpp_G0 = 0.1; //assumption
   G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
-  
+
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL, LPS, LPpi;
-  
+
   AGUniform gen1;
   AGUniform gen2;
   AGUniform gen3;
   AGUniform gen4;
 
   G4ThreeVector LPini2=G4ThreeVector(0.,0.,0.);
-  
+
   bool status = false;
-  bool status2 = false;
+  // bool status2 = false;
   bool status3 = false;
-  bool status4 = false;
-  bool status5 = false;
-  
+  // bool status4 = false;
+  // bool status5 = false;
 
   G4int n=0;
   while(1){
@@ -651,8 +645,8 @@ void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
 		  RunMustBeAborted,
 		  "KKppReaction::Production under Threshold!!");
      }
-  
-    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1, 
+
+    status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
 				  pb*LBeamDir,LPini2,
 				  LPKz, LPm1,theta_CM, gen1);
     theta_CM = theta_CM*(180./(acos(-1.)));
@@ -673,12 +667,12 @@ void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
 	 //status4=Decay2Body( ML, Mp, Mpim, LPL1, LPf3, LPf4, gen2 );
 	 //L -> p pi-
 	 //status5=Decay2Body( ML, Mp, Mpim, LPL2, LPf5, LPf6, gen2 );
-	 
+
 	 //if(status4 == true && status5 == true)
-       else 
+       else
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
-     
+
      pb = pGen->Get_env_Beam_mom()*GeV;
      dpb = 0.;
      if(pGen->Get_env_Beam_mom()!=0.)
@@ -686,7 +680,7 @@ void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
-  
+
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
   std::cout<<"BE_KKpp="<<BE_KKpp<<", p_K0="<<LPKz.mag()
 	   <<", p_L="<<LPL.mag()<<", p_S="<<LPS.mag()<<", p_pi="<<LPpi.mag()<<std::endl;
@@ -699,7 +693,7 @@ void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
   double theta_scat;
   double cos_theta_scat;
   G4ThreeVector beam_mom = pb*LBeamDir;
-  
+
   cos_theta_scat = (beam_mom.x()*LPKz.x()+beam_mom.y()*LPKz.y()+beam_mom.z()*LPKz.z())/(beam_mom.mag()*LPKz.mag());
   theta_scat = acos(cos_theta_scat)*(180./acos(-1.));
 
@@ -759,33 +753,32 @@ void KKppReaction::KKpp_LSpPim(G4Event* anEvent){
 				       Sigma->GetPDGMass()/GeV, Sigma->GetPDGEncoding());
   pGen->anaManager->SetPrimaryParticle(3,LPpi.x(),LPpi.y(),LPpi.z(),
 				       Pi->GetPDGMass()/GeV, Pi->GetPDGEncoding());
- 
+
   pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
   pGen->anaManager->SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
 }
 
-
-
 int Nbeam_JAM=0;
-//reactio No #3101 JAM input
-void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
-  G4double  mom_kp_x, mom_kp_y, mom_kp_z;
-  
+
+//_____________________________________________________________________________
+// reaction #3101 JAM input
+void
+KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
+{
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonMinus;
-  kaonMinus = particleTable->FindParticle("kaon-");
+  // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
   G4double pbeam=pGen->Get_env_Beam_mom();
   //  pbeam=1.8;
-  mom_kp_x=0;
-  mom_kp_y=0;
-  mom_kp_z=pbeam;
+  // G4double mom_kp_x = 0;
+  // G4double mom_kp_y = 0;
+  // G4double mom_kp_z = pbeam;
   pGen->anaManager->SetPrimaryBeam(0,0,pbeam);
-  
+
   G4String Nbeam_first =getenv("Nbeam_first");
   int N_first=atoi(Nbeam_first.c_str());
-  
+
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
   int ev_max= t1->GetEntries();
@@ -800,10 +793,10 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
 
   //  t1->GetEntry(Nbeam_JAMInput%ev_max);
   if(Nbeam_JAMInput<=ev_max){
-    
+
   t1->GetEntry(Nbeam_JAMInput);
   G4int np_JAM = np;
-  
+
   //  G4int np_JAM = Getnp_JAM(Nbeam_JAMInput);
   pGen->anaManager->SetNumberOfPrimaryParticle(np_JAM);
   pGen->anaManager->SetPrimaryInfo(0., 0., 0., 0., 0.);
@@ -841,7 +834,7 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
       if(G4UniformRand()>0.5)
 	ptmp=particleTable->FindParticle("kaon0S");
       else
-	ptmp=particleTable->FindParticle("kaon0L");   
+	ptmp=particleTable->FindParticle("kaon0L");
     }
     else{
       std::cout<<"pid_JAM="<<pid_JAM<<std::endl;
@@ -856,7 +849,7 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
     pGen->particleGun->SetParticlePosition(LPos);
     pGen->particleGun->SetParticleMomentum(LP);
     pGen->particleGun->GeneratePrimaryVertex(anEvent);
-    
+
     //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
     if(pid_JAM==-311)
       pGen->anaManager->SetPrimaryParticle(inp,LP.x(),LP.y(),LP.z(),
@@ -874,42 +867,42 @@ void KKppReaction::JAMInput(G4Event* anEvent, TTree*t1){
   ++Nbeam_JAM;
 }
 
-
+//_____________________________________________________________________________
 //reactio No #3102 K- beam through gaus without correlation
-void KKppReaction::KKpp_BeamThrough1(G4Event* anEvent){
+void
+KKppReaction::KKpp_BeamThrough1( G4Event* anEvent )
+{
+  // G4double Mp=G4Proton::Definition()->GetPDGMass();
+  // G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
+  // G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
+  // G4double Mn=G4Neutron::Definition()->GetPDGMass();
+  // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
+  // G4double ML=G4Lambda::Definition()->GetPDGMass();
+  // G4double MKz=G4KaonZero::Definition()->GetPDGMass();
+
+  // G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
+  // G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
 
 
-  G4double Mp=G4Proton::Definition()->GetPDGMass();
-  G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
-  G4double Mpip=G4PionPlus::Definition()->GetPDGMass();
-  G4double Mn=G4Neutron::Definition()->GetPDGMass();
-  G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
-  G4double ML=G4Lambda::Definition()->GetPDGMass();
-  G4double MKz=G4KaonZero::Definition()->GetPDGMass();
-
-  G4double Mi1=G4KaonMinus::Definition()->GetPDGMass();
-  G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
- 
- 
   double beam_x = G4RandGauss::shoot(pGen->Get_env_Beam_x0(),pGen->Get_env_Beam_dx());
   double beam_y = G4RandGauss::shoot(pGen->Get_env_Beam_y0(),pGen->Get_env_Beam_dy());
   //double beam_z = -129.;
   double beam_z = -300.;
   G4ThreeVector LPos = G4ThreeVector(beam_x, beam_y, beam_z);
-					     
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(), 
-						pGen->Get_env_Beam_v0(), 
-						pGen->Get_env_Beam_du(), 
-						pGen->Get_env_Beam_dv()); 
-  
+
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
+						pGen->Get_env_Beam_v0(),
+						pGen->Get_env_Beam_du(),
+						pGen->Get_env_Beam_dv());
+
   G4double pb = pGen->Get_env_Beam_mom()*GeV;
   //G4double pb = 0.3*GeV;
   G4double dpb = 0.;
   if(pGen->Get_env_Beam_mom()!=0.)
     dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
   pb += dpb;
-  
-  
+
+
   G4ThreeVector beam_mom = pb*LBeamDir;
 
   pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
@@ -931,25 +924,23 @@ void KKppReaction::KKpp_BeamThrough1(G4Event* anEvent){
   pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
 }
 
-
-//reactio No #3103 JAM input K0
-void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
-  
-  G4double  mom_kp_x, mom_kp_y, mom_kp_z;
-  
+//_____________________________________________________________________________
+//reaction No #3103 JAM input K0
+void
+KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
+{
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonMinus;
-  kaonMinus = particleTable->FindParticle("kaon-");
+  // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
   G4double pbeam=pGen->Get_env_Beam_mom();
   //  pbeam=1.8;
-  mom_kp_x=0;
-  mom_kp_y=0;
-  mom_kp_z=pbeam;
+  // G4double mom_kp_x = 0;
+  // G4double mom_kp_y = 0;
+  // G4double mom_kp_z = pbeam;
   pGen->anaManager->SetPrimaryBeam(0,0,pbeam);
-  
+
   G4String Nbeam_first =getenv("Nbeam_first");
   int N_first=atoi(Nbeam_first.c_str());
-  
+
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
   int ev_max= t1->GetEntries();
@@ -964,7 +955,7 @@ void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
 
   t1->GetEntry(Nbeam_JAMInput%ev_max);
   G4int np_JAM = np;
-  
+
   //  G4int np_JAM = Getnp_JAM(Nbeam_JAMInput);
   pGen->anaManager->SetNumberOfPrimaryParticle(np_JAM);
   pGen->anaManager->SetPrimaryInfo(0., 0., 0., 0., 0.);
@@ -979,7 +970,7 @@ void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
     if(pid_JAM==311)
       ++K0flag;
   }
-  
+
   if(K0flag>0){
     for(int inp=0; inp<np_JAM; ++inp){
       G4ParticleDefinition *ptmp;
@@ -1010,7 +1001,7 @@ void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
 	if(G4UniformRand()>0.5)
 	  ptmp=particleTable->FindParticle("kaon0S");
 	else
-	  ptmp=particleTable->FindParticle("kaon0L");   
+	  ptmp=particleTable->FindParticle("kaon0L");
       }
       else{
 	std::cout<<"pid_JAM="<<pid_JAM<<std::endl;
@@ -1025,7 +1016,7 @@ void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
       pGen->particleGun->SetParticlePosition(LPos);
       pGen->particleGun->SetParticleMomentum(LP);
       pGen->particleGun->GeneratePrimaryVertex(anEvent);
-    
+
       //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
       if(pid_JAM==-311)
 	pGen->anaManager->SetPrimaryParticle(inp,LP.x(),LP.y(),LP.z(),
@@ -1043,24 +1034,22 @@ void KKppReaction::JAMInput_K0(G4Event* anEvent, TTree*t1){
   ++Nbeam_JAM;
 }
 
+//_____________________________________________________________________________
 //reactio No #3104 JAM input K0bar
-void KKppReaction::JAMInput_K0bar(G4Event* anEvent, TTree*t1){
-  
-  G4double  mom_kp_x, mom_kp_y, mom_kp_z;
-  
+void KKppReaction::JAMInput_K0bar( G4Event* anEvent, TTree*t1 )
+{
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonMinus;
-  kaonMinus = particleTable->FindParticle("kaon-");
+  // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
   G4double pbeam=pGen->Get_env_Beam_mom();
   //  pbeam=1.8;
-  mom_kp_x=0;
-  mom_kp_y=0;
-  mom_kp_z=pbeam;
+  // G4double mom_kp_x = 0;
+  // G4double mom_kp_y = 0;
+  // G4double mom_kp_z = pbeam;
   pGen->anaManager->SetPrimaryBeam(0,0,pbeam);
-  
+
   G4String Nbeam_first =getenv("Nbeam_first");
   int N_first=atoi(Nbeam_first.c_str());
-  
+
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
   int ev_max= t1->GetEntries();
@@ -1075,7 +1064,7 @@ void KKppReaction::JAMInput_K0bar(G4Event* anEvent, TTree*t1){
 
   t1->GetEntry(Nbeam_JAMInput%ev_max);
   G4int np_JAM = np;
-  
+
   //  G4int np_JAM = Getnp_JAM(Nbeam_JAMInput);
   pGen->anaManager->SetNumberOfPrimaryParticle(np_JAM);
   pGen->anaManager->SetPrimaryInfo(0., 0., 0., 0., 0.);
@@ -1090,7 +1079,7 @@ void KKppReaction::JAMInput_K0bar(G4Event* anEvent, TTree*t1){
     if(pid_JAM==311)
       ++K0bflag;
   }
-  
+
   if(K0bflag>0){
     for(int inp=0; inp<np_JAM; ++inp){
       G4ParticleDefinition *ptmp;
@@ -1121,7 +1110,7 @@ void KKppReaction::JAMInput_K0bar(G4Event* anEvent, TTree*t1){
 	if(G4UniformRand()>0.5)
 	  ptmp=particleTable->FindParticle("kaon0S");
 	else
-	  ptmp=particleTable->FindParticle("kaon0L");   
+	  ptmp=particleTable->FindParticle("kaon0L");
       }
       else{
 	std::cout<<"pid_JAM="<<pid_JAM<<std::endl;
@@ -1136,7 +1125,7 @@ void KKppReaction::JAMInput_K0bar(G4Event* anEvent, TTree*t1){
       pGen->particleGun->SetParticlePosition(LPos);
       pGen->particleGun->SetParticleMomentum(LP);
       pGen->particleGun->GeneratePrimaryVertex(anEvent);
-    
+
       //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
       if(pid_JAM==-311)
 	pGen->anaManager->SetPrimaryParticle(inp,LP.x(),LP.y(),LP.z(),

@@ -1,9 +1,9 @@
-// ====================================================================
-//    shhwang h-dibaryon code from Feb. 2012.
-// ====================================================================
+// -*- C++ -*-
+
 #include "G4RunManager.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
+#include <QGSP_BERT.hh>
 
 #include "TPCDetectorConstruction.hh"
 #include "TPCPhysicsList.hh"
@@ -25,29 +25,22 @@ std::ofstream ofs;
 // ====================================================================
 //     main
 // ====================================================================
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
   // run manager
-  G4RunManager* runManager= new G4RunManager;  G4cout << G4endl;
+  G4RunManager* runManager= new G4RunManager;
   // set mandatory user initialization classes...
   // detector setup
-  runManager-> SetUserInitialization(new TPCDetectorConstruction);
+  runManager-> SetUserInitialization( new TPCDetectorConstruction );
   // particles and physics processes
-  runManager-> SetUserInitialization(new TPCPhysicsList);
-
-  getenv_read();
-
+  // runManager-> SetUserInitialization( new QGSP_BERT );
+  runManager-> SetUserInitialization( new TPCPhysicsList );
   TPCAnaManager* AnaManager = new TPCAnaManager();
-
   TPCPrimaryGeneratorAction* PrimaryGenerator =
     new TPCPrimaryGeneratorAction(AnaManager);
-
   TPCRunAction* RunAct = new TPCRunAction(AnaManager);
-
   TPCEventAction* EventAct = new TPCEventAction(AnaManager);
-
   TPCSteppingAction* StepAct = new TPCSteppingAction;
-
 
   // primary generator
   runManager-> SetUserAction(PrimaryGenerator);
@@ -68,8 +61,8 @@ int main(int argc, char** argv)
   runManager-> Initialize();
 
 
-  
-    
+
+
   if(argc==1) { // interactive session, if no arguments given
     // tcsh-like
     G4UItcsh* tcsh= new G4UItcsh("hypTPC(%s)[%/][%h]:");
@@ -84,15 +77,13 @@ int main(int argc, char** argv)
     G4String fileName = argv[1];
     UImanager-> ApplyCommand(command+fileName);
   }
-  
-
 
   // terminating...
 #ifdef G4VIS_USE
   delete visManager;
 #endif
 
-  delete runManager;  G4cout << G4endl;
+  delete runManager;
+  G4cout << "finished" << G4endl;
   return 0;
 }
-
