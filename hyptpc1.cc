@@ -8,7 +8,6 @@
 #include <TFile.h>
 
 #include "ConfMan.hh"
-
 #include "TPCDetectorConstruction.hh"
 #include "TPCPhysicsList.hh"
 #include "TPCPrimaryGeneratorAction.hh"

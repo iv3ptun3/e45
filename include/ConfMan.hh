@@ -14,6 +14,7 @@
 class ConfMan
 {
 public:
+  static TString  ClassName( void );
   static ConfMan& GetInstance( void );
   ~ConfMan( void );
 
@@ -37,7 +38,6 @@ private:
   BoolList    m_bool;
 
 public:
-  static TString ClassName( void );
   template <typename T>
   static const T& Get( const TString& key ) { return T(); }
   Bool_t    Initialize( void );
@@ -63,19 +63,19 @@ private:
 };
 
 //_____________________________________________________________________________
-inline ConfMan&
-ConfMan::GetInstance( void )
-{
-  static ConfMan s_instance;
-  return s_instance;
-}
-
-//_____________________________________________________________________________
 inline TString
 ConfMan::ClassName( void )
 {
   static const TString s_name("ConfMan");
   return s_name;
+}
+
+//_____________________________________________________________________________
+inline ConfMan&
+ConfMan::GetInstance( void )
+{
+  static ConfMan s_instance;
+  return s_instance;
 }
 
 //_____________________________________________________________________________
