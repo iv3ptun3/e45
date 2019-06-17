@@ -63,7 +63,8 @@ class TH2F;
 class TFile;
 class TTree;
 
-struct CounterData{
+struct CounterData
+{
   G4int ntrk;
   G4double resoX;
   G4int trackID;
@@ -83,8 +84,8 @@ struct CounterData{
   G4int parentID;
 };
 
-
-struct TPCData{
+struct TPCData
+{
   G4int tpctr;
   G4int tpcpid;
   G4int tpcparentid;
@@ -115,7 +116,8 @@ struct TPCData{
   //  G4double tpcene2
 };
 
-struct TargetData{
+struct TargetData
+{
   G4int targettr;
   G4double targetpx;
   G4double targetpy;
@@ -146,7 +148,8 @@ struct TargetData{
 };
 
 
-struct ScintData{
+struct ScintData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -165,7 +168,8 @@ struct ScintData{
   G4double scintvtxz;
 };
 
-struct ACData{
+struct ACData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -185,7 +189,8 @@ struct ACData{
 };
 
 
-struct NBARData{
+struct NBARData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -205,7 +210,8 @@ struct NBARData{
 };
 
 
-struct DCData{
+struct DCData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -224,7 +230,8 @@ struct DCData{
   G4double vtxz;
 };
 
-struct CHData{
+struct CHData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -243,7 +250,8 @@ struct CHData{
   G4double vtxz;
 };
 
-struct FTOFData{
+struct FTOFData
+{
   G4int trackID;
   G4double massSH;
   G4int qqSH;
@@ -263,7 +271,8 @@ struct FTOFData{
 };
 
 
-struct FDCData{
+struct FDCData
+{
   G4int trackID;
   G4int particleID;
   G4int detectorID;
@@ -272,13 +281,15 @@ struct FDCData{
   G4double mom[4];
 };
 
-struct PrimaryBeam {
+struct PrimaryBeam
+{
   G4double pg[4];                        // 4-mom 0: px, 1: py, 2: pz, 3: ene
   G4int gen;
   G4int mode;
 };
 
-struct PrimaryParticle {
+struct PrimaryParticle
+{
   G4int NumOfParticle;                   // Number of Primary particle
   G4double x0[MaxPrimaryParticle][3];    // Vertex position  0: x, 1: y, 2: z
   G4double p0[MaxPrimaryParticle][5];    // 4-mom, mass 0: px, 1: py, 2: pz, 3: ene, 4: mass
@@ -286,7 +297,8 @@ struct PrimaryParticle {
 };
 
 
-struct PrimaryInfo{
+struct PrimaryInfo
+{
   G4double mm_d;
   G4double mm_p;
   G4double theta;
@@ -297,6 +309,15 @@ struct PrimaryInfo{
 //_____________________________________________________________________________
 class TPCAnaManager
 {
+public:
+  static TPCAnaManager& GetInstance( void );
+  ~TPCAnaManager( void );
+
+private:
+  TPCAnaManager( void );
+  TPCAnaManager( const TPCAnaManager& );
+  TPCAnaManager& operator=( const TPCAnaManager& );
+
 private:
   /*
 ////sako-san's code
@@ -458,9 +479,6 @@ public:
       return ncutoff;
       }
       //sako-san's code end*/
-
-  TPCAnaManager();
-  ~TPCAnaManager();
 
   void BeginOfRunAction(int runnum);
   void EndOfRunAction();
@@ -768,5 +786,13 @@ public:
   }
 
 };
+
+//_____________________________________________________________________________
+inline TPCAnaManager&
+TPCAnaManager::GetInstance( void )
+{
+  static TPCAnaManager s_instance;
+  return s_instance;
+}
 
 #endif

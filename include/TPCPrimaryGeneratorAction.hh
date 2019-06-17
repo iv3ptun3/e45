@@ -1,12 +1,11 @@
-// ====================================================================
-//   TPCPrimaryGeneratorAction.hh
-//
-// ====================================================================
+// -*- C++ -*-
+
 #ifndef TPC_PRIMARY_GENERATOR_ACTION_H
 #define TPC_PRIMARY_GENERATOR_ACTION_H
- 
-#include "G4VUserPrimaryGeneratorAction.hh"
-#include "TPCAnaManager.hh"
+
+#include <G4VUserPrimaryGeneratorAction.hh>
+#include <G4Types.hh>
+
 #include <TH1.h>
 #include <TH2.h>
 #include <TCanvas.h>
@@ -15,12 +14,11 @@
 #include <TF1.h>
 
 class G4ParticleGun;
-class TPCAnaManager;
 
-class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
+class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+{
 private:
   G4ParticleGun* particleGun;   // particle gun provided by Geant4
-  TPCAnaManager* anaManager;
 
   G4double env_mass_hdibaryon;
   G4double env_width_hdibaryon;
@@ -68,9 +66,8 @@ private:
 
   TH1F* cmh;
 public:
-  TPCPrimaryGeneratorAction(TPCAnaManager* ana);
-  ~TPCPrimaryGeneratorAction();
-
+  TPCPrimaryGeneratorAction( void );
+  ~TPCPrimaryGeneratorAction( void );
 
   G4double Get_env_Beam_mom() const {return env_Beam_mom;};
   G4double Get_env_Beam_width() const {return env_Beam_width;};
@@ -105,7 +102,7 @@ public:
   void Generate_PhaseSpace(G4Event* anEvent); ///#30
 
   void Generate_hdibaryon1(G4Event* anEvent);
-  void Generate_hdibaryon2(G4Event* anEvent); 
+  void Generate_hdibaryon2(G4Event* anEvent);
   void Generate_hdibaryon_PHSG(G4Event* anEvent); //6
   void Generate_hdibaryon_PHSG_S(G4Event* anEvent); //7
   void Generate_hdibaryon_PHSG_LL(G4Event* anEvent); //9

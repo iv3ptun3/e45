@@ -16,8 +16,6 @@
 #include "TPCEventAction.hh"
 #include "TPCSteppingAction.hh"
 
-#include "TPCAnaManager.hh"
-#include "getenv.hh"
 #ifdef G4VIS_USE
 #include "TPCVisManager.hh"
 //#include "G4VisExecutive.hh"
@@ -47,11 +45,10 @@ main( int argc, char** argv )
   runManager->SetUserInitialization( new TPCDetectorConstruction );
   // runManager-> SetUserInitialization( new QGSP_BERT );
   runManager->SetUserInitialization( new TPCPhysicsList );
-  auto AnaManager = new TPCAnaManager;
-  runManager->SetUserAction( new TPCPrimaryGeneratorAction( AnaManager ) );
-  runManager->SetUserAction( new TPCRunAction( AnaManager ) );
+  runManager->SetUserAction( new TPCPrimaryGeneratorAction );
+  runManager->SetUserAction( new TPCRunAction );
   runManager->SetUserAction( new TPCSteppingAction );
-  runManager->SetUserAction( new TPCEventAction( AnaManager ) );
+  runManager->SetUserAction( new TPCEventAction );
 
 #ifdef G4VIS_USE
   auto visManager = new TPCVisManager;

@@ -1,12 +1,11 @@
-// ====================================================================
-//   TPCEventAction.cc
-//
-// ====================================================================
-#include "G4RunManager.hh"
-#include "G4Event.hh"
-#include "G4SDManager.hh"
+// -*- C++ -*-
 
 #include "TPCEventAction.hh"
+
+#include <G4RunManager.hh>
+#include <G4Event.hh>
+#include <G4SDManager.hh>
+
 #include "TPCTargetSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCScintSD.hh"
@@ -15,7 +14,6 @@
 #include "TPCCHSD.hh"
 #include "TPCNBARSD.hh"
 #include "TPCFTOFSD.hh"
-
 #include "TPCAnaManager.hh"
 
 #include "G4TrajectoryContainer.hh"
@@ -30,24 +28,23 @@
 namespace
 {
   using CLHEP::MeV;
+  TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
 }
 
-extern std::ofstream ofs;
+//_____________________________________________________________________________
+TPCEventAction::TPCEventAction( void )
+  : G4UserEventAction()
+{
+}
 
-////////////////////////////////
-TPCEventAction::TPCEventAction(TPCAnaManager* ana)
-  :AnaManager(ana)
-////////////////////////////////
-{}
+//_____________________________________________________________________________
+TPCEventAction::~TPCEventAction( void )
+{
+}
 
-/////////////////////////////////
-TPCEventAction::~TPCEventAction()
-/////////////////////////////////
-{}
-
-///////////////////////////////////////////////////////////////
-void TPCEventAction::BeginOfEventAction(const G4Event* anEvent)
-///////////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCEventAction::BeginOfEventAction( const G4Event* anEvent )
 {
   //  G4int nVtx= anEvent-> GetNumberOfPrimaryVertex();
   /*  for( G4int i=0; i< nVtx; i++) {
@@ -67,12 +64,12 @@ void TPCEventAction::BeginOfEventAction(const G4Event* anEvent)
   with_kurama = atoi( env_with_kurama.c_str() );
 
 
-  AnaManager->BeginOfEventAction();
+  gAnaMan.BeginOfEventAction();
 }
 
-/////////////////////////////////////////////////////////////
-void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
-/////////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 {
   G4int eventID = anEvent-> GetEventID();
   //  G4cout<<"event #:"<<eventID<<G4endl;
@@ -247,11 +244,11 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	}
       //      if(ilay>-1){ //--> ilay 1 : target ilay 0 : TPC, layer is from 2 to 38.
       if(ilay>-1){ //-->  -1 : TPC, layer is from 0 to 38. 2012.10.30
-	AnaManager->SetCounterData(nparticle-1,tof, xyz, mom, tid, pid,ilay,irow,beta,edep/MeV,parentid,tlength,slength);
+	gAnaMan.SetCounterData(nparticle-1,tof, xyz, mom, tid, pid,ilay,irow,beta,edep/MeV,parentid,tlength,slength);
       }
     }
     for(G4int i=0;i<nparticle;i++){
-      AnaManager->SetTPCData(i, pidtr[i], ptidtpc[i], ptidtpc_pid[i], pxtpc[i],pytpc[i],pztpc[i],pptpc[i], qqtpc[i], pmtpc[i], detpc[i], lentpc[i],laytpc[i],
+      gAnaMan.SetTPCData(i, pidtr[i], ptidtpc[i], ptidtpc_pid[i], pxtpc[i],pytpc[i],pztpc[i],pptpc[i], qqtpc[i], pmtpc[i], detpc[i], lentpc[i],laytpc[i],
 			     vtxpxtpc[i],vtxpytpc[i],vtxpztpc[i],
 			     vtxxtpc[i],vtxytpc[i],vtxztpc[i], vtxenetpc[i]);
     }
@@ -281,7 +278,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4int qq = (*scintHC)[i]-> GetParticleQqID();
       G4double tlength = (*scintHC)[i]-> GetLength();
       //      printf("didsc : %d \n", did);
-      AnaManager->SetScintData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetScintData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
       //      printf("didsc : %d \n", did);
     }
   }
@@ -311,7 +308,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4int qq = (*acHC)[i]-> GetParticleQqID();
 	G4double tlength = (*acHC)[i]-> GetLength();
 	//      printf("didsc : %d \n", did);
-	AnaManager->SetACData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+	gAnaMan.SetACData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
 	//      printf("didsc : %d \n", did);
       }
     }
@@ -342,7 +339,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4int qq = (*nbarHC)[i]-> GetParticleQqID();
 	G4double tlength = (*nbarHC)[i]-> GetLength();
 	//      printf("didsc : %d \n", did);
-	AnaManager->SetNBARData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+	gAnaMan.SetNBARData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
 	//      printf("didsc : %d \n", did);
       }
     }
@@ -385,7 +382,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
 	G4int irow=0.;
 	G4double beta = (*targetHC)[i]-> GetBeta();
 	G4double edep = (*targetHC)[i]-> GetEdep();
-	AnaManager->SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
+	gAnaMan.SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
 	//  void SetTargetData(G4ThreeVector pos, G4ThreeVector mom,
 	//		     G4int track, G4int particle,
 	//		     G4int parentid, G4ThreeVector vtxpos,
@@ -421,7 +418,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4int qq = (*dcHC)[i]-> GetParticleQqID();
       G4double tlength = (*dcHC)[i]-> GetLength();
       //      printf("didsc : %d \n", did);
-      AnaManager->SetDCData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetDCData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
       //      printf("didsc : %d \n", did);
     }
   }
@@ -452,7 +449,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4int qq = (*chHC)[i]-> GetParticleQqID();
       G4double tlength = (*chHC)[i]-> GetLength();
       //      printf("didsc : %d \n", did);
-      AnaManager->SetCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
       //      printf("didsc : %d \n", did);
     }
   }
@@ -481,7 +478,7 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
       G4double tlength = (*ftofHC)[i]-> GetLength();
       //      printf("ftof : %d \n", did);
       //      printf("ftof id: %d \n", tid);
-      AnaManager->SetFTOFData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetFTOFData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
       //      printf("didsc : %d \n", did);
     }
   }
@@ -509,5 +506,5 @@ void TPCEventAction::EndOfEventAction(const G4Event* anEvent)
     //      }
   }
 
-  AnaManager->EndOfEventAction();
+  gAnaMan.EndOfEventAction();
 }

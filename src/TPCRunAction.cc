@@ -1,11 +1,11 @@
-// ====================================================================
-//   TPCRunAction.cc
-//
-// ====================================================================
-#include "G4Run.hh"
+// -*- C++ -*-
+
 #include "TPCRunAction.hh"
-#include "TPCAnaManager.hh"
+
+#include <G4Run.hh>
 #include <fstream>
+
+#include "TPCAnaManager.hh"
 #include "GetNumberFromKernelEntropyPool.hh"
 #include "G4UIterminal.hh"
 #include "G4UItcsh.hh"
@@ -13,32 +13,31 @@
 #include "G4RunMessenger.hh"
 #include "G4StateManager.hh"
 
+namespace
+{
+  TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
+}
 
-extern std::ofstream ofs;
-
-////////////////////////////
-TPCRunAction::TPCRunAction(TPCAnaManager* ana)
-  : AnaManager(ana)
-////////////////////////////
+//_____________________________________________________________________________
+TPCRunAction::TPCRunAction( void )
+  : G4UserRunAction()
 {
 }
 
-/////////////////////////////
-TPCRunAction::~TPCRunAction()
-/////////////////////////////
+//_____________________________________________________________________________
+TPCRunAction::~TPCRunAction( void )
 {
 }
 
-//////////////////////////////////////////////////////
-void TPCRunAction::BeginOfRunAction(const G4Run* aRun)
-//////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCRunAction::BeginOfRunAction( const G4Run* aRun )
 {
-
   time_t the_time;
 
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 
-  AnaManager->BeginOfRunAction(aRun->GetRunID());
+  gAnaMan.BeginOfRunAction(aRun->GetRunID());
 
   // G4UImanager* UImanager= G4UImanager::GetUIpointer();
   // UImanager-> ApplyCommand("/run/beamOn 3");
@@ -75,12 +74,10 @@ void TPCRunAction::BeginOfRunAction(const G4Run* aRun)
   // }
 }
 
-////////////////////////////////////////////////////
-void TPCRunAction::EndOfRunAction(const G4Run* aRun)
-////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCRunAction::EndOfRunAction( const G4Run* aRun )
 {
-  AnaManager->EndOfRunAction();
-  //  ofs.close();
+  gAnaMan.EndOfRunAction();
   G4cout << ">>> #events generated= " << aRun-> GetNumberOfEvent() << G4endl;
 }
-

@@ -1,10 +1,11 @@
 // -*- C++ -*-
+/**
+ * E27Reaction.cc
+ * for the EventGeneration for the E27 experiment
+ */
 
-//-----------------------------------------------------------
-// E27Reaction.cc
-// for the EventGeneration for the E27 experiment
-//-----------------------------------------------------------
 #include "E27Reaction.hh"
+
 #include "TPCPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "Kinema3Resonance.hh"
@@ -26,11 +27,13 @@
 #include "G4IonConstructor.hh"
 #include "GeneratorHelper.hh"
 #include "AngDisGenerator.hh"
+#include "TPCAnaManager.hh"
 
 namespace
 {
   using CLHEP::mm;
   using CLHEP::GeV;
+  TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
   const int MaxTry = 1000;
   const double AtomicMassUnit = 0.9314932;
 }
@@ -58,7 +61,7 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
   mom_pip_z=pbeam;
   Energy_pip=sqrt(pionPlus->GetPDGMass()/GeV*pionPlus->GetPDGMass()/GeV+pbeam*pbeam);
 
-  pGen->anaManager->SetPrimaryBeam(0,0,pbeam);
+  gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
   // G4double Ebeam = sqrt(pbeam*pbeam+pionPlus->GetPDGMass()/GeV*pionPlus->GetPDGMass()/GeV);
 
@@ -79,9 +82,9 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
   pGen->particleGun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  //  anaManager->SetNumberOfPrimaryParticle(1);
-  //  anaManager->SetPrimaryParticle(0,mom_pip_x,mom_pip_y,mom_pip_z,pionPlus->GetPDGMass()/GeV);
-  //  anaManager->SetPrimaryVertex(0,vtx,vty,vtz);
+  //  gAnaMan->SetNumberOfPrimaryParticle(1);
+  //  gAnaMan->SetPrimaryParticle(0,mom_pip_x,mom_pip_y,mom_pip_z,pionPlus->GetPDGMass()/GeV);
+  //  gAnaMan->SetPrimaryVertex(0,vtx,vty,vtz);
 }
 
 //_____________________________________________________________________________
@@ -107,7 +110,7 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
   mom_Kp_z=pbeam;
   Energy_Kp=sqrt(KaonPlus->GetPDGMass()/GeV*KaonPlus->GetPDGMass()/GeV+pbeam*pbeam);
 
-  pGen->anaManager->SetPrimaryBeam(0,0,pbeam);
+  gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
   // G4double Ebeam = sqrt(pbeam*pbeam+KaonPlus->GetPDGMass()/GeV*KaonPlus->GetPDGMass()/GeV);
 
@@ -131,9 +134,9 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
   pGen->particleGun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  //  anaManager->SetNumberOfPrimaryParticle(1);
-  //  anaManager->SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,pionPlus->GetPDGMass()/GeV);
-  //  anaManager->SetPrimaryVertex(0,vtx,vty,vtz);
+  //  gAnaMan->SetNumberOfPrimaryParticle(1);
+  //  gAnaMan->SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,pionPlus->GetPDGMass()/GeV);
+  //  gAnaMan->SetPrimaryVertex(0,vtx,vty,vtz);
 }
 
 //_____________________________________________________________________________
@@ -239,7 +242,7 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
   double mm_d = (Lv_beam + Lv_targ_D + (-1.)*Lv_K).mag();
   double mm_p = (Lv_beam + Lv_targ_P + (-1.)*Lv_K).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
@@ -262,15 +265,15 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf3);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(3);
+  gAnaMan.SetNumberOfPrimaryParticle(3);
 
-  pGen->anaManager->SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
 
 }
 
@@ -373,7 +376,7 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
   double mm_d = (Lv_beam + Lv_targ_D + (-1.)*Lv_K).mag();
   double mm_p = (Lv_beam + Lv_targ_P + (-1.)*Lv_K).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
@@ -396,15 +399,15 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf3);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(3);
+  gAnaMan.SetNumberOfPrimaryParticle(3);
 
-  pGen->anaManager->SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaZ->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaZ->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
 
 }
 
@@ -508,7 +511,7 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
   double mm_d = (Lv_beam + Lv_targ_D + (-1.)*Lv_K).mag();
   double mm_p = (Lv_beam + Lv_targ_P + (-1.)*Lv_K).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
@@ -538,17 +541,17 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf4);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(4);
+  gAnaMan.SetNumberOfPrimaryParticle(4);
 
-  pGen->anaManager->SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiZero->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiZero->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
 }
 
 //_____________________________________________________________________________
@@ -651,7 +654,7 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
   double mm_d = (Lv_beam + Lv_targ_D + (-1.)*Lv_K).mag();
   double mm_p = (Lv_beam + Lv_targ_P + (-1.)*Lv_K).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
@@ -681,17 +684,17 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf4);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(4);
+  gAnaMan.SetNumberOfPrimaryParticle(4);
 
-  pGen->anaManager->SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaZero->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiZero->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaZero->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiZero->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
 }
 
 //_____________________________________________________________________________
@@ -794,7 +797,7 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
   double mm_d = (Lv_beam + Lv_targ_D + (-1.)*Lv_K).mag();
   double mm_p = (Lv_beam + Lv_targ_P + (-1.)*Lv_K).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
@@ -824,17 +827,17 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf4);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(4);
+  gAnaMan.SetNumberOfPrimaryParticle(4);
 
-  pGen->anaManager->SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiMinus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm_d, mm_p, thetaK, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),SigmaPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(3,LPf4.x(),LPf4.y(),LPf4.z(),PiMinus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(3,LPos.x(),LPos.y(),LPos.z());
 }
 
 //_____________________________________________________________________________
@@ -947,7 +950,7 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   double mm = (Lv_beam + Lv_targ + (-1.)*Lv_p).mag();
   double mm_p = (Lv_beam + Lv_targ_p + (-1.)*Lv_p).mag();
 
-  pGen->anaManager->SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
+  gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Proton;
   Proton = particleTable->FindParticle("proton");
@@ -980,15 +983,15 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   pGen->particleGun->SetParticleMomentum(LPf3);
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(3);
+  gAnaMan.SetNumberOfPrimaryParticle(3);
 
-  pGen->anaManager->SetPrimaryInfo(mm, mm_p, thetap, theta_scat, theta_CM);
-  pGen->anaManager->SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),Proton->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Be10->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
-  pGen->anaManager->SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryInfo(mm, mm_p, thetap, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Be10->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(1,LPos.x(),LPos.y(),LPos.z());
+  gAnaMan.SetPrimaryVertex(2,LPos.x(),LPos.y(),LPos.z());
 
 }
 
@@ -1030,7 +1033,7 @@ E27Reaction::E27_Kptest2(G4Event* anEvent)
   std::cout<<"Mom =("<<mom_Kp_x<<", "<<mom_Kp_y<<", "<<mom_Kp_z<<std::endl;
 
 
-  pGen->anaManager->SetPrimaryBeam(mom_Kp_x,mom_Kp_y,mom_Kp_z);
+  gAnaMan.SetPrimaryBeam(mom_Kp_x,mom_Kp_y,mom_Kp_z);
 
   // G4double Ebeam = sqrt(pbeam*pbeam+KaonPlus->GetPDGMass()/GeV*KaonPlus->GetPDGMass()/GeV);
 
@@ -1055,7 +1058,7 @@ E27Reaction::E27_Kptest2(G4Event* anEvent)
   pGen->particleGun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
   pGen->particleGun->GeneratePrimaryVertex(anEvent);
 
-  pGen->anaManager->SetNumberOfPrimaryParticle(1);
-  pGen->anaManager->SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,KaonPlus->GetPDGMass()/GeV);
-  pGen->anaManager->SetPrimaryVertex(0,vtx,vty,vtz);
+  gAnaMan.SetNumberOfPrimaryParticle(1);
+  gAnaMan.SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,KaonPlus->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
 }

@@ -1,38 +1,23 @@
 // -*- C++ -*-
 
 #include "TPCAnaManager.hh"
-#include "G4ThreeVector.hh"
-//#include "common.hh"
+
+#include <algorithm>
+
+#include <G4ThreeVector.hh>
+
+#include "ConfMan.hh"
 #include "ResHypTPC.hh"
 #include "RungeKuttaTracker.hh"
-//#include "RKTracking.hh"
-//#include "track.h"
-//#include "minuitFit.h"
-//#include "minuit.hh"
-/*
-#include "Minuit2/FCNBase.h"
-#include "Minuit2/FunctionMinimum.h"
-#include "Minuit2/MnUserParameterState.h"
-///#include "Minuit2/MinimumPrint.h"--it has a error
-#include "Minuit2/MnPrint.h"//--it has a error
-#include "Minuit2/MnMigrad.h"
-#include "Minuit2/MnMinos.h"
-#include "Minuit2/MnContours.h"
-#include "Minuit2/MnPlot.h"
-*/
 #include "minuit2.hh"
-
 #include "switch.h"
-//#include <cmath>
-//#include "rungeKuttaTrack.hh"
-#include <algorithm>
-//#include "getenv.hh"
 
 #define	MAX_DIM_FOR_RKF 3
 
 namespace
 {
   using CLHEP::mm;
+  const ConfMan& gConf = ConfMan::GetInstance();
 }
 
 //void chi2(int *npar, double *grad, double *fval,
@@ -49,7 +34,6 @@ extern double RKPara[MAX_ITERATION][NUM_PARA_RK];
 //			  void diff(int, double *, double, double *),
 //			  double *pt, double *ph, double timeEnd,
 //			  int kcnt, double hmin, double hmax, double TOL);
-
 
 //#include <string>
 
@@ -70,17 +54,20 @@ enum ROTATION_MODE {G2L,L2G};
 
 /////////////////////////end RK par
 
-TPCAnaManager::TPCAnaManager()
-{}
+//_____________________________________________________________________________
+TPCAnaManager::TPCAnaManager( void )
+{
+}
 
-TPCAnaManager::~TPCAnaManager()
-{}
+//_____________________________________________________________________________
+TPCAnaManager::~TPCAnaManager( void )
+{
+}
 
 //_____________________________________________________________________________
 void
 TPCAnaManager::BeginOfRunAction( int runnum )
 {
-
   //  G4String env_target_pos_z = getenv("Target_Pos_z");
   //  target_pos_z = atof( env_target_pos_z.c_str() );
   //pad position is fixed 2012. 12. 18
