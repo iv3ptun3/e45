@@ -12,6 +12,8 @@
 #include <TString.h>
 #include <TSystem.h>
 
+#include "DCGeomMan.hh"
+#include "DetSizeMan.hh"
 #include "FuncName.hh"
 
 //_____________________________________________________________________________
@@ -67,7 +69,7 @@ ConfMan::Initialize( void )
     if( key.IsNull() || val.IsNull() )
       continue;
 
-    std::cout << " key = "   << std::setw(10) << std::left << key
+    std::cout << " key = "   << std::setw(20) << std::left << key
 	      << " value = " << std::setw(30) << std::left << val
 	      << std::endl;
 
@@ -107,7 +109,8 @@ ConfMan::InitializeHistograms( void )
 Bool_t
 ConfMan::InitializeParameterFiles( void )
 {
-  return true;
+  return ( InitializeParameter<DCGeomMan>("DCGEO") &&
+	   InitializeParameter<DetSizeMan>("DSIZE") );
 }
 
 //_____________________________________________________________________________

@@ -59,7 +59,7 @@ public:
 
 private:
   TString FilePath( const TString& src ) const;
-  Bool_t  ShowResult( Bool_t s, const TString& name ) const;
+  Bool_t  ShowResult( Bool_t status, const TString& name ) const;
 };
 
 //_____________________________________________________________________________
@@ -112,9 +112,9 @@ ConfMan::Get<Bool_t>( const TString& key )
 
 //_____________________________________________________________________________
 inline Bool_t
-ConfMan::ShowResult( Bool_t s, const TString& name ) const
+ConfMan::ShowResult( Bool_t status, const TString& name ) const
 {
-  if( s )
+  if( status )
     std::cout << std::setw(20) << std::left
 	      << " ["+name+"]"
 	      << "-> Initialized" << std::endl;
@@ -122,7 +122,7 @@ ConfMan::ShowResult( Bool_t s, const TString& name ) const
     std::cout << std::setw(20) << std::left
 	      << " ["+name+"]"
 	      << "-> Failed" << std::endl;
-  return s;
+  return status;
 }
 
 //_____________________________________________________________________________

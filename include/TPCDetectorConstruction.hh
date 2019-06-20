@@ -1,22 +1,23 @@
-// ====================================================================
-//   TPCDetectorConstruction.hh
-//
-// ====================================================================
-#ifndef TPC_DETECTOR_CONSTRUCTION_H
-#define TPC_DETECTOR_CONSTRUCTION_H
+// -*- C++ -*-
 
-#include "G4VUserDetectorConstruction.hh"
-class E42_Cham;
-class TPCDetectorConstruction : public G4VUserDetectorConstruction {
+#ifndef TPC_DETECTOR_CONSTRUCTION_HH
+#define TPC_DETECTOR_CONSTRUCTION_HH
+
+#include <G4VUserDetectorConstruction.hh>
+
+//_____________________________________________________________________________
+class TPCDetectorConstruction : public G4VUserDetectorConstruction
+{
 public:
-  TPCDetectorConstruction();
-  ~TPCDetectorConstruction();
-private:
-  E42_Cham* par_cham;
-  void ConstructForwardSpectrometer();
+  TPCDetectorConstruction( void );
+  ~TPCDetectorConstruction( void );
 
-  // implement it.
-  virtual G4VPhysicalVolume* Construct(); 
+private:
+  void ConstructElements( void );
+
+private:
+  void ConstructForwardSpectrometer( void );
+  virtual G4VPhysicalVolume* Construct( void );
 };
 
 #endif

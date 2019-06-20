@@ -40,9 +40,8 @@ DCGeomMan::CalcWireNumber( Int_t lnum, Double_t pos ) const
     return record->WireNumber(pos);
   }
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -62,9 +61,8 @@ DCGeomMan::CalcWirePosition( Int_t lnum, Double_t wire ) const
     return record->WirePos(wire);
   }
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -92,9 +90,8 @@ DCGeomMan::GetLocalZ( Int_t lnum ) const
   if( record ){
     return record->Length();
   }else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -112,9 +109,8 @@ DCGeomMan::GetResolution( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->Resolution();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -132,9 +128,8 @@ DCGeomMan::GetTiltAngle( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->TiltAngle();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -152,9 +147,8 @@ DCGeomMan::GetRotAngle1( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->RotationAngle1();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -172,9 +166,8 @@ DCGeomMan::GetRotAngle2( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->RotationAngle2();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -192,9 +185,8 @@ DCGeomMan::GetGlobalPosition( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->Pos();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -220,9 +212,8 @@ DCGeomMan::NormalVector( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->NormalVector();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -240,9 +231,8 @@ DCGeomMan::UnitVector( Int_t lnum ) const
   const DCGeomRecord* record = GetRecord(lnum);
   if( record ) return record->UnitVector();
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 
@@ -263,9 +253,8 @@ DCGeomMan::GetRecord( Int_t lnum ) const
   if( itr!=end )
     record = itr->second;
   if( !record ){
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
   return record;
 }
@@ -347,8 +336,10 @@ ThreeVector
 DCGeomMan::Local2GlobalPos( Int_t lnum, const ThreeVector& in ) const
 {
   const DCGeomRecord* record = GetRecord(lnum);
-  if( !record )
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+  if( !record ){
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
+  }
 
   Double_t x = record->dxds()*in.x() + record->dxdt()*in.y()
     + record->dxdu()*in.z() + record->Pos().x();
@@ -373,9 +364,8 @@ DCGeomMan::Global2LocalPos( Int_t lnum, const ThreeVector& in ) const
 {
   const DCGeomRecord* record = GetRecord(lnum);
   if( !record ){
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 
   Double_t x
@@ -407,9 +397,8 @@ DCGeomMan::Local2GlobalDir( Int_t lnum, const ThreeVector& in ) const
 {
   const DCGeomRecord* record = GetRecord(lnum);
   if( !record ){
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 
   Double_t x = record->dxds()*in.x() + record->dxdt()*in.y()
@@ -435,9 +424,8 @@ DCGeomMan::Global2LocalDir( Int_t lnum, const ThreeVector& in ) const
 {
   const DCGeomRecord* record = GetRecord(lnum);
   if( !record ){
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-		<< lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 
   Double_t x = record->dsdx()*in.x() + record->dsdy()*in.y()
@@ -466,7 +454,8 @@ DCGeomMan::GetDetectorId( const TString& key ) const
     if ( itr->second->Name() == key )
       return itr->second->Id();
   }
-  throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+  std::string e(FUNC_NAME + Form( " No record : %s", key.Data() ) );
+  throw std::invalid_argument( e );
 }
 
 //_____________________________________________________________________________
@@ -485,9 +474,8 @@ DCGeomMan::SetResolution( Int_t lnum, Double_t res )
     record->SetResolution( res );
   }
   else{
-    std::cerr << FUNC_NAME << ": No record. Layer#="
-	      << lnum << std::endl;
-    throw std::invalid_argument( std::string(FUNC_NAME + " No record") );
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
   }
 }
 

@@ -28,22 +28,10 @@ TPCAnaRoot::~TPCAnaRoot( void )
 void
 TPCAnaRoot::BeginOfRunAction( int runnum )
 {
-  //  char filename[30];
-
-
-  char *filename;
   int i;
   char histname1[40],histname2[40];
 
-  //  sprintf(filename, "g4E42_%d.root", runnum);
-  //  G4String Filename = getenv("Out_ROOT_File_Name");
-  filename = getenv("Out_ROOT_File_Name");
-  printf("##### Open root file '%s'... #####\n",filename);
-  //  filename= Filename.c_str();
-  //  filename= Filename;
-
-  /* output file */
-  rootfile = gFile; // new TFile(filename,"RECREATE","Output file of TPC for E42");
+  rootfile = gFile;
 
   /* Time */
   htime = new TH1F("Time","Time",400, 0.0, 10.0);
@@ -89,17 +77,11 @@ TPCAnaRoot::BeginOfRunAction( int runnum )
 
   // tree->Branch("mm",&tree1ev.mm,"mm/D");
 
-
-
   //generator mode
   tree->Branch("gen",&tree1ev.gen,"gen/I");
   tree->Branch("mode",&tree1ev.mode,"mode/I");
 
-
-
   //Num Of Hit for K+
-
-
 
   ///////shhwang tpc hit step
 
@@ -218,8 +200,6 @@ TPCAnaRoot::BeginOfRunAction( int runnum )
   // tree->Branch("targetvtx",tree1ev.targetvtx,"targetvtx[targethits][3]/D");
 
   tree1ev.ev = 0;
-
-
 }
 
 void TPCAnaRoot::EndOfRunAction()

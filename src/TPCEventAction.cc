@@ -2,10 +2,20 @@
 
 #include "TPCEventAction.hh"
 
+#include <fstream>
+
 #include <G4RunManager.hh>
 #include <G4Event.hh>
 #include <G4SDManager.hh>
+#include <G4TrajectoryContainer.hh>
+#include <G4VVisManager.hh>
+#include <G4TrajectoryContainer.hh>
+#include <G4Trajectory.hh>
+#include <G4VTrajectory.hh>
+#include <G4UIterminal.hh>
+#include <G4UItcsh.hh>
 
+#include "ConfMan.hh"
 #include "TPCTargetSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCScintSD.hh"
@@ -16,19 +26,11 @@
 #include "TPCFTOFSD.hh"
 #include "TPCAnaManager.hh"
 
-#include "G4TrajectoryContainer.hh"
-#include "G4VVisManager.hh"
-#include "G4TrajectoryContainer.hh"
-#include "G4Trajectory.hh"
-#include "G4VTrajectory.hh"
-#include <fstream>
-#include "G4UIterminal.hh"
-#include "G4UItcsh.hh"
-
 namespace
 {
   using CLHEP::MeV;
-  TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
+  auto& gAnaMan = TPCAnaManager::GetInstance();
+  const auto& gConf = ConfMan::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -46,24 +48,6 @@ TPCEventAction::~TPCEventAction( void )
 void
 TPCEventAction::BeginOfEventAction( const G4Event* anEvent )
 {
-  //  G4int nVtx= anEvent-> GetNumberOfPrimaryVertex();
-  /*  for( G4int i=0; i< nVtx; i++) {
-    const G4PrimaryVertex* primaryVertex= anEvent-> GetPrimaryVertex(i);
-    }*/
-
-  G4String env_ac_use = getenv("AC_Use");
-  ac_use = atoi( env_ac_use.c_str() );
-
-  G4String env_n_bar_use = getenv("N_Bar_Use");
-  n_bar_use = atoi( env_n_bar_use.c_str() );
-
-  G4String env_experiment_num = getenv("Experiment_NUM");
-  experiment_num = atoi( env_experiment_num.c_str() );
-
-  G4String env_with_kurama = getenv("With_KURAMA");
-  with_kurama = atoi( env_with_kurama.c_str() );
-
-
   gAnaMan.BeginOfEventAction();
 }
 
@@ -283,7 +267,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  if(ac_use==1.){
+  if( gConf.Get<G4int>( "UseAC" ) == 1. ){
     static G4int idac = -1;
     if(idac < 0) idac = SDManager-> GetCollectionID("AC/hit");
     G4THitsCollection<TPCACHit>* acHC = 0;
@@ -314,7 +298,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  if(n_bar_use==1.){
+  if( gConf.Get<G4int>( "UseNBar" ) ==1.){
     static G4int idnbar = -1;
     if(idnbar < 0) idnbar = SDManager-> GetCollectionID("NBAR/hit");
     G4THitsCollection<TPCNBARHit>* nbarHC = 0;
@@ -392,7 +376,8 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  if(experiment_num==42||experiment_num==27){
+  if( gConf.Get<G4int>( "Experiment" ) == 42 ||
+      gConf.Get<G4int>( "Experiment" ) == 27 ){
   ////////////////DCs
   static G4int iddc = -1;
   if(iddc < 0) iddc = SDManager-> GetCollectionID("DC/hit");

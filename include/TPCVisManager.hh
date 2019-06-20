@@ -1,20 +1,19 @@
-// ====================================================================
-//   TPCVisManager.hh
-//
-// ====================================================================
-#ifndef TPC_VIS_MANAGER_H
-#define TPC_VIS_MANAGER_H
+// -*- C++ -*-
 
-#include "G4VisManager.hh"
+#ifndef TPC_VIS_MANAGER_HH
+#define TPC_VIS_MANAGER_HH
 
-class TPCVisManager : public G4VisManager {
+#include <G4VisManager.hh>
+
+//_____________________________________________________________________________
+class TPCVisManager : public G4VisManager
+{
 public:
-  TPCVisManager();
-  virtual ~TPCVisManager();
-  
-private:
-  virtual void RegisterGraphicsSystems();
+  TPCVisManager( void );
+  virtual ~TPCVisManager( void );
 
+private:
+  virtual void RegisterGraphicsSystems( void );
 };
 
 #endif

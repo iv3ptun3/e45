@@ -144,12 +144,6 @@ G4double GetTransverseRes(G4double y_pos)
 {
   double s0 = 0.204;// mm HIMAC result
   double Dt = 0.18;//mm/sqrt(cm) at 1T
-  // G4String sigma0x=getenv("sigma0x");
-  // double s0=atof( sigma0x.c_str()  );
-
-  // G4String D_t=getenv("Dt");
-  // double Dt=atof( D_t.c_str()  );
-
   double L_D = 30.+(y_pos*0.1);//cm
   double N_eff = 42.8;
   double A = 0.0582*0.01;//m-1 -> cm-1

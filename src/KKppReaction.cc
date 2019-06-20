@@ -1,11 +1,15 @@
 // -*- C++ -*-
 
-//-----------------------------------------------------------
-// KKppReaction.cc
-// for the EventGeneration for the KKpp reaction
-//-----------------------------------------------------------
+/**
+ * KKppReaction.cc
+ * for the EventGeneration for the KKpp reaction
+ */
+
 #include "KKppReaction.hh"
 
+#include "ConfMan.hh"
+#include "DCGeomMan.hh"
+#include "DetSizeMan.hh"
 #include "TPCPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "Kinema3Resonance.hh"
@@ -35,6 +39,9 @@ namespace
   using CLHEP::GeV;
   TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
   const int MaxTry=1000;
+  const auto& gConf = ConfMan::GetInstance();
+  const auto& gGeom = DCGeomMan::GetInstance();
+  const auto& gSize = DetSizeMan::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -52,24 +59,24 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
   G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
   G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0., gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
@@ -127,10 +134,10 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
 
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
@@ -245,24 +252,24 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
   G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
   G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
@@ -322,10 +329,10 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
 
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
@@ -416,24 +423,24 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
   G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
   G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
@@ -494,10 +501,10 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
 
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
@@ -599,24 +606,24 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
   G4double Mi1  = G4KaonMinus::Definition()->GetPDGMass();
   G4double Mi2  = G4Deuteron::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
@@ -675,10 +682,10 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
      }
 
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
   }
@@ -771,15 +778,14 @@ KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
-  G4double pbeam=pGen->Get_env_Beam_mom();
+  G4double pbeam = gConf.Get<G4double>( "BeamMom" );
   //  pbeam=1.8;
   // G4double mom_kp_x = 0;
   // G4double mom_kp_y = 0;
   // G4double mom_kp_z = pbeam;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
-  G4String Nbeam_first =getenv("Nbeam_first");
-  int N_first=atoi(Nbeam_first.c_str());
+  int N_first = gConf.Get<G4int>( "NbeamFirst" );
 
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
@@ -843,7 +849,7 @@ KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
       //getchar();
       continue;
     }
-    G4ThreeVector LPos = G4ThreeVector(0.,0.,pGen->Get_env_target_pos_z());
+    G4ThreeVector LPos = G4ThreeVector(0.,0.,gGeom.GetGlobalPosition( "Target" ).z());
     //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
     G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 
@@ -886,22 +892,22 @@ KKppReaction::KKpp_BeamThrough1( G4Event* anEvent )
   // G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
 
 
-  double beam_x = G4RandGauss::shoot(pGen->Get_env_Beam_x0(),pGen->Get_env_Beam_dx());
-  double beam_y = G4RandGauss::shoot(pGen->Get_env_Beam_y0(),pGen->Get_env_Beam_dy());
+  double beam_x = G4RandGauss::shoot(gConf.Get<G4double>( "BeamX0" ),gConf.Get<G4double>( "BeamDX" ));
+  double beam_y = G4RandGauss::shoot(gConf.Get<G4double>( "BeamY0" ),gConf.Get<G4double>( "BeamDY" ));
   //double beam_z = -129.;
   double beam_z = -300.;
   G4ThreeVector LPos = G4ThreeVector(beam_x, beam_y, beam_z);
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   //G4double pb = 0.3*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
 
@@ -933,15 +939,14 @@ KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
-  G4double pbeam=pGen->Get_env_Beam_mom();
+  G4double pbeam=gConf.Get<G4double>( "BeamMom" );
   //  pbeam=1.8;
   // G4double mom_kp_x = 0;
   // G4double mom_kp_y = 0;
   // G4double mom_kp_z = pbeam;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
-  G4String Nbeam_first =getenv("Nbeam_first");
-  int N_first=atoi(Nbeam_first.c_str());
+  int N_first = gConf.Get<G4int>( "NbeamFirst" );
 
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
@@ -1010,7 +1015,7 @@ KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
 	//getchar();
 	continue;
       }
-      G4ThreeVector LPos = G4ThreeVector(0.,0.,pGen->Get_env_target_pos_z());
+      G4ThreeVector LPos = G4ThreeVector(0.,0.,gGeom.GetGlobalPosition( "Target" ).z());
       //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
       G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 
@@ -1042,15 +1047,14 @@ void KKppReaction::JAMInput_K0bar( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
-  G4double pbeam=pGen->Get_env_Beam_mom();
+  G4double pbeam=gConf.Get<G4double>( "BeamMom" );
   //  pbeam=1.8;
   // G4double mom_kp_x = 0;
   // G4double mom_kp_y = 0;
   // G4double mom_kp_z = pbeam;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
-  G4String Nbeam_first =getenv("Nbeam_first");
-  int N_first=atoi(Nbeam_first.c_str());
+  int N_first = gConf.Get<G4int>( "NbeamFirst" );
 
   int Nbeam_JAMInput = Nbeam_JAM+N_first;
 
@@ -1119,7 +1123,7 @@ void KKppReaction::JAMInput_K0bar( G4Event* anEvent, TTree*t1 )
 	//getchar();
 	continue;
       }
-      G4ThreeVector LPos = G4ThreeVector(0.,0.,pGen->Get_env_target_pos_z());
+      G4ThreeVector LPos = G4ThreeVector(0.,0.,gGeom.GetGlobalPosition( "Target" ).z());
       //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
       G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 

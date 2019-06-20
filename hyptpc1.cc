@@ -33,8 +33,7 @@ main( int argc, char** argv )
   }
 
   ConfMan& gConf = ConfMan::GetInstance();
-  if( !gConf.Initialize( argv[kConfFile] ) ||
-      !gConf.InitializeParameterFiles() ){
+  if( !gConf.Initialize( argv[kConfFile] ) ){
     return EXIT_FAILURE;
   }
 
@@ -42,8 +41,8 @@ main( int argc, char** argv )
 
   auto runManager= new G4RunManager;
   runManager->SetUserInitialization( new TPCDetectorConstruction );
-  // runManager-> SetUserInitialization( new QGSP_BERT );
-  runManager->SetUserInitialization( new TPCPhysicsList );
+  runManager-> SetUserInitialization( new QGSP_BERT );
+  // runManager->SetUserInitialization( new TPCPhysicsList );
   runManager->SetUserAction( new TPCPrimaryGeneratorAction );
   runManager->SetUserAction( new TPCRunAction );
   runManager->SetUserAction( new TPCSteppingAction );

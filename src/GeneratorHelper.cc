@@ -1,25 +1,27 @@
 // -*- C++ -*-
 
-//-----------------------------------------------------------
-// GeneratorHelper.cc
-// for the EventGeneration for the E27 experiment
-//-----------------------------------------------------------
+/**
+ * GeneratorHelper.cc
+ * for the EventGeneration for the E27 experiment
+ */
+
 #include "GeneratorHelper.hh"
 
-#include <CLHEP/Units/PhysicalConstants.h>
-#include "common.hh"
-#include "Randomize.hh"
-#include "G4LorentzVector.hh"
-#include "AngDisGenerator.hh"
-
-#include "TLorentzVector.h"
-#include "TVector3.h"
-#include "TGenPhaseSpace.h"
 #include <cmath>
 #include <iomanip>
-#include "TFile.h"
-#include "TTree.h"
-#include "TBranch.h"
+
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <Randomize.hh>
+#include <G4LorentzVector.hh>
+
+#include <TFile.h>
+#include <TTree.h>
+#include <TBranch.h>
+#include <TLorentzVector.h>
+#include <TVector3.h>
+#include <TGenPhaseSpace.h>
+
+#include "AngDisGenerator.hh"
 
 namespace
 {
@@ -370,7 +372,6 @@ Decay3BodyPhaseSpace( double Mini, double Mf1, double Mf2, double Mf3,
 
   TGenPhaseSpace event1;
   event1.SetDecay(Total_lv,3,masses);
-  // G4cout<<"--------pbeb=="<<Pini1_lv.E() <<G4endl;
 
   while(1){
 
@@ -392,80 +393,5 @@ Decay3BodyPhaseSpace( double Mini, double Mf1, double Mf2, double Mf3,
   Pf2 = G4ThreeVector(Pf2_lv.Vect().X(), Pf2_lv.Vect().Y() ,Pf2_lv.Vect().Z());
   Pf3 = G4ThreeVector(Pf3_lv.Vect().X(), Pf3_lv.Vect().Y() ,Pf3_lv.Vect().Z());
 
-  // G4cout<<"Pf1= "<<Pf1.mag()<<G4endl;
-  // G4cout<<"Pf2= "<<Pf2.mag()<<G4endl;
-  // G4cout<<"Pf3= "<<Pf3.mag()<<G4endl;
   return true;
 }
-
-//for JAM_input
-
-// TTree *t1=new TTree;
-// G4int Getnp_JAM(int i_num)
-// {
-//   char *fin_name;
-//   fin_name = getenv("Input_JAM_File_Name");
-//   //  TFile *fin=new TFile("JAM_rootfile/E42JAM_0_rot.root","READ");
-//   TFile *fin=new TFile(fin_name,"READ");
-//   //TTree *t1=new TTree;
-//   t1=(TTree*)fin->Get("tree");
-//   int ev_max= t1->GetEntries();
-//   int np;
-//   t1->SetBranchAddress("np", &np);
-
-//   t1->GetEntry(i_num%ev_max);
-
-//   int G_np = np;
-
-//   delete fin;
-//   return G_np;
-// }
-
-// G4int GetPID_JAM(int i_num, int inp)
-// {
-//   char *fin_name;
-//   fin_name = getenv("Input_JAM_File_Name");
-//   //  TFile *fin=new TFile("JAM_rootfile/E42JAM_0_rot.root","READ");
-//   TFile *fin=new TFile(fin_name,"READ");
-//   t1=(TTree*)fin->Get("tree");
-//   int ev_max= t1->GetEntries();
-//   int np;
-//   int pid[20];
-
-//   t1->SetBranchAddress("np", &np);
-//   t1->SetBranchAddress("pid", pid);
-
-//   t1->GetEntry(i_num%ev_max);
-
-//   int G_pid = pid[inp];
-//   delete fin;
-
-//   return G_pid;
-// }
-
-// G4ThreeVector GetP_JAM(int i_num, int inp)
-// {
-//   char *fin_name;
-//   fin_name = getenv("Input_JAM_File_Name");
-//   //  TFile *fin=new TFile("JAM_rootfile/E42JAM_0_rot.root","READ");
-//   TFile *fin=new TFile(fin_name,"READ");
-//   //  TTree *t1=new TTree;
-//   t1=(TTree*)fin->Get("tree");
-//   int ev_max= t1->GetEntries();
-//   int np;
-//   G4double  px[20], py[20], pz[20];
-
-//   t1->SetBranchAddress("np", &np);
-//   t1->SetBranchAddress("px", px);
-//   t1->SetBranchAddress("py", py);
-//   t1->SetBranchAddress("pz", pz);
-
-//   t1->GetEntry(i_num%ev_max);
-//   G4double G_px = px[inp]*GeV;
-//   G4double G_py = py[inp]*GeV;
-//   G4double G_pz = pz[inp]*GeV;
-
-
-//   delete fin;
-//   return G4ThreeVector(G_px, G_py, G_pz);
-// }

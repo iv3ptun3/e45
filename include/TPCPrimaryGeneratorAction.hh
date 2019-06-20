@@ -13,21 +13,20 @@
 #include <TFile.h>
 #include <TF1.h>
 
+#include "ThreeVector.hh"
+
 class G4ParticleGun;
 
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
+public:
+  TPCPrimaryGeneratorAction( void );
+  ~TPCPrimaryGeneratorAction( void );
+
 private:
   G4ParticleGun* particleGun;   // particle gun provided by Geant4
 
-  G4double env_mass_hdibaryon;
-  G4double env_width_hdibaryon;
-  G4int env_Generator;
-  //  G4double env_Target_z;
-  G4double env_Kurama_gap;
-  G4double env_target_width;
-  G4double env_target_size_x;
-  G4double env_target_size_y;
+  ThreeVector m_target_size;
 
   G4double env_target_pos_z;
   G4double env_Beam_mom;
@@ -42,11 +41,6 @@ private:
   G4double env_Beam_v0;
   G4double env_Beam_du;
   G4double env_Beam_dv;
-
-
-
-
-  G4int env_Experiment_num;
 
   TFile* file;
   TH1F* gen_im;
@@ -65,29 +59,8 @@ private:
   TH1F* labk;
 
   TH1F* cmh;
+
 public:
-  TPCPrimaryGeneratorAction( void );
-  ~TPCPrimaryGeneratorAction( void );
-
-  G4double Get_env_Beam_mom() const {return env_Beam_mom;};
-  G4double Get_env_Beam_width() const {return env_Beam_width;};
-  G4double Get_env_target_width() const {return env_target_width;};
-  G4double Get_env_target_size_x() const {return env_target_size_x;};
-  G4double Get_env_target_size_y() const {return env_target_size_y;};
-
-  G4double Get_env_target_pos_z() const {return env_target_pos_z;};
-
-  G4double Get_env_Beam_x0() const {return env_Beam_x0;};
-  G4double Get_env_Beam_y0() const {return env_Beam_y0;};
-  G4double Get_env_Beam_dx() const {return env_Beam_dx;};
-  G4double Get_env_Beam_dy() const {return env_Beam_dy;};
-  G4double Get_env_Beam_u0() const {return env_Beam_u0;};
-  G4double Get_env_Beam_v0() const {return env_Beam_v0;};
-  G4double Get_env_Beam_du() const {return env_Beam_du;};
-  G4double Get_env_Beam_dv() const {return env_Beam_dv;};
-
-
-
   G4double miss1(G4double pbeam, G4double m1,G4double *p1);
   G4double missks(G4double pbeam, G4double mbeam, G4double m1,G4double *p1);
   G4double miss1(G4double *pbeam, G4double m1,G4double *p1);

@@ -68,90 +68,27 @@ TPCAnaManager::~TPCAnaManager( void )
 void
 TPCAnaManager::BeginOfRunAction( int runnum )
 {
-  //  G4String env_target_pos_z = getenv("Target_Pos_z");
-  //  target_pos_z = atof( env_target_pos_z.c_str() );
-  //pad position is fixed 2012. 12. 18
   target_pos_z=-143.;
-  //  std::cout<<"test env:"<<env.truncated_mean<<std::endl;
-  //  truncated_mean_cut=0.7;
-  G4String env_truncated_mean_cut = getenv("Truncated_mean_cut");
-  truncated_mean_cut = atof( env_truncated_mean_cut.c_str() );
-    /*
-  if(getenv("Truncated_mean_cut")){
-
-  }else{
-    std::cout<<"!======================================!"<<std::endl;
-    std::cout<<"getenv error: Truncated_mean_cut"<<std::endl;
-    std::cout<<"!======================================!"<<std::endl;
-    exit(1);
-  }
-    */
-
-  if(getenv("test_cut")){
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"test getenv"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    //    exit(1);
-  }else{
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"test getenv no"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-    std::cout<<"======================================"<<std::endl;
-  }
-
-  G4String env_experiment_num = getenv("Experiment_NUM");
-  env_Experiment_num=atoi(env_experiment_num.c_str() );
-
-  G4String env_trigger = getenv("Trigger");
-  trigger_env = atof( env_trigger.c_str() );
-
-  G4String env_pad_length_in = getenv("pad_length_in");
-  pad_length_in=atof( env_pad_length_in.c_str() );//out side less 100 mm. 10+5*x < 100 mm is pad_in_num
-
-  G4String env_pad_length_out = getenv("pad_length_out");
-  pad_length_out=atof( env_pad_length_out.c_str() );//gap 1mm
-  G4String env_pad_gap = getenv("pad_gap");
-  pad_gap=atof( env_pad_gap.c_str() );
+  truncated_mean_cut = gConf.Get<Double_t>("TruncatedMeanCut");
+  env_Experiment_num = gConf.Get<Int_t>("Experiment");
+  //out side less 100 mm. 10+5*x < 100 mm is pad_in_num
+  pad_length_in = gConf.Get<Double_t>("PadLengthIn");
+  pad_length_out = gConf.Get<Double_t>("PadLengthOut");
+  pad_gap = gConf.Get<Double_t>("PadGap");
 
   ////pad configure
-  G4String env_pad_configure = getenv("pad_configure");
-  env_pad_config=atoi( env_pad_configure.c_str() );
+  env_pad_config = gConf.Get<Int_t>("PadConfigure");
+  pad_in_num = gConf.Get<Int_t>("PadNumIn");
+  pad_out_num = gConf.Get<Int_t>("PadNumOut");
+  pad_in_width = gConf.Get<Double_t>("PadWidthOut");
+  pad_out_width = gConf.Get<Double_t>("PadWidthOut");
 
-  G4String env_pad_num_in = getenv("pad_num_in");
-  G4String env_pad_num_out = getenv("pad_num_out");
-  pad_in_num =  atoi( env_pad_num_in.c_str() );
-  pad_out_num = atoi( env_pad_num_out.c_str() );
+  env_on_off_helm = gConf.Get<Int_t>("ShsFieldMap");
 
-
-  G4String env_pad_width_in = getenv("pad_width_in");
-  pad_in_width=atof( env_pad_width_in.c_str() );
-  G4String env_pad_width_out = getenv("pad_width_out");
-  pad_out_width=atof( env_pad_width_out.c_str() );
-
-
-
-  G4String helmholtz_on_off=getenv("Helmholtz_fieldmap_on_off");
-  env_on_off_helm=atoi( helmholtz_on_off.c_str()  );
-
-
-  if(env_on_off_helm==0){
-    //    env_helm_field=0.;
-    //  }else if(env_on_off_helm==1){
-    G4String helmholtz=getenv("Helmholtz_field");
-    env_helm_field=atof( helmholtz.c_str()  );
+  if( env_on_off_helm == 0 ){
+    env_helm_field = gConf.Get<Int_t>("ShsField");
   }else{
-    G4cout<<"Env of the Helmholt_fieldmap is wrong"<<G4endl;
+    G4cout << "Env of the Helmholt_fieldmap is wrong" << G4endl;
     exit(-1);
   }
 

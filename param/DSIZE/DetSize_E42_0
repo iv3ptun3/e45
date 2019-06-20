@@ -1,0 +1,12 @@
+#
+#  DetSize_E42_0
+#
+#  note:
+#    The size is not half but full length.
+#    The unit is mm.
+#
+#______________________________________________________________________________
+# Name	X	Y	Z
+#
+
+Target	30.0	10.0	15.0

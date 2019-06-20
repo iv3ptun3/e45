@@ -1,4 +1,5 @@
 // -*- C++ -*-
+
 /**
  * E27Reaction.cc
  * for the EventGeneration for the E27 experiment
@@ -6,6 +7,9 @@
 
 #include "E27Reaction.hh"
 
+#include "ConfMan.hh"
+#include "DCGeomMan.hh"
+#include "DetSizeMan.hh"
 #include "TPCPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "Kinema3Resonance.hh"
@@ -36,6 +40,9 @@ namespace
   TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
   const int MaxTry = 1000;
   const double AtomicMassUnit = 0.9314932;
+  const auto& gConf = ConfMan::GetInstance();
+  const auto& gGeom = DCGeomMan::GetInstance();
+  const auto& gSize = DetSizeMan::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -53,7 +60,8 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
   //  kaonMinus = particleTable->FindParticle("kaon-");
   //kaonMinus = particleTable->FindParticle("pi-");
   pionPlus = particleTable->FindParticle("pi+");
-  G4double pbeam = CLHEP::RandGauss::shoot(pGen->Get_env_Beam_mom(),0.01294*pGen->Get_env_Beam_mom());
+  G4double pbeam = CLHEP::RandGauss::shoot( gConf.Get<G4double>("BeamMom"),
+					    0.01294*gConf.Get<G4double>("BeamMom") );
   //  pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548);
   //  pbeam=1.8;
   mom_pip_x=0;
@@ -71,8 +79,8 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
 
   G4double vtx = CLHEP::RandGauss::shoot(0,10.)*mm;
   G4double vty = CLHEP::RandFlat::shoot(0.,3.2)*mm;
-  G4double vtz= pGen->Get_env_target_pos_z();
-  //G4double vtz= CLHEP::RandFlat::shoot(pGen->Get_env_target_pos_z()-pGen->Get_env_target_width()/2,pGen->Get_env_target_pos_z()+pGen->Get_env_target_width()/2)*mm-250.*mm;
+  G4double vtz = gSize.Get("Target", ThreeVector::Z );
+  //G4double vtz= CLHEP::RandFlat::shoot(pGen->Get_env_target_pos_z()-gSize.Get( "Target", ThreeVector::Z )/2,pGen->Get_env_target_pos_z()+gSize.Get( "Target", ThreeVector::Z )/2)*mm-250.*mm;
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   //getchar();
   //beam pi+
@@ -102,7 +110,7 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
   //  kaonMinus = particleTable->FindParticle("kaon-");
   //kaonMinus = particleTable->FindParticle("pi-");
   KaonPlus = particleTable->FindParticle("kaon+");
-  G4double pbeam=CLHEP::RandGauss::shoot(pGen->Get_env_Beam_mom(),0.01294*pGen->Get_env_Beam_mom());
+  G4double pbeam=CLHEP::RandGauss::shoot(gConf.Get<G4double>( "BeamMom" ),0.01294*gConf.Get<G4double>( "BeamMom" ));
   //  pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548);
   //  pbeam=1.8;
   mom_Kp_x=0;
@@ -123,8 +131,8 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
 
   G4double vtx = 0.*mm;
   G4double vty = 0.*mm;
-  //  G4double vtz= CLHEP::RandFlat::shoot(pGen->Get_env_target_pos_z()-pGen->Get_env_target_width()/2,pGen->Get_env_target_pos_z()+pGen->Get_env_target_width()/2)*mm-250.*mm;
-  G4double vtz= pGen->Get_env_target_pos_z();
+  //  G4double vtz= CLHEP::RandFlat::shoot(gGeom.GetGlobalPosition( "Target" ).z()-gSize.Get( "Target", ThreeVector::Z )/2,gGeom.GetGlobalPosition( "Target" ).z()+gSize.Get( "Target", ThreeVector::Z )/2)*mm-250.*mm;
+  G4double vtz= gGeom.GetGlobalPosition( "Target" ).z();
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   // getchar();
   //scat K+
@@ -155,24 +163,24 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   G4double Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
@@ -213,10 +221,10 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
   }
@@ -293,24 +301,24 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   G4double Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
@@ -352,10 +360,10 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
 	   std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
   }
@@ -428,24 +436,24 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   G4double Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
@@ -487,10 +495,10 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
 	   std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
   }
@@ -571,24 +579,24 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   G4double Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
@@ -630,10 +638,10 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
 	   std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
   }
@@ -714,24 +722,24 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   G4double Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
@@ -773,10 +781,10 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
 	   std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if(gConf.Get<G4double>( "BeamMom" )!=0.)
+       dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
      Mm1 = BreitWigner(2.275, 0.162)*GeV; //E27
   }
@@ -856,24 +864,24 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   // G4double Mn=G4Neutron::Definition()->GetPDGMass();
   // G4double Mpiz=G4PionZero::Definition()->GetPDGMass();
 
-  G4ThreeVector LPos = GaussPosition_LqTarg( pGen->Get_env_Beam_x0(),
-					     pGen->Get_env_Beam_y0(),
-					     pGen->Get_env_target_pos_z(),
-					     pGen->Get_env_Beam_dx(),
-					     pGen->Get_env_Beam_dy(),
-					     pGen->Get_env_target_size_x(),
-					     pGen->Get_env_target_width());
+  G4ThreeVector LPos = GaussPosition_LqTarg( gConf.Get<G4double>( "BeamX0" ),
+					     gConf.Get<G4double>( "BeamY0" ),
+					     gGeom.GetGlobalPosition( "Target" ).z(),
+					     gConf.Get<G4double>( "BeamDX" ),
+					     gConf.Get<G4double>( "BeamDY" ),
+					     gSize.Get( "Target", ThreeVector::X ),
+					     gSize.Get( "Target", ThreeVector::Z ));
   //Note!! env_target_width = Target_Size_z (height of target)
 
-  G4ThreeVector LBeamDir =  GaussDirectionInUV( pGen->Get_env_Beam_u0(),
-						pGen->Get_env_Beam_v0(),
-						pGen->Get_env_Beam_du(),
-						pGen->Get_env_Beam_dv());
+  G4ThreeVector LBeamDir =  GaussDirectionInUV( gConf.Get<G4double>( "BeamU0" ),
+						gConf.Get<G4double>( "BeamV0" ),
+						gConf.Get<G4double>( "BeamDU" ),
+						gConf.Get<G4double>( "BeamDV" ));
 
-  G4double pb = pGen->Get_env_Beam_mom()*GeV;
+  G4double pb = gConf.Get<G4double>( "BeamMom" )*GeV;
   G4double dpb = 0.;
-  if(pGen->Get_env_Beam_mom()!=0.)
-    dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+  if(gConf.Get<G4double>( "BeamMom" )!=0.)
+    dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
   double Boron11Mass = 11.0093054 * AtomicMassUnit*GeV;
@@ -917,12 +925,13 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
 	 std::cout<<"Mm1="<<Mm1<<std::endl;
        }
      }
-     pb = pGen->Get_env_Beam_mom()*GeV;
+     pb = gConf.Get<G4double>( "BeamMom" )*GeV;
      dpb = 0.;
 
 
-     if(pGen->Get_env_Beam_mom()!=0.)
-       dpb = G4RandGauss::shoot(0.,pGen->Get_env_Beam_width())*GeV;
+     if( gConf.Get<G4double>( "BeamWidth" ) != 0. ){
+       dpb = G4RandGauss::shoot( 0., gConf.Get<G4double>( "BeamWidth" ) )*GeV ;
+     }
      pb += dpb;
 
      Mm1 = BreitWigner(Boron11Mass + MK - 132.5
@@ -1047,8 +1056,8 @@ E27Reaction::E27_Kptest2(G4Event* anEvent)
 
   G4double vtx = 0.*mm;
   G4double vty = 0.*mm;
-  //  G4double vtz= CLHEP::RandFlat::shoot(pGen->Get_env_target_pos_z()-pGen->Get_env_target_width()/2,pGen->Get_env_target_pos_z()+pGen->Get_env_target_width()/2)*mm-250.*mm;
-  G4double vtz= pGen->Get_env_target_pos_z();
+  //  G4double vtz= CLHEP::RandFlat::shoot(gGeom.GetGlobalPosition( "Target" ).z()-gSize.Get( "Target", ThreeVector::Z )/2,gGeom.GetGlobalPosition( "Target" ).z()+gSize.Get( "Target", ThreeVector::Z )/2)*mm-250.*mm;
+  G4double vtz= gGeom.GetGlobalPosition( "Target" ).z();
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   // getchar();
   //scat K+
