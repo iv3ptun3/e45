@@ -1,16 +1,23 @@
-// ====================================================================
-//   TPCTargetHit.hh
-//
-// ====================================================================
-#ifndef TPC_TARGET_HIT_H
-#define TPC_TARGET_HIT_H
- 
+// -*- C++ -*-
+
+#ifndef TPC_TARGET_HIT_HH
+#define TPC_TARGET_HIT_HH
+
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 
-class TPCTargetHit : public G4VHit {
+//_____________________________________________________________________________
+class TPCTargetHit : public G4VHit
+{
+public:
+  TPCTargetHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4int tid,
+		G4int pid, G4int Parentid,G4double Mass, G4int Charge,
+		G4ThreeVector& Vtxpos, G4ThreeVector& Vtxmom,
+		G4double avtxene, G4double Kinene );
+  virtual ~TPCTargetHit( void );
+
 private:
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
@@ -25,33 +32,19 @@ private:
   G4double Length;
   G4double mass;
   G4int charge;
-  G4ThreeVector vtxmome;
   G4ThreeVector vtxposi;
+  G4ThreeVector vtxmome;
   G4double vtxene;
   G4double kinene;
+
 public:
-  //  TPCTargetHit();
-  TPCTargetHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4int tid, 
-	       G4int pid, G4int Parentid,G4double Mass, G4int Charge,
-	       G4ThreeVector& Vtxpos, G4ThreeVector& Vtxmom, 
-	       G4double avtxene, G4double Kinene);
-  TPCTargetHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-	    G4int tid, G4int pid, 
-	    G4int ilay, G4int irow, 
-	    G4double b, G4double ed, G4int parentid, G4double Length, 
-	    G4double Mass, G4int Charge,
-	       G4ThreeVector& vtxmom, G4ThreeVector& vtxpos, G4double vtxene, G4double Kinene);
-  
-  virtual ~TPCTargetHit();
-  
-  // copy constructor & assignment operator
   TPCTargetHit(const TPCTargetHit& right);
   const TPCTargetHit& operator=(const TPCTargetHit& right);
-  
+
   // new/delete operators
   void* operator new(size_t);
   void operator delete(void* aHit);
-  
+
   // set/get functions
   const G4ThreeVector& GetPosition() const { return xyz; }
   const G4ThreeVector& GetMomentum() const { return pxyz; }
@@ -103,7 +96,7 @@ inline const TPCTargetHit& TPCTargetHit::operator=
 }
 
 // externally instanciated.
-extern G4Allocator<TPCTargetHit> TPCTargetHitAllocator; 
+extern G4Allocator<TPCTargetHit> TPCTargetHitAllocator;
 
 inline void* TPCTargetHit::operator new(size_t)
 {

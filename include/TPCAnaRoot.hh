@@ -1,15 +1,10 @@
-#ifndef TPCANAROOT_H
-#define TPCANAROOT_H 1
+// -*- C++ -*-
 
-#include "G4ThreeVector.hh"
-#include "globals.hh"
-#include "TFile.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TNtuple.h"
-#include "TTree.h"
-#include "TBranch.h"
-#include "common.hh"
+#ifndef TPCANAROOT_HH
+#define TPCANAROOT_HH
+
+#include <globals.hh>
+#include <G4ThreeVector.hh>
 
 class TH1F;
 class TH2F;
@@ -29,14 +24,16 @@ const G4int MaxTrig = 500;
 const G4int MaxDCHit = 500;
 const G4int MaxPrimaryParticle = 10;
 
-struct Tree1Ev {
+//_____________________________________________________________________________
+struct Tree1Ev
+{
 
-  G4int ev;        // Event number  
+  G4int ev;        // Event number
   G4double pg[4];  // 4-momentum for inncident beam
   G4int gen;        // generator number
   G4int mode;        // mode number
 
-  G4double mm_d; //missing-mass of d(pi,K) reaction 
+  G4double mm_d; //missing-mass of d(pi,K) reaction
   G4double mm_p;  //missing-mass for proton target kinematic
   G4double mm; //missing-mass (should be same as mm_d)
   G4double theta; //theta of scat K
@@ -66,12 +63,12 @@ struct Tree1Ev {
 
 
   G4int npid;
-  G4double x0[MaxPrimaryParticle][3];   
-  G4double p0[MaxPrimaryParticle][5];  
-  G4double pt0[MaxPrimaryParticle];  
-  G4double mass0[MaxPrimaryParticle];  
-  G4int pid0[MaxPrimaryParticle];  
-  G4double theta0[MaxPrimaryParticle];  
+  G4double x0[MaxPrimaryParticle][3];
+  G4double p0[MaxPrimaryParticle][5];
+  G4double pt0[MaxPrimaryParticle];
+  G4double mass0[MaxPrimaryParticle];
+  G4int pid0[MaxPrimaryParticle];
+  G4double theta0[MaxPrimaryParticle];
 
   /* number of ntrks in TPC by shhwang*/
   G4int ntrtpc;
@@ -147,20 +144,20 @@ struct Tree1Ev {
   G4double slengthtpc[MaxTrack];    // Energy deposit/dx
 
   G4int laytpc[MaxTrack];      // number of pad layer
-  G4int rowtpc[MaxTrack];      // number of pad raw  
+  G4int rowtpc[MaxTrack];      // number of pad raw
   G4double toftpc[MaxTrack];   // tof
   G4int parentID[MaxTrack];      // parent id
   G4double cir_r[MaxTrack];   // fit radius
   G4double cir_x[MaxTrack];   // fit center x
   G4double cir_z[MaxTrack];   // fit center z
   G4double cir_fit[MaxTrack];   // fit center fit
-  G4int vtx_flag[MaxTrack]; // flag, how to estimate vtx 
-  G4double a_fory[MaxTrack]; // co-efficient a for linear track (y, theta) 
-  G4double b_fory[MaxTrack]; // co-efficient b for linear track (y, theta) 
+  G4int vtx_flag[MaxTrack]; // flag, how to estimate vtx
+  G4double a_fory[MaxTrack]; // co-efficient a for linear track (y, theta)
+  G4double b_fory[MaxTrack]; // co-efficient b for linear track (y, theta)
 
 
   G4int ntsc;                 // Number of Hit in Scint.
-  G4int tidsc[MaxTrig];       // Track ID   
+  G4int tidsc[MaxTrig];       // Track ID
   G4int pidsc[MaxTrig];	    // Particle ID
   G4int didsc[MaxTrig];	    // detector ID
   G4double masssc[MaxTrig];	    // particle mass ID
@@ -188,7 +185,7 @@ struct Tree1Ev {
 
   ///ac
   G4int ntac;                 // Number of Hit in Acint.
-  G4int tidac[MaxTrig];       // Track ID   
+  G4int tidac[MaxTrig];       // Track ID
   G4int pidac[MaxTrig];	    // Particle ID
   G4int didac[MaxTrig];	    // detector ID
   G4double massac[MaxTrig];	    // particle mass ID
@@ -216,7 +213,7 @@ struct Tree1Ev {
 
   ////////nbar
   G4int ntnbar;                 // Number of Hit in Nbarint.
-  G4int tidnbar[MaxTrig];       // Trnbark ID   
+  G4int tidnbar[MaxTrig];       // Trnbark ID
   G4int pidnbar[MaxTrig];	    // Particle ID
   G4int didnbar[MaxTrig];	    // detector ID
   G4double massnbar[MaxTrig];	    // particle mass ID
@@ -246,7 +243,7 @@ struct Tree1Ev {
 
   ///dc
   G4int ntdc;                 // Number of Hit in Dcint.
-  G4int tiddc[MaxTrig];       // Trdck ID   
+  G4int tiddc[MaxTrig];       // Trdck ID
   G4int piddc[MaxTrig];	    // Particle ID
   G4int diddc[MaxTrig];	    // detector ID
   G4double massdc[MaxTrig];	    // particle mass ID
@@ -274,7 +271,7 @@ struct Tree1Ev {
 
   ///ch
   G4int ntch;                 // Number of Hit in Chint.
-  G4int tidch[MaxTrig];       // Trchk ID   
+  G4int tidch[MaxTrig];       // Trchk ID
   G4int pidch[MaxTrig];	    // Particle ID
   G4int didch[MaxTrig];	    // detector ID
   G4double massch[MaxTrig];	    // particle mass ID
@@ -303,7 +300,7 @@ struct Tree1Ev {
 
   ///ftof
   G4int ntftof;                 // Number of Hit in Ftofint.
-  G4int tidftof[MaxTrig];       // Trftofk ID   
+  G4int tidftof[MaxTrig];       // Trftofk ID
   G4int pidftof[MaxTrig];	    // Particle ID
   G4int didftof[MaxTrig];	    // detector ID
   G4double massftof[MaxTrig];	    // particle mass ID
@@ -330,7 +327,7 @@ struct Tree1Ev {
 
   /////////////It does not use in current G4
   /*  G4int ntfdc;                     // Number of Hit in FDC
-  G4int tidfdc[MaxTrackFDC];       // Track ID   
+  G4int tidfdc[MaxTrackFDC];       // Track ID
   G4int pidfdc[MaxTrackFDC];	 // Particle ID
   G4int didfdc[MaxTrackFDC];	 // detector ID
   G4double xfdc[MaxTrackFDC];      // coordinates
@@ -343,7 +340,7 @@ struct Tree1Ev {
   */
 
   G4int targethits;                     // Number of Hit in TARGET
-  G4int targetpid[MaxTrack];       // Track ID   
+  G4int targetpid[MaxTrack];       // Track ID
   G4int targetparentid[MaxTrack];	 // Particle ID
   G4int targettid[MaxTrack];	 // detector ID
   G4double targetpos[MaxTrack][3];      // coordinates
@@ -351,9 +348,13 @@ struct Tree1Ev {
 
 };
 
-
+//_____________________________________________________________________________
 class TPCAnaRoot
 {
+public:
+  TPCAnaRoot( void );
+  ~TPCAnaRoot( void );
+
 private:
   TFile *rootfile;
   TH1F *hpos[3];
@@ -364,8 +365,6 @@ private:
   Tree1Ev tree1ev;
 
 public:
-  TPCAnaRoot();
-  ~TPCAnaRoot();
   void BeginOfRunAction(int runnum);
   void EndOfRunAction();
   void BeginOfEventAction();
@@ -403,18 +402,18 @@ public:
   //  void tpcHit(){
   //    tree1ev.ntrtpc += 1;
   //  }
-  
+
   void FillPrimaryParticle(int id, double* x0, double* p0, int pid);
-  void FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K, 
-		  int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K, 
+  void FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
+		  int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
 		  int HitNumScint_K, int HitNumTarget_K);
 
-  void FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p, 
-		  int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p, 
+  void FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
+		  int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
 		  int HitNumScint_p, int HitNumTarget_p);
 
   void FillBeam(G4double px, G4double py, G4double pz);
-  void FillPrimaryInfo(G4double mm_d, G4double mm_p, G4double theta, 
+  void FillPrimaryInfo(G4double mm_d, G4double mm_p, G4double theta,
 		       G4double theta_scat, G4double theta_CM);
 
   void FillLayerPad(G4int nlay,G4int npad);
@@ -422,12 +421,12 @@ public:
   void FillGenMode(G4int gen,G4int mode);
 
   void FillTPCData(G4double tpcpx1,G4double tpcpy1,
-		   G4double tpcpz1,G4double tpcpp1, 
-		   G4int tpcpid1, G4int tpcparentid1, G4int tpcparentid_pid1, 
-		   G4int tpcqq1, 
-		   G4double tpcpm1, G4double tpcde1, G4double tpclen1, 
+		   G4double tpcpz1,G4double tpcpp1,
+		   G4int tpcpid1, G4int tpcparentid1, G4int tpcparentid_pid1,
+		   G4int tpcqq1,
+		   G4double tpcpm1, G4double tpcde1, G4double tpclen1,
 		   G4double tpcdedx1,G4double tpcdedxtr1, G4int tpclay1,
-		   G4double tpcvtxpx1,G4double tpcvtxpy1, G4double tpcvtxqz1, 
+		   G4double tpcvtxpx1,G4double tpcvtxpy1, G4double tpcvtxqz1,
 		   G4double tpcvtxx1,G4double tpcvtxy1, G4double tpcvtxz1,
 		   G4double tpcvtxx1fit,G4double tpcvtxy1fit, G4double tpcvtxz1fit,
 		   G4double tpcpxfit1,G4double tpcpyfit1,G4double tpcpzfit1,G4double tpcptfit1,
@@ -437,44 +436,44 @@ public:
 
   void FillScintData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double scintvtxpx1,G4double scintvtxpy1, G4double scintvtxqz1, 
-		     G4double scintvtxx1,G4double scintvtxy1, G4double scintvtxz1, G4double tlength1);  
+		     G4double scintvtxpx1,G4double scintvtxpy1, G4double scintvtxqz1,
+		     G4double scintvtxx1,G4double scintvtxy1, G4double scintvtxz1, G4double tlength1);
 
   void FillACData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double acvtxpx1,G4double acvtxpy1, G4double acvtxqz1, 
-		     G4double acvtxx1,G4double acvtxy1, G4double acvtxz1, G4double tlength1);  
+		     G4double acvtxpx1,G4double acvtxpy1, G4double acvtxqz1,
+		     G4double acvtxx1,G4double acvtxy1, G4double acvtxz1, G4double tlength1);
 
 
   void FillNBARData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double nbarvtxpx1,G4double nbarvtxpy1, G4double nbarvtxqz1, 
-		     G4double nbarvtxx1,G4double nbarvtxy1, G4double nbarvtxz1, G4double tlength1);  
+		     G4double nbarvtxpx1,G4double nbarvtxpy1, G4double nbarvtxqz1,
+		     G4double nbarvtxx1,G4double nbarvtxy1, G4double nbarvtxz1, G4double tlength1);
 
 
   void FillDCData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1, 
-		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);  
+		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1,
+		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);
 
   void FillCHData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1, 
-		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);  
+		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1,
+		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);
 
   void FillFTOFData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
-		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1, 
-		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);  
+		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1,
+		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);
 
 
 
   /*  void FillFDCData(G4double time, G4double* pos, G4double* mom,
-			  G4int tid, G4int pid, G4int did);  
+			  G4int tid, G4int pid, G4int did);
   */
 
   void FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4int trackid,
-		      G4ThreeVector pos, G4ThreeVector vtx);  
+		      G4ThreeVector pos, G4ThreeVector vtx);
 
 
   void FillTree();

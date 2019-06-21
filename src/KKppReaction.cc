@@ -20,7 +20,6 @@
 #include "KinemaHweak.hh"
 #include "KinemaFermi.hh"
 #include "KinemaKstar.hh"
-#include "common.hh"
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"

@@ -1,22 +1,18 @@
 // -*- C++ -*-
 
-#ifndef TPC_PRIMARY_GENERATOR_ACTION_H
-#define TPC_PRIMARY_GENERATOR_ACTION_H
+#ifndef TPC_PRIMARY_GENERATOR_ACTION_HH
+#define TPC_PRIMARY_GENERATOR_ACTION_HH
 
 #include <G4VUserPrimaryGeneratorAction.hh>
 #include <G4Types.hh>
-
-#include <TH1.h>
-#include <TH2.h>
-#include <TCanvas.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <TF1.h>
 
 #include "ThreeVector.hh"
 
 class G4ParticleGun;
 
+class TFile;
+
+//_____________________________________________________________________________
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
@@ -41,24 +37,6 @@ private:
   G4double env_Beam_v0;
   G4double env_Beam_du;
   G4double env_Beam_dv;
-
-  TFile* file;
-  TH1F* gen_im;
-  TH1F* cmk;
-  TH1F* phik;
-  TH1F* phih;
-
-  TH1F* phidiff;
-  TH1F* thetadiff;
-
-  TH1F* missk;
-  TH1F* coscmk;
-  TH1F* coscmh;
-
-  TH1F* coslabk;
-  TH1F* labk;
-
-  TH1F* cmh;
 
 public:
   G4double miss1(G4double pbeam, G4double m1,G4double *p1);
@@ -133,15 +111,10 @@ public:
   void Generate_E07_study_kp_04_15(G4Event* anEvent); //#79 k+ from 0.4 GeV to 1.5 GeV
   void Generate_E07_study_kpxi1530(G4Event* anEvent); //#80 knp --> kpxi1530-
   void Generate_E07_study_Takahashi(G4Event* anEvent); //#81 knp --> kpXi-, Takahashi-san's code
-  double deg2rad(double theta);
   double RandSin(void);
-
 
   friend class E27Reaction;
   friend class KKppReaction;
-
-
 };
-
 
 #endif

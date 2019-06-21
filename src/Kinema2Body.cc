@@ -1,15 +1,21 @@
+// -*- C++ -*-
+
+#include "Kinema2Body.hh"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "Kinema2Body.hh"
-#define PI acos(-1.)
-Kinema2Body::Kinema2Body(void)
+#include <CLHEP/Units/SystemOfUnits.h>
+
+//_____________________________________________________________________________
+Kinema2Body::Kinema2Body( void )
 {
 }
 
-Kinema2Body::Kinema2Body(double m1, double m2, double m3, double m4)
+//_____________________________________________________________________________
+Kinema2Body::Kinema2Body( double m1, double m2, double m3, double m4 )
 {
   kin.M_1 = m1;
   kin.M_2 = m2;
@@ -18,15 +24,19 @@ Kinema2Body::Kinema2Body(double m1, double m2, double m3, double m4)
   //  G4cout<<"mass test 2body:"<<kin.M_1<<kin.M_2<<kin.M_3<<kin.M_4<<G4endl;
 }
 
-void Kinema2Body::SetMass(double *mass)
+//_____________________________________________________________________________
+void
+Kinema2Body::SetMass( double *mass )
 {
   kin.M_1 = mass[0];
   kin.M_2 = mass[1];
   kin.M_3 = mass[2];
   kin.M_4 = mass[3];
 }
-  
-void Kinema2Body::SetMass(int i, double mass)
+
+//_____________________________________________________________________________
+void
+Kinema2Body::SetMass( int i, double mass )
 {
   switch (i) {
   case 1:
@@ -44,10 +54,11 @@ void Kinema2Body::SetMass(int i, double mass)
   default:
     fprintf(stderr,"Kinema2Body::SetMass No such particle:%d\n",i);
   }
-  return;
 }
 
-void Kinema2Body::SetMomentum(int i,double mom)
+//_____________________________________________________________________________
+void
+Kinema2Body::SetMomentum( int i, double mom )
 {
   switch (i) {
   case 1:
@@ -65,11 +76,11 @@ void Kinema2Body::SetMomentum(int i,double mom)
   default:
     fprintf(stderr,"Kinema2Body::SetMomentum No such particle:%d\n",i);
   }
-  return;
 }
 
-
-void Kinema2Body::SetTheta(int i,double theta)
+//_____________________________________________________________________________
+void
+Kinema2Body::SetTheta( int i, double theta )
 {
   switch (i) {
   case 1:
@@ -81,29 +92,29 @@ void Kinema2Body::SetTheta(int i,double theta)
   default:
     fprintf(stderr,"Kinema2Body::SetTheta No such particle:%d\n",i);
   }
-  return;
 }
 
-
-void Kinema2Body::SetThetaCM(double theta_cm)
+//_____________________________________________________________________________
+void
+Kinema2Body::SetThetaCM( double theta_cm )
 {
   kin.theta_cm = theta_cm;
-  return;
 }
 
-int Kinema2Body::calc_kinema(void)
+//_____________________________________________________________________________
+int
+Kinema2Body::calc_kinema( void )
 {
-  
   kin.E_1_lab = p2E(kin.p_1_lab/cos(kin.p_1_theta),kin.M_1); //energy m1
   kin.E_2_lab = p2E(kin.p_2_lab/cos(kin.p_2_theta),kin.M_2); //energy m2
   /*
   G4cout<<"kin.p_1_theta:"<<kin.p_1_theta<<G4endl;
   G4cout<<"kin.p_2_theta:"<<kin.p_2_theta<<G4endl;
-  G4cout<<"calc_kinema"<<G4endl;  
-  G4cout<<"E1"<<G4endl;  
+  G4cout<<"calc_kinema"<<G4endl;
+  G4cout<<"E1"<<G4endl;
   G4cout<<kin.E_1_lab<<G4endl;
   G4cout<<kin.p_1_lab<<":"<<kin.M_1<<G4endl;
-  G4cout<<"E2"<<G4endl;  
+  G4cout<<"E2"<<G4endl;
   G4cout<<kin.E_2_lab<<G4endl;
   G4cout<<kin.p_2_lab<<":"<<kin.M_2<<G4endl;
   */
@@ -123,8 +134,8 @@ int Kinema2Body::calc_kinema(void)
 
   //  kin.E_12_cm = kin.gamma_cm * kin.E_2_lab - kin.beta_cm * kin.gamma_cm * kin.p_2_lab;
   /*
-  G4cout<<"-----------------------------------------"<<G4endl;  
-  G4cout<<"center of mass e1 e2"<<G4endl;  
+  G4cout<<"-----------------------------------------"<<G4endl;
+  G4cout<<"center of mass e1 e2"<<G4endl;
   G4cout<<"p1:"<<sqrt(pow(kin.E_1_cm,2)-pow(kin.M_1,2))<<G4endl;
   G4cout<<"p2:"<<sqrt(pow(kin.E_2_cm,2)-pow(kin.M_2,2))<<G4endl;
   G4cout<<kin.E_1_cm<<G4endl;
@@ -184,7 +195,7 @@ int Kinema2Body::calc_kinema(void)
   p_lab_xy = kin.p_34_cm * sin(deg2rad(kin.theta_cm));
   kin.p_3_lab = sqrt(pow(p_lab_z,2.0) + pow(p_lab_xy,2.0));
 
-  
+
   p_lab_z = kin.beta_cm * kin.gamma_cm * kin.E_4_cm - kin.gamma_cm * kin.p_34_cm * cos(deg2rad(kin.theta_cm));
   kin.p_4_lab = sqrt(pow(p_lab_z,2.0) + pow(-p_lab_xy,2.0));
 
@@ -200,12 +211,16 @@ int Kinema2Body::calc_kinema(void)
   return 0;
 }
 
-double Kinema2Body::p2E(double p,double m)
+//_____________________________________________________________________________
+double
+Kinema2Body::p2E( double p, double m )
 {
   return sqrt(p*p + m*m);
 }
 
-double Kinema2Body::E2p(double E,double m)
+//_____________________________________________________________________________
+double
+Kinema2Body::E2p( double E, double m )
 {
   if (E*E - m*m<0.000000001)
     return 0.0;
@@ -213,13 +228,18 @@ double Kinema2Body::E2p(double E,double m)
     return sqrt(E*E - m*m);
 }
 
-double Kinema2Body::pE2beta(double p,double E,double m_2)
+//_____________________________________________________________________________
+double
+Kinema2Body::pE2beta( double p, double E, double m_2 )
 {
   //target stops in rest
   return p/(E + m_2);
 }
 
-double Kinema2Body::pE2beta(double p1,double E1,double m1, double p2, double E2, double m2)
+//_____________________________________________________________________________
+double
+Kinema2Body::pE2beta( double p1, double E1, double /* m1 */,
+		      double p2, double E2, double /* m2 */ )
 {
   //move --> it is correct
   //Ecm=sqrt((E1+E2)^2-(p1+p2)^2)
@@ -248,7 +268,7 @@ double Kinema2Body::theta2theta_cm(double theta,double p,double E,double kin_gam
 {
   double value;
 
-  value = atan(p*sin(deg2rad(theta))/(-kin_gamma*beta*E + kin_gamma*p*cos(deg2rad(theta))))*180.0/PI;
+  value = atan(p*sin(deg2rad(theta))/(-kin_gamma*beta*E + kin_gamma*p*cos(deg2rad(theta))))*180.0/CLHEP::pi;
 
   if ( value < 0.0 )
     value = value + 180.0;
@@ -260,7 +280,7 @@ double Kinema2Body::theta_cm2theta_lab(double theta,double p,double E,double gam
 {
   double value;
 
-  value = atan(p*sin(deg2rad(theta))/(beta_cm*gamma_cm*E + gamma_cm*p*cos(deg2rad(theta))))*180.0/PI;
+  value = atan(p*sin(deg2rad(theta))/(beta_cm*gamma_cm*E + gamma_cm*p*cos(deg2rad(theta))))*180.0/CLHEP::pi;
 
   if (value < 0.0)
     value = value + 180.0;
@@ -272,7 +292,7 @@ double Kinema2Body::theta_cm2phi_lab(double theta,double p,double E,double gamma
 {
   double value;
 
-  value = atan(p*sin(deg2rad(theta))/(beta_cm*gamma_cm*E - gamma_cm*p*cos(deg2rad(theta))))*180.0/PI;
+  value = atan(p*sin(deg2rad(theta))/(beta_cm*gamma_cm*E - gamma_cm*p*cos(deg2rad(theta))))*180.0/CLHEP::pi;
 
   if (value < 0.0)
     value = value + 180.0;
@@ -281,12 +301,12 @@ double Kinema2Body::theta_cm2phi_lab(double theta,double p,double E,double gamma
 }
 
 double Kinema2Body::deg2rad(double theta) {
-  return PI*theta/180.0;
+  return CLHEP::pi*theta/180.0;
 }
 
 double Kinema2Body::rag2deg(double rag)
 {
-  return 360.0 * rag/ (2.0 * PI);
+  return 360.0 * rag/ (2.0 * CLHEP::pi);
 }
 
 void Kinema2Body::Dump(void)
@@ -429,7 +449,7 @@ double Kinema2Body::GetThetaCM(void)
   return kin.theta_cm;
 }
 
-double Kinema2Body::GetMass(int i) 
+double Kinema2Body::GetMass(int i)
 {
   switch (i) {
   case 1:

@@ -1,8 +1,13 @@
-#ifndef __KINEMAHWEAK_HH__
-#define __KINEMAHWEAK_HH__
+// -*- C++ -*-
+
+#ifndef KINEMAHWEAK_HH
+#define KINEMAHWEAK_HH
 
 #include "Kinema2Body.hh"
-struct KINEMA_HWEAK{
+
+//_____________________________________________________________________________
+struct KINEMA_HWEAK
+{
   double E_1_lab;
   double p_1_lab;
   double M_1;
@@ -27,7 +32,9 @@ struct KINEMA_HWEAK{
   double Phi1;
 };
 
-class KinemaHweak {
+//_____________________________________________________________________________
+class KinemaHweak
+{
 private:
   Kinema2Body kin1;
   KINEMA_HWEAK kin3;

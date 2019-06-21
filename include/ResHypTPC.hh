@@ -1,17 +1,19 @@
+// -*- C++ -*-
+
 // Author : Hiroyuki Sako
-#ifndef RES_HYP_TPC_H
-#define RES_HYP_TPC_H
+
+#ifndef RES_HYP_TPC_HH
+#define RES_HYP_TPC_HH
+
 #include <math.h>
-#include "globals.hh"
-#include "TH1.h"
-#include "TH2.h"
-#include "TF1.h"
-#include "common.hh"
+#include <globals.hh>
 
 class TH1F;
 class TF1;
 
-class ResHypTPC {
+//_____________________________________________________________________________
+class ResHypTPC
+{
 private:
   static const bool debug = false;
   G4double pad_size;
@@ -65,7 +67,6 @@ private:
     nsigma = nmpv * sigma_amp;
 
   };
-  
 
 public:
   //  ResHypTPC(G4double pad_size=2., G4double pad_length=10., G4double threshold=0.1, G4double diff_T=0.18, G4double smearing=0);
@@ -79,7 +80,7 @@ public:
 };
 G4double getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_rms, G4double x, G4double y, G4double dxdz, G4double dydz);
   G4double getYDeviation(G4double y);
-  
+
   G4double getDiffusionX(G4double y) const {
     if (y>=0) {
       return diffusion_T*sqrt(y/10.);
@@ -87,8 +88,6 @@ G4double getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_rms, G4doubl
       return -1;
     }
   };
-
-
 
   G4double getNsum() {
     return n_sum;
@@ -102,5 +101,5 @@ G4double getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_rms, G4doubl
 
 G4double GetTransverseRes(G4double y);
 //const G4double ResHypTPC::y_resolution = 0.5;
-#endif
 
+#endif

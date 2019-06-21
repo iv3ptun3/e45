@@ -53,10 +53,9 @@ TPCPadSD::Initialize( G4HCofThisEvent* HCTE )
   ntrk=0;
   hitsCollection = new G4THitsCollection<TPCPadHit>( SensitiveDetectorName,
 						     collectionName[0] );
-
   // push H.C. to "Hit Collection of This Event"
   G4int hcid = GetCollectionID(0);
-  HCTE->AddHitsCollection(hcid, hitsCollection);
+  HCTE->AddHitsCollection( hcid, hitsCollection );
 
   if( m_gem_discharge > 0 ){
     if( m_gem_fix_dead == 0 ){
@@ -83,12 +82,10 @@ TPCPadSD::Initialize( G4HCofThisEvent* HCTE )
   }
 }
 
-///////////////////////////////////////////////////////////
-G4bool TPCPadSD::ProcessHits(G4Step* aStep,
-				G4TouchableHistory* ROhist)
-///////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+G4bool
+TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
-  // get step information from "PreStepPoint"
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   const G4Track* aTrack = aStep->GetTrack();
   G4int copyNo = preStepPoint -> GetPhysicalVolume()->GetCopyNo();
@@ -395,24 +392,23 @@ G4bool TPCPadSD::ProcessHits(G4Step* aStep,
   hitsCollection-> insert(ahit);
   return true;
   //}End of fboundary
-
 }
 
-////////////////////////////////////////////////////
-void TPCPadSD::EndOfEvent(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPadSD::EndOfEvent(G4HCofThisEvent* /* HCTE */ )
 {
 }
 
-////////////////////////////
-void TPCPadSD::DrawAll()
-////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPadSD::DrawAll( void )
 {
 }
 
-/////////////////////////////
-void TPCPadSD::PrintAll()
-/////////////////////////////
+//_____________________________________________________________________________
+void
+TPCPadSD::PrintAll( void )
 {
   hitsCollection-> PrintAllHits();
 }

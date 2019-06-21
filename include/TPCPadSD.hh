@@ -38,10 +38,10 @@ public:
   G4int ntrk;
   // virtual methods
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );
-  virtual void Initialize( G4HCofThisEvent* HCTE );
-  virtual void EndOfEvent( G4HCofThisEvent* HCTE );
-  virtual void DrawAll( void );
-  virtual void PrintAll( void );
+  virtual void   Initialize( G4HCofThisEvent* HCTE );
+  virtual void   EndOfEvent( G4HCofThisEvent* HCTE );
+  virtual void   DrawAll( void );
+  virtual void   PrintAll( void );
 };
 
 #endif

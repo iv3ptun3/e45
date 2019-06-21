@@ -46,7 +46,7 @@ TPCEventAction::~TPCEventAction( void )
 
 //_____________________________________________________________________________
 void
-TPCEventAction::BeginOfEventAction( const G4Event* anEvent )
+TPCEventAction::BeginOfEventAction( const G4Event* )
 {
   gAnaMan.BeginOfEventAction();
 }
@@ -84,7 +84,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4double vtxpxtpc[MaxTrackTPC]={0};
     G4double vtxpytpc[MaxTrackTPC]={0};
     G4double vtxpztpc[MaxTrackTPC]={0};
-    G4double vtxpptpc[MaxTrackTPC]={0};
+    // G4double vtxpptpc[MaxTrackTPC]={0};
     G4double vtxenetpc[MaxTrackTPC]={0};
     G4double detpc[MaxTrackTPC]={0};
     G4int laytpc[MaxTrackTPC]={0};
@@ -119,7 +119,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	qqtpc[nparticle]=charge;
 	pmtpc[nparticle]=mass;
 	detpc[nparticle]=detpc[nparticle]+edep;
-	vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
+	// vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
 	if(ilay>-1){
 	  laytpc[nparticle]=laytpc[nparticle]+1;
 	}
@@ -132,7 +132,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	vtxpxtpc[nparticle]=vtxmom[0];
 	vtxpytpc[nparticle]=vtxmom[1];
 	vtxpztpc[nparticle]=vtxmom[2];
-	vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
+	// vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
 
 	vtxxtpc[nparticle]=vtxpos[0];
 	vtxytpc[nparticle]=vtxpos[1];
@@ -164,7 +164,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	vtxpxtpc[nparticle]=vtxmom[0];
 	vtxpytpc[nparticle]=vtxmom[1];
 	vtxpztpc[nparticle]=vtxmom[2];
-	vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
+	// vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
 	vtxenetpc[nparticle]=vtxene;
 
 	vtxxtpc[nparticle]=vtxpos[0];
@@ -192,7 +192,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	vtxpxtpc[nparticle]=vtxmom[0];
 	vtxpytpc[nparticle]=vtxmom[1];
 	vtxpztpc[nparticle]=vtxmom[2];
-	vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
+	// vtxpptpc[nparticle]=sqrt(pow(vtxmom[0],2)+pow(vtxmom[1],2)+pow(vtxmom[2],2));
 
 	vtxenetpc[nparticle]=vtxene;
 
@@ -307,18 +307,18 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	G4ThreeVector vtxmom = (*targetHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*targetHC)[i]-> GetVtxEnergy();
 	G4ThreeVector xyz = (*targetHC)[i]-> GetPosition();
-	G4double tof= (*targetHC)[i]-> GetTOF();
+	// G4double tof= (*targetHC)[i]-> GetTOF();
 	G4int tid = (*targetHC)[i]-> GetTrackID();
 	G4int ptid = (*targetHC)[i]-> GetParentID();
 	G4int pid = (*targetHC)[i]-> GetParticleID();
-	G4double mass = (*targetHC)[i]-> GetMass();
-	G4int charge = (*targetHC)[i]-> GetCharge();
-	//      G4double mass = (*targetHC)[i]-> GetPDGMass(); //mass(GeV)
-	G4int parentid = (*targetHC)[i]-> GetParentID();
-	G4double tlength = (*targetHC)[i]-> GettLength();
-	G4int irow=0.;
-	G4double beta = (*targetHC)[i]-> GetBeta();
-	G4double edep = (*targetHC)[i]-> GetEdep();
+	// G4double mass = (*targetHC)[i]-> GetMass();
+	// G4int charge = (*targetHC)[i]-> GetCharge();
+	// // G4double mass = (*targetHC)[i]-> GetPDGMass(); //mass(GeV)
+	// G4int parentid = (*targetHC)[i]-> GetParentID();
+	// G4double tlength = (*targetHC)[i]-> GettLength();
+	// G4int irow=0.;
+	// G4double beta = (*targetHC)[i]-> GetBeta();
+	// G4double edep = (*targetHC)[i]-> GetEdep();
 	gAnaMan.SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
       }
     }

@@ -1,51 +1,40 @@
-// ====================================================================
-//   TPCNBARSD.cc
-//
-// ====================================================================
-#include "G4VPhysicalVolume.hh"
-#include "G4Step.hh"
-#include "G4Track.hh"
-#include "G4VTouchable.hh"
-#include "G4TouchableHistory.hh"
+// -*- C++ -*-
+
 #include "TPCNBARSD.hh"
+
+#include <G4VPhysicalVolume.hh>
+#include <G4Step.hh>
+#include <G4Track.hh>
+#include <G4VTouchable.hh>
+#include <G4TouchableHistory.hh>
 #include "TPCNBARHit.hh"
 
-////////////////////////////////////////////////
-TPCNBARSD::TPCNBARSD(const G4String& name)
-  : G4VSensitiveDetector(name)
-////////////////////////////////////////////////
+//_____________________________________________________________________________
+TPCNBARSD::TPCNBARSD( const G4String& name )
+  : G4VSensitiveDetector( name )
 {
   collectionName.insert("hit");
 }
 
-/////////////////////////////////
-TPCNBARSD::~TPCNBARSD()
-/////////////////////////////////
+//_____________________________________________________________________________
+TPCNBARSD::~TPCNBARSD( void )
 {
 }
 
-
-////////////////////////////////////////////////
-void TPCNBARSD::Initialize(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCNBARSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  // create hit collection(s)
   hitsCollection = new G4THitsCollection<TPCNBARHit>( SensitiveDetectorName,
-						       collectionName[0]);
-
-  // push H.C. to "Hit Collection of This Event"
+						      collectionName[0] );
   G4int hcid = GetCollectionID(0);
-  HCTE-> AddHitsCollection(hcid, hitsCollection);
+  HCTE->AddHitsCollection( hcid, hitsCollection );
 }
 
-
-///////////////////////////////////////////////////////////
-G4bool TPCNBARSD::ProcessHits(G4Step* aStep, 
-				G4TouchableHistory* ROhist)
-///////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+G4bool
+TPCNBARSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
-
-  // get step information from "PreStepPoint"
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   G4String particleName;
 
@@ -83,7 +72,7 @@ G4bool TPCNBARSD::ProcessHits(G4Step* aStep,
 
   G4TouchableHistory* theTouchable
     = (G4TouchableHistory*)(aStep->GetPreStepPoint()->GetTouchable());
-  G4VPhysicalVolume* physVol = theTouchable->GetVolume(); 
+  G4VPhysicalVolume* physVol = theTouchable->GetVolume();
 
 
   G4ThreeVector VertexPosition = aTrack->GetVertexPosition();
@@ -118,21 +107,20 @@ G4bool TPCNBARSD::ProcessHits(G4Step* aStep,
   return true;
 }
 
-////////////////////////////////////////////////////
-void TPCNBARSD::EndOfEvent(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCNBARSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
-////////////////////////////
-void TPCNBARSD::DrawAll()
-////////////////////////////
+//_____________________________________________________________________________
+void
+TPCNBARSD::DrawAll( void )
 {
 }
 
-/////////////////////////////
-void TPCNBARSD::PrintAll()
-/////////////////////////////
+//_____________________________________________________________________________
+void TPCNBARSD::PrintAll( void )
 {
   hitsCollection-> PrintAllHits();
 }

@@ -1,9 +1,14 @@
-#ifndef __KINEMAHWEAKNONESO_HH__
-#define __KINEMAHWEAKNONESO_HH__
+// -*- C++ -*-
+
+#ifndef KINEMA_H_WEAK_NONRESO_HH
+#define KINEMA_H_WEAK_NONRESO_HH
 
 #include "Kinema2Body.hh"
 #include "Kinema3Body.hh"
-struct KINEMA_HWEAKNONESO{
+
+//_____________________________________________________________________________
+struct KINEMA_HWEAKNONESO
+{
   double E_1_lab;
   double p_1_lab;
   double M_1;
@@ -46,14 +51,20 @@ struct KINEMA_HWEAKNONESO{
   double Phi1,Phi2;
 };
 
-class KinemaHWeakNonReso {
+//_____________________________________________________________________________
+class KinemaHWeakNonReso
+{
+public:
+  KinemaHWeakNonReso( double m1, double m2, double m3, double m4, double m5,
+		      double m_res, double width, double p1, double p2 );
+  ~KinemaHWeakNonReso( void );
+
 private:
   Kinema2Body kin1;
-  Kinema3Body kin2; // change.... shhwang
+  // Kinema3Body kin2; // change.... shhwang
   KINEMA_HWEAKNONESO kin3;
 
 public:
-  KinemaHWeakNonReso(double m1, double m2, double m3, double m4, double m5, double m_res, double width, double p1, double p2);
   double p2E(double p,double m);
   void CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi);
   double deg2rad(double theta);

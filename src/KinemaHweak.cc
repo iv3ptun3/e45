@@ -1,3 +1,5 @@
+// -*- C++ -*-
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,15 +9,15 @@
 #include "Randomize.hh"
 #include "G4ios.hh"
 
-#define PI 3.141592654
-
-KinemaHweak::KinemaHweak(double m1, double m2, double m3, double m4, double p1, double p2)
+//_____________________________________________________________________________
+KinemaHweak::KinemaHweak( double m1, double m2, double m3,
+			  double m4, double p1, double p2 )
 {
   double ECM;
   double vx3, vy3, vz3;            /* unit vector */
   double vx4, vy4, vz4;            /* unit vector */
   double theta3, theta4;
-  double phi3;                     /* 2phi(CM system)*/ 
+  double phi3;                     /* 2phi(CM system)*/
   double Theta3,Phi3;              /*heta,Ph*/
   double Theta4,Phi4;              /* eta,Ph*/
 
@@ -44,7 +46,7 @@ KinemaHweak::KinemaHweak(double m1, double m2, double m3, double m4, double p1, 
   //    kin3.M_res = CLHEP::RandBreitWigner::shoot(m_res, width);
   //  } while (kin3.M_3+kin3.M_4 > kin3.M_res || kin3.M_res > ECM-kin3.M_5);
   //  kin3.M_res = m_res;
-  
+
   if(ECM<m3+m4){
     G4cout<<"Center of energy less than the mass sum for the produced particles"<<G4endl;
     return;
@@ -96,22 +98,27 @@ KinemaHweak::KinemaHweak(double m1, double m2, double m3, double m4, double p1, 
   //Dump();
 }
 
-double KinemaHweak::p2E(double p,double m)
+//_____________________________________________________________________________
+double
+KinemaHweak::p2E( double p,double m )
 {
   return sqrt(p*p + m*m);
 }
 
-void KinemaHweak::CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi)
+//_____________________________________________________________________________
+void
+KinemaHweak::CalcDistoribution( double unitx, double unity, double /* unitz */,
+				double *theta, double *phi )
 {
   *theta = rag2deg(acos(unitx));
   *phi=rag2deg(atan2(unity,unitx));
-  /*  if (unity>=0.0 && unitz>0.0) 
+  /*  if (unity>=0.0 && unitz>0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<0.0 && unitz>=0.0) 
+  else if (unity<0.0 && unitz>=0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<=0.0 && unitz<0.0) 
+  else if (unity<=0.0 && unitz<0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity>0.0 && unitz<=0.0) 
+  else if (unity>0.0 && unitz<=0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
   else {
     fprintf(stderr,
@@ -124,18 +131,23 @@ void KinemaHweak::CalcDistoribution(double unitx, double unity, double unitz, do
   return;
 }
 
-
-double KinemaHweak::deg2rad(double theta) {
+//_____________________________________________________________________________
+double
+KinemaHweak::deg2rad( double theta )
+{
   return 3.141592654*theta/180.0;
 }
 
-double KinemaHweak::rag2deg(double rag)
+//_____________________________________________________________________________
+double
+KinemaHweak::rag2deg( double rag )
 {
   return 360.0 * rag/ (2.0 * 3.141592654);
 }
 
-    
-double KinemaHweak::RandSin(void)
+//_____________________________________________________________________________
+double
+KinemaHweak::RandSin( void )
 {
   int success=0;
   double x,fx;
@@ -151,7 +163,9 @@ double KinemaHweak::RandSin(void)
   return x;
 }
 
-void KinemaHweak::Dump(void)
+//_____________________________________________________________________________
+void
+KinemaHweak::Dump( void )
 {
   printf("======KinemaHweak Dump======\n");
   printf("--Particle1--\n");
@@ -181,7 +195,9 @@ void KinemaHweak::Dump(void)
   return;
 }
 
-double KinemaHweak::GetEnergy(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetEnergy( int i )
 {
   switch (i) {
   case 1:
@@ -202,7 +218,9 @@ double KinemaHweak::GetEnergy(int i)
   }
 }
 
-double KinemaHweak::GetMomentum(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetMomentum( int i )
 {
   switch (i) {
   case 1:
@@ -223,7 +241,9 @@ double KinemaHweak::GetMomentum(int i)
   }
 }
 
-void KinemaHweak::GetMomentum(int i, double *mom)
+//_____________________________________________________________________________
+void
+KinemaHweak::GetMomentum( int i, double *mom )
 {
   switch (i) {
   case 1:
@@ -252,7 +272,9 @@ void KinemaHweak::GetMomentum(int i, double *mom)
   }
 }
 
-double KinemaHweak::GetTheta(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetTheta( int i )
 {
   switch (i) {
   case 1:
@@ -273,7 +295,9 @@ double KinemaHweak::GetTheta(int i)
   }
 }
 
-double KinemaHweak::GetPhi(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetPhi( int i )
 {
   switch (i) {
   case 1:
@@ -294,7 +318,9 @@ double KinemaHweak::GetPhi(int i)
   }
 }
 
-double KinemaHweak::GetThetaCM(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetThetaCM( int i )
 {
   switch (i) {
   case 1:
@@ -306,7 +332,9 @@ double KinemaHweak::GetThetaCM(int i)
   }
 }
 
-double KinemaHweak::GetPhiCM(int i)
+//_____________________________________________________________________________
+double
+KinemaHweak::GetPhiCM( int i )
 {
   switch (i) {
   case 1:
@@ -318,8 +346,9 @@ double KinemaHweak::GetPhiCM(int i)
   }
 }
 
-
-void KinemaHweak::RotateMom(int i, double deg, double *mom)
+//_____________________________________________________________________________
+void
+KinemaHweak::RotateMom( int i, double deg, double *mom )
 {
   double Sin,Cos;
 
@@ -341,4 +370,3 @@ void KinemaHweak::RotateMom(int i, double deg, double *mom)
     exit(1);
   }
 }
-

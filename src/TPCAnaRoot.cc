@@ -3,9 +3,16 @@
 #include "TPCAnaRoot.hh"
 
 #include <CLHEP/Units/PhysicalConstants.h>
-#include "Randomize.hh"
-#include "G4UIterminal.hh"
-#include "G4UItcsh.hh"
+#include <G4UIterminal.hh>
+#include <G4UItcsh.hh>
+#include <Randomize.hh>
+
+#include <TFile.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TNtuple.h>
+#include <TTree.h>
+#include <TBranch.h>
 
 namespace
 {
@@ -26,7 +33,7 @@ TPCAnaRoot::~TPCAnaRoot( void )
 
 //_____________________________________________________________________________
 void
-TPCAnaRoot::BeginOfRunAction( int runnum )
+TPCAnaRoot::BeginOfRunAction( int )
 {
   int i;
   char histname1[40],histname2[40];
@@ -202,19 +209,25 @@ TPCAnaRoot::BeginOfRunAction( int runnum )
   tree1ev.ev = 0;
 }
 
-void TPCAnaRoot::EndOfRunAction()
+//_____________________________________________________________________________
+void
+TPCAnaRoot::EndOfRunAction( void )
 {
   rootfile->Write();
   rootfile->Close();
   tree1ev.ev = 0;
 }
 
-
-void TPCAnaRoot::BeginOfTrackingAction()
+//_____________________________________________________________________________
+void
+TPCAnaRoot::BeginOfTrackingAction( void )
 {
-  G4cout<< "test tracking action"<<G4endl;
+  G4cout <<  "test tracking action" << G4endl;
 }
-void TPCAnaRoot::BeginOfEventAction()
+
+//_____________________________________________________________________________
+void
+TPCAnaRoot::BeginOfEventAction( void )
 {
 
   tree1ev.ev++;
@@ -530,6 +543,7 @@ void TPCAnaRoot::BeginOfEventAction()
   }
 }
 
+//_____________________________________________________________________________
 //void TPCAnaRoot::FillScintData(G4double time, G4double *pos, G4double *mom,
 //			  G4int tid, G4int pid, G4int did)
 //{
@@ -538,16 +552,18 @@ void TPCAnaRoot::BeginOfEventAction()
 //  tree1ev.ysc[tree1ev.ntsc] = pos[1];
 //  tree1ev.zsc[tree1ev.ntsc] = pos[2];
 
-
-void TPCAnaRoot::FillGenMode(G4int gen_in,G4int mode_in)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillGenMode( G4int gen_in,G4int mode_in )
 {
   //  tree1ev.slengthtpc[tree1ev.nttpc] = slength;
   tree1ev.gen = gen_in;
   tree1ev.mode = mode_in;
 }
 
-
-void TPCAnaRoot::FillLayerPad(G4int nlay,G4int npad)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillLayerPad( G4int nlay,G4int npad )
 {
   //  tree1ev.slengthtpc[tree1ev.nttpc] = slength;
 
@@ -558,20 +574,25 @@ void TPCAnaRoot::FillLayerPad(G4int nlay,G4int npad)
   //  G4cout<<tree1ev.laypad[tree1ev.nttpc][tree1ev.nthlay[tree1ev.nttpc]][tree1ev.nthpad[tree1ev.nttpc]]<<G4endl;
 }
 
-
-
-void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
-			     G4double tpcpz,G4double tpcpp,
-			     G4int tpcpid, G4int tpcparentid, G4int tpcparentid_pid,
-			     G4int tpcqq,
-			     G4double tpcpm, G4double tpcde, G4double tpclen,
-			     G4double tpcdedx,G4double tpcdedxtr, G4int tpclay,
-			     G4double tpcvtxpx,G4double tpcvtxpy,G4double tpcvtxpz,
-			     G4double tpcvtxx,G4double tpcvtxy,G4double tpcvtxz,
-			     G4double tpcvtxxfit,G4double tpcvtxyfit,G4double tpcvtxzfit,
-			     G4double tpcpxfit,G4double tpcpyfit,G4double tpcpzfit,G4double tpcptfit,
-			     G4double cir_r, G4double cir_x, G4double cir_z, G4double cir_fit,
-			     G4int vtx_flag, G4double a_fory, G4double b_fory)//--> should be changed
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillTPCData( G4double tpcpx,G4double tpcpy,
+			 G4double tpcpz,G4double,
+			 G4int tpcpid, G4int tpcparentid,
+			 G4int tpcparentid_pid,
+			 G4int tpcqq,
+			 G4double tpcpm, G4double tpcde, G4double tpclen,
+			 G4double tpcdedx, G4double tpcdedxtr, G4int tpclay,
+			 G4double tpcvtxpx, G4double tpcvtxpy,
+			 G4double tpcvtxpz,
+			 G4double tpcvtxx, G4double tpcvtxy, G4double tpcvtxz,
+			 G4double tpcvtxxfit, G4double tpcvtxyfit,
+			 G4double tpcvtxzfit,
+			 G4double tpcpxfit, G4double tpcpyfit,
+			 G4double tpcpzfit, G4double tpcptfit,
+			 G4double cir_r, G4double cir_x, G4double cir_z,
+			 G4double cir_fit,
+			 G4int vtx_flag, G4double a_fory, G4double b_fory )
 
 {
   tree1ev.trpidtpc[tree1ev.ntrtpc] = tpcpid;
@@ -637,9 +658,9 @@ void TPCAnaRoot::FillTPCData(G4double tpcpx,G4double tpcpy,
   //  G4cout <<"check fill11111 :"<<tree1ev.trpxtpc[tree1ev.ntrtpc-1]<< G4endl;
 }
 
-
-
-void TPCAnaRoot::FillMom(G4double *mom)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillMom( G4double *mom )
 {
   G4int i;
   for(i=0;i<3;i++){
@@ -652,7 +673,9 @@ void TPCAnaRoot::FillMom(G4double *mom)
   tree1ev.pptpc[tree1ev.nttpc] = sqrt(pow(2,mom[0])+pow(2,mom[1])+pow(2,mom[2]))/GeV;
 }
 
-void TPCAnaRoot::FillPos(G4double *pos)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillPos( G4double *pos )
 {
   G4int i;
   for(i=0;i<3;i++){
@@ -665,13 +688,16 @@ void TPCAnaRoot::FillPos(G4double *pos)
 
 }
 
-void TPCAnaRoot::FillNtrk(G4int ntrk)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillNtrk( G4int ntrk )
 {
   tree1ev.ntrk[tree1ev.nttpc] = ntrk;
 }
 
-
-void TPCAnaRoot::FillPos0(G4double *pos, G4double resoX)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillPos0( G4double *pos, G4double resoX )
 {
   tree1ev.x0tpc[tree1ev.nttpc] = pos[0]/mm;
   tree1ev.y0tpc[tree1ev.nttpc] = pos[1]/mm;
@@ -679,41 +705,54 @@ void TPCAnaRoot::FillPos0(G4double *pos, G4double resoX)
   tree1ev.resoX[tree1ev.nttpc] = resoX;
 }
 
-void TPCAnaRoot::FillTime(G4double time)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillTime( G4double time )
 {
   //  printf("time = %f\n",time);
   htime->Fill(time);
 
 }
 
-void TPCAnaRoot::FillBeta(G4double beta)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillBeta( G4double beta )
 {
   tree1ev.betatpc[tree1ev.nttpc] = beta;
 }
 
-void TPCAnaRoot::FillEdep(G4double edep)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillEdep( G4double edep )
 {
   tree1ev.edeptpc[tree1ev.nttpc] = edep;
 }
 
-void TPCAnaRoot::FilldEdx(G4double dedx)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FilldEdx( G4double dedx )
 {
   tree1ev.dedxtpc[tree1ev.nttpc] = dedx;
 }
 
-void TPCAnaRoot::FillsLength(G4double slength)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillsLength( G4double slength )
 {
   tree1ev.slengthtpc[tree1ev.nttpc] = slength;
 }
 
-void TPCAnaRoot::FillTree()
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillTree( void )
 {
   tree->Fill();
 }
 
-void TPCAnaRoot::FillPrimaryParticle(int id, double* x0, double* p0, int pid)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillPrimaryParticle( int id, double* x0, double* p0, int pid )
 {
-
   for(int i=0;i<3;i++){
     tree1ev.x0[id][i] = x0[i];
   }
@@ -727,12 +766,14 @@ void TPCAnaRoot::FillPrimaryParticle(int id, double* x0, double* p0, int pid)
   tree1ev.pt0[id] = sqrt(pow(p0[0],2.0)+pow(p0[1],2.0));
   tree1ev.mass0[id] = p0[4];
   tree1ev.theta0[id] =
-    180.0*atan2(sqrt(pow(p0[0],2.0)+pow(p0[1],2.0)),p0[2])/PI;
+    180.0*atan2(sqrt(pow(p0[0],2.0)+pow(p0[1],2.0)),p0[2])/CLHEP::pi;
   tree1ev.npid++;
   //  G4cout<<"p0 test:"<<p0[id][4]<<G4endl;
 }
 
-void TPCAnaRoot::FillBeam(double px, double py, double pz)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillBeam( double px, double py, double pz )
 {
 
   tree1ev.pg[0] = px;
@@ -742,23 +783,24 @@ void TPCAnaRoot::FillBeam(double px, double py, double pz)
 
 }
 
-
-void TPCAnaRoot::FillPrimaryInfo(double mm_d, double mm_p, double theta,
-				 double theta_scat, double theta_CM)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillPrimaryInfo( double mm_d, double mm_p, double theta,
+			     double theta_scat, double theta_CM )
 {
-
   tree1ev.mm_d = mm_d;
   tree1ev.mm_p = mm_p;
   tree1ev.theta = theta;
   tree1ev.theta_scat = theta_scat;
   tree1ev.theta_CM = theta_CM;
-
   tree1ev.mm = mm;
 }
 
-void TPCAnaRoot::FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
-			    int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
-			    int HitNumScint_K, int HitNumTarget_K)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillNumOfK( int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
+			int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
+			int HitNumScint_K, int HitNumTarget_K )
 {
   tree1ev.HitNum_K = HitNum_K;
   tree1ev.HitNumAC_K = HitNumAC_K;
@@ -770,11 +812,11 @@ void TPCAnaRoot::FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
   tree1ev.HitNumTarget_K = HitNumTarget_K;
 }
 
-
-
-void TPCAnaRoot::FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
-			    int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
-			    int HitNumScint_p, int HitNumTarget_p)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillNumOfp( int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
+			int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
+			int HitNumScint_p, int HitNumTarget_p )
 {
   tree1ev.HitNum_p = HitNum_p;
   tree1ev.HitNumAC_p = HitNumAC_p;
@@ -786,14 +828,16 @@ void TPCAnaRoot::FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
   tree1ev.HitNumTarget_p = HitNumTarget_p;
 }
 
-
-void TPCAnaRoot::FillScintData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double scintvtxpx,G4double scintvtxpy,G4double scintvtxpz,
-			       G4double scintvtxx,G4double scintvtxy,G4double scintvtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillScintData( G4double time, G4double *pos, G4double *mom,
+			   G4int tid, G4int pid, G4int did,G4double mass,
+			   G4int qq, G4int parentID,
+			   G4double scintvtxpx, G4double scintvtxpy,
+			   G4double scintvtxpz,
+			   G4double scintvtxx, G4double scintvtxy,
+			   G4double scintvtxz, G4double tlength )
 {
-
   //  tree1ev.tofsc[tree1ev.ntsc] = time+CLHEP::RandGauss::shoot(0.,0.130);
   tree1ev.tofsc[tree1ev.ntsc] = time;
   tree1ev.scpID[tree1ev.ntsc] = parentID;
@@ -828,12 +872,14 @@ void TPCAnaRoot::FillScintData(G4double time, G4double *pos, G4double *mom,
 
 }
 
-
-void TPCAnaRoot::FillACData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double acvtxpx,G4double acvtxpy,G4double acvtxpz,
-			       G4double acvtxx,G4double acvtxy,G4double acvtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillACData( G4double time, G4double *pos, G4double *mom,
+			G4int tid, G4int pid, G4int did,G4double mass,
+			G4int qq,G4int parentID,
+			G4double acvtxpx,G4double acvtxpy,G4double acvtxpz,
+			G4double acvtxx,G4double acvtxy,G4double acvtxz,
+			G4double tlength )
 {
 
   tree1ev.tofac[tree1ev.ntac] = time;
@@ -868,17 +914,16 @@ void TPCAnaRoot::FillACData(G4double time, G4double *pos, G4double *mom,
   tree1ev.ntac++;
 }
 
-
-
-
-
-void TPCAnaRoot::FillNBARData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double nbarvtxpx,G4double nbarvtxpy,G4double nbarvtxpz,
-			       G4double nbarvtxx,G4double nbarvtxy,G4double nbarvtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillNBARData( G4double time, G4double *pos, G4double *mom,
+			  G4int tid, G4int pid, G4int did, G4double mass,
+			  G4int qq,G4int parentID,
+			  G4double nbarvtxpx, G4double nbarvtxpy,
+			  G4double nbarvtxpz,
+			  G4double nbarvtxx, G4double nbarvtxy,
+			  G4double nbarvtxz, G4double tlength )
 {
-
   tree1ev.tofnbar[tree1ev.ntnbar] = time;
   tree1ev.nbarpID[tree1ev.ntnbar] = parentID;
   //  G4cout<<"particle:parentid :"<<pid<<":"<<parentID<<G4endl;
@@ -911,14 +956,14 @@ void TPCAnaRoot::FillNBARData(G4double time, G4double *pos, G4double *mom,
   tree1ev.ntnbar++;
 }
 
-
-
-
-void TPCAnaRoot::FillDCData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillDCData( G4double time, G4double *pos, G4double *mom,
+			G4int tid, G4int pid, G4int did,G4double mass,
+			G4int qq,G4int parentID,
+			G4double vtxpx,G4double vtxpy,G4double vtxpz,
+			G4double vtxx,G4double vtxy,G4double vtxz,
+			G4double tlength )
 {
 
   tree1ev.tofdc[tree1ev.ntdc] = time;
@@ -953,14 +998,15 @@ void TPCAnaRoot::FillDCData(G4double time, G4double *pos, G4double *mom,
   tree1ev.ntdc++;
 }
 
-
-void TPCAnaRoot::FillCHData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillCHData( G4double time, G4double *pos, G4double *mom,
+			G4int tid, G4int pid, G4int did,G4double mass,
+			G4int qq,G4int parentID,
+			G4double vtxpx,G4double vtxpy,G4double vtxpz,
+			G4double vtxx,G4double vtxy,G4double vtxz,
+			G4double tlength )
 {
-
   tree1ev.tofch[tree1ev.ntch] = time;
   tree1ev.chpID[tree1ev.ntch] = parentID;
   //  G4cout<<"particle:parentid :"<<pid<<":"<<parentID<<G4endl;
@@ -993,15 +1039,15 @@ void TPCAnaRoot::FillCHData(G4double time, G4double *pos, G4double *mom,
   tree1ev.ntch++;
 }
 
-
-
-void TPCAnaRoot::FillFTOFData(G4double time, G4double *pos, G4double *mom,
-			       G4int tid, G4int pid, G4int did,G4double mass, G4int qq,G4int parentID,
-			       G4double vtxpx,G4double vtxpy,G4double vtxpz,
-			       G4double vtxx,G4double vtxy,G4double vtxz, G4double tlength
-)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillFTOFData( G4double time, G4double *pos, G4double *mom,
+			  G4int tid, G4int pid, G4int did,G4double mass,
+			  G4int qq, G4int parentID,
+			  G4double vtxpx,G4double vtxpy,G4double vtxpz,
+			  G4double vtxx,G4double vtxy,G4double vtxz,
+			  G4double tlength )
 {
-
   tree1ev.tofftof[tree1ev.ntftof] = time;
   tree1ev.ftofpID[tree1ev.ntftof] = parentID;
   //  G4cout<<"particle:parentid :"<<pid<<":"<<parentID<<G4endl;
@@ -1034,8 +1080,7 @@ void TPCAnaRoot::FillFTOFData(G4double time, G4double *pos, G4double *mom,
   //  std::cout<<  tree1ev.ntftof<<std::endl;
 }
 
-
-
+//_____________________________________________________________________________
 /*void TPCAnaRoot::FillFDCData(G4double time, G4double *pos, G4double *mom,
 			  G4int tid, G4int pid, G4int did)
 {
@@ -1058,7 +1103,11 @@ void TPCAnaRoot::FillFTOFData(G4double time, G4double *pos, G4double *mom,
 }
 */
 
-void TPCAnaRoot::FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4int trackid, G4ThreeVector pos, G4ThreeVector vtx)
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillTargetData( G4int, G4int particleid, G4int parentid,
+			    G4int trackid, G4ThreeVector pos,
+			    G4ThreeVector vtx )
 {
   //  tree1ev.targethits[tree1ev.ntfdc] = nhit;
   tree1ev.targetpid[tree1ev.targethits] = particleid;
@@ -1070,8 +1119,6 @@ void TPCAnaRoot::FillTargetData(G4int nhit, G4int particleid, G4int parentid, G4
   tree1ev.targetvtx[tree1ev.targethits][0] = vtx.getX();
   tree1ev.targetvtx[tree1ev.targethits][1] = vtx.getY();
   tree1ev.targetvtx[tree1ev.targethits][2] = vtx.getZ();
-
   tree1ev.targethits++;
   //  G4cout<<tree1ev.targethits<<G4endl;
-
 }

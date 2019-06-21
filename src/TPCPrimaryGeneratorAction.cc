@@ -12,8 +12,13 @@
 #include <G4IonConstructor.hh>
 #include <Randomize.hh>
 
+#include <TH1.h>
+#include <TH2.h>
+#include <TCanvas.h>
 #include <TTree.h>
 #include <TFile.h>
+#include <TF1.h>
+#include <TMath.h>
 
 #include "ConfMan.hh"
 #include "DetSizeMan.hh"
@@ -27,7 +32,6 @@
 #include "KinemaHweak.hh"
 #include "KinemaFermi.hh"
 #include "KinemaKstar.hh"
-#include "common.hh"
 #include "TPCAnaManager.hh"
 #include "ThreeVector.hh"
 
@@ -55,9 +59,6 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
 //_____________________________________________________________________________
 TPCPrimaryGeneratorAction::~TPCPrimaryGeneratorAction( void )
 {
-  //  delete particleGun;
-  // file->Write();
-  // file->Close();
 }
 
 //_____________________________________________________________________________
@@ -286,7 +287,9 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   //  Generate_hybrid3body_mode4(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
 }
 
-void TPCPrimaryGeneratorAction::Generate_hdibaryon2(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
   //  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
@@ -532,7 +535,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon2(G4Event* anEvent)
 
 }
 
-void TPCPrimaryGeneratorAction::Generate_hanul(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
@@ -697,11 +702,10 @@ void TPCPrimaryGeneratorAction::Generate_hanul(G4Event* anEvent)
   //  gen_im->Fill(invm);
 }
 
-
-
-
-//generator #30
-void TPCPrimaryGeneratorAction::Generate_PhaseSpace(G4Event* anEvent)
+//_____________________________________________________________________________
+// generator #30
+void
+TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
 {
 
   G4double Energy_Be10,momentum_Be10[4]={0.};
@@ -991,11 +995,9 @@ void TPCPrimaryGeneratorAction::Generate_PhaseSpace(G4Event* anEvent)
   */
 }
 
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 {
   G4double  momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -1119,8 +1121,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -1245,9 +1248,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -1371,8 +1374,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_Kp_Kn(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
 {
   G4double  momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -1491,8 +1495,9 @@ void TPCPrimaryGeneratorAction::Generate_Kp_Kn(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_beam(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_beam( G4Event* anEvent )
 {
   //  G4double  momk[3], mom[3],momkn[3];
   G4double Ebeam, pbeam;
@@ -1538,11 +1543,9 @@ void TPCPrimaryGeneratorAction::Generate_beam(G4Event* anEvent)
   //  gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
 }
 
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
 {
   G4double  momk[4]={0.}, mom[3]={0.};
   G4double Ebeam, pbeam;
@@ -1665,8 +1668,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_hybrid(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid( G4Event* anEvent )
 {
   G4double mass_hybrid, width_hybrid;
 
@@ -1827,9 +1831,9 @@ void TPCPrimaryGeneratorAction::Generate_hybrid(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_hybrid3body(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
@@ -1992,14 +1996,13 @@ void TPCPrimaryGeneratorAction::Generate_hybrid3body(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-
-
-
-///////E45 elastic scattering pip
-void TPCPrimaryGeneratorAction::Generate_E45_elastic_pip(G4Event* anEvent)
+//_____________________________________________________________________________
+// E45 elastic scattering pip
+void
+TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
-  G4double Ebeam, pbeam;
+  G4double Ebeam, pbeam=0.;
 
   G4double pbm[4];
   G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
@@ -2178,14 +2181,13 @@ void TPCPrimaryGeneratorAction::Generate_E45_elastic_pip(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-
-///////E45 elastic scattering pin
-void TPCPrimaryGeneratorAction::Generate_E45_elastic_pin(G4Event* anEvent)
+//_____________________________________________________________________________
+// E45 elastic scattering pin
+void
+TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
-  G4double Ebeam, pbeam;
+  G4double Ebeam, pbeam=0.;
 
   G4double pbm[4];
   G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
@@ -2364,9 +2366,9 @@ void TPCPrimaryGeneratorAction::Generate_E45_elastic_pin(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
@@ -2501,8 +2503,9 @@ void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
@@ -2674,8 +2677,9 @@ void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
@@ -2846,8 +2850,9 @@ void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
@@ -3018,7 +3023,9 @@ void TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
 }
 
-void TPCPrimaryGeneratorAction::Generate_hdibaryon1(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
 
@@ -3183,11 +3190,9 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon1(G4Event* anEvent)
 
 }
 
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_hybridPHSG(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_hybridPHSG( G4Event* anEvent )
 {
   //  G4double mom[3];
   G4double Ebeam;
@@ -3268,7 +3273,9 @@ void TPCPrimaryGeneratorAction::Generate_hybridPHSG(G4Event* anEvent)
   */
 }
 
-void TPCPrimaryGeneratorAction::Generate_test(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_test( G4Event* anEvent )
 {
   //  G4double mass_hdibaryon, width_hdibaryon;
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
@@ -3309,9 +3316,9 @@ void TPCPrimaryGeneratorAction::Generate_test(G4Event* anEvent)
 
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_dedx_single(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_dedx_single( G4Event* anEvent )
 {
   //  G4double mass_hdibaryon, width_hdibaryon;
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
@@ -3378,9 +3385,9 @@ void TPCPrimaryGeneratorAction::Generate_dedx_single(G4Event* anEvent)
   //  gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-//void TPCPrimaryGeneratorAction::Generate_dedx_all(G4Event* anEvent)
-void TPCPrimaryGeneratorAction::Generate_all(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_all( G4Event* anEvent )
 {
   //  G4double mass_hdibaryon, width_hdibaryon;
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
@@ -3506,9 +3513,10 @@ void TPCPrimaryGeneratorAction::Generate_all(G4Event* anEvent)
   ///////kp PG
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1(G4Event* anEvent) // generator 60
+//_____________________________________________________________________________
+// generator 60
+void
+TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
 {
   G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
@@ -3643,12 +3651,10 @@ void TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1(G4Event* anEvent) // ge
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2(G4Event* anEvent) // generator 61
+//_____________________________________________________________________________
+// generator 61
+void
+TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
 {
   G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
@@ -3783,8 +3789,9 @@ void TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2(G4Event* anEvent) // ge
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_Lambda1405_reso(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
   //  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
@@ -3813,8 +3820,8 @@ void TPCPrimaryGeneratorAction::Generate_Lambda1405_reso(G4Event* anEvent)
   G4ParticleDefinition* proton;
   G4ParticleDefinition* kaonZero;
   //  G4cout<<"check222"<<G4endl;
-  G4ParticleDefinition* sigma;
-  G4ParticleDefinition* pion;
+  G4ParticleDefinition* sigma = nullptr;
+  G4ParticleDefinition* pion = nullptr;
   //  G4cout<<"check333"<<G4endl;
 
   //  G4cout<<"check444"<<G4endl;
@@ -4052,9 +4059,10 @@ void TPCPrimaryGeneratorAction::Generate_Lambda1405_reso(G4Event* anEvent)
 
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_Sigma1385_rad(G4Event* anEvent) // generator 63
+//_____________________________________________________________________________
+// generator 63
+void
+TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
 {
   G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
@@ -4189,10 +4197,10 @@ void TPCPrimaryGeneratorAction::Generate_Sigma1385_rad(G4Event* anEvent) // gene
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-
-void TPCPrimaryGeneratorAction::Generate_Sigma1385(G4Event* anEvent) // generator 62
+//_____________________________________________________________________________
+// generator 62
+void
+TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
 {
   G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
@@ -4327,11 +4335,10 @@ void TPCPrimaryGeneratorAction::Generate_Sigma1385(G4Event* anEvent) // generato
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_pip_KsL(G4Event* anEvent) // generator 11
+//_____________________________________________________________________________
+// generator 11
+void
+TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 {
   G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
@@ -4458,8 +4465,10 @@ void TPCPrimaryGeneratorAction::Generate_pip_KsL(G4Event* anEvent) // generator 
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_pip_KsS(G4Event* anEvent) // generator 12
+//_____________________________________________________________________________
+// generator 12
+void
+TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
 {
   G4double  momks[3], mom[3];
   G4double Ebeam, pbeam;
@@ -4583,9 +4592,9 @@ void TPCPrimaryGeneratorAction::Generate_pip_KsS(G4Event* anEvent) // generator 
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_pip_KstarL(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_pip_KstarL( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
 
@@ -4750,10 +4759,9 @@ void TPCPrimaryGeneratorAction::Generate_pip_KstarL(G4Event* anEvent)
 
 }
 
-
-
-
-void TPCPrimaryGeneratorAction::Generate_pip_KstarS(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
 
@@ -4917,12 +4925,9 @@ void TPCPrimaryGeneratorAction::Generate_pip_KstarS(G4Event* anEvent)
 
 }
 
-
-
-
-
-
-void TPCPrimaryGeneratorAction::Generate_E07_study(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
@@ -5075,8 +5080,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study(G4Event* anEvent)
   // gen_im->Fill(invm);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_kp(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kp( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
@@ -5162,8 +5168,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kp(G4Event* anEvent)
 
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
@@ -5252,8 +5259,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam(G4Event* anEvent)
 
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_all(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
@@ -5447,8 +5455,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_all(G4Event* anEvent)
   //gen_im->Fill(invm);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_knp(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 {
   G4double  momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -5549,7 +5558,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_knp(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-void TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -5651,8 +5662,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -5759,7 +5771,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -5864,7 +5878,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp(G4Event* an
   //  gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -5977,9 +5993,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
 {
   G4double momk[3], mom[3];
   G4double Ebeam, pbeam;
@@ -6106,9 +6122,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_pro_08_20(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_pro_08_20( G4Event* anEvent )
 {
   G4double Energy_p, mom_p_x, mom_p_y, mom_p_z;
   //  G4double mom[3];
@@ -6162,8 +6178,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_pro_08_20(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
 }
 
-
-void TPCPrimaryGeneratorAction::Generate_E07_study_kp_04_15(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_E07_study_kp_04_15( G4Event* anEvent )
 {
   //  G4cout<<"e07_generator"<<G4endl;
   G4double Energy_p, mom_p_x, mom_p_y, mom_p_z;
@@ -6217,9 +6234,9 @@ void TPCPrimaryGeneratorAction::Generate_E07_study_kp_04_15(G4Event* anEvent)
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
 }
 
-
-
-void TPCPrimaryGeneratorAction::Generate_test2(G4Event* anEvent)
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::Generate_test2( G4Event* anEvent )
 {
   //  G4double mass_hdibaryon, width_hdibaryon;
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
@@ -6265,20 +6282,16 @@ void TPCPrimaryGeneratorAction::Generate_test2(G4Event* anEvent)
 
 }
 
-
-
-double TPCPrimaryGeneratorAction::deg2rad(double theta) {
-  return 3.141592654*theta/180.0;
-}
-
-double TPCPrimaryGeneratorAction::RandSin(void)
+//_____________________________________________________________________________
+double
+TPCPrimaryGeneratorAction::RandSin( void )
 {
   int success=0;
   double x,fx;
 
   do {
     x = 180.0 * (double)CLHEP::RandFlat::shoot();
-    fx = sin(deg2rad(x));
+    fx = sin(TMath::DegToRad()*x);
     if (fx >= (double)CLHEP::RandFlat::shoot())
       success = 1;
   } while (success==0);
@@ -6286,7 +6299,10 @@ double TPCPrimaryGeneratorAction::RandSin(void)
   return x;
 }
 
-G4double TPCPrimaryGeneratorAction::miss1(G4double pbeam, G4double m1,G4double *p1){
+//_____________________________________________________________________________
+G4double
+TPCPrimaryGeneratorAction::miss1( G4double pbeam, G4double m1,G4double *p1 )
+{
   G4double miss1;
   G4double rmp;
   G4double pp, pmiss, emiss;
@@ -6316,7 +6332,11 @@ G4double TPCPrimaryGeneratorAction::miss1(G4double pbeam, G4double m1,G4double *
   return miss1;
 }
 
-  G4double TPCPrimaryGeneratorAction::missks(G4double pbeam, G4double mbeam, G4double m1,G4double *p1){
+//_____________________________________________________________________________
+G4double
+TPCPrimaryGeneratorAction::missks( G4double pbeam, G4double mbeam,
+				   G4double m1,G4double *p1 )
+{
   G4double missks;
   G4double rmp;
   G4double pp, pmiss, emiss;
@@ -6347,8 +6367,10 @@ G4double TPCPrimaryGeneratorAction::miss1(G4double pbeam, G4double m1,G4double *
   return missks;
 }
 
-
-G4double TPCPrimaryGeneratorAction::miss1(G4double *pbeam, G4double m1,G4double *p1){
+//_____________________________________________________________________________
+G4double
+TPCPrimaryGeneratorAction::miss1( G4double *pbeam, G4double m1,G4double *p1 )
+{
   G4double miss1;
   G4double rmp;
   G4double pp, pmiss, emiss;
@@ -6384,32 +6406,37 @@ G4double TPCPrimaryGeneratorAction::miss1(G4double *pbeam, G4double m1,G4double 
   return miss1;
 }
 
-
-  G4double TPCPrimaryGeneratorAction::lorentz(G4double *v1,G4double betaz,G4double *v2){
-    // boosts the vector v1 with beta
-    //  G4double v1[4],betaz,v2[4];
-    //  G4double v1[4],betaz,v2[4];
-    G4double b2, gamma;
-    //  lorentz=-1;
-    b2= pow(betaz,2.);
-    if(b2==0.){
-      v2[0]=v1[0];
-      v2[1]=v1[1];
-      v2[2]=v1[2];
-      v2[3]=v1[3];
-      return -1;
-    }else{
-      gamma=1./sqrt(1.-b2);
-      v2[0] = v1[0];
-      v2[1] = v1[1];
-      v2[2] = gamma*(v1[2] - betaz*v1[3]);
-      v2[3] = gamma*(v1[3] - betaz*v1[2]);
-      return 1;
-    }
+//_____________________________________________________________________________
+G4double
+TPCPrimaryGeneratorAction::lorentz( G4double *v1,G4double betaz,G4double *v2 )
+{
+  // boosts the vector v1 with beta
+  //  G4double v1[4],betaz,v2[4];
+  //  G4double v1[4],betaz,v2[4];
+  G4double b2, gamma;
+  //  lorentz=-1;
+  b2= pow(betaz,2.);
+  if(b2==0.){
+    v2[0]=v1[0];
+    v2[1]=v1[1];
+    v2[2]=v1[2];
+    v2[3]=v1[3];
+    return -1;
+  }else{
+    gamma=1./sqrt(1.-b2);
+    v2[0] = v1[0];
+    v2[1] = v1[1];
+    v2[2] = gamma*(v1[2] - betaz*v1[3]);
+    v2[3] = gamma*(v1[3] - betaz*v1[2]);
+    return 1;
   }
+}
 
-
-G4double TPCPrimaryGeneratorAction::lorentcmlab(G4double *v1,G4double betaz,G4double *v2){
+//_____________________________________________________________________________
+G4double
+TPCPrimaryGeneratorAction::lorentcmlab( G4double *v1, G4double betaz,
+					G4double *v2 )
+{
   // boosts the vector v1 with beta
   //  G4double v1[4],betaz,v2[4];
   //  G4double v1[4],betaz,v2[4];
@@ -6432,7 +6459,11 @@ G4double TPCPrimaryGeneratorAction::lorentcmlab(G4double *v1,G4double betaz,G4do
   }
 }
 
-G4int TPCPrimaryGeneratorAction::HarmonicFermiMomentum(G4int Angular_mom,G4double *Kf){
+//_____________________________________________________________________________
+G4int
+TPCPrimaryGeneratorAction::HarmonicFermiMomentum( G4int Angular_mom,
+						  G4double *Kf )
+{
   /////// Copy of H. Takahashi-san's code
   /////// revised to geant4 by S.Hwang
   G4double ymax, b;

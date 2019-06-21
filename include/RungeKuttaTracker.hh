@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
-#ifndef RUNGEKUTTATRACKER_H
-#define RUNGEKUTTATRACKER_H 1
+#ifndef RUNGE_KUTTA_TRACKER_HH
+#define RUNGE_KUTTA_TRACKER_HH
 
 #include "track.hh"
 #include "ThreeVector.hh"
@@ -12,7 +12,8 @@
 class RungeKuttaTracker
 {
 public:
-  RungeKuttaTracker(int c_use, Track* aTrack);
+  RungeKuttaTracker( int c_use, Track* aTrack );
+  ~RungeKuttaTracker( void );
 
 private:
   void RungeKuttaTracking(int c_use, Track* aTrack);
@@ -22,7 +23,7 @@ private:
 			       ThreeVector &B,
 			       ThreeVector &dBdY, ThreeVector &dBdZ);
   int RungeKuttaFit(int c_use, int iteration, Track* aTrack,double *rk_par0,
-		    double *rk_par, double rk_hit[20][24]);
+		    double *rk_par, double* rk_hit );
   void RungeKuttaStep(int c_use, double qp0,double h,
 		      double z0,double *u0,double *dudz0,
 		      double dudw0[2][5],double ddudw0[2][5]);
@@ -51,9 +52,13 @@ private:
   double C1[2][2],C2[2][2],C3[2][2],C4[2][2];
 
   ///calculation of deviation
-  void dKdw0(int c_use, double h,double *dudv0, double *ddudv0, double A1[2][2],double A2[2][2],double A3[2][2],double A4[2][2]);
-  void dKdp0(int c_use, double h,double *dudv0, double *ddudv0,
-	     double *f1,double *f2,double *f3,double *f4, double A1[2][2],double A2[2][2],double A3[2][2],double A4[2][2]);
+  void dKdw0( int c_use, double h,double *dudv0, double *ddudv0,
+	      double A1[2][2], double A2[2][2],
+	      double A3[2][2], double A4[2][2] );
+  void dKdp0( int c_use, double h,double *dudv0, double *ddudv0,
+	      double *f1, double *f2,double *f3,double *f4,
+	      double A1[2][2], double A2[2][2],
+	      double A3[2][2], double A4[2][2] );
 
   double dK1[2],dK2[2],dK3[2],dK4[2];
 

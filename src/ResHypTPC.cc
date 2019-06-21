@@ -1,12 +1,24 @@
+// -*- C++ -*-
+
+#include "ResHypTPC.hh"
+
 //#include <TH1.h>
 //#include <TF1.h>
 
-#include "ResHypTPC.hh"
-#include "Randomize.hh"
+#include <Randomize.hh>
+
 #include "TPCAnaManager.hh"
 
-//ResHypTPC::ResHypTPC(double t_pad_size=2, double t_pad_length = 10, double t_threshold = 0.1, double diff_T = 0.18) {
-ResHypTPC::ResHypTPC() {}
+// ResHypTPC::ResHypTPC( double t_pad_size=2,
+// 		      double t_pad_length=10,
+// 		      double t_threshold=0.1,
+// 		      double diff_T=0.18)
+
+//_____________________________________________________________________________
+ResHypTPC::ResHypTPC( void )
+{
+}
+
 /*
   y_resolution = 0.5;
   sigma_amp = 13.3/53.9;
@@ -15,7 +27,12 @@ ResHypTPC::ResHypTPC() {}
   diffuse_GEM = 0.1;
   }
 */
-ResHypTPC::ResHypTPC(G4double t_pad_size, G4double t_pad_length, G4double t_threshold, G4double diff_T, G4double smearing) {
+
+//_____________________________________________________________________________
+ResHypTPC::ResHypTPC( G4double t_pad_size, G4double t_pad_length,
+		      G4double t_threshold, G4double diff_T,
+		      G4double smearing )
+{
   //  //  const G4double ResHypTPC::y_resolution= 0.5;
   y_resolution= 0.5;
   sigma_amp = 13.3/53.9;

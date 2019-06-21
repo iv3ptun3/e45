@@ -1,7 +1,5 @@
-// ====================================================================
-//   TPCFTOFSD.cc
-//
-// ====================================================================
+// -*- C++ -*-
+
 #include "G4VPhysicalVolume.hh"
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -10,63 +8,50 @@
 #include "TPCFTOFSD.hh"
 #include "TPCFTOFHit.hh"
 
-////////////////////////////////////////////////
-TPCFTOFSD::TPCFTOFSD(const G4String& name)
-  : G4VSensitiveDetector(name)
-////////////////////////////////////////////////
+//_____________________________________________________________________________
+TPCFTOFSD::TPCFTOFSD( const G4String& name )
+  : G4VSensitiveDetector( name )
 {
   collectionName.insert("hit");
 }
 
-/////////////////////////////////
-TPCFTOFSD::~TPCFTOFSD()
-/////////////////////////////////
+//_____________________________________________________________________________
+TPCFTOFSD::~TPCFTOFSD( void )
 {
 }
 
-
-////////////////////////////////////////////////
-void TPCFTOFSD::Initialize(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCFTOFSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  // create hit collection(s)
   hitsCollection = new G4THitsCollection<TPCFTOFHit>( SensitiveDetectorName,
-						       collectionName[0]);
-
-  // push H.C. to "Hit Collection of This Event"
+						      collectionName[0] );
   G4int hcid = GetCollectionID(0);
-  HCTE-> AddHitsCollection(hcid, hitsCollection);
+  HCTE->AddHitsCollection( hcid, hitsCollection );
 }
 
-
-///////////////////////////////////////////////////////////
-G4bool TPCFTOFSD::ProcessHits(G4Step* aStep, 
-				G4TouchableHistory* ROhist)
-///////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+G4bool
+TPCFTOFSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
-
-  // get step information from "PreStepPoint"
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   G4String particleName;
-
   if(aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge() == 0.)
     return false;
-
   particleName = aStep-> GetTrack()-> GetDefinition()-> GetParticleName();
-  /*
+#if 0
   // e+/e- rejection
   if( particleName == "e-")
     return false;
   if( particleName == "e+")
     return false;
-  */
+#endif
   const G4Track* aTrack = aStep->GetTrack();
   G4String particleType;
   particleType = aTrack->GetDefinition()->GetParticleType();
 
   //    if(particleType == "lepton")
   //      return false;
-
 
   //
   //  if( (particleName != "kaon+")){
@@ -84,8 +69,7 @@ G4bool TPCFTOFSD::ProcessHits(G4Step* aStep,
 
   G4TouchableHistory* theTouchable
     = (G4TouchableHistory*)(aStep->GetPreStepPoint()->GetTouchable());
-  G4VPhysicalVolume* physVol = theTouchable->GetVolume(); 
-
+  G4VPhysicalVolume* physVol = theTouchable->GetVolume();
 
   G4ThreeVector VertexPosition = aTrack->GetVertexPosition();
   G4ThreeVector VertexMomentum = aTrack->GetVertexMomentumDirection();
@@ -113,27 +97,28 @@ G4bool TPCFTOFSD::ProcessHits(G4Step* aStep,
   iDet=copyNo;
 
   // create a new hit and push them to "Hit Coleltion"
-  TPCFTOFHit* ahit= new TPCFTOFHit(pos, mom, tof, tid, pid, iDet,mass,qq,parentID, VertexPosition, VertexMomentum, VertexEnergy,tlength);
-  hitsCollection-> insert(ahit);
-
+  TPCFTOFHit* ahit= new TPCFTOFHit( pos, mom, tof, tid, pid, iDet, mass, qq,
+				    parentID, VertexPosition, VertexMomentum,
+				    VertexEnergy, tlength );
+  hitsCollection-> insert( ahit );
   return true;
 }
 
-////////////////////////////////////////////////////
-void TPCFTOFSD::EndOfEvent(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCFTOFSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
-////////////////////////////
-void TPCFTOFSD::DrawAll()
-////////////////////////////
+//_____________________________________________________________________________
+void
+TPCFTOFSD::DrawAll( void )
 {
 }
 
-/////////////////////////////
-void TPCFTOFSD::PrintAll()
-/////////////////////////////
+//_____________________________________________________________________________
+void
+TPCFTOFSD::PrintAll( void )
 {
   hitsCollection-> PrintAllHits();
 }

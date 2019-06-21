@@ -189,7 +189,7 @@ TPCAnaManager::BeginOfRunAction( int runnum )
       for(G4int i=0;i<pad_in_num+pad_out_num;i++){
 	if(i<pad_in_num){
 	  seg_angle[i]=360./double(numpads[i]);
-	  seg_width[i]=pad_in[i]*(angle[i])*PI/180./numpads[i];
+	  seg_width[i]=pad_in[i]*(angle[i])*CLHEP::pi/180./numpads[i];
 
 	  num_pad_check=angle[i]/seg_angle[i];
 	}else if(i>=pad_in_num){
@@ -1341,17 +1341,17 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     counterData[hitnum].resoX = compx;
 
-    counterData[hitnum].pos[ZCOORD] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
-    counterData[hitnum].pos[XCOORD] = sh_rho*sin(sh_smear_alpha);
-    counterData[hitnum].pos[YCOORD] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
+    counterData[hitnum].pos[ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
+    counterData[hitnum].pos[ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
+    counterData[hitnum].pos[ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
 
-    counterData[hitnum].pos0[XCOORD] = pos.getX();
-    counterData[hitnum].pos0[YCOORD] = pos.getY();
-    counterData[hitnum].pos0[ZCOORD] = pos.getZ();
+    counterData[hitnum].pos0[ThreeVector::X] = pos.getX();
+    counterData[hitnum].pos0[ThreeVector::Y] = pos.getY();
+    counterData[hitnum].pos0[ThreeVector::Z] = pos.getZ();
 
-    counterData[hitnum].mom[XCOORD] = mom.getX();
-    counterData[hitnum].mom[YCOORD] = mom.getY();
-    counterData[hitnum].mom[ZCOORD] = mom.getZ();
+    counterData[hitnum].mom[ThreeVector::X] = mom.getX();
+    counterData[hitnum].mom[ThreeVector::Y] = mom.getY();
+    counterData[hitnum].mom[ThreeVector::Z] = mom.getZ();
 
     counterData[hitnum].trackID = track;
     counterData[hitnum].particleID = particle;
@@ -1557,12 +1557,12 @@ void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector
   }
 
   scintData[hitnum].time = time;
-  scintData[hitnum].pos[XCOORD] = pos.getX();
-  scintData[hitnum].pos[YCOORD] = pos.getY();
-  scintData[hitnum].pos[ZCOORD] = pos.getZ();
-  scintData[hitnum].mom[XCOORD] = mom.getX();
-  scintData[hitnum].mom[YCOORD] = mom.getY();
-  scintData[hitnum].mom[ZCOORD] = mom.getZ();
+  scintData[hitnum].pos[ThreeVector::X] = pos.getX();
+  scintData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  scintData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  scintData[hitnum].mom[ThreeVector::X] = mom.getX();
+  scintData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  scintData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   scintData[hitnum].trackID = track;
   scintData[hitnum].massSH = mass;
   scintData[hitnum].qqSH = qq;
@@ -1600,12 +1600,12 @@ void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mo
     return;
   }
   acData[hitnum].time = time;
-  acData[hitnum].pos[XCOORD] = pos.getX();
-  acData[hitnum].pos[YCOORD] = pos.getY();
-  acData[hitnum].pos[ZCOORD] = pos.getZ();
-  acData[hitnum].mom[XCOORD] = mom.getX();
-  acData[hitnum].mom[YCOORD] = mom.getY();
-  acData[hitnum].mom[ZCOORD] = mom.getZ();
+  acData[hitnum].pos[ThreeVector::X] = pos.getX();
+  acData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  acData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  acData[hitnum].mom[ThreeVector::X] = mom.getX();
+  acData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  acData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   acData[hitnum].trackID = track;
   acData[hitnum].massSH = mass;
   acData[hitnum].qqSH = qq;
@@ -1651,12 +1651,12 @@ void TPCAnaManager::SetNBARData(G4double time, G4ThreeVector pos, G4ThreeVector 
     return;
   }
   nbarData[hitnum].time = time;
-  nbarData[hitnum].pos[XCOORD] = pos.getX();
-  nbarData[hitnum].pos[YCOORD] = pos.getY();
-  nbarData[hitnum].pos[ZCOORD] = pos.getZ();
-  nbarData[hitnum].mom[XCOORD] = mom.getX();
-  nbarData[hitnum].mom[YCOORD] = mom.getY();
-  nbarData[hitnum].mom[ZCOORD] = mom.getZ();
+  nbarData[hitnum].pos[ThreeVector::X] = pos.getX();
+  nbarData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  nbarData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  nbarData[hitnum].mom[ThreeVector::X] = mom.getX();
+  nbarData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  nbarData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   nbarData[hitnum].trackID = track;
   nbarData[hitnum].massSH = mass;
   nbarData[hitnum].qqSH = qq;
@@ -1704,12 +1704,12 @@ void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mo
     return;
   }
   dcData[hitnum].time = time;
-  dcData[hitnum].pos[XCOORD] = pos.getX();
-  dcData[hitnum].pos[YCOORD] = pos.getY();
-  dcData[hitnum].pos[ZCOORD] = pos.getZ();
-  dcData[hitnum].mom[XCOORD] = mom.getX();
-  dcData[hitnum].mom[YCOORD] = mom.getY();
-  dcData[hitnum].mom[ZCOORD] = mom.getZ();
+  dcData[hitnum].pos[ThreeVector::X] = pos.getX();
+  dcData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  dcData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  dcData[hitnum].mom[ThreeVector::X] = mom.getX();
+  dcData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  dcData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   dcData[hitnum].trackID = track;
   //  std::cout<<"DC"<<std::endl;
   //  std::cout<<track<<std::endl;
@@ -1757,12 +1757,12 @@ void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mo
     return;
   }
   chData[hitnum].time = time;
-  chData[hitnum].pos[XCOORD] = pos.getX();
-  chData[hitnum].pos[YCOORD] = pos.getY();
-  chData[hitnum].pos[ZCOORD] = pos.getZ();
-  chData[hitnum].mom[XCOORD] = mom.getX();
-  chData[hitnum].mom[YCOORD] = mom.getY();
-  chData[hitnum].mom[ZCOORD] = mom.getZ();
+  chData[hitnum].pos[ThreeVector::X] = pos.getX();
+  chData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  chData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  chData[hitnum].mom[ThreeVector::X] = mom.getX();
+  chData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  chData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   chData[hitnum].trackID = track;
   //  std::cout<<"CH"<<std::endl;
   //  std::cout<<track<<std::endl;
@@ -1810,12 +1810,12 @@ void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector 
     return;
   }
   ftofData[hitnum].time = time;
-  ftofData[hitnum].pos[XCOORD] = pos.getX();
-  ftofData[hitnum].pos[YCOORD] = pos.getY();
-  ftofData[hitnum].pos[ZCOORD] = pos.getZ();
-  ftofData[hitnum].mom[XCOORD] = mom.getX();
-  ftofData[hitnum].mom[YCOORD] = mom.getY();
-  ftofData[hitnum].mom[ZCOORD] = mom.getZ();
+  ftofData[hitnum].pos[ThreeVector::X] = pos.getX();
+  ftofData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  ftofData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  ftofData[hitnum].mom[ThreeVector::X] = mom.getX();
+  ftofData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  ftofData[hitnum].mom[ThreeVector::Z] = mom.getZ();
   ftofData[hitnum].trackID = track;
   //  std::cout<<"FTOF"<<std::endl;
   //  std::cout<<track<<std::endl;

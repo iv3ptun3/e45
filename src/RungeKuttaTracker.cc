@@ -1,16 +1,20 @@
 // -*- C++ -*-
 
-//rungeKuttaTracker.cc
-//2013.6.4. S.Hwang
-//2013.6.17. revised the program as same as LEPS ana
+/**
+ *  2013.6.4. S.Hwang
+ *  2013.6.17. revised the program as same as LEPS ana
+ */
 
 #include "RungeKuttaTracker.hh"
-#include "track.hh"
-#include "globals.hh"
-#include "ThreeVector.hh"
+
+#include <globals.hh>
+
+#include <TMath.h>
+
 //#include "filter.h"
 #include "MathTools.hh"
-#include "TMath.h"
+#include "ThreeVector.hh"
+#include "track.hh"
 
 //#include "nrutil.h"
 
@@ -20,13 +24,10 @@
 
 //_____________________________________________________________________________
 void
-nrerror( char error_text[] )
+nrerror( G4String error_text )
 {
-  //  fprintf(stderr,"1");
-  //  fprintf(stderr,"2");
-  //  fprintf(stderr,"3");
-  std::cout<<"error in where?:"<<error_text<<std::endl;
-  exit(1);
+  std::cout << "error in where?:" << error_text << std::endl;
+  std::exit(1);
 }
 
 //_____________________________________________________________________________
@@ -41,14 +42,14 @@ ivector( long nl, long nh )
 
 //_____________________________________________________________________________
 void
-free_ivector( int *v, long nl, long nh )
+free_ivector( int *v, long nl, long /* nh */ )
 {
   free((FREE_ARG) (v+nl-NR_END));
 }
 
 //_____________________________________________________________________________
 int
-gaussj( double a[6][6],int n, double *b, int m )
+gaussj( double a[6][6], int n, double* /* b */, int /* m */ )
 {
   int *indxc,*indxr,*ipiv;
   int i,icol=0,irow=0,j,k,l,ll;
@@ -108,16 +109,23 @@ gaussj( double a[6][6],int n, double *b, int m )
 
 }
 
-
-
-RungeKuttaTracker::RungeKuttaTracker (int c_use, Track* aTrack){
+//_____________________________________________________________________________
+RungeKuttaTracker::RungeKuttaTracker( int c_use, Track* aTrack )
+{
   RungeKuttaTracking(c_use, aTrack);
 }
 
-void RungeKuttaTracker::RungeKuttaTracking(int c_use, Track* aTrack){
+//_____________________________________________________________________________
+RungeKuttaTracker::~RungeKuttaTracker( void )
+{
+}
 
+//_____________________________________________________________________________
+void
+RungeKuttaTracker::RungeKuttaTracking( int /* c_use */, Track* aTrack )
+{
   ///////////leps ana method
-  int ndf=2*(aTrack->numHits-aTrack->nout)-5;
+  // int ndf=2*(aTrack->numHits-aTrack->nout)-5;
   std::cout<<"start tracking-"<<std::endl;
   std::cout<<"numhits:"<<aTrack->numHits<<std::endl;
   /*  double dc_pos[22]=
@@ -139,12 +147,12 @@ void RungeKuttaTracker::RungeKuttaTracking(int c_use, Track* aTrack){
   int iteration=0;
   double rk_par0[20];
   double rk_par1[20]={0};
-  double rk_hit[20][24];//[para name][number of layer]
-  double rk_hit1[20][24];//[para name][number of layer]
-  double chi2=0.;
-  double chi2_old=0.;
-  double chi2_new=0.;
-  int ierr=0.;
+  // double rk_hit[20][24];//[para name][number of layer]
+  // double rk_hit1[20][24];//[para name][number of layer]
+  // double chi2=0.;
+  // double chi2_old=0.;
+  // double chi2_new=0.;
+  // int ierr=0.;
 
   //  1st Fit
   //  let's define rk_par0 for LEPSana
@@ -166,7 +174,7 @@ void RungeKuttaTracker::RungeKuttaTracking(int c_use, Track* aTrack){
 
   iteration=1;
   ///include RKstep
-  ierr=RungeKuttaFit(c_use, iteration,aTrack,rk_par0,rk_par1,rk_hit);
+  // ierr=RungeKuttaFit(c_use, iteration,aTrack,rk_par0,rk_par1,rk_hit);
   //  std::cout<<"number of step:"<<ierr<<std::endl;
   //prepare next step
   //  std::cout<<"after 1st rungekutta fit"<<std::endl;
@@ -186,7 +194,7 @@ void RungeKuttaTracker::RungeKuttaTracking(int c_use, Track* aTrack){
   for(int i=0;i<50;i++){
     iteration=iteration+1;
     chi2old=rk_par1[5]/(rk_par1[6]-5);///previous chi2
-    ierr=RungeKuttaFit(c_use, iteration,aTrack,rk_par0,rk_par1,rk_hit);
+    // ierr=RungeKuttaFit(c_use, iteration,aTrack,rk_par0,rk_par1,rk_hit);
     chi2new=rk_par1[5]/(rk_par1[6]-5.);
     mom[iteration]=rk_par1[4];
     std::cout<<"km chi2/ndf:"<<rk_par1[5]/(rk_par1[6]-5.)<<std::endl;
@@ -207,17 +215,33 @@ void RungeKuttaTracker::RungeKuttaTracking(int c_use, Track* aTrack){
   }
 }
 
-void RungeKuttaTracker::RungeKuttaFieldIntegral(int c_use, double *init_par, double *final_par, ThreeVector &B){
-  int test;
+//_____________________________________________________________________________
+void
+RungeKuttaTracker::RungeKuttaFieldIntegral( int /* c_use */,
+					    double* /* init_par */,
+					    double* /* final_par */,
+					    ThreeVector& /* B */ )
+{
 }
 
-void RungeKuttaTracker::RungeKuttaFieldIntegral(int c_use, double *init_par, double *final_par, ThreeVector &B, ThreeVector &dBdY, ThreeVector &dBdZ){
-  int test;
+//_____________________________________________________________________________
+void
+RungeKuttaTracker::RungeKuttaFieldIntegral( int /* c_use */,
+					    double* /* init_par */,
+					    double* /* final_par */,
+					    ThreeVector& /* B */,
+					    ThreeVector& /* dBdY */,
+					    ThreeVector& /* dBdZ */ )
+{
 }
 
-int RungeKuttaTracker::RungeKuttaFit(int c_use, int iteration, Track* aTrack, double *rk_par0, double *rk_par1, double rk_hit[20][24]){
-
-  double chi2=0.;
+//_____________________________________________________________________________
+int
+RungeKuttaTracker::RungeKuttaFit( int c_use, int iteration, Track* aTrack,
+				  double* rk_par0, double* rk_par1,
+				  double* /* rk_hit */ )
+{
+  // double chi2=0.;
   //  double u0[2];
   //  double dudz0[2];
   //  double qp0;
@@ -314,9 +338,8 @@ int RungeKuttaTracker::RungeKuttaFit(int c_use, int iteration, Track* aTrack, do
       //////////runge kutta step///////////////
       std::cout<<"number of step:"<<num_step<<std::endl;
       std::cout<<"run rungekuttastep:"<<num_step<<std::endl;
-      RungeKuttaStep(c_use, qp0,h,
-		     z0,u0,dudz0,dudw0,ddudw0
-		     );
+      RungeKuttaStep( c_use, qp0,h,
+		      z0,u0,dudz0,dudw0,ddudw0 );
       //      prepare next step
       z=z0+h;
       z0=z;
@@ -537,29 +560,33 @@ int RungeKuttaTracker::RungeKuttaFit(int c_use, int iteration, Track* aTrack, do
   return num_step;
 }
 
-
-void RungeKuttaTracker::RungeKuttaStep(int c_use, double qp0,double h,
-				       double z0,double *u0,double *dudz0,double dudw0[2][5],double ddudw0[2][5]){
+//_____________________________________________________________________________
+void
+RungeKuttaTracker::RungeKuttaStep( int c_use, double /* qp0 */, double h,
+				   double /* z0 */, double* /* u0 */,
+				   double* /* dudz0 */,
+				   double dudw0_[2][5], double ddudw0_[2][5] )
+{
   //  std::cout<<"rungekutta step"<<std::endl;
 
   double u1[3];
-  double b1[3];
+  // double b1[3];
   double dudz1[2];
 
   double u2[3];
-  double b2[3];
+  // double b2[3];
   double dudz2[2];
 
   double u3[3];
-  double b3[3];
+  // double b3[3];
   double dudz3[2];
 
   double u4[3];
-  double b4[3];
+  // double b4[3];
   double dudz4[2];
 
   double A1[2][2], A2[2][2], A3[2][2], A4[2][2];
-  double C1[2][2], C2[2][2], C3[2][2], C4[2][2];
+  // double C1[2][2], C2[2][2], C3[2][2], C4[2][2];
   double K1[2],K2[2],K3[2],K4[2];
   double f1[2],f2[2],f3[2],f4[2];
 
@@ -567,7 +594,7 @@ void RungeKuttaTracker::RungeKuttaStep(int c_use, double qp0,double h,
   double b0[3]={0};
   double dbdu0[3][2]={{0}};
   double h2=h*h;
-  double z=z0+h;
+  z = z0+h;
 
   ///////////////////////////////
   ///////// 1st point /////////
@@ -750,21 +777,21 @@ void RungeKuttaTracker::RungeKuttaStep(int c_use, double qp0,double h,
     if(i<4){
 
       for(int j=0;j<2;j++){
-	dudv0[j]=dudw0[j][i];
-	ddudv0[j]=ddudw0[j][i];
+	dudv0[j]=dudw0_[j][i];
+	ddudv0[j]=ddudw0_[j][i];
 	dKdw0(c_use,h,dudv0,ddudv0,A1,A2,A3,A4);///out put dK1,dK2,dK3,dK4
       }
     }else{///qp0
       for(int j=0;j<2;j++){
-	dudp0[j]=dudw0[j][i];
-	ddudp0[j]=ddudw0[j][i];
+	dudp0[j]=dudw0_[j][i];
+	ddudp0[j]=ddudw0_[j][i];
 	dKdp0(c_use, h,dudp0,ddudp0,f1,f2,f3,f4,A1,A2,A3,A4);///out put dK1,dK2,dK3,dK4
       }
     }
 
     for(int j=0;j<2;j++){
-      dudw[j][i]=dudw0[j][i]+h*ddudw0[j][i]+h2*(dK1[j]+dK2[j]+dK3[j])/6.;
-      ddudw[j][i]=ddudw0[j][i]+h*(dK1[j]+2.*dK2[j]+2.*dK3[j]+dK4[j])/6.;
+      dudw[j][i]=dudw0_[j][i]+h*ddudw0_[j][i]+h2*(dK1[j]+dK2[j]+dK3[j])/6.;
+      ddudw[j][i]=ddudw0_[j][i]+h*(dK1[j]+2.*dK2[j]+2.*dK3[j]+dK4[j])/6.;
     }
     //    if(i==4){
     //      std::cout<<"dudw:dudw0-->"<<dudw[0][i]<<":"<<dudw0[0][i]<<std::endl;
@@ -777,13 +804,14 @@ void RungeKuttaTracker::RungeKuttaStep(int c_use, double qp0,double h,
   //    }
 }
 
-
-
-void RungeKuttaTracker::fACK(int c_use, double *dudz, double *b, double dbdu[3][2],double qp0){
-
+//_____________________________________________________________________________
+void
+RungeKuttaTracker::fACK( int c_use, double *dudz_, double *b,
+			 double /* dbdu */ [3][2], double qp0_ )
+{
   double dx, dy, bx, by, bz, dx2, dy2, dd;
-  dx=dudz[0];
-  dy=dudz[1];
+  dx=dudz_[0];
+  dy=dudz_[1];
   bx=b[0];
   by=b[1];
   bz=b[2];
@@ -793,8 +821,8 @@ void RungeKuttaTracker::fACK(int c_use, double *dudz, double *b, double dbdu[3][
   dd=sqrt(1.+dx2+dy2);
   f[0]=dd*(dx*dy*bx -(1.+dx2)*by +dy*bz);
   f[1]=dd*((1.+dy2)*bx -dx*dy*by -dx*bz);
-  K[0]=qp0*f[0];
-  K[1]=qp0*f[1];
+  K[0]=qp0_*f[0];
+  K[1]=qp0_*f[1];
 
   //  std::cout<<"in the fACK"<<std::endl;
   ///A matrix
@@ -808,11 +836,11 @@ void RungeKuttaTracker::fACK(int c_use, double *dudz, double *b, double dbdu[3][
   ////// a[1][1]=dfy/dy'
 
   //  A[0][0]=dd*(dy*()
-  //((1.+2.*dx2+dy2)*dy*bx - dx*(3.+3.*dx2+2.*dy2)*by + dx*dy*bz)*qp0/dd;
-  A[0][0]=((1.+2.*dx2+dy2)*dy*bx - dx*(3.+3.*dx2+2.*dy2)*by + dx*dy*bz)*qp0/dd;
-  A[0][1]=(dx*(1.+dx2+2.*dy2)*bx - dy*(1.+dx2)*by + (1.+dx2+2.*dy2)*bz)*qp0/dd;
-  A[1][0]=(dx*(1.+dy2)*bx - dy*(1.+2.*dx2+dy2)*by - (1.+2.*dx2+dy2)*bz)*qp0/dd;
-  A[1][1]=(dy*(3.+2.*dx2+3.*dy2)*bx - dx*(1.+dx2+2.*dy2)*by - dx*dy*bz)*qp0/dd;
+  //((1.+2.*dx2+dy2)*dy*bx - dx*(3.+3.*dx2+2.*dy2)*by + dx*dy*bz)*qp0_/dd;
+  A[0][0]=((1.+2.*dx2+dy2)*dy*bx - dx*(3.+3.*dx2+2.*dy2)*by + dx*dy*bz)*qp0_/dd;
+  A[0][1]=(dx*(1.+dx2+2.*dy2)*bx - dy*(1.+dx2)*by + (1.+dx2+2.*dy2)*bz)*qp0_/dd;
+  A[1][0]=(dx*(1.+dy2)*bx - dy*(1.+2.*dx2+dy2)*by - (1.+2.*dx2+dy2)*bz)*qp0_/dd;
+  A[1][1]=(dy*(3.+2.*dx2+3.*dy2)*bx - dx*(1.+dx2+2.*dy2)*by - dx*dy*bz)*qp0_/dd;
 
 #if 0
   std::cout<<"dx:"<<dx<<std::endl;

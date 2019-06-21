@@ -1,9 +1,13 @@
-#ifndef __KINEMA2BODY_HH__
-#define __KINEMA2BODY_HH__
+// -*- C++ -*-
+
+#ifndef KINEMA2BODY_HH
+#define KINEMA2BODY_HH
 
 #include "kinema_cm2lab.h"
-#include "globals.hh"
-class Kinema2Body {
+
+//_____________________________________________________________________________
+class Kinema2Body
+{
 private:
   KINEMA_CM2LAB kin;
   double Phi;
@@ -37,6 +41,6 @@ public:
   double GetThetaLab(void);
   double GetPhiLab(void);
   double GetThetaCM(void);
-  double GetMass(int i); 
+  double GetMass(int i);
 };
 #endif

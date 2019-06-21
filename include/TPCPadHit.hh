@@ -1,18 +1,27 @@
-// ====================================================================
-//   TPCPadHit.hh
-//
-// ====================================================================
-#ifndef TPC_PAD_HIT_H
-#define TPC_PAD_HIT_H
- 
+// -*- C++ -*-
+
+#ifndef TPC_PAD_HIT_HH
+#define TPC_PAD_HIT_HH
+
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 
-class TPCPadHit : public G4VHit {
+//_____________________________________________________________________________
+class TPCPadHit : public G4VHit
+{
+public:
+  TPCPadHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
+	     G4int tid, G4int pid,
+	     G4int ilay, G4int irow,
+	     G4double b, G4double ed, G4int parentid, G4double Length,
+	     G4double Mass, G4int Charge,
+	     G4ThreeVector& vtxmom, G4ThreeVector& vtxpos, G4double vtxene,
+	     G4double slength, G4int parentid_pid );
+  virtual ~TPCPadHit( void );
+
 private:
-  //G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,G4int tid, G4int pid, G4int ilay, G4int irow, G4double Beta, G4double Ed, G4int Parentid, G4double tlength, G4double Mass, G4int Charge,G4ThreeVector& Vtxpos, G4ThreeVector& Vtxmom, G4double avtxene
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
   G4double tof;
@@ -23,7 +32,6 @@ private:
   G4double beta;
   G4double edep; // Energy deposit
   G4int parentID;
-  G4int parentID_pid;
   G4double Length;
   G4double mass;
   G4int charge;
@@ -31,44 +39,17 @@ private:
   G4ThreeVector vtxposi;
   G4double vtxene;
   G4double SLength;
+  G4int parentID_pid;
+
 public:
-  //  TPCPadHit();
-  /*
-  TPCPadHit(G4ThreeVector& axyz, G4double t);
-  TPCPadHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t);
-  TPCPadHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-  	    G4int tid, G4int pid);
-  */
-  /*  TPCPadHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-	    G4int tid, G4int pid, 
-	    G4int ilay, G4int irow, 
-	    G4double b, G4double ed, G4int parentid, G4double Length, 
-	    G4double Mass, G4int Charge);
-  */
-  TPCPadHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-	    G4int tid, G4int pid, 
-	    G4int ilay, G4int irow, 
-	    G4double b, G4double ed, G4int parentid, G4double Length, 
-	    G4double Mass, G4int Charge,
-	    G4ThreeVector& vtxmom, G4ThreeVector& vtxpos, G4double vtxene, 
-	    G4double slength, G4int parentid_pid);
-
-  /*  TPCPadHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-  	    G4int tid, G4int pid,
-  	    G4int ilay, G4int irow);
-  */
-
-  
-  virtual ~TPCPadHit();
-  
   // copy constructor & assignment operator
   TPCPadHit(const TPCPadHit& right);
   const TPCPadHit& operator=(const TPCPadHit& right);
-  
+
   // new/delete operators
   void* operator new(size_t);
   void operator delete(void* aHit);
-  
+
   // set/get functions
   const G4ThreeVector& GetPosition() const { return xyz; }
   const G4ThreeVector& GetMomentum() const { return pxyz; }
@@ -120,7 +101,7 @@ inline const TPCPadHit& TPCPadHit::operator=
 }
 
 // externally instanciated.
-extern G4Allocator<TPCPadHit> TPCPadHitAllocator; 
+extern G4Allocator<TPCPadHit> TPCPadHitAllocator;
 
 inline void* TPCPadHit::operator new(size_t)
 {

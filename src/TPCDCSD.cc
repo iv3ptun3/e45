@@ -1,51 +1,41 @@
-// ====================================================================
-//   TPCDCSD.cc
-//
-// ====================================================================
-#include "G4VPhysicalVolume.hh"
-#include "G4Step.hh"
-#include "G4Track.hh"
-#include "G4VTouchable.hh"
-#include "G4TouchableHistory.hh"
+// -*- C++ -*-
+
 #include "TPCDCSD.hh"
+
+#include <G4VPhysicalVolume.hh>
+#include <G4Step.hh>
+#include <G4Track.hh>
+#include <G4VTouchable.hh>
+#include <G4TouchableHistory.hh>
+
 #include "TPCDCHit.hh"
 
-////////////////////////////////////////////////
+//_____________________________________________________________________________
 TPCDCSD::TPCDCSD(const G4String& name)
-  : G4VSensitiveDetector(name)
-////////////////////////////////////////////////
+  : G4VSensitiveDetector( name )
 {
   collectionName.insert("hit");
 }
 
-/////////////////////////////////
-TPCDCSD::~TPCDCSD()
-/////////////////////////////////
+//_____________________________________________________________________________
+TPCDCSD::~TPCDCSD( void )
 {
 }
 
-
-////////////////////////////////////////////////
-void TPCDCSD::Initialize(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCDCSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  // create hit collection(s)
   hitsCollection = new G4THitsCollection<TPCDCHit>( SensitiveDetectorName,
-						       collectionName[0]);
-
-  // push H.C. to "Hit Collection of This Event"
+						    collectionName[0] );
   G4int hcid = GetCollectionID(0);
-  HCTE-> AddHitsCollection(hcid, hitsCollection);
+  HCTE->AddHitsCollection( hcid, hitsCollection );
 }
 
-
-///////////////////////////////////////////////////////////
-G4bool TPCDCSD::ProcessHits(G4Step* aStep, 
-				G4TouchableHistory* ROhist)
-///////////////////////////////////////////////////////////
+//_____________________________________________________________________________
+G4bool
+TPCDCSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */)
 {
-
-  // get step information from "PreStepPoint"
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   G4String particleName;
 
@@ -82,7 +72,7 @@ G4bool TPCDCSD::ProcessHits(G4Step* aStep,
 
   G4TouchableHistory* theTouchable
     = (G4TouchableHistory*)(aStep->GetPreStepPoint()->GetTouchable());
-  G4VPhysicalVolume* physVol = theTouchable->GetVolume(); 
+  G4VPhysicalVolume* physVol = theTouchable->GetVolume();
 
 
   G4ThreeVector VertexPosition = aTrack->GetVertexPosition();
@@ -111,27 +101,29 @@ G4bool TPCDCSD::ProcessHits(G4Step* aStep,
   iDet=copyNo;
 
   // create a new hit and push them to "Hit Coleltion"
-  TPCDCHit* ahit= new TPCDCHit(pos, mom, tof, tid, pid, iDet,mass,qq,parentID, VertexPosition, VertexMomentum, VertexEnergy,tlength);
+  TPCDCHit* ahit= new TPCDCHit(pos, mom, tof, tid, pid, iDet,mass, qq,
+			       parentID, VertexPosition, VertexMomentum,
+			       VertexEnergy, tlength);
   hitsCollection-> insert(ahit);
 
   return true;
 }
 
-////////////////////////////////////////////////////
-void TPCDCSD::EndOfEvent(G4HCofThisEvent* HCTE)
-////////////////////////////////////////////////////
+//_____________________________________________________________________________
+void
+TPCDCSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
-////////////////////////////
-void TPCDCSD::DrawAll()
-////////////////////////////
+//_____________________________________________________________________________
+void
+TPCDCSD::DrawAll( void )
 {
 }
 
-/////////////////////////////
-void TPCDCSD::PrintAll()
-/////////////////////////////
+//_____________________________________________________________________________
+void
+TPCDCSD::PrintAll( void )
 {
-  hitsCollection-> PrintAllHits();
+  hitsCollection->PrintAllHits();
 }
