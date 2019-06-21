@@ -2,16 +2,17 @@
 
 #include "TPCRunAction.hh"
 
-#include <G4Run.hh>
 #include <fstream>
 
-#include "TPCAnaManager.hh"
+#include <G4Run.hh>
+#include <G4RunManager.hh>
+#include <G4RunMessenger.hh>
+#include <G4StateManager.hh>
+#include <G4UIterminal.hh>
+#include <G4UItcsh.hh>
+
 #include "GetNumberFromKernelEntropyPool.hh"
-#include "G4UIterminal.hh"
-#include "G4UItcsh.hh"
-#include "G4RunManager.hh"
-#include "G4RunMessenger.hh"
-#include "G4StateManager.hh"
+#include "TPCAnaManager.hh"
 
 namespace
 {
@@ -33,7 +34,7 @@ TPCRunAction::~TPCRunAction( void )
 void
 TPCRunAction::BeginOfRunAction( const G4Run* aRun )
 {
-  time_t the_time;
+  // time_t the_time;
 
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 
@@ -57,8 +58,9 @@ TPCRunAction::BeginOfRunAction( const G4Run* aRun )
   // the_time = time((time_t *)0);
   // CLHEP::HepRandom::setTheSeed(the_time);
 
-  int initSeed=GetIntFromKernelEntropyPool()&0x7FFFFFFF;
-  CLHEP::HepRandom::setTheSeed(initSeed);
+  // int initSeed = GetIntFromKernelEntropyPool()&0x7FFFFFFF;
+  // CLHEP::HepRandom::setTheSeed(initSeed);
+  G4Random::setTheSeed( std::time(nullptr) );
   int startSeed=CLHEP::HepRandom::getTheSeed();
   G4cout << "*** Initial Seed = " << startSeed << G4endl;
   CLHEP::HepRandom::showEngineStatus();
@@ -79,5 +81,5 @@ void
 TPCRunAction::EndOfRunAction( const G4Run* aRun )
 {
   gAnaMan.EndOfRunAction();
-  G4cout << ">>> #events generated= " << aRun-> GetNumberOfEvent() << G4endl;
+  G4cout << ">>> #events generated= " << aRun->GetNumberOfEvent() << G4endl;
 }

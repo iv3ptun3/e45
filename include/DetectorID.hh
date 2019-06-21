@@ -173,5 +173,6 @@ const Int_t NumOfSegSFT_UV  = 320;
 const Int_t DetIdTPC  = 201;
 const Int_t DetIdHTOF = 202;
 const Int_t NumOfSegHTOF = 32;
+// const Int_t NumOfPlaneHTOF = 4;
 
 #endif

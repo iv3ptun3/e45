@@ -37,7 +37,7 @@ TPCField::TPCField( const G4String& file1, const G4String& file2 )
     }
      printf("Finish reading OPERA3D file\n");
   }
-  if( gConf.Get<G4int>( "KuramaOn" ) == 1 ){
+  if( gConf.Get<G4int>( "ConstructKurama" ) == 1 ){
     std::ifstream ifs(file2);
     printf("Reading OPERA3D file by J.Y. Park \n");
     for(int ix= 0; ix<MAX_KURAMA_X_OPERA3D; ix++){

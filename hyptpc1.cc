@@ -56,17 +56,19 @@ main( int argc, char** argv )
 
   runManager->Initialize();
 
+  auto uiManager= G4UImanager::GetUIpointer();
+
   // interactive session, if no arguments given
   if( argc == kArgc-1 ) {
     auto tcsh = new G4UItcsh( "HypTPC(%s)[%/][%h]: " );
     auto session = new G4UIterminal( tcsh );
     tcsh->SetLsColor( GREEN, CYAN );
+    uiManager->ApplyCommand("/control/execute g4macro/vis.mac");
     session->SessionStart();
     delete session;
   }
   // batch mode
   else if( argc == kArgc ) {
-    auto uiManager= G4UImanager::GetUIpointer();
     G4String command("/control/execute ");
     G4String fileName( argv[kG4Macro] );
     uiManager->ApplyCommand( command + fileName );

@@ -10,6 +10,7 @@
 #include <G4ParticleDefinition.hh>
 #include <G4UImanager.hh>
 #include <G4IonConstructor.hh>
+#include <Randomize.hh>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -27,7 +28,6 @@
 #include "KinemaFermi.hh"
 #include "KinemaKstar.hh"
 #include "common.hh"
-#include "Randomize.hh"
 #include "TPCAnaManager.hh"
 #include "ThreeVector.hh"
 
@@ -69,6 +69,12 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 
   G4int generator = gConf.Get<G4int>( "Generator" );
 
+  static G4bool first = true;
+  if( first ){
+    G4cout << "   Generator : " << generator << G4endl;
+    first = false;
+  }
+
   TTree *t1 = nullptr;
   if( generator == 3101 ||
       generator == 3103 ||
@@ -78,6 +84,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   }
 
   gAnaMan.SetGeneratorID( generator );
+
   switch( generator  ){
   case 0:
     ///no generation
@@ -263,10 +270,6 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     break;
   }
 
-  G4cout << "(:  (:  (:  (:  (:  (:  (:  (:  (:  (:  " << G4endl;
-  G4cout << "Generator ID: " << generator << G4endl;
-  G4cout << "---------------------------------------" << G4endl;
-
   // G4UImanager* UImanager= G4UImanager::GetUIpointer();
   // UImanager-> ApplyCommand("/run/beamOn 3");
   // G4cout<<"hoge"<<G4endl;
@@ -313,18 +316,17 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon2(G4Event* anEvent)
   kaonPlus = particleTable->FindParticle("kaon+");
   kaonMinus = particleTable->FindParticle("kaon-");
 
-
+  G4double beam_momentum = gConf.Get<G4double>( "BeamMom" );
 
   //  Ebeam = 1.9;       // Incident gamma energy (GeV)
   pg_x = 0.0;
   pg_y = 0.0;
   //  G4double pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548)*GeV;
   //  pg_z = env_Beam_mom;
-  pg_z=CLHEP::RandGauss::shoot(env_Beam_mom,0.01294*env_Beam_mom);
+  pg_z = CLHEP::RandGauss::shoot( beam_momentum, 0.01294*beam_momentum );
   //  G4cout<<"Ebeam:"<<Ebeam<<G4endl;
   pbeam=sqrt(pow(pg_x,2)+pow(pg_y,2)+pow(pg_z,2));
   Ebeam = sqrt(pbeam*pbeam+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
-
 
   //  G4cout<<"env_beam_mom:"<<env_Beam_mom<<G4endl;
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
@@ -332,14 +334,12 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon2(G4Event* anEvent)
   width_hdibaryon = gConf.Get<G4double>( "HdibaryonWidth" );
 
  up:
-  Kinema3Resonance Hdibaryon(kaonMinus->GetPDGMass()/GeV,
-			     ((proton->GetPDGMass()/GeV)*2),
-			     Lambda1->GetPDGMass()/GeV,
-			     Lambda2->GetPDGMass()/GeV,
-			     kaonPlus->GetPDGMass()/GeV,
-			     mass_hdibaryon, width_hdibaryon, pg_z, 0.0);
-
-  //  G4cout<<mass_hdibaryon<<", "<<pg_z<<G4endl;
+  Kinema3Resonance Hdibaryon( kaonMinus->GetPDGMass()/GeV,
+			      ((proton->GetPDGMass()/GeV)*2),
+			      Lambda1->GetPDGMass()/GeV,
+			      Lambda2->GetPDGMass()/GeV,
+			      kaonPlus->GetPDGMass()/GeV,
+			      mass_hdibaryon, width_hdibaryon, pg_z, 0.0);
 
   Energy_kp = Hdibaryon.GetEnergy(5);
   momentum_kp = Hdibaryon.GetMomentum(5);
@@ -348,13 +348,6 @@ void TPCPrimaryGeneratorAction::Generate_hdibaryon2(G4Event* anEvent)
   //  if(atan((mom[1])/mom[2])*180/3.141592654 > 15. ) goto up;
   if( fabs(atan2(mom[1],mom[2])*180/3.141592654) > 15. || fabs(atan2(mom[0],mom[2])*180/3.141592654) > 20. ) goto up;
   //  if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>15.) goto up;
-
-  //  std::cout<<"atan:"<<atan(abs(mom[1])/mom[2])*180/3.141592654<<std::endl;
-  //  std::cout<<"acos:"<<(acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)<<std::endl;
-  //  std::cout<<"atan:"<<atan(fabs(mom[1])/mom[2])*180/3.141592654<<std::endl;
-  //  std::cout<<momentum_kp<<std::endl;
-  //  std::cout<<"fabs:"<<fabs(-1.1111)<<std::endl;
-
 
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);

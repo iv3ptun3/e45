@@ -56,8 +56,7 @@ void
 TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 {
   G4int eventID = anEvent-> GetEventID();
-  //  G4cout<<"event #:"<<eventID<<G4endl;
-  if(eventID % 100 == 0){
+  if( eventID % 100 == 0 ){
     G4cout << ">>> Event ID: " << eventID << G4endl;
   }
   G4SDManager* SDManager= G4SDManager::GetSDMpointer();
@@ -66,11 +65,9 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
   G4HCofThisEvent* HCTE= anEvent-> GetHCofThisEvent();
   if(! HCTE) return;  // no hits in this events. nothing to do!
 
-  static G4int idcounter= -1;
-  if(idcounter<0) idcounter= SDManager-> GetCollectionID("TPC/hit");
-  G4THitsCollection<TPCPadHit>* padHC = 0;
-  padHC = (G4THitsCollection<TPCPadHit>*)HCTE-> GetHC(idcounter);
-  if(padHC){
+  static const G4int idcounter = SDManager->GetCollectionID("TPC/hit");
+  if( idcounter > 0 ){
+    auto padHC = (G4THitsCollection<TPCPadHit>*)HCTE->GetHC( idcounter );
     G4int nhits= padHC -> entries();
     G4int pidtr[MaxTrackTPC]={0};
     G4int ptidtpc[MaxTrackTPC]={0};
@@ -81,7 +78,6 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4double pytpc[MaxTrackTPC]={0};
     G4double pztpc[MaxTrackTPC]={0};
     G4double pptpc[MaxTrackTPC]={0};
-
     G4double vtxxtpc[MaxTrackTPC]={0};
     G4double vtxytpc[MaxTrackTPC]={0};
     G4double vtxztpc[MaxTrackTPC]={0};
@@ -90,22 +86,16 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4double vtxpztpc[MaxTrackTPC]={0};
     G4double vtxpptpc[MaxTrackTPC]={0};
     G4double vtxenetpc[MaxTrackTPC]={0};
-
     G4double detpc[MaxTrackTPC]={0};
     G4int laytpc[MaxTrackTPC]={0};
     G4double lentpc[MaxTrackTPC]={0};
-
-
     G4int nparticle=0;
-    //            G4cout<<"pad nhits:"<<nhits<<G4endl;
-    for(G4int i=0; i< nhits; i++) {
+    for( G4int i=0; i<nhits; ++i ){
       G4ThreeVector vtxpos = (*padHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*padHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*padHC)[i]-> GetVtxEnergy();
-
       G4ThreeVector xyz = (*padHC)[i]-> GetPosition();
       G4ThreeVector mom = (*padHC)[i]-> GetMomentum();
-
       G4double tof= (*padHC)[i]-> GetTOF();
       G4int tid = (*padHC)[i]-> GetTrackID();
       G4int ptid = (*padHC)[i]-> GetParentID();
@@ -119,14 +109,12 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       //      G4double mass = (*padHC)[i]-> GetPDGMass(); //mass(GeV)
       G4int parentid = (*padHC)[i]-> GetParentID();
       G4double tlength = (*padHC)[i]-> GettLength();
-
       G4int irow=0.;
       G4double beta = (*padHC)[i]-> GetBeta();
       G4double edep = (*padHC)[i]-> GetEdep();
       G4double slength = (*padHC)[i]-> GetsLength();
       //      G4VTrajectoryPoint *tp -> padHC->GetPoint(i);
       //    G4int nhits= padHC -> entries();
-
       if( nparticle==0 ){
 	qqtpc[nparticle]=charge;
 	pmtpc[nparticle]=mass;
@@ -237,20 +225,15 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 			     vtxxtpc[i],vtxytpc[i],vtxztpc[i], vtxenetpc[i]);
     }
   }
-  //  G4cout<<"33333333333333333333333333"<<G4endl;
-  static G4int idscint = -1;
-  if(idscint < 0) idscint = SDManager-> GetCollectionID("SCINT/hit");
-  G4THitsCollection<TPCScintHit>* scintHC = 0;
-  scintHC = (G4THitsCollection<TPCScintHit>*)HCTE-> GetHC(idscint);
 
-  if(scintHC){
+  static const G4int id_scint = SDManager-> GetCollectionID("SCINT/hit");
+  if( id_scint > 0 ){
+    auto scintHC = (G4THitsCollection<TPCScintHit>*)HCTE->GetHC( id_scint );
     G4int nhits= scintHC -> entries();
-    //    G4cout<<nhits<<G4endl;
     for(G4int i=0; i< nhits; i++) {
       G4ThreeVector vtxpos = (*scintHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*scintHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*scintHC)[i]-> GetVtxEnergy();
-
       G4ThreeVector xyz = (*scintHC)[i]-> GetPosition();
       G4ThreeVector mom = (*scintHC)[i]-> GetMomentum();
       G4int ptid = (*scintHC)[i]-> GetParentID();
@@ -261,26 +244,19 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4double mass = (*scintHC)[i]-> GetParticleMassID();
       G4int qq = (*scintHC)[i]-> GetParticleQqID();
       G4double tlength = (*scintHC)[i]-> GetLength();
-      //      printf("didsc : %d \n", did);
       gAnaMan.SetScintData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-      //      printf("didsc : %d \n", did);
     }
   }
 
   if( gConf.Get<G4int>( "UseAC" ) == 1. ){
-    static G4int idac = -1;
-    if(idac < 0) idac = SDManager-> GetCollectionID("AC/hit");
-    G4THitsCollection<TPCACHit>* acHC = 0;
-    acHC = (G4THitsCollection<TPCACHit>*)HCTE-> GetHC(idac);
-
-    if(acHC){
+    static const G4int id_ac = SDManager->GetCollectionID("AC/hit");
+    if( id_ac > 0 ){
+      auto acHC = (G4THitsCollection<TPCACHit>*)HCTE->GetHC( id_ac );
       G4int nhits= acHC -> entries();
-      //    G4cout<<nhits<<G4endl;
       for(G4int i=0; i< nhits; i++) {
 	G4ThreeVector vtxpos = (*acHC)[i]-> GetVtxPosition();
 	G4ThreeVector vtxmom = (*acHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*acHC)[i]-> GetVtxEnergy();
-
 	G4ThreeVector xyz = (*acHC)[i]-> GetPosition();
 	G4ThreeVector mom = (*acHC)[i]-> GetMomentum();
 	G4int ptid = (*acHC)[i]-> GetParentID();
@@ -291,68 +267,46 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	G4double mass = (*acHC)[i]-> GetParticleMassID();
 	G4int qq = (*acHC)[i]-> GetParticleQqID();
 	G4double tlength = (*acHC)[i]-> GetLength();
-	//      printf("didsc : %d \n", did);
 	gAnaMan.SetACData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-	//      printf("didsc : %d \n", did);
       }
     }
   }
 
-  if( gConf.Get<G4int>( "UseNBar" ) ==1.){
-    static G4int idnbar = -1;
-    if(idnbar < 0) idnbar = SDManager-> GetCollectionID("NBAR/hit");
-    G4THitsCollection<TPCNBARHit>* nbarHC = 0;
-    nbarHC = (G4THitsCollection<TPCNBARHit>*)HCTE-> GetHC(idnbar);
-
-    if(nbarHC){
-      G4int nhits= nbarHC -> entries();
-      //    G4cout<<nhits<<G4endl;
-      for(G4int i=0; i< nhits; i++) {
-	G4ThreeVector vtxpos = (*nbarHC)[i]-> GetVtxPosition();
-	G4ThreeVector vtxmom = (*nbarHC)[i]-> GetVtxMomentum();
-	G4double vtxene =(*nbarHC)[i]-> GetVtxEnergy();
-
-	G4ThreeVector xyz = (*nbarHC)[i]-> GetPosition();
-	G4ThreeVector mom = (*nbarHC)[i]-> GetMomentum();
-	G4int ptid = (*nbarHC)[i]-> GetParentID();
-	G4double tof= (*nbarHC)[i]-> GetTOF();
-	G4int tid = (*nbarHC)[i]-> GetTrackID();
-	G4int pid = (*nbarHC)[i]-> GetParticleID();
-	G4int did = (*nbarHC)[i]-> GetDetectorID();
-	G4double mass = (*nbarHC)[i]-> GetParticleMassID();
-	G4int qq = (*nbarHC)[i]-> GetParticleQqID();
-	G4double tlength = (*nbarHC)[i]-> GetLength();
-	//      printf("didsc : %d \n", did);
-	gAnaMan.SetNBARData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-	//      printf("didsc : %d \n", did);
-      }
+  static const G4int id_nbar = SDManager-> GetCollectionID("NBAR/hit");
+  if( id_nbar > 0 && gConf.Get<G4int>( "UseNBar" ) == 1. ){
+    auto nbarHC = (G4THitsCollection<TPCNBARHit>*)HCTE->GetHC( id_nbar );
+    G4int nhits = nbarHC->entries();
+    for(G4int i=0; i< nhits; i++) {
+      G4ThreeVector vtxpos = (*nbarHC)[i]-> GetVtxPosition();
+      G4ThreeVector vtxmom = (*nbarHC)[i]-> GetVtxMomentum();
+      G4double vtxene =(*nbarHC)[i]-> GetVtxEnergy();
+      G4ThreeVector xyz = (*nbarHC)[i]-> GetPosition();
+      G4ThreeVector mom = (*nbarHC)[i]-> GetMomentum();
+      G4int ptid = (*nbarHC)[i]-> GetParentID();
+      G4double tof= (*nbarHC)[i]-> GetTOF();
+      G4int tid = (*nbarHC)[i]-> GetTrackID();
+      G4int pid = (*nbarHC)[i]-> GetParticleID();
+      G4int did = (*nbarHC)[i]-> GetDetectorID();
+      G4double mass = (*nbarHC)[i]-> GetParticleMassID();
+      G4int qq = (*nbarHC)[i]-> GetParticleQqID();
+      G4double tlength = (*nbarHC)[i]-> GetLength();
+      gAnaMan.SetNBARData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
     }
   }
 
-  static G4int idtarget = -1;
-  if(idtarget < 0) idtarget = SDManager-> GetCollectionID("TAR/hit");
-  //  G4cout<<"idtarget:"<<idtarget<<G4endl;
-  G4THitsCollection<TPCTargetHit>* targetHC = 0;
-  targetHC = (G4THitsCollection<TPCTargetHit>*)HCTE-> GetHC(idtarget);
-  //  G4cout<<targetHC<<G4endl;
-
-  if(targetHC){
-    G4int nhits= targetHC -> entries();
-    //    G4cout<<"target nhits:"<<nhits<<G4endl;
+  static const G4int id_target = SDManager->GetCollectionID("TAR/hit");
+  if( id_target > 0 ){
+    auto targetHC = (G4THitsCollection<TPCTargetHit>*)HCTE->GetHC( id_target );
+    G4int nhits = targetHC->entries();
     for(G4int i=0; i< nhits; i++) {
       G4double kinene =(*targetHC)[i]-> GetKinEnergy();;
       G4ThreeVector mom = (*targetHC)[i]-> GetMomentum();
       G4double test= sqrt(pow(mom.getX(),2)+pow(mom.getY(),2)+pow(mom.getZ(),2));
-      //      G4cout<<i<<"th hits,"<<mom<<": kine energy:"<<kinene<<G4endl;
       if(kinene==0.00000000000000000000 && test != 0.  ){
-
 	G4ThreeVector vtxpos = (*targetHC)[i]-> GetVtxPosition();
 	G4ThreeVector vtxmom = (*targetHC)[i]-> GetVtxMomentum();
 	G4double vtxene =(*targetHC)[i]-> GetVtxEnergy();
-
 	G4ThreeVector xyz = (*targetHC)[i]-> GetPosition();
-
-
 	G4double tof= (*targetHC)[i]-> GetTOF();
 	G4int tid = (*targetHC)[i]-> GetTrackID();
 	G4int ptid = (*targetHC)[i]-> GetParentID();
@@ -362,36 +316,22 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	//      G4double mass = (*targetHC)[i]-> GetPDGMass(); //mass(GeV)
 	G4int parentid = (*targetHC)[i]-> GetParentID();
 	G4double tlength = (*targetHC)[i]-> GettLength();
-
 	G4int irow=0.;
 	G4double beta = (*targetHC)[i]-> GetBeta();
 	G4double edep = (*targetHC)[i]-> GetEdep();
 	gAnaMan.SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
-	//  void SetTargetData(G4ThreeVector pos, G4ThreeVector mom,
-	//		     G4int track, G4int particle,
-	//		     G4int parentid, G4ThreeVector vtxpos,
-	//		     G4ThreeVector vtxmom, G4double vtxene);
       }
-    //    G4cout<<target
     }
   }
 
-  if( gConf.Get<G4int>( "Experiment" ) == 42 ||
-      gConf.Get<G4int>( "Experiment" ) == 27 ){
-  ////////////////DCs
-  static G4int iddc = -1;
-  if(iddc < 0) iddc = SDManager-> GetCollectionID("DC/hit");
-  G4THitsCollection<TPCDCHit>* dcHC = 0;
-  dcHC = (G4THitsCollection<TPCDCHit>*)HCTE-> GetHC(iddc);
-
-  if(dcHC){
+  static const G4int id_dc = SDManager->GetCollectionID("DC/hit");
+  if( id_dc > 0 ){
+    auto dcHC = (G4THitsCollection<TPCDCHit>*)HCTE->GetHC( id_dc );
     G4int nhits= dcHC -> entries();
-    //    G4cout<<nhits<<G4endl;
     for(G4int i=0; i< nhits; i++) {
       G4ThreeVector vtxpos = (*dcHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*dcHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*dcHC)[i]-> GetVtxEnergy();
-
       G4ThreeVector xyz = (*dcHC)[i]-> GetPosition();
       G4ThreeVector mom = (*dcHC)[i]-> GetMomentum();
       G4int ptid = (*dcHC)[i]-> GetParentID();
@@ -402,27 +342,18 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4double mass = (*dcHC)[i]-> GetParticleMassID();
       G4int qq = (*dcHC)[i]-> GetParticleQqID();
       G4double tlength = (*dcHC)[i]-> GetLength();
-      //      printf("didsc : %d \n", did);
       gAnaMan.SetDCData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-      //      printf("didsc : %d \n", did);
     }
   }
 
-
-  ////////////////CH
-  static G4int idch = -1;
-  if(idch < 0) idch = SDManager-> GetCollectionID("CH/hit");
-  G4THitsCollection<TPCCHHit>* chHC = 0;
-  chHC = (G4THitsCollection<TPCCHHit>*)HCTE-> GetHC(idch);
-
-  if(chHC){
+  static const G4int id_ch = SDManager->GetCollectionID("CH/hit");
+  if( id_ch > 0 ){
+    auto chHC = (G4THitsCollection<TPCCHHit>*)HCTE->GetHC( id_ch );
     G4int nhits= chHC -> entries();
-    //    G4cout<<nhits<<G4endl;
     for(G4int i=0; i< nhits; i++) {
       G4ThreeVector vtxpos = (*chHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*chHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*chHC)[i]-> GetVtxEnergy();
-
       G4ThreeVector xyz = (*chHC)[i]-> GetPosition();
       G4ThreeVector mom = (*chHC)[i]-> GetMomentum();
       G4int ptid = (*chHC)[i]-> GetParentID();
@@ -433,24 +364,18 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4double mass = (*chHC)[i]-> GetParticleMassID();
       G4int qq = (*chHC)[i]-> GetParticleQqID();
       G4double tlength = (*chHC)[i]-> GetLength();
-      //      printf("didsc : %d \n", did);
       gAnaMan.SetCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-      //      printf("didsc : %d \n", did);
     }
   }
 
-  ////////////////FTOF
-  static G4int idftof = -1;
-  if(idftof < 0) idftof = SDManager-> GetCollectionID("FTOF/hit");
-  G4THitsCollection<TPCFTOFHit>* ftofHC = 0;
-  ftofHC = (G4THitsCollection<TPCFTOFHit>*)HCTE-> GetHC(idftof);
-  if(ftofHC){
-    G4int nhits= ftofHC -> entries();
+  static const G4int id_ftof = SDManager->GetCollectionID("FTOF/hit");
+  if( id_ftof > 0 ){
+    auto ftofHC = (G4THitsCollection<TPCFTOFHit>*)HCTE->GetHC( id_ftof );
+    G4int nhits = ftofHC->entries();
     for(G4int i=0; i< nhits; i++) {
       G4ThreeVector vtxpos = (*ftofHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*ftofHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*ftofHC)[i]-> GetVtxEnergy();
-
       G4ThreeVector xyz = (*ftofHC)[i]-> GetPosition();
       G4ThreeVector mom = (*ftofHC)[i]-> GetMomentum();
       G4int ptid = (*ftofHC)[i]-> GetParentID();
@@ -461,35 +386,17 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4double mass = (*ftofHC)[i]-> GetParticleMassID();
       G4int qq = (*ftofHC)[i]-> GetParticleQqID();
       G4double tlength = (*ftofHC)[i]-> GetLength();
-      //      printf("ftof : %d \n", did);
-      //      printf("ftof id: %d \n", tid);
       gAnaMan.SetFTOFData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-      //      printf("didsc : %d \n", did);
     }
   }
 
+  auto trajectoryContainer = anEvent->GetTrajectoryContainer();
+  if( trajectoryContainer && G4VVisManager::GetConcreteInstance() ){
+    G4int n_trajectories = trajectoryContainer->entries();
+    for( G4int i=0; i<n_trajectories; ++i ){
+      auto trj = (G4Trajectory*)( (*(anEvent->GetTrajectoryContainer()))[i] );
+      trj->DrawTrajectory();
+    }
   }
-
-
-  G4TrajectoryContainer* trajectoryContainer = anEvent->GetTrajectoryContainer();
-  G4int n_trajectories = 0;
-  if (trajectoryContainer) n_trajectories = trajectoryContainer->entries();
-  if (1) {
-    if (G4VVisManager::GetConcreteInstance())
-      {
-        for (G4int i=0; i<n_trajectories; i++)
-          {
-            G4Trajectory* trj = (G4Trajectory*)
-              ((*(anEvent->GetTrajectoryContainer()))[i]);
-            G4String particleName = trj->GetParticleDefinition()->GetParticleName();
-	    trj->DrawTrajectory();
-	  }
-      }
-  // Hits
-    //      if( HCTE ){
-    //        if( padHC )  padHC->DrawAllHits();
-    //      }
-  }
-
   gAnaMan.EndOfEventAction();
 }

@@ -10,3 +10,12 @@
 #
 
 Target	30.0	10.0	15.0
+
+#______________________________________________________________________________
+# Name			Value
+TpcRin			  0.0
+TpcRout			574.0
+TpcDz			302.0
+TpcRinFieldCage		574.0
+TpcRoutFieldCage	654.0
+TpcDzFieldCage		400.0
