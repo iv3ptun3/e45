@@ -80,7 +80,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   if( generator == 3101 ||
       generator == 3103 ||
       generator == 3104 ){
-    TFile *fin = new TFile( gConf.Get<TString>("Input_JAM_File_Name"), "READ");
+    TFile *fin = new TFile( gConf.Get<G4String>("Input_JAM_File_Name"), "READ");
     t1 = (TTree*)fin->Get("tree");
   }
 
@@ -294,30 +294,18 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   G4double mass_hdibaryon, width_hdibaryon;
   //  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
 
-  G4double Energy_L1, momentum_L1, mom_L1_x, mom_L1_y, mom_L1_z;
-  G4double Energy_L2, momentum_L2, mom_L2_x, mom_L2_y, mom_L2_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp;//, Phikp;
-
+  G4double Energy_L1, mom_L1_x, mom_L1_y, mom_L1_z;
+  G4double Energy_L2, mom_L2_x, mom_L2_y, mom_L2_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z, pbeam;
+  G4double pg_x,pg_y,pg_z;
   // G4double rmk=0.493677;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* Lambda1;
-  G4ParticleDefinition* Lambda2;
-  G4ParticleDefinition* proton;
-
-  proton = particleTable->FindParticle("proton");
-  Lambda1 = particleTable->FindParticle("lambda");
-  Lambda2 = particleTable->FindParticle("lambda");
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  auto Lambda1 = particleTable->FindParticle("lambda");
+  auto Lambda2 = particleTable->FindParticle("lambda");
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
 
   G4double beam_momentum = gConf.Get<G4double>( "BeamMom" );
 
@@ -328,8 +316,8 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  pg_z = env_Beam_mom;
   pg_z = CLHEP::RandGauss::shoot( beam_momentum, 0.01294*beam_momentum );
   //  G4cout<<"Ebeam:"<<Ebeam<<G4endl;
-  pbeam=sqrt(pow(pg_x,2)+pow(pg_y,2)+pow(pg_z,2));
-  Ebeam = sqrt(pbeam*pbeam+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
+  // G4double pbeam=sqrt(pow(pg_x,2)+pow(pg_y,2)+pow(pg_z,2));
+  // G4double Ebeam = sqrt(pbeam*pbeam+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
 
   //  G4cout<<"env_beam_mom:"<<env_Beam_mom<<G4endl;
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
@@ -345,7 +333,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
 			      mass_hdibaryon, width_hdibaryon, pg_z, 0.0);
 
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   //  if(atan((mom[1])/mom[2])*180/3.141592654 > 15. ) goto up;
@@ -354,31 +342,31 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
 
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);
-  momentum_L1 = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L1 = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   mom_L1_x = mom[0];
   mom_L1_y = mom[1];
   mom_L1_z = mom[2];
 
-  ThetaL1 = Hdibaryon.GetTheta(3);
-  PhiL1 = Hdibaryon.GetPhi(3);
+  // G4double ThetaL1 = Hdibaryon.GetTheta(3);
+  // G4double PhiL1 = Hdibaryon.GetPhi(3);
 
   /* L2 */
   Energy_L2 = Hdibaryon.GetEnergy(4);
-  momentum_L2 = Hdibaryon.GetMomentum(4);
+  // G4double momentum_L2 = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
 
   mom_L2_x = mom[0];
   mom_L2_y = mom[1];
   mom_L2_z = mom[2];
 
-  ThetaL2 = Hdibaryon.GetTheta(4);
-  PhiL2 = Hdibaryon.GetPhi(4);
+  // G4double ThetaL2 = Hdibaryon.GetTheta(4);
+  // G4double PhiL2 = Hdibaryon.GetPhi(4);
 
   /* Kp */
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   mom_kp_x = mom[0];
@@ -386,7 +374,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   mom_kp_z = mom[2];
 
   //  Thetakp = Hdibaryon.GetThetaCM(5);
-  Thetakp = Hdibaryon.GetThetaCM(1);
+  // G4double Thetakp = Hdibaryon.GetThetaCM(1);
   //  Phikp = Hdibaryon.GetPhi(5);
   //  G4cout<<Phikp<<G4endl;
   // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
@@ -398,24 +386,24 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  G4cout<<Energy_kp<<G4endl;
   //  //  G4double beta= sqrt(1.8*1.8-0.493677*0.493677)/(2*0.93827203+Energy_kp);
   //  G4cout<<(proton->GetPDGMass()/GeV)<<G4endl;
-  G4double beta= pbeam/(2.*0.938272013+Ebeam);
+  // G4double beta= pbeam/(2.*0.938272013+Ebeam);
   //  G4cout<<"Pri:"<<beta<<G4endl;
   //  G4double beta= sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2))/(2*0.93827203+1.8);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  G4double momcmkpp;
+  // G4double test;
+  // G4double momk[4]={0.};
+  // G4double momkpp;
+  // G4double momcmk[4]={0.};
+  // G4double momcmkpp;
 
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
-  momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  test=lorentz(momk,beta,momcmk);
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
+  // test=lorentz(momk,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -444,9 +432,9 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  hlab[3]=sqrt(pow(hlab[0],2)+pow(hlab[1],2)+pow(hlab[2],2)+pow(Lambda1->GetPDGMass()/GeV,2)*2);
   //  mass_hdibaryon = 2.250;    // Mass for H
   hlab[3]=sqrt(hlab[0]*hlab[0]+hlab[1]*hlab[1]+hlab[2]*hlab[2]+mass_hdibaryon*mass_hdibaryon);
-  G4double hcm[4];
+  // G4double hcm[4];
 
-  test=lorentz(hlab,beta,hcm);
+  // test=lorentz(hlab,beta,hcm);
   // G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
   // cmh->Fill(acos(hcm[2]/hcmpp)/3.141592654*180);
 
@@ -462,15 +450,15 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   // phidiff->Fill(hphi-cmphik);
   //  G4cout<<"theta diff H:"<<acos(hcm[2]/hcmpp)/3.141592654*180<<G4endl;
   //  G4cout<<"theta diff K+:"<<acos(momcmk[2]/momcmkpp)/3.141592654*180<<G4endl;
-  G4double momsum[3]={0};
-  momsum[0]=mom_kp_x+mom_L1_x+mom_L2_x;
-  momsum[1]=mom_kp_y+mom_L1_y+mom_L2_y;
-  momsum[2]=mom_kp_z+mom_L1_z+mom_L2_z;
+  // G4double momsum[3]={0};
+  // momsum[0]=mom_kp_x+mom_L1_x+mom_L2_x;
+  // momsum[1]=mom_kp_y+mom_L1_y+mom_L2_y;
+  // momsum[2]=mom_kp_z+mom_L1_z+mom_L2_z;
   //  G4cout<<"mom sum:"<<momsum[0]<<":"<<momsum[1]<<":"<<momsum[2]<<G4endl;
-  G4double momH[3]={0};
-  momH[0]=mom_L1_x+mom_L2_x;
-  momH[1]=mom_L1_y+mom_L2_y;
-  momH[2]=mom_L1_z+mom_L2_z;
+  // G4double momH[3]={0};
+  // momH[0]=mom_L1_x+mom_L2_x;
+  // momH[1]=mom_L1_y+mom_L2_y;
+  // momH[2]=mom_L1_z+mom_L2_z;
   //  G4cout<<"mom sum X H:kp:"<<momH[0]<<":"<<mom_kp_x<<G4endl;
   //  G4cout<<"mom sum Y H:kp:"<<momH[1]<<":"<<mom_kp_y<<G4endl;
   //  G4cout<<"mom sum Z H:kp:"<<momH[2]<<":"<<mom_kp_z<<G4endl;
@@ -482,15 +470,15 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  G4cout<<"ppk:"<<sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z)<<G4endl;
   //missk->Fill(misskp);
 
-  G4double e1,e2,etot,invm2,ptot,invm;
-  invm=-1.;
+  // G4double e1,e2,etot,invm2,ptot,invm;
+  // invm=-1.;
 
-  ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=etot-ptot;
-  if(invm2 > 0) invm=sqrt(invm2);
+  // ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
+  // e1=Energy_L1;
+  // e2=Energy_L2;
+  // etot=pow(e1+e2,2);
+  // invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
 
   //  G4cout<<"IM(LL)"<<invm<<G4endl;
@@ -547,26 +535,14 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
 
   char fnam[30];
 
-  int res;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piMinus;
-  //  G4ParticleDefinition* piPlus;
-
-  G4ParticleDefinition* Lambda;
-  G4ParticleDefinition* lambda1;
-  G4ParticleDefinition* lambda2;
-
-  kaonMinus = particleTable->FindParticle("kaon-");
-  kaonPlus = particleTable->FindParticle("kaon+");
-  proton = particleTable->FindParticle("proton");
-  piMinus = particleTable->FindParticle("pi-");
-  Lambda = particleTable->FindParticle("lambda");
-  lambda1 = particleTable->FindParticle("lambda");
-  lambda2 = particleTable->FindParticle("lambda");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  // auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  // auto proton = particleTable->FindParticle("proton");
+  // auto piMinus = particleTable->FindParticle("pi-");
+  auto Lambda = particleTable->FindParticle("lambda");
+  auto lambda1 = particleTable->FindParticle("lambda");
+  auto lambda2 = particleTable->FindParticle("lambda");
 
   FILE *fp;
   sprintf(fnam,"inc64cu.dat");
@@ -582,16 +558,16 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   int ran = CLHEP::RandFlat::shoot(1.,22478.);
 
   while(1){
-    res=fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
-	       ,&data[0],&data[1],&data[2],&data[3],&data[4]
-	       ,&data[5],&data[6],&data[7],&data[8],&data[9]
-	       ,&data[10],&data[11],&data[12],&data[13],&data[14]
-	       ,&data[15],&data[16],&data[17],&data[18],&data[19]
-	       ,&data[20],&data[21],&data[22],&data[23],&data[24]
-	       ,&data[25],&data[26],&data[27],&data[28],&data[29]
-	       ,&data[30],&data[31],&data[32],&data[33],&data[34]
-	       ,&data[35],&data[36],&data[37],&data[38],&data[39]
-	       ,&data[40]);
+    fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
+	   ,&data[0],&data[1],&data[2],&data[3],&data[4]
+	   ,&data[5],&data[6],&data[7],&data[8],&data[9]
+	   ,&data[10],&data[11],&data[12],&data[13],&data[14]
+	   ,&data[15],&data[16],&data[17],&data[18],&data[19]
+	   ,&data[20],&data[21],&data[22],&data[23],&data[24]
+	   ,&data[25],&data[26],&data[27],&data[28],&data[29]
+	   ,&data[30],&data[31],&data[32],&data[33],&data[34]
+	   ,&data[35],&data[36],&data[37],&data[38],&data[39]
+	   ,&data[40]);
     check=check+1.;
     if(check==ran) break;
     //    if(res==EOF) break;
@@ -610,7 +586,6 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
 
   fclose(fp);
 
-  G4double Energy_beam;
   G4double Energy_L1;
   G4double Energy_L2;
   G4double Energy_ka;
@@ -618,7 +593,7 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   vtx[2] = CLHEP::RandFlat::shoot( -150. - m_target_size.z()/2,
 				   -150. + m_target_size.z()/2 );
 
-  Energy_beam = pbm[3];
+  // G4double Energy_beam = pbm[3];
   G4ThreeVector momentumBeam(-pbm[0],-pbm[1],-pbm[2]);
   //  G4ThreeVector vertexPos(vtx[0]*mm,vtx[1]*mm, vtx[2]*mm);
   G4ThreeVector vertexPos(0.*mm,0.*mm, vtx[2]*mm);
@@ -627,19 +602,19 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   Energy_L1 = pL1[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
   Energy_L2 = pL2[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
 
-  G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  momk[0]=pka[0];
-  momk[1]=pka[1];
-  momk[2]=pka[2];
-  momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
+  // G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
+  // G4double test;
+  // G4double momk[4]={0.};
+  // G4double momkpp;
+  // G4double momcmk[4]={0.};
+  // momk[0]=pka[0];
+  // momk[1]=pka[1];
+  // momk[2]=pka[2];
+  // momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
 
-  momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
+  // momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
 
-  test=lorentz(momk,beta,momcmk);
+  // test=lorentz(momk,beta,momcmk);
   // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
@@ -687,18 +662,18 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   gAnaMan.SetPrimaryVertex(2,0.,0.,vtx[2]);
 
 
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
   // G4double rmk=0.493677;
   // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //  missk->Fill(misskp);
 
-  ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=(etot-ptot);
-  if(invm2 > 0) invm=sqrt(invm2);
+  // ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
+  // e1=Energy_L1;
+  // e2=Energy_L2;
+  // etot=pow(e1+e2,2);
+  // invm2=(etot-ptot);
+  // if(invm2 > 0) invm=sqrt(invm2);
   //  gen_im->Fill(invm);
 }
 
@@ -719,53 +694,33 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
   // G4double Thetakp1, Phikp1;
 
   // G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmC12, rmBe10,rmL,rmkp;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* Carbon12;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* Beryllium10;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* Lambda1;
-  G4ParticleDefinition* Lambda2;
-  G4ParticleDefinition* LLphase;
-
-
-
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  Lambda1 = particleTable->FindParticle("lambda");
-  Lambda2 = particleTable->FindParticle("lambda");
-
-  LLphase = particleTable->FindParticle("phaseLL");
-
-  //  kaonMinus->DumpTable();
-
-  G4int Z = 6, A = 12;
+  G4double pg_x,pg_y,pg_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  // auto kaonPlus = particleTable->FindParticle("kaon+");
+  // auto kaonMinus = particleTable->FindParticle("kaon-");
+  // auto Lambda1 = particleTable->FindParticle("lambda");
+  // auto Lambda2 = particleTable->FindParticle("lambda");
+  auto LLphase = particleTable->FindParticle("phaseLL");
+  // G4int Z, A;
+  // G4double excitEnergy = 0.*keV;
   // G4double ionCharge   = 0.*eplus;
-  G4double excitEnergy = 0.*keV;
-  Carbon12 = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-  //    Carbon12->DumpTable();
-
-  Z = 4, A = 10;
-  excitEnergy = 0.*keV;
-  Beryllium10 = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
-  //    Beryllium10->DumpTable();
-
+  // auto Carbon12 = G4IonTable::GetIonTable()->GetIon( Z=6, A=12, excitEnergy );
+  // auto Beryllium10 = G4IonTable::GetIonTable()->GetIon( Z=4, A=10, excitEnergy );
+  // kaonMinus->DumpTable();
+  // Carbon12->DumpTable();
+  // Beryllium10->DumpTable();
   G4double pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548)*GeV;
   pg_x = 0.0;
   pg_y = 0.0;
   pg_z = pbeam;
 
-  Ebeam = sqrt(pow(pbeam/GeV,2)+pow(kaonMinus->GetPDGMass()/GeV,2));
+  // G4double Ebeam = sqrt(pow(pbeam/GeV,2)+pow(kaonMinus->GetPDGMass()/GeV,2));
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
 
-  rmC12=Carbon12->GetPDGMass()/GeV;
-  rmkp=kaonPlus->GetPDGMass()/GeV;
-  rmBe10=Beryllium10->GetPDGMass()/GeV;
-  rmL=Lambda1->GetPDGMass()/GeV;
+  // G4double rmC12=Carbon12->GetPDGMass()/GeV;
+  // G4double rmkp=kaonPlus->GetPDGMass()/GeV;
+  // G4double rmBe10=Beryllium10->GetPDGMass()/GeV;
+  // G4double rmL=Lambda1->GetPDGMass()/GeV;
 
   // G4double W=sqrt(pow(Ebeam+rmC12,2)-pow(pbeam/GeV,2));
   //  G4cout<<"C mass------->"<<Carbon12->GetPDGMass()/GeV<<G4endl;
@@ -999,26 +954,17 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 {
-  G4double  momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hdibaryon;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* proton;
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  proton = particleTable->FindParticle("proton");
-  hdibaryon = particleTable->FindParticle("hdibaryon");
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto proton = particleTable->FindParticle("proton");
+  auto hdibaryon = particleTable->FindParticle("hdibaryon");
   //  G4double pimom=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   pbeam=1.8;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
@@ -1029,8 +975,6 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
   pbm[1]=0;
   pbm[2]=pbeam;
   pbm[3]=Ebeam;
-  //  G4cout<<"hdibaryon mass"<<hdibaryon->GetPDGMass()/GeV<<G4endl;
-  //  G4cout<<"hdibaryon mass"<<hdibaryon->GetPDGMass()/GeV<<G4endl;
  up:
   KinemaHweak Hdibaryon(kaonMinus->GetPDGMass()/GeV,
 			(proton->GetPDGMass()/GeV)*2,
@@ -1039,37 +983,35 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
-
-
   if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>15.) goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momentum_h<<":"<<sqrt(mom[0]*mom[0]+mom[1]*mom[1]+mom[2]*mom[2])<<G4endl;
-
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
@@ -1125,26 +1067,17 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hdibaryonS;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* proton;
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  proton = particleTable->FindParticle("proton");
-  hdibaryonS = particleTable->FindParticle("hdibaryonS");
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto proton = particleTable->FindParticle("proton");
+  auto hdibaryonS = particleTable->FindParticle("hdibaryonS");
   //  G4double pimom=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   pbeam=1.8;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
@@ -1165,18 +1098,17 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-
   if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>15.) goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -1188,14 +1120,15 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
@@ -1252,26 +1185,17 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hdibaryonLL;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* proton;
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  proton = particleTable->FindParticle("proton");
-  hdibaryonLL = particleTable->FindParticle("hdibaryonLL");
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto proton = particleTable->FindParticle("proton");
+  auto hdibaryonLL = particleTable->FindParticle("hdibaryonLL");
   //  G4double pimom=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   pbeam=1.8;
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
@@ -1292,7 +1216,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -1303,7 +1227,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -1315,14 +1239,15 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
@@ -1378,27 +1303,17 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
 {
-  G4double  momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Energy_kn,  mom_kn_x, mom_kn_y, mom_kn_z;
-  G4double Theta_h, Phi_h;
-
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hdibaryonLL;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* proton;
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  proton = particleTable->FindParticle("proton");
-  hdibaryonLL = particleTable->FindParticle("hdibaryonLL");
-
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  G4double Energy_kn, mom_kn_x, mom_kn_y, mom_kn_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto proton = particleTable->FindParticle("proton");
+  auto hdibaryonLL = particleTable->FindParticle("hdibaryonLL");
   pbeam=1.8;
   mom_kn_x=0;
   mom_kn_y=0;
@@ -1424,34 +1339,34 @@ TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
 
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-
   if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>15.  ) goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
-  Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double Energy_h = Hdibaryon.GetEnergy(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
-  mom_h_x = mom[0];
-  mom_h_y = mom[1];
-  mom_h_z = mom[2];
+  // G4double mom_h_x = mom[0];
+  // G4double mom_h_y = mom[1];
+  // G4double mom_h_z = mom[2];
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
@@ -1500,7 +1415,6 @@ void
 TPCPrimaryGeneratorAction::Generate_beam( G4Event* anEvent )
 {
   //  G4double  momk[3], mom[3],momkn[3];
-  G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   //  G4double pbm[4];
   G4double Energy_kn,  mom_kn_x, mom_kn_y, mom_kn_z;
@@ -1509,7 +1423,7 @@ TPCPrimaryGeneratorAction::Generate_beam( G4Event* anEvent )
   G4ParticleDefinition* kaonMinus;
   //  kaonMinus = particleTable->FindParticle("kaon-");
   kaonMinus = particleTable->FindParticle("pi-");
-  pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,0.01294*env_Beam_mom);
+  G4double pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,0.01294*env_Beam_mom);
   //  pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548);
   //  pbeam=1.8;
   mom_kn_x=0;
@@ -1519,9 +1433,7 @@ TPCPrimaryGeneratorAction::Generate_beam( G4Event* anEvent )
 
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
 
-  Ebeam = sqrt(pbeam*pbeam+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);
-
-
+  // G4double Ebeam = sqrt(pbeam*pbeam+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);
   //  G4double vtx = CLHEP::RandFlat::shoot(-15.,15.)*mm;
   //  G4double vty = CLHEP::RandFlat::shoot(-5.,5.)*mm;
   //  G4double vtz= CLHEP::RandFlat::shoot(env_target_pos_z-env_target_width/2,env_target_pos_z+env_target_width/2)*mm;
@@ -1551,21 +1463,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hdibaryon;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* proton;
-
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  proton = particleTable->FindParticle("proton");
-  hdibaryon = particleTable->FindParticle("hdibaryon");
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto proton = particleTable->FindParticle("proton");
+  auto hdibaryon = particleTable->FindParticle("hdibaryon");
 
   //  G4double pimom=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   pbeam=1.8;
@@ -1587,7 +1491,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -1598,7 +1502,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -1610,8 +1514,8 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
   momk[0]=mom_kp_x;
@@ -1674,28 +1578,18 @@ TPCPrimaryGeneratorAction::Generate_hybrid( G4Event* anEvent )
 {
   G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
-
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double pg_x,pg_y,pg_z;
+  // G4double rmpro = 0.93827203;
+  // G4double rmpi = 0.13957018;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piMinus;
-  G4ParticleDefinition* piPlus;
-
-  proton = particleTable->FindParticle("proton");
-  piPlus = particleTable->FindParticle("pi+");
-  piMinus = particleTable->FindParticle("pi-");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  auto piPlus = particleTable->FindParticle("pi+");
+  auto piMinus = particleTable->FindParticle("pi-");
 
   //  G4double pbeam=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   G4double pbeam=1.;
@@ -1703,7 +1597,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid( G4Event* anEvent )
   pg_y = 0.0;
   pg_z = pbeam;
 
-  Ebeam = sqrt(pow(pbeam,2)+pow(piMinus->GetPDGMass()/GeV,2));
+  // G4double Ebeam = sqrt(pow(pbeam,2)+pow(piMinus->GetPDGMass()/GeV,2));
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
 
   mass_hybrid = 1.22;    // Mass for H
@@ -1716,41 +1610,41 @@ TPCPrimaryGeneratorAction::Generate_hybrid( G4Event* anEvent )
 		      piPlus->GetPDGMass()/GeV, //pi2
 		      mass_hybrid, width_hybrid, pg_z, 0.0);
 
-//  Hdibaryon.Dump();
+  //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double Thetapro = Hybrid.GetTheta(3);
+  // G4double Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double Thetapi1 = Hybrid.GetTheta(4);
+  // G4double Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
@@ -1837,28 +1731,18 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
-
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double rmpro = 0.93827203;
+  // G4double rmpi = 0.13957018;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piMinus;
-  G4ParticleDefinition* piPlus;
-
-  proton = particleTable->FindParticle("proton");
-  piPlus = particleTable->FindParticle("pi+");
-  piMinus = particleTable->FindParticle("pi-");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  auto piPlus = particleTable->FindParticle("pi+");
+  auto piMinus = particleTable->FindParticle("pi-");
 
   G4double pbeam=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   //  G4double pbeam=0.7;
@@ -1884,38 +1768,38 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
 //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double Thetapro = Hybrid.GetTheta(3);
+  // G4double Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double Thetapi1 = Hybrid.GetTheta(4);
+  // G4double Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
@@ -1945,16 +1829,16 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
   missk->Fill(misskp);
   */
 
-  G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
 
-  ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
-  e1=Energy_pro;
-  e2=Energy_pi1;
-  e3=Energy_pi2;
-  etot=pow(e1+e2+e3,2);
-  invm2=etot-ptot;
+  // ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
+  // e1=Energy_pro;
+  // e2=Energy_pi1;
+  // e3=Energy_pi2;
+  // etot=pow(e1+e2+e3,2);
+  // invm2=etot-ptot;
 
-  if(invm2 > 0) invm=sqrt(invm2);
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   //  G4cout<<"invm:"<<invm<<G4endl;
   /////shhwang hybrid1
@@ -2001,20 +1885,15 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam=0.;
 
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* pip;
-  G4ParticleDefinition* proton;
-
-  pip = particleTable->FindParticle("pi+");
-  proton = particleTable->FindParticle("proton");
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto pip = particleTable->FindParticle("pi+");
+  auto proton = particleTable->FindParticle("proton");
 
   G4double protonMass=proton->GetPDGMass()/GeV;//unit GeV
   G4double pipMass=pip->GetPDGMass()/GeV;//unit GeV
@@ -2123,7 +2002,7 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 			pbm, p_proton,cosx);
 
   Energy_kp=Hdibaryon.GetEnergy(3);
-  momentum_kp = Hdibaryon.GetMomentum(3);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -2135,20 +2014,21 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
   //  gAnaMan.SetCrossSection(cosx);
 
   Energy_h = Hdibaryon.GetEnergy(4);
-  momentum_h = Hdibaryon.GetMomentum(4);
+  // G4double momentum_h = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
 
   //  cout<<mom_h_z<<endl;
-  Theta_h = Hdibaryon.GetTheta(4);
-  Phi_h = Hdibaryon.GetPhi(4);
+  // G4double Theta_h = Hdibaryon.GetTheta(4);
+  // G4double Phi_h = Hdibaryon.GetPhi(4);
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pipMass*pipMass);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pipMass*pipMass);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -2185,14 +2065,11 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam=0.;
-
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* pin;
   G4ParticleDefinition* proton;
@@ -2307,7 +2184,7 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
 			pbm, p_proton,cosx);
 
   Energy_kp=Hdibaryon.GetEnergy(3);
-  momentum_kp = Hdibaryon.GetMomentum(3);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -2319,20 +2196,21 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
   //  gAnaMan.SetCrossSection(cosx);
 
   Energy_h = Hdibaryon.GetEnergy(4);
-  momentum_h = Hdibaryon.GetMomentum(4);
+  // G4double   momentum_h = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
 
   //  cout<<mom_h_z<<endl;
-  Theta_h = Hdibaryon.GetTheta(4);
-  Phi_h = Hdibaryon.GetPhi(4);
+  // G4double   Theta_h = Hdibaryon.GetTheta(4);
+  // G4double   Phi_h = Hdibaryon.GetPhi(4);
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pinMass*pinMass);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pinMass*pinMass);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -2370,19 +2248,14 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
 
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double rmpro=0.93827203;
+  // G4double rmpi=0.13957018;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* neutron;
@@ -2413,51 +2286,51 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1( G4Event* anEvent )
 //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double   Thetapro = Hybrid.GetTheta(3);
+  // G4double   Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double   momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double   Thetapi1 = Hybrid.GetTheta(4);
+  // G4double   Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double   momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double   Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
-  G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
 
-  ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
-  e1=Energy_pro;
-  e2=Energy_pi1;
-  e3=Energy_pi2;
-  etot=pow(e1+e2+e3,2);
-  invm2=etot-ptot;
+  // ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
+  // e1=Energy_pro;
+  // e2=Energy_pi1;
+  // e3=Energy_pi2;
+  // etot=pow(e1+e2+e3,2);
+  // invm2=etot-ptot;
 
-  if(invm2 > 0) invm=sqrt(invm2);
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
 
   G4double vtx,vty,vtz;
@@ -2507,19 +2380,14 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
 
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double rmpro=0.93827203;
+  // G4double rmpi=0.13957018;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* proton;
@@ -2556,38 +2424,38 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2( G4Event* anEvent )
 //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double   momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double Thetapro = Hybrid.GetTheta(3);
+  // G4double   Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double   momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double   Thetapi1 = Hybrid.GetTheta(4);
+  // G4double   Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double   momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double   Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
@@ -2617,16 +2485,16 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2( G4Event* anEvent )
   missk->Fill(misskp);
   */
 
-  G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
 
-  ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
-  e1=Energy_pro;
-  e2=Energy_pi1;
-  e3=Energy_pi2;
-  etot=pow(e1+e2+e3,2);
-  invm2=etot-ptot;
+  // ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
+  // e1=Energy_pro;
+  // e2=Energy_pi1;
+  // e3=Energy_pi2;
+  // etot=pow(e1+e2+e3,2);
+  // invm2=etot-ptot;
 
-  if(invm2 > 0) invm=sqrt(invm2);
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   //  G4cout<<"invm:"<<invm<<G4endl;
   /////shhwang hybrid1
@@ -2681,19 +2549,14 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
 
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double rmpro=0.93827203;
+  // G4double rmpi=0.13957018;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* neutron;
@@ -2729,38 +2592,38 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3( G4Event* anEvent )
 //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double   momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double Thetapro = Hybrid.GetTheta(3);
+  // G4double   Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double   momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double   Thetapi1 = Hybrid.GetTheta(4);
+  // G4double   Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double   momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double   Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
@@ -2790,16 +2653,14 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3( G4Event* anEvent )
   missk->Fill(misskp);
   */
 
-  G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
-
-  ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
-  e1=Energy_pro;
-  e2=Energy_pi1;
-  e3=Energy_pi2;
-  etot=pow(e1+e2+e3,2);
-  invm2=etot-ptot;
-
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
+  // e1=Energy_pro;
+  // e2=Energy_pi1;
+  // e3=Energy_pi2;
+  // etot=pow(e1+e2+e3,2);
+  // invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   //  G4cout<<"invm:"<<invm<<G4endl;
   /////shhwang hybrid1
@@ -2854,19 +2715,14 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4( G4Event* anEvent )
 {
   //  G4double mass_hybrid, width_hybrid;
 
-  G4double Energy_pro, momentum_pro, mom_pro_x, mom_pro_y, mom_pro_z;
-  G4double Energy_pi1, momentum_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
-  G4double Energy_pi2, momentum_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
-
-  G4double Thetapro, Phipro;
-  G4double Thetapi1, Phipi1;
-  G4double Thetapi2;
+  G4double Energy_pro, mom_pro_x, mom_pro_y, mom_pro_z;
+  G4double Energy_pi1, mom_pi1_x, mom_pi1_y, mom_pi1_z;
+  G4double Energy_pi2, mom_pi2_x, mom_pi2_y, mom_pi2_z;
 
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double rmpro,rmpi;
-  rmpro=0.93827203;
-  rmpi=0.13957018;
+  G4double rmpro = 0.93827203;
+  // G4double rmpi = 0.13957018;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* proton;
@@ -2902,38 +2758,38 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4( G4Event* anEvent )
 //  Hdibaryon.Dump();
   /* pro */
   Energy_pro = Hybrid.GetEnergy(3);
-  momentum_pro = Hybrid.GetMomentum(3);
+  // G4double momentum_pro = Hybrid.GetMomentum(3);
   Hybrid.GetMomentum(3,mom);
 
   mom_pro_x = mom[0];
   mom_pro_y = mom[1];
   mom_pro_z = mom[2];
 
-  Thetapro = Hybrid.GetTheta(3);
-  Phipro = Hybrid.GetPhi(3);
+  // G4double Thetapro = Hybrid.GetTheta(3);
+  // G4double   Phipro = Hybrid.GetPhi(3);
 
   /* L2 */
   Energy_pi1 = Hybrid.GetEnergy(4);
-  momentum_pi1 = Hybrid.GetMomentum(4);
+  // G4double   momentum_pi1 = Hybrid.GetMomentum(4);
   Hybrid.GetMomentum(4,mom);
 
   mom_pi1_x = mom[0];
   mom_pi1_y = mom[1];
   mom_pi1_z = mom[2];
 
-  Thetapi1 = Hybrid.GetTheta(4);
-  Phipi1 = Hybrid.GetPhi(4);
+  // G4double   Thetapi1 = Hybrid.GetTheta(4);
+  // G4double   Phipi1 = Hybrid.GetPhi(4);
 
   /* pi2 */
   Energy_pi2 = Hybrid.GetEnergy(5);
-  momentum_pi2 = Hybrid.GetMomentum(5);
+  // G4double   momentum_pi2 = Hybrid.GetMomentum(5);
   Hybrid.GetMomentum(5,mom);
 
   mom_pi2_x = mom[0];
   mom_pi2_y = mom[1];
   mom_pi2_z = mom[2];
 
-  Thetapi2 = Hybrid.GetThetaCM(1);
+  // G4double   Thetapi2 = Hybrid.GetThetaCM(1);
   // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
@@ -2963,16 +2819,16 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4( G4Event* anEvent )
   missk->Fill(misskp);
   */
 
-  G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
+  // G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
 
-  ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
-  e1=Energy_pro;
-  e2=Energy_pi1;
-  e3=Energy_pi2;
-  etot=pow(e1+e2+e3,2);
-  invm2=etot-ptot;
+  // ptot=pow(mom_pro_x+mom_pi1_x+mom_pi2_x,2)+pow(mom_pro_y+mom_pi1_y+mom_pi2_y,2)+pow(mom_pro_z+mom_pi1_z+mom_pi2_z,2);
+  // e1=Energy_pro;
+  // e2=Energy_pi1;
+  // e3=Energy_pi2;
+  // etot=pow(e1+e2+e3,2);
+  // invm2=etot-ptot;
 
-  if(invm2 > 0) invm=sqrt(invm2);
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   //  G4cout<<"invm:"<<invm<<G4endl;
   /////shhwang hybrid1
@@ -3027,17 +2883,12 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
 
-  G4double Energy_L1, momentum_L1, mom_L1_x, mom_L1_y, mom_L1_z;
-  G4double Energy_L2, momentum_L2, mom_L2_x, mom_L2_y, mom_L2_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp;
+  G4double Energy_L1, mom_L1_x, mom_L1_y, mom_L1_z;
+  G4double Energy_L2, mom_L2_x, mom_L2_y, mom_L2_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
 
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double pbeam;
+  G4double pg_x,pg_y,pg_z;
   // G4double rmk=0.493677;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -3053,12 +2904,12 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
   kaonPlus = particleTable->FindParticle("kaon+");
   kaonMinus = particleTable->FindParticle("kaon-");
 
-  Ebeam = sqrt(1.8*1.8+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
+  // G4double Ebeam = sqrt(1.8*1.8+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
 
   pg_x = 0.0;
   pg_y = 0.0;
   pg_z = 1.8;
-  pbeam=1.8;
+  // G4double pbeam=1.8;
 
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
 
@@ -3075,60 +2926,55 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
 //  Hdibaryon.Dump();
 
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double   momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);
-  momentum_L1 = Hdibaryon.GetMomentum(3);
+  // G4double   momentum_L1 = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   mom_L1_x = mom[0];
   mom_L1_y = mom[1];
   mom_L1_z = mom[2];
 
-  ThetaL1 = Hdibaryon.GetTheta(3);
-  PhiL1 = Hdibaryon.GetPhi(3);
+  // G4double ThetaL1 = Hdibaryon.GetTheta(3);
+  // G4double PhiL1 = Hdibaryon.GetPhi(3);
 
   /* L2 */
   Energy_L2 = Hdibaryon.GetEnergy(4);
-  momentum_L2 = Hdibaryon.GetMomentum(4);
+  // G4double   momentum_L2 = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
 
   mom_L2_x = mom[0];
   mom_L2_y = mom[1];
   mom_L2_z = mom[2];
 
-  ThetaL2 = Hdibaryon.GetTheta(4);
-  PhiL2 = Hdibaryon.GetPhi(4);
+  // G4double   ThetaL2 = Hdibaryon.GetTheta(4);
+  // G4double   PhiL2 = Hdibaryon.GetPhi(4);
 
   /* Kp */
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double   momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-  Thetakp = Hdibaryon.GetThetaCM(1);
+  // G4double Thetakp = Hdibaryon.GetThetaCM(1);
   // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
-  G4double beta= sqrt(pbeam*pbeam)/(2.*0.938272013+Ebeam);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  G4double momcmkpp;
-
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
-  momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  test=lorentz(momk,beta,momcmk);
-  momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double beta= sqrt(pbeam*pbeam)/(2.*0.938272013+Ebeam);
+  // G4double momk[4]={};
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
+  // G4double test=lorentz(momk,beta,momcmk);
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
 
   // coscmk->Fill((momcmk[2]/momcmkpp));
@@ -3140,13 +2986,12 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
   //missk->Fill(misskp);
 
   //cal for invariant mass
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=etot-ptot;
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double etot=pow(e1+e2,2);
+  // G4double invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   double vtx = 0.*mm;
   double vty = 0.*mm;
@@ -3195,15 +3040,10 @@ TPCPrimaryGeneratorAction::Generate_hybridPHSG( G4Event* anEvent )
   //  G4double mom[3];
   G4double Ebeam;
   //  G4double rmk=0.493677;
-  G4double pbm[4];
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* hybridbaryon;
-  G4ParticleDefinition* piMinus;
-  G4ParticleDefinition* proton;
-  piMinus = particleTable->FindParticle("pi-");
-  proton = particleTable->FindParticle("proton");
-  hybridbaryon = particleTable->FindParticle("hybridb");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  // auto piMinus = particleTable->FindParticle("pi-");
+  // auto proton = particleTable->FindParticle("proton");
+  auto hybridbaryon = particleTable->FindParticle("hybridb");
 
   //  G4double pimom=0.635+CLHEP::RandFlat::shoot()*(2.000-0.635);
   G4double pimom=1.;
@@ -3211,54 +3051,48 @@ TPCPrimaryGeneratorAction::Generate_hybridPHSG( G4Event* anEvent )
   //  Ebeam = sqrt(pimom*pimom+piMinus->GetPDGMass()/GeV*piMinus->GetPDGMass()/GeV);
   Ebeam = sqrt(pimom*pimom+0.13957018*0.13957018);
 
-  pbm[0]=0;
-  pbm[1]=0;
-  pbm[2]=pimom;
-  pbm[3]=Ebeam;
+  // G4double pbm[4];
+  // pbm[0]=0;
+  // pbm[1]=0;
+  // pbm[2]=pimom;
+  // pbm[3]=Ebeam;
 
-  G4double test;
-  G4double beta= pimom/(0.93827203+pbm[3]);
-  G4double momhycm[4]={0};
+  // G4double beta= pimom/(0.93827203+pbm[3]);
+  // G4double momhycm[4]={0};
   G4double rmp=0.93827203;
   G4double rmpi=0.13957018;
- G4double W=sqrt(pow(Ebeam+rmp,2)-pow(pimom,2));
- G4double W2=sqrt(pow(rmp,2)+pow(rmpi,2)+2*Ebeam*rmp);
-
- //  momhycm[3]=hybridbaryon->GetPDGMass()/GeV;
-  momhycm[3]=W2;
+  G4double W=sqrt(pow(Ebeam+rmp,2)-pow(pimom,2));
+  G4double W2=sqrt(pow(rmp,2)+pow(rmpi,2)+2*Ebeam*rmp);
+  // momhycm[3]=hybridbaryon->GetPDGMass()/GeV;
+  // momhycm[3]=W2;
   G4double momhylab[4]={0};
-
-  test=lorentcmlab(momhycm,beta,momhylab);
+  // G4double test=lorentcmlab(momhycm,beta,momhylab);
   G4cout<<"momhylab x: "<<momhylab[0]<<G4endl;
   G4cout<<"momhylab y: "<<momhylab[1]<<G4endl;
   G4cout<<"momhylab z: "<<momhylab[2]<<G4endl;
-
-
   G4cout<<"momhylab energy"<<momhylab[3]<<G4endl;
   ///////gun
- G4cout<<"check energy"<<W<<G4endl;
- G4cout<<"w"<<W<<G4endl;
- G4cout<<"w2"<<W2<<G4endl;
- particleGun->SetParticleDefinition(hybridbaryon);
- particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  G4cout<<"check energy"<<W<<G4endl;
+  G4cout<<"w"<<W<<G4endl;
+  G4cout<<"w2"<<W2<<G4endl;
+  particleGun->SetParticleDefinition(hybridbaryon);
+  particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
   //  particleGun->SetParticleEnergy((Ebeam+proton->GetPDGMass()/GeV - hybridbaryon->GetPDGMass()/GeV)*GeV);
- // particleGun->SetParticleEnergy((momhylab[3] - hybridbaryon->GetPDGMass()/GeV)*GeV);
- // particleGun->SetParticleEnergy((W - hybridbaryon->GetPDGMass()/GeV)*GeV);
- // particleGun->SetParticleEnergy((momhylab[3])*GeV);
- // particleGun->SetParticleEnergy(0.5*GeV);
- //  particleGun->SetParticleEnergy((W - hybridbaryon->GetPDGMass()/GeV)*GeV);
- particleGun->SetParticleMomentum(1.*GeV); //KE ~ 0.35746632293688GeV
+  // particleGun->SetParticleEnergy((momhylab[3] - hybridbaryon->GetPDGMass()/GeV)*GeV);
+  // particleGun->SetParticleEnergy((W - hybridbaryon->GetPDGMass()/GeV)*GeV);
+  // particleGun->SetParticleEnergy((momhylab[3])*GeV);
+  // particleGun->SetParticleEnergy(0.5*GeV);
+  //  particleGun->SetParticleEnergy((W - hybridbaryon->GetPDGMass()/GeV)*GeV);
+  particleGun->SetParticleMomentum(1.*GeV); //KE ~ 0.35746632293688GeV
 
   //  G4cout<<"sh test energy:"<<(Ebeam+proton->GetPDGMass()/GeV - hybridbaryon->GetPDGMass()/GeV)<<G4endl;
- //  G4cout<<"sh test energy:"<<momhylab[3]- hybridbaryon->GetPDGMass()/GeV<<G4endl;
+  //  G4cout<<"sh test energy:"<<momhylab[3]- hybridbaryon->GetPDGMass()/GeV<<G4endl;
 
   //  particleGun->SetParticleEnergy((W - hybridbaryon->GetPDGMass()/GeV)*GeV);
 
   particleGun->SetParticlePosition(G4ThreeVector(0.,0.,-150.*mm));
   particleGun->GeneratePrimaryVertex(anEvent);
   //  G4cout<<hybridbaryon->GetPDGMass()/GeV  <<G4endl;
-
-
 
   /*
   gAnaMan.SetNumberOfPrimaryParticle(3);
@@ -3324,16 +3158,10 @@ TPCPrimaryGeneratorAction::Generate_dedx_single( G4Event* anEvent )
   //  G4double mom[3];
   //  G4double Ebeam,pg_x,pg_y,pg_z, pbeam;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piplus;
-  G4ParticleDefinition* piminus;
-  //  G4ParticleDefinition* kaonplus;
-  //  G4ParticleDefinition* kaonminus;
-
-  proton = particleTable->FindParticle("proton");
-  piplus = particleTable->FindParticle("pi+");
-  piminus = particleTable->FindParticle("pi-");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  // auto piplus = particleTable->FindParticle("pi+");
+  // auto piminus = particleTable->FindParticle("pi-");
 
   /* proton */
   G4double phi=CLHEP::RandFlat::shoot(-1.,1.)*3.141592654;
@@ -3516,13 +3344,11 @@ TPCPrimaryGeneratorAction::Generate_all( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   G4double pbm[4];
-  G4double Energy_L, momentum_L, mom_L_x, mom_L_y, mom_L_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_L, Phi_L;
-
+  G4double Energy_L, mom_L_x, mom_L_y, mom_L_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Lambda1405;
   G4ParticleDefinition* proton;
@@ -3545,7 +3371,6 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
   pbm[2]=pbeam;
   pbm[3]=Ebeam;
 
-  // up:
   KinemaKstar Hdibaryon(piMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			Lambda1405->GetPDGMass()/GeV,
@@ -3553,7 +3378,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -3563,7 +3388,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_L = Hdibaryon.GetEnergy(3);
-  momentum_L = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -3575,14 +3400,15 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_L = Hdibaryon.GetTheta(3);
-  Phi_L = Hdibaryon.GetPhi(3);
+  // G4double Theta_L = Hdibaryon.GetTheta(3);
+  // G4double Phi_L = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
+  // G4double momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
 
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
@@ -3654,13 +3480,11 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   G4double pbm[4];
-  G4double Energy_L, momentum_L, mom_L_x, mom_L_y, mom_L_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_L, Phi_L;
-
+  G4double Energy_L, mom_L_x, mom_L_y, mom_L_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Lambda1405;
   G4ParticleDefinition* proton;
@@ -3683,7 +3507,6 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
   pbm[2]=pbeam;
   pbm[3]=Ebeam;
 
-  // up:
   KinemaKstar Hdibaryon(piMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			Lambda1405->GetPDGMass()/GeV,
@@ -3691,7 +3514,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -3701,7 +3524,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_L = Hdibaryon.GetEnergy(3);
-  momentum_L = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -3713,14 +3536,15 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_L = Hdibaryon.GetTheta(3);
-  Phi_L = Hdibaryon.GetPhi(3);
+  // G4double Theta_L = Hdibaryon.GetTheta(3);
+  // G4double Phi_L = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
+  // G4double momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
 
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
@@ -3739,8 +3563,6 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
   //  G4double cmphik=atan2(momks[1],momks[0])*180/3.141592654;
   //  G4cout<<"comp phi:"<<cmphik<<":"<<Phi_L<<G4endl;
   //coscmk->Fill(momcmk[2]/momcmkpp);
-
-
   // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
   //  G4double misskp = missks(pbeam,kstar0->GetPDGMass()/GeV,momks);
   //  G4cout<<"missing mass : "<<misskp<<G4endl;
@@ -3794,27 +3616,22 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   G4double mass_hdibaryon, width_hdibaryon;
   //  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
 
-  G4double Energy_L1, momentum_L1, mom_L1_x, mom_L1_y, mom_L1_z;
-  G4double Energy_L2, momentum_L2, mom_L2_x, mom_L2_y, mom_L2_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp;//, Phikp;
+  G4double Energy_L1, mom_L1_x, mom_L1_y, mom_L1_z;
+  G4double Energy_L2, mom_L2_x, mom_L2_y, mom_L2_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
 
   G4double mom[3];
-  G4double Ebeam;
   // G4double pg_x, pg_y, pg_z;
   G4double pbeam;
   // G4double rmk=0.493677;
 
   //  G4cout<<"check111"<<G4endl;
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  auto particleTable = G4ParticleTable::GetParticleTable();
 
   // G4ParticleDefinition* sigmaPlus;
   // G4ParticleDefinition* sigmaMinus;
   // G4ParticleDefinition* sigmaZero;
-  G4ParticleDefinition* piPlus;
+  // G4ParticleDefinition* piPlus;
   // G4ParticleDefinition* piZero;
   G4ParticleDefinition* piMinus;
   G4ParticleDefinition* proton;
@@ -3832,42 +3649,39 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   G4double check_decay_mode=CLHEP::RandFlat::shoot();
   G4int mode=0.;
 
-
   //  G4cout<<"check 1"<<G4endl;
-   if(check_decay_mode<=1./3.){
-     mode=1.; //S+pi-
-     sigma = particleTable->FindParticle("sigma+");
-     pion = particleTable->FindParticle("pi-");
-   }else if(check_decay_mode>1./3. && check_decay_mode<=2./3.){
-     mode=2.;     //S0pi0
-     sigma = particleTable->FindParticle("sigma0");
-     pion = particleTable->FindParticle("pi0");
-   }else if(check_decay_mode>2./3. && check_decay_mode<=1.){
-     mode=3.;     //S-pi+
-     sigma = particleTable->FindParticle("sigma-");
-     pion = particleTable->FindParticle("pi+");
-   }else{
-     G4cout<<"Break Lambda decay mode"<<G4endl;
-   }
-   //  G4cout<<"check 2"<<G4endl;
-   gAnaMan.SetModeID(mode);
-
+  if(check_decay_mode<=1./3.){
+    mode=1.; //S+pi-
+    sigma = particleTable->FindParticle("sigma+");
+    pion = particleTable->FindParticle("pi-");
+  }else if(check_decay_mode>1./3. && check_decay_mode<=2./3.){
+    mode=2.;     //S0pi0
+    sigma = particleTable->FindParticle("sigma0");
+    pion = particleTable->FindParticle("pi0");
+  }else if(check_decay_mode>2./3. && check_decay_mode<=1.){
+    mode=3.;     //S-pi+
+    sigma = particleTable->FindParticle("sigma-");
+    pion = particleTable->FindParticle("pi+");
+  }else{
+    G4cout<<"Break Lambda decay mode"<<G4endl;
+  }
+  //  G4cout<<"check 2"<<G4endl;
+  gAnaMan.SetModeID(mode);
 
   proton = particleTable->FindParticle("proton");
   //  sigmaPlus = particleTable->FindParticle("sigma+");
   //  sigmaMinus = particleTable->FindParticle("sigma-");
   //  sigmaZero = particleTable->FindParticle("sigma0");
 
-  piPlus = particleTable->FindParticle("pi+");
+  // auto piPlus = particleTable->FindParticle("pi+");
   piMinus = particleTable->FindParticle("pi-");
   //  piZero = particleTable->FindParticle("pi0");
 
   kaonZero = particleTable->FindParticle("kaon0S");
 
-
   //  Ebeam = 1.9;       // Incident gamma energy (GeV)
   pbeam=CLHEP::RandGauss::shoot(env_Beam_mom,env_Beam_mom*3.3*0.0001/2.3548);
-  Ebeam = sqrt(pow(pbeam,2)+pow(piMinus->GetPDGMass()/GeV,2));
+  // G4double Ebeam = sqrt(pow(pbeam,2)+pow(piMinus->GetPDGMass()/GeV,2));
   gAnaMan.SetPrimaryBeam(0,0,pbeam);// how about add mass information?
 
   //  G4cout<< piMinus->GetPDGMass()/GeV <<G4endl;
@@ -3878,7 +3692,6 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   //  G4cout<< mass_hdibaryon <<G4endl;
   //  G4cout<< width_hdibaryon <<G4endl;
   //  G4cout<< pbeam <<G4endl;
-  // up:
   Kinema3Resonance  Hdibaryon(piMinus->GetPDGMass()/GeV,
 			     proton->GetPDGMass()/GeV,
 			     pion->GetPDGMass()/GeV,
@@ -3888,38 +3701,38 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
 
   //  G4cout<<"check 3"<<G4endl;
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   //  if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>15.) goto up;
 
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);
-  momentum_L1 = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L1 = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   mom_L1_x = mom[0];
   mom_L1_y = mom[1];
   mom_L1_z = mom[2];
 
-  ThetaL1 = Hdibaryon.GetTheta(3);
-  PhiL1 = Hdibaryon.GetPhi(3);
+  // G4double ThetaL1 = Hdibaryon.GetTheta(3);
+  // G4double PhiL1 = Hdibaryon.GetPhi(3);
 
   /* L2 */
   Energy_L2 = Hdibaryon.GetEnergy(4);
-  momentum_L2 = Hdibaryon.GetMomentum(4);
+  // G4double momentum_L2 = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
 
   mom_L2_x = mom[0];
   mom_L2_y = mom[1];
   mom_L2_z = mom[2];
 
-  ThetaL2 = Hdibaryon.GetTheta(4);
-  PhiL2 = Hdibaryon.GetPhi(4);
+  // G4double ThetaL2 = Hdibaryon.GetTheta(4);
+  // G4double PhiL2 = Hdibaryon.GetPhi(4);
 
   /* Kp */
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   mom_kp_x = mom[0];
@@ -3927,8 +3740,8 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   mom_kp_z = mom[2];
 
   //  Thetakp = Hdibaryon.GetThetaCM(5);
-  Thetakp = Hdibaryon.GetThetaCM(1);
-  //  Phikp = Hdibaryon.GetPhi(5);
+  // G4double Thetakp = Hdibaryon.GetThetaCM(1);
+  // G4double Phikp = Hdibaryon.GetPhi(5);
   //  G4cout<<Phikp<<G4endl;
   // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
@@ -3940,24 +3753,19 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   //  //  G4double beta= sqrt(1.8*1.8-0.493677*0.493677)/(2*0.93827203+Energy_kp);
   //  G4cout<<(proton->GetPDGMass()/GeV)<<G4endl;
 
-  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
+  // G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
   //  G4cout<<"Pri:"<<beta<<G4endl;
   //  G4double beta= sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2))/(2*0.93827203+1.8);
 
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  G4double momcmkpp;
-
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pow(piMinus->GetPDGMass()/GeV,2));
-  momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  test=lorentz(momk,beta,momcmk);
-
-  momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momk[4]={};
+  // G4double momcmk[4]={};
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pow(piMinus->GetPDGMass()/GeV,2));
+  // G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
+  // G4double test=lorentz(momk,beta,momcmk);
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180.);
 
 
@@ -3977,9 +3785,9 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   hlab[2]=mom_L1_z+mom_L2_z;
 
   hlab[3]=sqrt(hlab[0]*hlab[0]+hlab[1]*hlab[1]+hlab[2]*hlab[2]+mass_hdibaryon*mass_hdibaryon);
-  G4double hcm[4];
+  // G4double hcm[4];
 
-  test=lorentz(hlab,beta,hcm);
+  // G4double test=lorentz(hlab,beta,hcm);
   // G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
   // cmh->Fill(acos(hcm[2]/hcmpp)/3.141592654*180);
 
@@ -3993,29 +3801,28 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
 
   //phidiff->Fill(hphi-cmphik);
 
-  G4double momsum[3]={0};
-  momsum[0]=mom_kp_x+mom_L1_x+mom_L2_x;
-  momsum[1]=mom_kp_y+mom_L1_y+mom_L2_y;
-  momsum[2]=mom_kp_z+mom_L1_z+mom_L2_z;
+  // G4double momsum[3]={};
+  // momsum[0]=mom_kp_x+mom_L1_x+mom_L2_x;
+  // momsum[1]=mom_kp_y+mom_L1_y+mom_L2_y;
+  // momsum[2]=mom_kp_z+mom_L1_z+mom_L2_z;
 
-  G4double momH[3]={0};
-  momH[0]=mom_L1_x+mom_L2_x;
-  momH[1]=mom_L1_y+mom_L2_y;
-  momH[2]=mom_L1_z+mom_L2_z;
+  // G4double momH[3]={};
+  // momH[0]=mom_L1_x+mom_L2_x;
+  // momH[1]=mom_L1_y+mom_L2_y;
+  // momH[2]=mom_L1_z+mom_L2_z;
 
   // G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
 
   //missk->Fill(misskp);
 
-  G4double e1,e2,etot,invm2,ptot,invm;
-  invm=-1.;
-
-  ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=etot-ptot;
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double invm2 = -9999.;
+  // G4double invm = -9999.;
+  // G4double ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
+  // G4double etot=pow(e1+e2,2);
+  // invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
 
   //  G4cout<<"IM(LL)"<<invm<<G4endl;
@@ -4064,13 +3871,11 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   G4double pbm[4];
-  G4double Energy_L, momentum_L, mom_L_x, mom_L_y, mom_L_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_L, Phi_L;
-
+  G4double Energy_L, mom_L_x, mom_L_y, mom_L_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Sigma1385;
   G4ParticleDefinition* proton;
@@ -4101,7 +3906,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -4111,7 +3916,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_L = Hdibaryon.GetEnergy(3);
-  momentum_L = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -4123,14 +3928,15 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_L = Hdibaryon.GetTheta(3);
-  Phi_L = Hdibaryon.GetPhi(3);
+  // G4double Theta_L = Hdibaryon.GetTheta(3);
+  // G4double Phi_L = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
+  // G4double momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
 
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
@@ -4202,13 +4008,11 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   G4double pbm[4];
-  G4double Energy_L, momentum_L, mom_L_x, mom_L_y, mom_L_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_L, Phi_L;
-
+  G4double Energy_L, mom_L_x, mom_L_y, mom_L_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Sigma1385;
   G4ParticleDefinition* proton;
@@ -4231,7 +4035,6 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
   pbm[2]=pbeam;
   pbm[3]=Ebeam;
   //  G4cout<<"check11"<<G4endl;
-  // up:
   KinemaKstar Hdibaryon(piMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			Sigma1385->GetPDGMass()/GeV,
@@ -4239,7 +4042,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -4249,7 +4052,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_L = Hdibaryon.GetEnergy(3);
-  momentum_L = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -4261,14 +4064,15 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_L = Hdibaryon.GetTheta(3);
-  Phi_L = Hdibaryon.GetPhi(3);
+  // G4double Theta_L = Hdibaryon.GetTheta(3);
+  // G4double Phi_L = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
+  // G4doulbe momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+pow(k0->GetPDGMass()/GeV,2));
 
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
@@ -4340,15 +4144,13 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   //  G4double rmks=0.896;
   G4double pbm[4];
-  G4double Energy_L, momentum_L, mom_L_x, mom_L_y, mom_L_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_L, Phi_L;
-
+  G4double Energy_L, mom_L_x, mom_L_y, mom_L_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Lambda;
   G4ParticleDefinition* kstar0;
@@ -4376,7 +4178,6 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
   //  G4cout<<"piMinus mass:"<<piMinus->GetPDGMass()/GeV<<G4endl;
   //  G4cout<<"KstarMinus mass:"<<kstar0->GetPDGMass()/GeV<<G4endl;
   //  G4cout<<"Lambda mass:"<<Lambda->GetPDGMass()/GeV<<G4endl;
-  // up:
   KinemaKstar Hdibaryon(piMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			Lambda->GetPDGMass()/GeV,
@@ -4384,7 +4185,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -4394,7 +4195,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_L = Hdibaryon.GetEnergy(3);
-  momentum_L = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -4406,14 +4207,15 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_L = Hdibaryon.GetTheta(3);
-  Phi_L = Hdibaryon.GetPhi(3);
+  // G4double Theta_L = Hdibaryon.GetTheta(3);
+  // G4double Phi_L = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+0.896*0.896);
+  // G4double momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+0.896*0.896);
 
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
@@ -4470,15 +4272,13 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
 {
-  G4double  momks[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   //  G4double rmks=0.896;
   G4double pbm[4];
-  G4double Energy_S, momentum_S, mom_S_x, mom_S_y, mom_S_z;
-  G4double Energy_ksp, momentum_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
-  G4double Theta_S, Phi_S;
-
+  G4double Energy_S, mom_S_x, mom_S_y, mom_S_z;
+  G4double Energy_ksp, mom_ksp_x, mom_ksp_y, mom_ksp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Sigma0;
   G4ParticleDefinition* kstar0;
@@ -4503,7 +4303,6 @@ TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
   pbm[3]=Ebeam;
   //  G4cout<<"hdibaryon mass"<<hdibaryon->GetPDGMass()/GeV<<G4endl;
   //  G4cout<<"hdibaryon mass"<<hdibaryon->GetPDGMass()/GeV<<G4endl;
-  // up:
   KinemaKstar Hdibaryon(piMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			Sigma0->GetPDGMass()/GeV,
@@ -4511,7 +4310,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_ksp=Hdibaryon.GetEnergy(4);
-  momentum_ksp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_ksp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_ksp_x = mom[0];
   mom_ksp_y = mom[1];
@@ -4521,7 +4320,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_S = Hdibaryon.GetEnergy(3);
-  momentum_S = Hdibaryon.GetMomentum(3);
+  // G4double momentum_S = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   //  G4cout<<"mom kp :"<<mom[0]<<":"<<mom[1]<<":"<<mom[2]<<G4endl;
@@ -4533,14 +4332,15 @@ TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
 
   //  G4cout<<"h mom:"<<mom[1]<<G4endl;
 
-  Theta_S = Hdibaryon.GetTheta(3);
-  Phi_S = Hdibaryon.GetPhi(3);
+  // G4double Theta_S = Hdibaryon.GetTheta(3);
+  // G4double Phi_S = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momks[0]=mom_ksp_x;
-  momks[1]=mom_ksp_y;
-  momks[2]=mom_ksp_z;
-  momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+0.896*0.896);
+  // G4double momks[4];
+  // momks[0]=mom_ksp_x;
+  // momks[1]=mom_ksp_y;
+  // momks[2]=mom_ksp_z;
+  // momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+0.896*0.896);
   //  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
@@ -4597,110 +4397,82 @@ void
 TPCPrimaryGeneratorAction::Generate_pip_KstarL( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
-
-  G4double Energy_L1, momentum_L1, mom_L1_x, mom_L1_y, mom_L1_z;
-  G4double Energy_L2, momentum_L2, mom_L2_x, mom_L2_y, mom_L2_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp;
-
+  G4double Energy_L1, mom_L1_x, mom_L1_y, mom_L1_z;
+  G4double Energy_L2, mom_L2_x, mom_L2_y, mom_L2_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double pbeam;
+  G4double pg_x,pg_y,pg_z;
   //  G4double rmk=0.493677;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* piMinus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* Lambda;
-  G4ParticleDefinition* proton;
-
-  proton = particleTable->FindParticle("proton");
-  Lambda = particleTable->FindParticle("lambda");
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  piMinus = particleTable->FindParticle("pi-");
-
-
-
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  auto Lambda = particleTable->FindParticle("lambda");
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  // auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto piMinus = particleTable->FindParticle("pi-");
   pg_x = 0.0;
   pg_y = 0.0;
   pg_z = 1.8;
-  pbeam=1.8;
-
-  Ebeam = sqrt(pbeam*pbeam+piMinus->GetPDGMass()/GeV*piMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
+  // G4double pbeam = 1.8;
+  // G4double Ebeam = sqrt(pbeam*pbeam+piMinus->GetPDGMass()/GeV*piMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
 
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
   mass_hdibaryon = gConf.Get<G4double>( "HdibaryonMass" ); // 0.89594;
   width_hdibaryon = gConf.Get<G4double>( "HdibaryonWidth" ); // 0.0487;
-
   Kinema3Resonance Hdibaryon(piMinus->GetPDGMass()/GeV,
 			     proton->GetPDGMass()/GeV,
 			     kaonPlus->GetPDGMass()/GeV,
 			     piMinus->GetPDGMass()/GeV,
 			     Lambda->GetPDGMass()/GeV,
 			     mass_hdibaryon, width_hdibaryon, pg_z, 0.0);
-
-//  Hdibaryon.Dump();
-
+  //  Hdibaryon.Dump();
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
-
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);
-  momentum_L1 = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L1 = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
-
   mom_L1_x = mom[0];
   mom_L1_y = mom[1];
   mom_L1_z = mom[2];
-
-  ThetaL1 = Hdibaryon.GetTheta(3);
-  PhiL1 = Hdibaryon.GetPhi(3);
-
+  // G4double ThetaL1 = Hdibaryon.GetTheta(3);
+  // G4double PhiL1 = Hdibaryon.GetPhi(3);
   /* L2 */
   Energy_L2 = Hdibaryon.GetEnergy(4);
-  momentum_L2 = Hdibaryon.GetMomentum(4);
+  // G4double momentum_L2 = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
 
   mom_L2_x = mom[0];
   mom_L2_y = mom[1];
   mom_L2_z = mom[2];
 
-  ThetaL2 = Hdibaryon.GetTheta(4);
-  PhiL2 = Hdibaryon.GetPhi(4);
+  // G4double ThetaL2 = Hdibaryon.GetTheta(4);
+  // G4double PhiL2 = Hdibaryon.GetPhi(4);
 
   /* Kp */
-  Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double Energy_kp = Hdibaryon.GetEnergy(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-  Thetakp = Hdibaryon.GetThetaCM(1);
+  // G4double Thetakp = Hdibaryon.GetThetaCM(1);
   // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
-  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  G4double momcmkpp;
-
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+Lambda->GetPDGMass()/GeV*Lambda->GetPDGMass()/GeV);
-  momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  test=lorentz(momk,beta,momcmk);
-  momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
+  // G4double momcmk[4] = {};
+  // G4double momk[4] = {};
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+Lambda->GetPDGMass()/GeV*Lambda->GetPDGMass()/GeV);
+  // G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
+  // G4double test=lorentz(momk,beta,momcmk);
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   // cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
 
   // coscmk->Fill((momcmk[2]/momcmkpp));
@@ -4712,13 +4484,13 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarL( G4Event* anEvent )
   //missk->Fill(misskp);
 
   //cal for invariant mass
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=etot-ptot;
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double ptot= pow(mom_L1_x+mom_L2_x,2) +
+  //   pow(mom_L1_y+mom_L2_y,2) + pow(mom_L1_z+mom_L2_z,2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double etot=pow(e1+e2,2);
+  // G4double invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
   double vtx = 0.*mm;
   double vty = 0.*mm;
@@ -4765,40 +4537,26 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
 {
   G4double mass_hdibaryon, width_hdibaryon;
 
-  G4double Energy_L1, momentum_L1, mom_L1_x, mom_L1_y, mom_L1_z;
-  G4double Energy_L2, momentum_L2, mom_L2_x, mom_L2_y, mom_L2_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp;
-
+  G4double Energy_L1, mom_L1_x, mom_L1_y, mom_L1_z;
+  G4double Energy_L2, mom_L2_x, mom_L2_y, mom_L2_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z;
-  G4double pbeam;
+  G4double pg_x,pg_y,pg_z;
   //  G4double rmk=0.493677;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* piMinus;
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* Lambda;
-  G4ParticleDefinition* proton;
-
-  proton = particleTable->FindParticle("proton");
-  Lambda = particleTable->FindParticle("sigma0");
-  kaonPlus = particleTable->FindParticle("kaon+");
-  kaonMinus = particleTable->FindParticle("kaon-");
-  piMinus = particleTable->FindParticle("pi-");
-
-
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  auto proton = particleTable->FindParticle("proton");
+  auto Lambda = particleTable->FindParticle("sigma0");
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  // auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto piMinus = particleTable->FindParticle("pi-");
 
   pg_x = 0.0;
   pg_y = 0.0;
   pg_z = 1.8;
-  pbeam=1.8;
+  // G4double pbeam=1.8;
 
-  Ebeam = sqrt(pbeam*pbeam+piMinus->GetPDGMass()/GeV*piMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
+  // G4double Ebeam = sqrt(pbeam*pbeam+piMinus->GetPDGMass()/GeV*piMinus->GetPDGMass()/GeV);       // Incident gamma energy (GeV)
 
   gAnaMan.SetPrimaryBeam(pg_x,pg_y,pg_z);
   mass_hdibaryon = gConf.Get<G4double>( "HdibaryonMass" ); // 0.89594;
@@ -4814,60 +4572,55 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
 //  Hdibaryon.Dump();
 
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   /* L1 */
   Energy_L1 = Hdibaryon.GetEnergy(3);
-  momentum_L1 = Hdibaryon.GetMomentum(3);
+  // G4double momentum_L1 = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
 
   mom_L1_x = mom[0];
   mom_L1_y = mom[1];
   mom_L1_z = mom[2];
 
-  ThetaL1 = Hdibaryon.GetTheta(3);
-  PhiL1 = Hdibaryon.GetPhi(3);
+  // G4double ThetaL1 = Hdibaryon.GetTheta(3);
+  // G4double PhiL1 = Hdibaryon.GetPhi(3);
 
   /* L2 */
   Energy_L2 = Hdibaryon.GetEnergy(4);
-  momentum_L2 = Hdibaryon.GetMomentum(4);
+  // G4double momentum_L2 = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
 
   mom_L2_x = mom[0];
   mom_L2_y = mom[1];
   mom_L2_z = mom[2];
 
-  ThetaL2 = Hdibaryon.GetTheta(4);
-  PhiL2 = Hdibaryon.GetPhi(4);
+  // G4double ThetaL2 = Hdibaryon.GetTheta(4);
+  // G4double PhiL2 = Hdibaryon.GetPhi(4);
 
   /* Kp */
   Energy_kp = Hdibaryon.GetEnergy(5);
-  momentum_kp = Hdibaryon.GetMomentum(5);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(5);
   Hdibaryon.GetMomentum(5,mom);
 
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-  Thetakp = Hdibaryon.GetThetaCM(1);
+  // G4double Thetakp = Hdibaryon.GetThetaCM(1);
   // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
-  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  G4double momcmkpp;
-
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+Lambda->GetPDGMass()/GeV*Lambda->GetPDGMass()/GeV);
-  momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  test=lorentz(momk,beta,momcmk);
-  momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
+  // G4double momk[4] = {};
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+Lambda->GetPDGMass()/GeV*Lambda->GetPDGMass()/GeV);
+  // G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
+  // G4double test=lorentz(momk,beta,momcmk);
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   // cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
 
   // coscmk->Fill((momcmk[2]/momcmkpp));
@@ -4880,13 +4633,12 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
   //  missk->Fill(misskp);
 
   //cal for invariant mass
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=etot-ptot;
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double ptot=pow(mom_L1_x+mom_L2_x,2)+pow(mom_L1_y+mom_L2_y,2)+pow(mom_L1_z+mom_L2_z,2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double etot=pow(e1+e2,2);
+  // G4double invm2=etot-ptot;
+  // if(invm2 > 0) invm=sqrt(invm2);
   //gen_im->Fill(invm);
 
   double vtx = 0.*mm;
@@ -4932,32 +4684,20 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
-  double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
-				//,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
+  // double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
+  //,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
   //  double pp1[4]={-9999.9999}, ppi1[4]={-9999.9999}, pp2[4]={-9999.9999}, ppi2[4]={-9999.9999};
 
   char fnam[30];
 
-  int res;
-
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* kaonMinus;
-  G4ParticleDefinition* kaonPlus;
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piMinus;
-  //  G4ParticleDefinition* piPlus;
-
-  G4ParticleDefinition* Lambda;
-  G4ParticleDefinition* lambda1;
-  G4ParticleDefinition* lambda2;
-
-  kaonMinus = particleTable->FindParticle("kaon-");
-  kaonPlus = particleTable->FindParticle("kaon+");
-  proton = particleTable->FindParticle("proton");
-  piMinus = particleTable->FindParticle("pi-");
-  Lambda = particleTable->FindParticle("lambda");
-  lambda1 = particleTable->FindParticle("lambda");
-  lambda2 = particleTable->FindParticle("lambda");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  // auto kaonMinus = particleTable->FindParticle("kaon-");
+  auto kaonPlus = particleTable->FindParticle("kaon+");
+  // auto proton = particleTable->FindParticle("proton");
+  // auto piMinus = particleTable->FindParticle("pi-");
+  // auto Lambda = particleTable->FindParticle("lambda");
+  // auto lambda1 = particleTable->FindParticle("lambda");
+  // auto lambda2 = particleTable->FindParticle("lambda");
 
   FILE *fp;
   sprintf(fnam,"inc64cu.dat");
@@ -4973,16 +4713,16 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   int ran = CLHEP::RandFlat::shoot(1.,22478.);
 
   while(1){
-    res=fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
-	       ,&data[0],&data[1],&data[2],&data[3],&data[4]
-	       ,&data[5],&data[6],&data[7],&data[8],&data[9]
-	       ,&data[10],&data[11],&data[12],&data[13],&data[14]
-	       ,&data[15],&data[16],&data[17],&data[18],&data[19]
-	       ,&data[20],&data[21],&data[22],&data[23],&data[24]
-	       ,&data[25],&data[26],&data[27],&data[28],&data[29]
-	       ,&data[30],&data[31],&data[32],&data[33],&data[34]
-	       ,&data[35],&data[36],&data[37],&data[38],&data[39]
-	       ,&data[40]);
+    fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
+	   ,&data[0],&data[1],&data[2],&data[3],&data[4]
+	   ,&data[5],&data[6],&data[7],&data[8],&data[9]
+	   ,&data[10],&data[11],&data[12],&data[13],&data[14]
+	   ,&data[15],&data[16],&data[17],&data[18],&data[19]
+	   ,&data[20],&data[21],&data[22],&data[23],&data[24]
+	   ,&data[25],&data[26],&data[27],&data[28],&data[29]
+	   ,&data[30],&data[31],&data[32],&data[33],&data[34]
+	   ,&data[35],&data[36],&data[37],&data[38],&data[39]
+	   ,&data[40]);
     check=check+1.;
     if(check==ran) break;
     //    if(res==EOF) break;
@@ -4991,8 +4731,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   for(int ii=0;ii<4;ii++){
     pbm[ii]=data[ii]/1000.;
     pka[ii]=data[ii+4]/1000.;
-    pL1[ii]=data[ii+11]/1000.;
-    pL2[ii]=data[ii+15]/1000.;
+    // pL1[ii]=data[ii+11]/1000.;
+    // pL2[ii]=data[ii+15]/1000.;
   }
 
   for(int ii=0;ii<3;ii++){
@@ -5001,36 +4741,27 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
 
   fclose(fp);
 
-  G4double Energy_beam;
-  G4double Energy_L1;
-  G4double Energy_L2;
-  G4double Energy_ka;
-
   //  G4cout<<"m_target_size.z() :"<<atof(env_m_target_size.z().c_str())<<G4endl;
   vtx[2]= CLHEP::RandFlat::shoot(100.-m_target_size.z()/2,100.+m_target_size.z()/2);
 
-  Energy_beam = pbm[3];
+  // G4double Energy_beam = pbm[3];
   G4ThreeVector momentumBeam(pbm[0],pbm[1],pbm[2]);
   //  G4ThreeVector vertexPos(vtx[0]*mm,vtx[1]*mm, vtx[2]*mm);
   G4ThreeVector vertexPos(0.*mm,0.*mm, vtx[2]*mm);
 
-  Energy_ka = pka[3]; //total energy sqrt(pp^2+rmk^2)??
-  Energy_L1 = pL1[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
-  Energy_L2 = pL2[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
+  G4double Energy_ka = pka[3]; //total energy sqrt(pp^2+rmk^2)??
+  // G4double Energy_L1 = pL1[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
+  // G4double Energy_L2 = pL2[3]; //lambda momenta ?? --> 4 momomenta sqrt(p^2+m^2)
 
-  G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  momk[0]=pka[0];
-  momk[1]=pka[1];
-  momk[2]=pka[2];
-  momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
-
-  momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
-
-  test=lorentz(momk,beta,momcmk);
+  // G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
+  // G4double momcmk[4] = {};
+  // G4double momk[4];
+  // momk[0]=pka[0];
+  // momk[1]=pka[1];
+  // momk[2]=pka[2];
+  // momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
+  // G4double momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
+  // G4double test = lorentz(momk,beta,momcmk);
   // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
@@ -5066,18 +4797,16 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   gAnaMan.SetPrimaryVertex(0,0.,0.,vtx[2]);
   //  gAnaMan.SetPrimaryVertex(1,0.,0.,vtx[2]);
 
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
   // G4double rmk=0.493677;
   // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //  missk->Fill(misskp);
-
-  ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=(etot-ptot);
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double etot=pow(e1+e2,2);
+  // G4double invm2=(etot-ptot);
+  // if(invm2 > 0) invm=sqrt(invm2);
   // gen_im->Fill(invm);
 }
 
@@ -5087,13 +4816,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
-  double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
-				//,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
+  // double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
+  //,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
   //  double pp1[4]={-9999.9999}, ppi1[4]={-9999.9999}, pp2[4]={-9999.9999}, ppi2[4]={-9999.9999};
 
   char fnam[30];
-
-  int res;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonPlus;
@@ -5113,16 +4840,16 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp( G4Event* anEvent )
   int ran = CLHEP::RandFlat::shoot(1.,22478.);
 
   while(1){
-    res=fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
-	       ,&data[0],&data[1],&data[2],&data[3],&data[4]
-	       ,&data[5],&data[6],&data[7],&data[8],&data[9]
-	       ,&data[10],&data[11],&data[12],&data[13],&data[14]
-	       ,&data[15],&data[16],&data[17],&data[18],&data[19]
-	       ,&data[20],&data[21],&data[22],&data[23],&data[24]
-	       ,&data[25],&data[26],&data[27],&data[28],&data[29]
-	       ,&data[30],&data[31],&data[32],&data[33],&data[34]
-	       ,&data[35],&data[36],&data[37],&data[38],&data[39]
-	       ,&data[40]);
+    fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
+	   ,&data[0],&data[1],&data[2],&data[3],&data[4]
+	   ,&data[5],&data[6],&data[7],&data[8],&data[9]
+	   ,&data[10],&data[11],&data[12],&data[13],&data[14]
+	   ,&data[15],&data[16],&data[17],&data[18],&data[19]
+	   ,&data[20],&data[21],&data[22],&data[23],&data[24]
+	   ,&data[25],&data[26],&data[27],&data[28],&data[29]
+	   ,&data[30],&data[31],&data[32],&data[33],&data[34]
+	   ,&data[35],&data[36],&data[37],&data[38],&data[39]
+	   ,&data[40]);
     check=check+1.;
     if(check==ran) {
       //      G4cout<<check<<G4endl;
@@ -5134,8 +4861,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp( G4Event* anEvent )
   for(int ii=0;ii<4;ii++){
     pbm[ii]=data[ii]/1000.;
     pka[ii]=data[ii+4]/1000.;
-    pL1[ii]=data[ii+11]/1000.;
-    pL2[ii]=data[ii+15]/1000.;
+    // pL1[ii]=data[ii+11]/1000.;
+    // pL2[ii]=data[ii+15]/1000.;
   }
 
   for(int ii=0;ii<3;ii++){
@@ -5145,11 +4872,9 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp( G4Event* anEvent )
   fclose(fp);
 
   G4double Energy_ka;
-  G4double Energy_beam;
-
   //  G4cout<<"m_target_size.z() :"<<atof(env_m_target_size.z().c_str())<<G4endl;
   vtx[2]= CLHEP::RandFlat::shoot(100.-m_target_size.z()/2,100.+m_target_size.z()/2);
-  Energy_beam = pbm[3];
+  // G4double Energy_beam = pbm[3];
   G4ThreeVector momentumBeam(pbm[0],pbm[1],pbm[2]);
   //  G4ThreeVector vertexPos(vtx[0]*mm,vtx[1]*mm, vtx[2]*mm);
   G4ThreeVector vertexPos(0.*mm,0.*mm, vtx[2]*mm);
@@ -5175,13 +4900,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
-  double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
-				//,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
+  // double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
+  //,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
   //  double pp1[4]={-9999.9999}, ppi1[4]={-9999.9999}, pp2[4]={-9999.9999}, ppi2[4]={-9999.9999};
 
   char fnam[30];
-
-  int res;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonPlus;
@@ -5201,16 +4924,16 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam( G4Event* anEvent )
   int ran = CLHEP::RandFlat::shoot(1.,22478.);
 
   while(1){
-    res=fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
-	       ,&data[0],&data[1],&data[2],&data[3],&data[4]
-	       ,&data[5],&data[6],&data[7],&data[8],&data[9]
-	       ,&data[10],&data[11],&data[12],&data[13],&data[14]
-	       ,&data[15],&data[16],&data[17],&data[18],&data[19]
-	       ,&data[20],&data[21],&data[22],&data[23],&data[24]
-	       ,&data[25],&data[26],&data[27],&data[28],&data[29]
-	       ,&data[30],&data[31],&data[32],&data[33],&data[34]
-	       ,&data[35],&data[36],&data[37],&data[38],&data[39]
-	       ,&data[40]);
+    fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
+	   ,&data[0],&data[1],&data[2],&data[3],&data[4]
+	   ,&data[5],&data[6],&data[7],&data[8],&data[9]
+	   ,&data[10],&data[11],&data[12],&data[13],&data[14]
+	   ,&data[15],&data[16],&data[17],&data[18],&data[19]
+	   ,&data[20],&data[21],&data[22],&data[23],&data[24]
+	   ,&data[25],&data[26],&data[27],&data[28],&data[29]
+	   ,&data[30],&data[31],&data[32],&data[33],&data[34]
+	   ,&data[35],&data[36],&data[37],&data[38],&data[39]
+	   ,&data[40]);
     check=check+1.;
     if(check==ran) {
       //      G4cout<<check<<G4endl;
@@ -5222,8 +4945,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam( G4Event* anEvent )
   for(int ii=0;ii<4;ii++){
     pbm[ii]=data[ii]/1000.;
     pka[ii]=data[ii+4]/1000.;
-    pL1[ii]=data[ii+11]/1000.;
-    pL2[ii]=data[ii+15]/1000.;
+    // pL1[ii]=data[ii+11]/1000.;
+    // pL2[ii]=data[ii+15]/1000.;
   }
 
   //  for(int ii=0;ii<3;ii++){
@@ -5232,13 +4955,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kp_beam( G4Event* anEvent )
   fclose(fp);
 
   G4double Energy_ka;
-  G4double Energy_beam;
-
   vtx[0] = CLHEP::RandFlat::shoot(-15.,15.)*mm;
   vtx[1] = CLHEP::RandFlat::shoot(-5.,5.)*mm;
   vtx[2]= CLHEP::RandFlat::shoot(100.-m_target_size.z()/2,100.+m_target_size.z()/2)*mm;
 
-  Energy_beam = pbm[3];
+  // G4double Energy_beam = pbm[3];
   G4ThreeVector momentumBeam(pbm[0],pbm[1],pbm[2]);
 
   gAnaMan.SetPrimaryBeam(pbm[0],pbm[1],pbm[2]);
@@ -5266,13 +4987,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 {
 
   double pbm[4]={-9999.9999}, pka[4]={-9999.9999}, vtx[3]={-9999.9999};
-  double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
-				//,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
+  // double pL1[4]={-9999.9999}, pL2[4]={-9999.9999};
+  //,xL1[3]={-9999.9999}, xL2[3]={-9999.9999};
   //  double pp1[4]={-9999.9999}, ppi1[4]={-9999.9999}, pp2[4]={-9999.9999}, ppi2[4]={-9999.9999};
 
   char fnam[30];
-
-  int res;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   //  G4ParticleDefinition* kaonMinus;
@@ -5285,8 +5004,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   //    G4ParticleDefinition* lambda1;
   //    G4ParticleDefinition* lambda2;
 
-    //  kaonMinus = particleTable->FindParticle("kaon-");
-    kaonPlus = particleTable->FindParticle("kaon+");
+  //  kaonMinus = particleTable->FindParticle("kaon-");
+  kaonPlus = particleTable->FindParticle("kaon+");
   //  proton = particleTable->FindParticle("proton");
   //  piMinus = particleTable->FindParticle("pi-");
   //  piPlus = particleTable->FindParticle("pi+");
@@ -5305,16 +5024,16 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   int ran = CLHEP::RandFlat::shoot(1.,22478.);
 
   while(1){
-    res=fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
-	       ,&data[0],&data[1],&data[2],&data[3],&data[4]
-	       ,&data[5],&data[6],&data[7],&data[8],&data[9]
-	       ,&data[10],&data[11],&data[12],&data[13],&data[14]
-	       ,&data[15],&data[16],&data[17],&data[18],&data[19]
-	       ,&data[20],&data[21],&data[22],&data[23],&data[24]
-	       ,&data[25],&data[26],&data[27],&data[28],&data[29]
-	       ,&data[30],&data[31],&data[32],&data[33],&data[34]
-	       ,&data[35],&data[36],&data[37],&data[38],&data[39]
-	       ,&data[40]);
+    fscanf(fp,"%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n"
+	   ,&data[0],&data[1],&data[2],&data[3],&data[4]
+	   ,&data[5],&data[6],&data[7],&data[8],&data[9]
+	   ,&data[10],&data[11],&data[12],&data[13],&data[14]
+	   ,&data[15],&data[16],&data[17],&data[18],&data[19]
+	   ,&data[20],&data[21],&data[22],&data[23],&data[24]
+	   ,&data[25],&data[26],&data[27],&data[28],&data[29]
+	   ,&data[30],&data[31],&data[32],&data[33],&data[34]
+	   ,&data[35],&data[36],&data[37],&data[38],&data[39]
+	   ,&data[40]);
     check=check+1.;
     if(check==ran) break;
     //    if(res==EOF) break;
@@ -5323,8 +5042,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   for(int ii=0;ii<4;ii++){
     pbm[ii]=data[ii]/1000.;
     pka[ii]=data[ii+4]/1000.;
-    pL1[ii]=data[ii+11]/1000.;
-    pL2[ii]=data[ii+15]/1000.;
+    // pL1[ii]=data[ii+11]/1000.;
+    // pL2[ii]=data[ii+15]/1000.;
   }
 
   for(int ii=0;ii<3;ii++){
@@ -5333,25 +5052,21 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 
   fclose(fp);
 
-  G4double Energy_beam;
   //  G4double Energy_p;
   G4double Energy_kp;
   //  G4double Energy_pip;
   //  G4double Energy_pin;
   //  G4double Energy_kn;
 
-  G4double Energy_L1;
-  G4double Energy_L2;
-
   //  G4cout<<"m_target_size.z() :"<<atof(env_m_target_size.z().c_str())<<G4endl;
   vtx[2]= CLHEP::RandFlat::shoot(100.-m_target_size.z()/2,100.+m_target_size.z()/2);
 
-  Energy_beam = pbm[3];
+  // G4double Energy_beam = pbm[3];
   G4ThreeVector momentumBeam(pbm[0],pbm[1],pbm[2]);
   //  G4ThreeVector vertexPos(vtx[0]*mm,vtx[1]*mm, vtx[2]*mm);
   G4ThreeVector vertexPos(0.*mm,0.*mm, vtx[2]*mm);
-  Energy_L1 = pL1[3]; //total energy sqrt(pp^2+rmk^2)??
-  Energy_L2 = pL2[3]; //total energy sqrt(pp^2+rmk^2)??
+  // G4double Energy_L1 = pL1[3]; //total energy sqrt(pp^2+rmk^2)??
+  // G4double Energy_L2 = pL2[3]; //total energy sqrt(pp^2+rmk^2)??
 
   //  Energy_p = sqrt(pow(pka[0],2)+pow(pka[1],2)+pow(pka[2],2)+proton->GetPDGMass()/GeV*proton->GetPDGMass()/GeV); //total energy sqrt(pp^2+rmk^2)??
   Energy_kp = sqrt(pow(pka[0],2)+pow(pka[1],2)+pow(pka[2],2)+kaonPlus->GetPDGMass()/GeV*kaonPlus->GetPDGMass()/GeV); //total energy sqrt(pp^2+rmk^2)??
@@ -5359,20 +5074,17 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 //  Energy_pin = sqrt(pow(pka[0],2)+pow(pka[1],2)+pow(pka[2],2)+proton->GetPDGMass()/GeV*proton->GetPDGMass()/GeV); //total energy sqrt(pp^2+rmk^2)??
 //  Energy_kn = sqrt(pow(pka[0],2)+pow(pka[1],2)+pow(pka[2],2)+kaonMinus->GetPDGMass()/GeV*kaonMinus->GetPDGMass()/GeV); //total energy sqrt(pp^2+rmk^2)??
 
+  // G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
+  // G4double momcmk[4]={0.};
+  // G4double momk[4]={0.};
+  // momk[0]=pka[0];
+  // momk[1]=pka[1];
+  // momk[2]=pka[2];
+  // momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
 
-  G4double beta= pbm[2]/(2*0.93827203+pbm[3]);
-  G4double test;
-  G4double momk[4]={0.};
-  G4double momkpp;
-  G4double momcmk[4]={0.};
-  momk[0]=pka[0];
-  momk[1]=pka[1];
-  momk[2]=pka[2];
-  momk[3]=sqrt(pka[0]*pka[0]+pka[1]*pka[1]+pka[2]*pka[2]+0.493677*0.493677);
+  // G4double momkpp = sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
 
-  momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
-
-  test=lorentz(momk,beta,momcmk);
+  // G4double test=lorentz(momk,beta,momcmk);
   // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
@@ -5442,17 +5154,17 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   //  gAnaMan.SetPrimaryVertex(1,0.,0.,vtx[2]);
   //  gAnaMan.SetPrimaryVertex(2,0.,0.,vtx[2]);
 
-  G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
   // G4double rmk=0.493677;
   // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //missk->Fill(misskp);
-  ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
-  e1=Energy_L1;
-  e2=Energy_L2;
-  etot=pow(e1+e2,2);
-  invm2=(etot-ptot);
-  if(invm2 > 0) invm=sqrt(invm2);
+  // G4double ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
+  // G4double e1=Energy_L1;
+  // G4double e2=Energy_L2;
+  // G4double etot=pow(e1+e2,2);
+  // G4double invm2=(etot-ptot);
+  // if( invm2 > 0 )
+  //   invm=sqrt(invm2);
   //gen_im->Fill(invm);
 }
 
@@ -5460,15 +5172,12 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 {
-  G4double  momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
   G4ParticleDefinition* proton;
@@ -5493,7 +5202,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(3);
-  momentum_kp = Hdibaryon.GetMomentum(3);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -5502,7 +5211,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(4);
-  momentum_h = Hdibaryon.GetMomentum(4);
+  // G4double momentum_h = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
@@ -5510,14 +5219,15 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
   //  cout<<mom_h_z<<endl;
   if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.) goto up;
 
-  Theta_h = Hdibaryon.GetTheta(4);
-  Phi_h = Hdibaryon.GetPhi(4);
+  // G4double Theta_h = Hdibaryon.GetTheta(4);
+  // G4double Phi_h = Hdibaryon.GetPhi(4);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
@@ -5563,15 +5273,12 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
   G4ParticleDefinition* proton;
@@ -5589,7 +5296,6 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
   pbm[1]=0;
   pbm[2]=pbeam;
   pbm[3]=Ebeam;
-  // up:
   KinemaHweak Hdibaryon(kaonMinus->GetPDGMass()/GeV,
 			proton->GetPDGMass()/GeV,
 			kaonMinus->GetPDGMass()/GeV,
@@ -5597,7 +5303,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(3);
-  momentum_kp = Hdibaryon.GetMomentum(3);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -5606,7 +5312,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(4);
-  momentum_h = Hdibaryon.GetMomentum(4);
+  // G4double momentum_h = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
@@ -5614,14 +5320,15 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
   //  cout<<mom_h_z<<endl;
   //    if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.) goto up;
 
-  Theta_h = Hdibaryon.GetTheta(4);
-  Phi_h = Hdibaryon.GetPhi(4);
+  // G4double Theta_h = Hdibaryon.GetTheta(4);
+  // G4double Phi_h = Hdibaryon.GetPhi(4);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
@@ -5667,15 +5374,12 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 {
-  G4double momk[4], mom[4];
+  G4double mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
   G4ParticleDefinition* kaonPlus;
@@ -5707,30 +5411,32 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
-    if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.) goto up;
+  if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.)
+    goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
   //  cout<<mom_h_z<<endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -5776,15 +5482,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEvent )
 {
-  G4double momk[4], mom[4];
+  G4double mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
   G4ParticleDefinition* kaonPlus;
@@ -5814,30 +5516,32 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEven
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
-    if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.) goto up;
+  if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.)
+    goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
-  Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double Energy_h = Hdibaryon.GetEnergy(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
-  mom_h_x = mom[0];
-  mom_h_y = mom[1];
-  mom_h_z = mom[2];
+  // G4double mom_h_x = mom[0];
+  // G4double mom_h_y = mom[1];
+  // G4double mom_h_z = mom[2];
   //  cout<<mom_h_z<<endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -5883,15 +5587,12 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEven
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 {
-  G4double momk[4], mom[4];
+  G4double mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
   G4ParticleDefinition* kaonPlus;
@@ -5925,34 +5626,35 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 			pbm[2], 0.0);
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
   mom_kp_z = mom[2];
 
-  if((atan2(mom_kp_y,mom_kp_z))/3.141592*180.<-18. || (atan2(mom_kp_y,mom_kp_z))/3.141592*180.>20. )
+  if((atan2(mom_kp_y,mom_kp_z))/3.141592*180.<-18. ||
+     (atan2(mom_kp_y,mom_kp_z))/3.141592*180.>20. )
     goto up;
 
   //    if((acos(mom[2]/sqrt(pow(mom[0],2)+pow(mom[1],2)+pow(mom[2],2)))*180/3.141592654)>20.) goto up;
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
   //  cout<<mom_h_z<<endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
-
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -5998,14 +5700,12 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
 {
-  G4double momk[4], mom[3];
+  G4double mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
-  G4double Energy_h, momentum_h, mom_h_x, mom_h_y, mom_h_z;
-  G4double Energy_kp, momentum_kp, mom_kp_x, mom_kp_y, mom_kp_z;
-  G4double Theta_h, Phi_h;
-
+  G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
+  G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonMinus;
@@ -6055,7 +5755,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
   }
 
   Energy_kp=Hdibaryon.GetEnergy(4);
-  momentum_kp = Hdibaryon.GetMomentum(4);
+  // G4double momentum_kp = Hdibaryon.GetMomentum(4);
   Hdibaryon.GetMomentum(4,mom);
   mom_kp_x = mom[0];
   mom_kp_y = mom[1];
@@ -6064,25 +5764,23 @@ TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
   //  G4cout<<"kp mom:"<<mom[1]<<G4endl;
 
   Energy_h = Hdibaryon.GetEnergy(3);
-  momentum_h = Hdibaryon.GetMomentum(3);
+  // G4double momentum_h = Hdibaryon.GetMomentum(3);
   Hdibaryon.GetMomentum(3,mom);
   mom_h_x = mom[0];
   mom_h_y = mom[1];
   mom_h_z = mom[2];
 
-
-
-
   //  cout<<mom_h_z<<endl;
 
-  Theta_h = Hdibaryon.GetTheta(3);
-  Phi_h = Hdibaryon.GetPhi(3);
+  // G4double Theta_h = Hdibaryon.GetTheta(3);
+  // G4double Phi_h = Hdibaryon.GetPhi(3);
 
   ////check kinematics
-  momk[0]=mom_kp_x;
-  momk[1]=mom_kp_y;
-  momk[2]=mom_kp_z;
-  momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
+  // G4double momk[4];
+  // momk[0]=mom_kp_x;
+  // momk[1]=mom_kp_y;
+  // momk[2]=mom_kp_z;
+  // momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
   // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
@@ -6245,12 +5943,9 @@ TPCPrimaryGeneratorAction::Generate_test2( G4Event* anEvent )
   //  G4double mom[3];
   //  G4double Ebeam,pg_x,pg_y,pg_z, pbeam;
 
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* proton;
-  G4ParticleDefinition* piminus;
-
-  proton = particleTable->FindParticle("proton");
-  piminus = particleTable->FindParticle("pi-");
+  auto particleTable = G4ParticleTable::GetParticleTable();
+  // auto proton = particleTable->FindParticle("proton");
+  auto piminus = particleTable->FindParticle("pi-");
 
   /* proton */
   //  G4double mompx=0.10;
@@ -6289,14 +5984,12 @@ TPCPrimaryGeneratorAction::RandSin( void )
 {
   int success=0;
   double x,fx;
-
   do {
     x = 180.0 * (double)CLHEP::RandFlat::shoot();
     fx = sin(TMath::DegToRad()*x);
     if (fx >= (double)CLHEP::RandFlat::shoot())
       success = 1;
   } while (success==0);
-
   return x;
 }
 
@@ -6304,33 +5997,19 @@ TPCPrimaryGeneratorAction::RandSin( void )
 G4double
 TPCPrimaryGeneratorAction::miss1( G4double pbeam, G4double m1,G4double *p1 )
 {
-  G4double miss1;
-  G4double rmp;
-  G4double pp, pmiss, emiss;
-  G4double px, py, pz, ebeam;
-
-  miss1 = -100.;
-  rmp=0.938272013;
-  //  pbeam=1.8;
-  pmiss=0.000;
-  emiss=0.000;
-
-  px=p1[0];
-  py=p1[1];
-  pz=p1[2];
-  pp=sqrt(px*px+py*py+pz*pz);
-  ebeam=sqrt(pow(pbeam,2)+pow(m1,2));
-  pmiss=pow(px,2)
-    +  pow(py,2)
-    +  pow(pz-pbeam,2);
-  emiss=pow((ebeam+rmp*2-sqrt(pow(pp,2)+pow(m1,2))),2);
-  //  cout<<"emiss:"<<emiss<<endl;
-  //    G4cout<<"m1:"<<m1<<G4endl;
-  //  G4cout<<"ebeam:"<<ebeam<<G4endl;
-  if((emiss-pmiss)>0){
-    miss1=sqrt(emiss-pmiss);
+  G4double miss = -9999.;
+  G4double rmp = 0.938272013;;
+  G4double px = p1[0];
+  G4double py = p1[1];
+  G4double pz = p1[2];
+  G4double pp = sqrt(px*px+py*py+pz*pz);
+  G4double ebeam = sqrt(pow(pbeam,2)+pow(m1,2));
+  G4double pmiss = pow(px,2) +  pow(py,2) +  pow(pz-pbeam,2);
+  G4double emiss = pow((ebeam+rmp*2-sqrt(pow(pp,2)+pow(m1,2))),2);
+  if( emiss - pmiss > 0 ){
+    miss = sqrt( emiss - pmiss );
   }
-  return miss1;
+  return miss;
 }
 
 //_____________________________________________________________________________
@@ -6338,73 +6017,39 @@ G4double
 TPCPrimaryGeneratorAction::missks( G4double pbeam, G4double mbeam,
 				   G4double m1,G4double *p1 )
 {
-  G4double missks;
-  G4double rmp;
-  G4double pp, pmiss, emiss;
-  G4double px, py, pz, ebeam;
-  //  G4cout<<"test:"<<m1<<G4endl;
-
-  missks = -100.;
-  rmp=0.938272013;
-  pmiss=0.000;
-  emiss=0.000;
-
-  px=p1[0];
-  py=p1[1];
-  pz=p1[2];
-  //  G4cout<<"   px:"<<px<<"   py:"<<py<<"   pz:"<<pz<<G4endl;
-  pp=sqrt(px*px+py*py+pz*pz);
-  ebeam=sqrt(pow(pbeam,2)+pow(mbeam,2));
-  pmiss=pow(px,2)
-    +  pow(py,2)
-    +  pow(pz-pbeam,2);
-  emiss=pow((ebeam+rmp-sqrt(pow(pp,2)+pow(m1,2))),2);
-  //  G4cout<<"emiss:"<<emiss<<G4endl;
-  //  G4cout<<"m1:"<<m1<<G4endl;
-  //  G4cout<<"ebeam:"<<ebeam<<G4endl;
-  if((emiss-pmiss)>0){
-    missks=sqrt(emiss-pmiss);
+  G4double miss = -9999.;
+  G4double rmp = 0.938272013;;
+  G4double px = p1[0];
+  G4double py = p1[1];
+  G4double pz = p1[2];
+  G4double pp = sqrt(px*px+py*py+pz*pz);
+  G4double ebeam = sqrt(pow(pbeam,2)+pow(mbeam,2));
+  G4double pmiss = pow(px,2) +  pow(py,2) +  pow(pz-pbeam,2);
+  G4double emiss = pow((ebeam+rmp-sqrt(pow(pp,2)+pow(m1,2))),2);
+  if( emiss - pmiss > 0 ){
+    miss = sqrt( emiss - pmiss );
   }
-  return missks;
+  return miss;
 }
 
 //_____________________________________________________________________________
 G4double
 TPCPrimaryGeneratorAction::miss1( G4double *pbeam, G4double m1,G4double *p1 )
 {
-  G4double miss1;
-  G4double rmp;
-  G4double pp, pmiss, emiss;
-  G4double px, py, pz, ebeam;
-
-  G4double pbeamx, pbeamy, pbeamz;
-
-  miss1 = -100.;
-  rmp=0.938272013;
-  //  pbeam=1.8;
-  pmiss=0.000;
-  emiss=0.000;
-
-  px=p1[0];
-  py=p1[1];
-  pz=p1[2];
-  pp=sqrt(px*px+py*py+pz*pz);
-
-  pbeamx=pbeam[0];
-  pbeamy=pbeam[1];
-  pbeamz=pbeam[2];
-  ebeam=sqrt(pow(pbeamx,2)+pow(pbeamy,2)+pow(pbeamz,2)+pow(m1,2));
-  pmiss=pow(px-pbeamx,2)
-    +  pow(py-pbeamy,2)
-    +  pow(pz-pbeamz,2);
-  emiss=pow((ebeam+rmp*2 - sqrt(pow(pp,2)+pow(m1,2)) ),2);
-  //  cout<<"emiss:"<<emiss<<endl;
-  //    G4cout<<"m1:"<<m1<<G4endl;
-  //  G4cout<<"ebeam:"<<ebeam<<G4endl;
-  if((emiss-pmiss)>0){
-    miss1=sqrt(emiss-pmiss);
+  G4double miss = -9999.;
+  G4double rmp = 0.938272013;;
+  G4double px = p1[0];
+  G4double py = p1[1];
+  G4double pz = p1[2];
+  G4double pp = sqrt(px*px+py*py+pz*pz);
+  G4double pbeamx=pbeam[0], pbeamy=pbeam[1], pbeamz=pbeam[2];
+  G4double ebeam = sqrt(pow(pbeamx,2)+pow(pbeamy,2)+pow(pbeamz,2)+pow(m1,2));
+  G4double pmiss = pow(px-pbeamx,2) +  pow(py-pbeamy,2) +  pow(pz-pbeamz,2);
+  G4double emiss = pow((ebeam+rmp*2 - sqrt(pow(pp,2)+pow(m1,2)) ),2);
+  if( emiss - pmiss > 0 ){
+    miss = std::sqrt( emiss - pmiss );
   }
-  return miss1;
+  return miss;
 }
 
 //_____________________________________________________________________________

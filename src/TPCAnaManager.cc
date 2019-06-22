@@ -303,7 +303,7 @@ int TPCAnaManager::EndOfEventAction()
     //  if( HitNum > 0 && HitNumFTOF>0 && HitNumScint>0){
 
     // Fill TPC hits condition
-    G4int detID = 0;
+    // G4int detID = 0;
 
     G4int c[MAX_TRACK] = {};
 
@@ -317,7 +317,7 @@ int TPCAnaManager::EndOfEventAction()
     G4double vtxzfit[MAX_TRACK];//read fit parameters
 
     G4double vtxpxfit[MAX_TRACK];//read fit parameters
-    G4double vtxpyfit[MAX_TRACK];//read fit parameters
+    // G4double vtxpyfit[MAX_TRACK];//read fit parameters
     G4double vtxpzfit[MAX_TRACK];//read fit parameters
 
     for(G4int i=0;i<MAX_TRACK;i++){
@@ -325,7 +325,7 @@ int TPCAnaManager::EndOfEventAction()
       vtxyfit[i]=-9999.9999;
       vtxzfit[i]=-9999.9999;
       vtxpxfit[i]=-9999.9999;
-      vtxpyfit[i]=-9999.9999;
+      // vtxpyfit[i]=-9999.9999;
       vtxpzfit[i]=-9999.9999;
       Pz[i]=-9999.9999;
     }
@@ -1055,17 +1055,7 @@ int TPCAnaManager::EndOfEventAction()
 			  );
     }
 
-    detID = 0;
-
-
-
-
-
-
-
-
-
-
+    // detID = 0;
 
     //------------------&^-^-------------------//
     ////rungekutta study for kurama
@@ -1185,11 +1175,12 @@ int TPCAnaManager::EndOfEventAction()
 }
 
 /////shhwang TPC
-void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
-				   G4ThreeVector mom,
-				   G4int track, G4int particle,
-				   G4int iLay,  G4int iRow, G4double beta,
-				   G4double edep, G4int parentid,G4double tlength, G4double slength)
+void TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
+				    G4ThreeVector mom,
+				    G4int track, G4int particle,
+				    G4int iLay,  G4int iRow, G4double beta,
+				    G4double edep, G4int parentid,
+				    G4double /* tlength */, G4double slength )
 {
   G4int hitnum = HitNum;
   G4bool flag=true;
@@ -1240,12 +1231,12 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     G4double sh_sigmaY = 0.500*mm; //--> smearing : 400 um
 
     G4double ang_sh=atan2(sh_pos.getY(),sh_pos.getX());
-    G4double ang_check=0;
+    // G4double ang_check=0;
     if(ang_sh>acos(-1.)){
       ang_sh=ang_sh-2*acos(-1.);
-      ang_check=-1;
+      // ang_check=-1;
     }else{
-      ang_check=1.;
+      // ang_check=1.;
     }
     // G4double arc_sh=pad_in[iLay]*ang_sh;
     // G4int ith_pad_in=arc_sh/pad_in_width;
@@ -1403,15 +1394,22 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
   return;
 }
 
-
-void TPCAnaManager::SetTPCData(G4int tpctr2, G4int tpcpid2, G4int tpcparentid2, G4int tpcparentid_pid2, G4double tpcpx2, G4double tpcpy2,G4double tpcpz2,G4double tpcpp2,  G4int tpcqq2, G4double tpcpm2, G4double tpcde2, G4double tpclen2, G4int tpclay2,
-			       G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
-			       G4double vtxxtpc2,G4double vtxytpc2,G4double vtxztpc2, G4double vtxene2){
-
+//_____________________________________________________________________________
+void
+TPCAnaManager::SetTPCData( G4int tpctr2, G4int tpcpid2, G4int tpcparentid2,
+			   G4int tpcparentid_pid2, G4double tpcpx2,
+			   G4double tpcpy2, G4double tpcpz2,
+			   G4double /* tpcpp2 */,
+			   G4int tpcqq2, G4double tpcpm2, G4double tpcde2,
+			   G4double tpclen2, G4int tpclay2,
+			   G4double vtxpxtpc2, G4double vtxpytpc2,
+			   G4double vtxpztpc2,
+			   G4double vtxxtpc2, G4double vtxytpc2,
+			   G4double vtxztpc2, G4double vtxene2 )
+{
   G4int hitnum = tpctr2;
 
-  G4double theta;
-  theta=acos(tpcpz2/tpcpp2);
+  // G4double theta=acos(tpcpz2/tpcpp2);
 
   tpcData[hitnum].tpctr = tpctr2;
   tpcData[hitnum].tpcpid = tpcpid2;
@@ -1853,10 +1851,11 @@ void TPCAnaManager::SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector 
 //_____________________________________________________________________________
 // AnaManager->SetTargetData(tof, xyz, mom, tid, pid,mass,parentid);
 void
-TPCAnaManager::SetTargetData( G4int nhits, G4ThreeVector xyz, G4ThreeVector mom,
+TPCAnaManager::SetTargetData( G4int /* nhits */,
+			      G4ThreeVector xyz, G4ThreeVector /* mom */,
 			      G4int track, G4int particle,
 			      G4int parentid,G4ThreeVector vtxpos,
-			      G4ThreeVector vtxmom, G4double )
+			      G4ThreeVector /* vtxmom */, G4double )
 {
   G4int hitnum = HitNumTarget;
 

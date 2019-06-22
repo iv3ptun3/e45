@@ -265,7 +265,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name]->AddElement( m_element_map["Silicon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
 
-  TString target_material = gConf.Get<TString>("TargetMaterial");
+  G4String target_material = gConf.Get<G4String>("TargetMaterial");
   G4cout << "   Target material : " << target_material << G4endl;
   if( target_material == "Carbon" ){
     m_material_map["Target"] = m_material_map["Carbon"];

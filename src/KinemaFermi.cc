@@ -129,15 +129,15 @@ KinemaFermi::KinemaFermi( double m1, double m2, double m3, double m4,
 
   double theta_p1_psum;
   double theta_p2_psum;
-  double theta_p1_p2;
+  // double theta_p1_p2;
   if(Plab2==0){
     theta_p1_psum=0.;
     theta_p2_psum=0.;
-    theta_p1_p2=0.;
+    // theta_p1_p2=0.;
   }else {
     theta_p1_psum=acos( (p1[0]*p12_sum[0]+p1[1]*p12_sum[1]+p1[2]*p12_sum[2]) /(Plab1*p12_sum[3]));//beam
     theta_p2_psum=acos(  ( p2[0]*p12_sum[0] + p2[1]*p12_sum[1] +p2[2]*p12_sum[2]) /(Plab2*p12_sum[3]));//proton
-    theta_p1_p2=acos((p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2])/(Plab1*Plab2));
+    // theta_p1_p2=acos((p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2])/(Plab1*Plab2));
   }
   /*
   G4cout<<"theta_p1_psum:"<<theta_p1_psum<<G4endl;
@@ -360,7 +360,7 @@ KinemaFermi::p2E( double p,double m )
 
 //_____________________________________________________________________________
 void
-KinemaFermi::CalcDistoribution( double unitx, double unity, double unitz,
+KinemaFermi::CalcDistoribution( double unitx, double unity, double /* unitz */,
 				double *theta, double *phi )
 {
   *theta = rag2deg(acos(unitx));

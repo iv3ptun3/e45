@@ -165,12 +165,16 @@ ResHypTPC::getXDeviation( G4int &n_electron, G4int &n_pad, G4double &x_rms,
   return x_mean-x_track;
 }
 
-
-G4double ResHypTPC::getYDeviation(G4double y_track) {
+//_____________________________________________________________________________
+G4double
+ResHypTPC::getYDeviation( G4double /* y_track */ )
+{
   return y_resolution;
 }
 
-G4double GetTransverseRes(G4double y_pos)
+//_____________________________________________________________________________
+G4double
+GetTransverseRes( G4double y_pos )
 {
   double s0 = 0.204;// mm HIMAC result
   double Dt = 0.18;//mm/sqrt(cm) at 1T
