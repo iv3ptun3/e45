@@ -14,6 +14,15 @@ class TF1;
 //_____________________________________________________________________________
 class ResHypTPC
 {
+public:
+  // ResHypTPC( G4double pad_size=2., G4double pad_length=10.,
+  // 	     G4double threshold=0.1, G4double diff_T=0.18,
+  // 	     G4double smearing=0 );
+  ResHypTPC( void );
+  ResHypTPC( G4double pad_size, G4double pad_length, G4double threshold,
+	     G4double diff_T, G4double smearing );
+  ~ResHypTPC( void );
+
 private:
   static const bool debug = false;
   G4double pad_size;
@@ -49,9 +58,9 @@ private:
   G4double x_mean;
   G4double x2_mean;
 
-    TF1 *f_n_drift_electron;
+  TF1 *f_n_drift_electron;
   //    TF1 *f_diffusion;
-    TF1 *f_GEM_avalanche;
+  TF1 *f_GEM_avalanche;
   //    TF1 *f_const_smearing;
 
   void init() {
@@ -69,18 +78,9 @@ private:
   };
 
 public:
-  //  ResHypTPC(G4double pad_size=2., G4double pad_length=10., G4double threshold=0.1, G4double diff_T=0.18, G4double smearing=0);
-  ResHypTPC();
-  ResHypTPC(G4double pad_size, G4double pad_length, G4double threshold, G4double diff_T, G4double smearing);
-  ~ResHypTPC() {
-    delete f_n_drift_electron;
-    //    delete f_diffusion;
-    delete f_GEM_avalanche;
-    //    delete f_const_smearing;
-};
-G4double getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_rms, G4double x, G4double y, G4double dxdz, G4double dydz);
+  G4double getXDeviation( G4int &n_electron, G4int &n_pad, G4double &x_rms,
+			  G4double x, G4double y, G4double dxdz, G4double dydz );
   G4double getYDeviation(G4double y);
-
   G4double getDiffusionX(G4double y) const {
     if (y>=0) {
       return diffusion_T*sqrt(y/10.);

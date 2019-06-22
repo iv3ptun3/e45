@@ -71,14 +71,14 @@ TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   //  G4cout<<"test4"<<G4endl;
 
   G4ThreeVector mom= preStepPoint-> GetMomentum();
-  G4double tof= preStepPoint-> GetGlobalTime();
-  G4double beta= preStepPoint-> GetBeta();
+  // G4double tof= preStepPoint-> GetGlobalTime();
+  // G4double beta= preStepPoint-> GetBeta();
   G4int tid =  aStep-> GetTrack()-> GetTrackID();
   G4int pid =  aStep-> GetTrack()-> GetDefinition() -> GetPDGEncoding();
   G4double mass = aStep -> GetTrack()->GetDynamicParticle()->GetMass();
   G4int charge = aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge();
-  G4double edep = aStep->GetTotalEnergyDeposit();
-  G4double tlength = aStep->GetTrack()-> GetTrackLength();
+  // G4double edep = aStep->GetTotalEnergyDeposit();
+  // G4double tlength = aStep->GetTrack()-> GetTrackLength();
   G4int parentID =  aStep-> GetTrack()-> GetParentID();
 
   //  G4cout<<"test1"<<G4endl;
@@ -91,11 +91,11 @@ TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   //  G4double globalTime    = track->GetGlobalTime();
 
   //  G4cout<<pid<<":"<<kinEnergy<<G4endl;
-  G4int iLay=0;
-  G4int iRow=0;
   G4String name = physVol->GetName();
 
-  TPCTargetHit* ahit= new TPCTargetHit(pos, mom, tid, pid, parentID, mass, charge, VertexPosition, VertexMomentum, VertexEnergy, kinEnergy);
+  TPCTargetHit* ahit= new TPCTargetHit( pos, mom, tid, pid, parentID,
+					mass, charge, VertexPosition,
+					VertexMomentum, VertexEnergy, kinEnergy );
 
   hitsCollection-> insert(ahit);
   return true;

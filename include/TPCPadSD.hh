@@ -20,11 +20,8 @@ public:
 
 private:
   G4THitsCollection<TPCPadHit>* hitsCollection;
-  //  G4int pidtr[50];
-  //  G4int nparticle;
   G4double select_plane;
   G4int num_plane;
-  G4double deadarea;
   G4int num_deadarea;
   G4int select_dead;
 
@@ -36,7 +33,6 @@ private:
 
 public:
   G4int ntrk;
-  // virtual methods
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );
   virtual void   Initialize( G4HCofThisEvent* HCTE );
   virtual void   EndOfEvent( G4HCofThisEvent* HCTE );

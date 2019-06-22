@@ -4,13 +4,16 @@
 
 #include <algorithm>
 
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <G4ThreeVector.hh>
+#include <Randomize.hh>
 
 #include "ConfMan.hh"
 #include "ResHypTPC.hh"
 #include "RungeKuttaTracker.hh"
 #include "minuit2.hh"
 #include "switch.h"
+#include "track.hh"
 
 #define	MAX_DIM_FOR_RKF 3
 
@@ -26,8 +29,8 @@ namespace
 //MinuitFCN fcn =  chi2;
 //MinuitFCN *fcn
 //extern int chi2prb_(float* chi2,int* ndf,float* prb);
-const int MaxFCNCall = 300;
-const double EPS = 1.;
+// const int MaxFCNCall = 300;
+// const double EPS = 1.;
 extern double RKChi2[MAX_ITERATION];
 extern double RKPara[MAX_ITERATION][NUM_PARA_RK];
 //void rungeKuttaFehlberg(int n, double x[],
@@ -69,24 +72,24 @@ void
 TPCAnaManager::BeginOfRunAction( int runnum )
 {
   target_pos_z=-143.;
-  truncated_mean_cut = gConf.Get<Double_t>("TruncatedMeanCut");
-  env_Experiment_num = gConf.Get<Int_t>("Experiment");
+  truncated_mean_cut = gConf.Get<G4double>("TruncatedMeanCut");
+  env_Experiment_num = gConf.Get<G4int>("Experiment");
   //out side less 100 mm. 10+5*x < 100 mm is pad_in_num
-  pad_length_in = gConf.Get<Double_t>("PadLengthIn");
-  pad_length_out = gConf.Get<Double_t>("PadLengthOut");
-  pad_gap = gConf.Get<Double_t>("PadGap");
+  pad_length_in = gConf.Get<G4double>("PadLengthIn");
+  pad_length_out = gConf.Get<G4double>("PadLengthOut");
+  pad_gap = gConf.Get<G4double>("PadGap");
 
   ////pad configure
-  env_pad_config = gConf.Get<Int_t>("PadConfigure");
-  pad_in_num = gConf.Get<Int_t>("PadNumIn");
-  pad_out_num = gConf.Get<Int_t>("PadNumOut");
-  pad_in_width = gConf.Get<Double_t>("PadWidthOut");
-  pad_out_width = gConf.Get<Double_t>("PadWidthOut");
+  env_pad_config = gConf.Get<G4int>("PadConfigure");
+  pad_in_num = gConf.Get<G4int>("PadNumIn");
+  pad_out_num = gConf.Get<G4int>("PadNumOut");
+  pad_in_width = gConf.Get<G4double>("PadWidthOut");
+  pad_out_width = gConf.Get<G4double>("PadWidthOut");
 
-  env_on_off_helm = gConf.Get<Int_t>("ShsFieldMap");
+  env_on_off_helm = gConf.Get<G4int>("ShsFieldMap");
 
   if( env_on_off_helm == 0 ){
-    env_helm_field = gConf.Get<Int_t>("ShsField");
+    env_helm_field = gConf.Get<G4int>("ShsField");
   }else{
     G4cout << "Env of the Helmholt_fieldmap is wrong" << G4endl;
     exit(-1);
@@ -302,7 +305,7 @@ int TPCAnaManager::EndOfEventAction()
     // Fill TPC hits condition
     G4int detID = 0;
 
-    G4int c[MAX_TRACK]={0.};
+    G4int c[MAX_TRACK] = {};
 
     for(G4int i=0;i<MAX_TRACK;i++){
       mean[i]=0.;
@@ -340,7 +343,7 @@ int TPCAnaManager::EndOfEventAction()
       G4cout<<"Error--> over the number of tracks in the TPC:"<<tpctrNum<<G4endl;
     }
 
-    G4int sh_paID[MAX_TRACK]={-1000.};
+    G4int sh_paID[MAX_TRACK] = {};
     for( G4int i=0; i<HitNum; i++){
       G4int ii=counterData[i].ntrk;
       x[ii][c[ii]]=counterData[i].pos[0];
@@ -1073,7 +1076,6 @@ int TPCAnaManager::EndOfEventAction()
     /////////////////////////////////////////////
     /////////////////////////////////////////////
     if(HitNumDC>0){
-      double kurama_rkpar[5]={0};
       Track kurama_tr[MAX_TRACK];
       //    std::cout<<"start kurama tracking"<<std::endl;
       kurama_tr[0].numHits=0.;
@@ -1081,7 +1083,6 @@ int TPCAnaManager::EndOfEventAction()
       initTrack_ku(kurama_tr);
       int num_cand_track_id[30];
       int num_cand_track=0;
-      int tmp=0;
       double dc_res[22]=
 	{0.050,0.05,0.05,0.05,//ssd1
 	 0.05,0.05,0.05,0.05,//ssd2
@@ -1104,7 +1105,7 @@ int TPCAnaManager::EndOfEventAction()
 	 121,122,123,124,//dc2
 	 131,132,133,134//dc3
 	};
-      int num_hit_track[30]={0.};
+      int num_hit_track[30] = {};
 
       for(int i=0 ; i<HitNumDC ; i++){
 	//      std::cout << dcData[i].trackID << ":" <<dcData[i].detectorID << std::endl;
@@ -1246,9 +1247,9 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
     }else{
       ang_check=1.;
     }
-    G4double arc_sh=pad_in[iLay]*ang_sh;
-    G4int ith_pad_in=arc_sh/pad_in_width;
-    G4int ith_pad_out=arc_sh/pad_out_width;
+    // G4double arc_sh=pad_in[iLay]*ang_sh;
+    // G4int ith_pad_in=arc_sh/pad_in_width;
+    // G4int ith_pad_out=arc_sh/pad_out_width;
 
 
     // G4double delta_x=0.;
@@ -1287,7 +1288,7 @@ void TPCAnaManager::SetCounterData(G4int ntrk,G4double time, G4ThreeVector pos,
 
     ///include saho-san's code
 
-    G4double compy=0.;
+    // G4double compy=0.;
     G4double compx=0.;
 
     // G4int n_electron=0; //output

@@ -8,13 +8,13 @@
 #include <map>
 #include <vector>
 
-#include <TString.h>
+#include <globals.hh>
 
 //_____________________________________________________________________________
 class ConfMan
 {
 public:
-  static TString  ClassName( void );
+  static G4String  ClassName( void );
   static ConfMan& GetInstance( void );
   ~ConfMan( void );
 
@@ -24,49 +24,49 @@ private:
   ConfMan& operator=( const ConfMan& );
 
 private:
-  typedef std::map<TString, TString>  StrList;
-  typedef std::map<TString, Double_t> DoubleList;
-  typedef std::map<TString, Int_t>    IntList;
-  typedef std::map<TString, Bool_t>   BoolList;
-  TString     m_conf_key;
-  TString     m_conf_dir;
-  Bool_t      m_is_ready;
-  StrList     m_file;
-  StrList     m_string;
-  DoubleList  m_double;
-  IntList     m_int;
-  BoolList    m_bool;
+  typedef std::map<G4String, G4String>  StrList;
+  typedef std::map<G4String, G4double> DoubleList;
+  typedef std::map<G4String, G4int>    IntList;
+  typedef std::map<G4String, G4bool>   BoolList;
+  G4String     m_conf_key;
+  G4String     m_conf_dir;
+  G4bool       m_is_ready;
+  StrList      m_file;
+  StrList      m_string;
+  DoubleList   m_double;
+  IntList      m_int;
+  BoolList     m_bool;
 
 public:
   template <typename T>
-  static const T& Get( const TString& key ) { return T(); }
-  Bool_t    Initialize( void );
-  Bool_t    Initialize( const TString& file_name );
-  Bool_t    InitializeHistograms( void );
-  Bool_t    InitializeParameterFiles( void );
-  Bool_t    IsReady( void ) const { return m_is_ready; }
-  // Bool_t    Finalize( void );
-  // Bool_t    FinalizeProcess( void );
+  static const T& Get( const G4String& key );
+  G4bool    Initialize( void );
+  G4bool    Initialize( const G4String& file_name );
+  G4bool    InitializeHistograms( void );
+  G4bool    InitializeParameterFiles( void );
+  G4bool    IsReady( void ) const { return m_is_ready; }
+  // G4bool    Finalize( void );
+  // G4bool    FinalizeProcess( void );
 
   // Initialize Parameter
   template <typename T>
-  Bool_t    InitializeParameter( void );
+  G4bool    InitializeParameter( void );
   template <typename T>
-  Bool_t    InitializeParameter( const TString& key );
+  G4bool    InitializeParameter( const G4String& key );
   template <typename T>
-  Bool_t    InitializeParameter( const TString& key1,
-				 const TString& key2 );
+  G4bool    InitializeParameter( const G4String& key1,
+				 const G4String& key2 );
 
 private:
-  TString FilePath( const TString& src ) const;
-  Bool_t  ShowResult( Bool_t status, const TString& name ) const;
+  G4String FilePath( const G4String& src ) const;
+  G4bool  ShowResult( G4bool status, const G4String& name ) const;
 };
 
 //_____________________________________________________________________________
-inline TString
+inline G4String
 ConfMan::ClassName( void )
 {
-  static const TString s_name("ConfMan");
+  static const G4String s_name("ConfMan");
   return s_name;
 }
 
@@ -80,39 +80,39 @@ ConfMan::GetInstance( void )
 
 //_____________________________________________________________________________
 template <>
-inline const TString&
-ConfMan::Get<TString>( const TString& key )
+inline const G4String&
+ConfMan::Get<G4String>( const G4String& key )
 {
   return GetInstance().m_string[key];
 }
 
 //_____________________________________________________________________________
 template <>
-inline const Double_t&
-ConfMan::Get<Double_t>( const TString& key )
+inline const G4double&
+ConfMan::Get<G4double>( const G4String& key )
 {
   return GetInstance().m_double[key];
 }
 
 //_____________________________________________________________________________
 template <>
-inline const Int_t&
-ConfMan::Get<Int_t>( const TString& key )
+inline const G4int&
+ConfMan::Get<G4int>( const G4String& key )
 {
   return GetInstance().m_int[key];
 }
 
 //_____________________________________________________________________________
 template <>
-inline const Bool_t&
-ConfMan::Get<Bool_t>( const TString& key )
+inline const G4bool&
+ConfMan::Get<G4bool>( const G4String& key )
 {
   return GetInstance().m_bool[key];
 }
 
 //_____________________________________________________________________________
-inline Bool_t
-ConfMan::ShowResult( Bool_t status, const TString& name ) const
+inline G4bool
+ConfMan::ShowResult( G4bool status, const G4String& name ) const
 {
   if( status )
     std::cout << std::setw(20) << std::left
@@ -127,7 +127,7 @@ ConfMan::ShowResult( Bool_t status, const TString& name ) const
 
 //_____________________________________________________________________________
 template <typename T>
-inline Bool_t
+inline G4bool
 ConfMan::InitializeParameter( void )
 {
   return
@@ -137,8 +137,8 @@ ConfMan::InitializeParameter( void )
 
 //_____________________________________________________________________________
 template <typename T>
-inline Bool_t
-ConfMan::InitializeParameter( const TString& key )
+inline G4bool
+ConfMan::InitializeParameter( const G4String& key )
 {
   return
     ShowResult( T::GetInstance().Initialize(m_file[key]),
@@ -147,9 +147,9 @@ ConfMan::InitializeParameter( const TString& key )
 
 //_____________________________________________________________________________
 template <typename T>
-inline Bool_t
-ConfMan::InitializeParameter( const TString& key1,
-			      const TString& key2 )
+inline G4bool
+ConfMan::InitializeParameter( const G4String& key1,
+			      const G4String& key2 )
 {
   return
     ShowResult( T::GetInstance().Initialize(m_file[key1],

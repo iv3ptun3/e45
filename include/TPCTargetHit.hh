@@ -21,21 +21,19 @@ public:
 private:
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
-  G4double tof;
-  G4int trackID;
-  G4int particleID;
-  G4int iLay;
-  G4int iRow;
-  G4double beta;
-  G4double edep; // Energy deposit
-  G4int parentID;
-  G4double Length;
-  G4double mass;
-  G4int charge;
+  G4double      tof;
+  G4int         trackID;
+  G4int         particleID;
+  G4double      beta;
+  G4double      edep; // Energy deposit
+  G4int         parentID;
+  G4double      Length;
+  G4double      mass;
+  G4int         charge;
   G4ThreeVector vtxposi;
   G4ThreeVector vtxmome;
-  G4double vtxene;
-  G4double kinene;
+  G4double      vtxene;
+  G4double      kinene;
 
 public:
   TPCTargetHit(const TPCTargetHit& right);

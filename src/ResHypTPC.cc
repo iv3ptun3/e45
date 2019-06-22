@@ -2,8 +2,8 @@
 
 #include "ResHypTPC.hh"
 
-//#include <TH1.h>
-//#include <TF1.h>
+#include <TH1.h>
+#include <TF1.h>
 
 #include <Randomize.hh>
 
@@ -63,8 +63,21 @@ ResHypTPC::ResHypTPC( G4double t_pad_size, G4double t_pad_length,
     //    f_const_smearing->SetParameter(2,const_smearing);
 }
 
-G4double ResHypTPC::getXDeviation(G4int &n_electron, G4int &n_pad, G4double &x_rms, G4double x_track, G4double y_track, G4double dxdz_track=0, G4double dydz_track=0) {
+//_____________________________________________________________________________
+ResHypTPC::~ResHypTPC( void )
+{
+  delete f_n_drift_electron;
+  //    delete f_diffusion;
+  delete f_GEM_avalanche;
+  //    delete f_const_smearing;
+}
 
+//_____________________________________________________________________________
+G4double
+ResHypTPC::getXDeviation( G4int &n_electron, G4int &n_pad, G4double &x_rms,
+			  G4double x_track, G4double y_track,
+			  G4double dxdz_track=0, G4double dydz_track=0 )
+{
   if (debug) std::cout << "in getXDeviation" << std::endl;
   G4double path_length = pad_length*sqrt(1.+dxdz_track*dxdz_track+dydz_track*dydz_track);
   //  G4cout<<path_length<<G4endl;

@@ -1,67 +1,29 @@
 // -*- C++ -*-
 
-#ifndef TPCANAMANAGER_H
-#define TPCANAMANAGER_H
+#ifndef TPC_ANA_MANAGER_HH
+#define TPC_ANA_MANAGER_HH
 
-#include "G4RunManager.hh"
-#include "G4Event.hh"
-#include "G4SDManager.hh"
+#include <G4ThreeVector.hh>
 
-#include "globals.hh"
-#include "TFile.h"
-#include "TH1.h"
-#include "TH2.h"
-#include "TF1.h"
-#include "TCanvas.h"
-
-#include "TNtuple.h"
-#include "TTree.h"
-#include "TBranch.h"
 #include "TPCAnaRoot.hh"
-#include <algorithm>
-#include "math.h"
-//#include "getenv.hh"
-//#include "RKTracking.hh"
-/////for rungekutta
-//#include "minuitFit.h"
-//#include "minuit.h"
-#include "track.hh"
-//#include "ResHypTPC.hh"
-//#include "Minuit.hh"
-///#include "hit.h"
-//#include "rungeKuttaTrack.hh"
-// #include "Minuit2/FunctionMinimum.h"
 
-//double chisqr_;
-
-#if 0
-#define MAX_HIT_NUM 1560
-#define MAX_PRIMARY_PARTICLE 10
-#endif
-
-
-//double chi2fcn::operator()(int np, double *g, double*u, int iflag){
+struct Track;
 
 void initTrack(Track* aTrack);
 void initTrack_ku(Track* aTrack);
-//void setTrack(Track*,int ntrk,double* x,double* z,double* y,double* ede,double* c);
-//void initTrackVertex(Track*);
-
 int setInitialPara(Track* aTrack, double* initPara);
 int setVirtualPlane(Track* aTrack);
 void minuitInit(double printLevel);
-//void chi2(int *npar, double *grad, double *fval,
-//	  double *xval, int *iflag, void (*futil)() );
-//MinuitFCN fcn =  chi2 ;
 
-const int MAXtpctrNum=30;
-const int MAXtpctrhitNum=500;
+static const int MAXtpctrNum=30;
+static const int MAXtpctrhitNum=500;
 
 class TH1F;
 class TH2F;
 class TFile;
 class TTree;
 
+//_____________________________________________________________________________
 struct CounterData
 {
   G4int ntrk;
@@ -83,6 +45,7 @@ struct CounterData
   G4int parentID;
 };
 
+//_____________________________________________________________________________
 struct TPCData
 {
   G4int tpctr;
@@ -146,7 +109,7 @@ struct TargetData
 
 };
 
-
+//_____________________________________________________________________________
 struct ScintData
 {
   G4int trackID;
@@ -167,6 +130,7 @@ struct ScintData
   G4double scintvtxz;
 };
 
+//_____________________________________________________________________________
 struct ACData
 {
   G4int trackID;
@@ -187,7 +151,7 @@ struct ACData
   G4double acvtxz;
 };
 
-
+//_____________________________________________________________________________
 struct NBARData
 {
   G4int trackID;
@@ -208,7 +172,7 @@ struct NBARData
   G4double nbarvtxz;
 };
 
-
+//_____________________________________________________________________________
 struct DCData
 {
   G4int trackID;
@@ -229,6 +193,7 @@ struct DCData
   G4double vtxz;
 };
 
+//_____________________________________________________________________________
 struct CHData
 {
   G4int trackID;
@@ -249,6 +214,7 @@ struct CHData
   G4double vtxz;
 };
 
+//_____________________________________________________________________________
 struct FTOFData
 {
   G4int trackID;
@@ -269,7 +235,7 @@ struct FTOFData
   G4double vtxz;
 };
 
-
+//_____________________________________________________________________________
 struct FDCData
 {
   G4int trackID;
@@ -280,6 +246,7 @@ struct FDCData
   G4double mom[4];
 };
 
+//_____________________________________________________________________________
 struct PrimaryBeam
 {
   G4double pg[4];                        // 4-mom 0: px, 1: py, 2: pz, 3: ene
@@ -287,6 +254,7 @@ struct PrimaryBeam
   G4int mode;
 };
 
+//_____________________________________________________________________________
 struct PrimaryParticle
 {
   G4int NumOfParticle;                   // Number of Primary particle
@@ -295,7 +263,7 @@ struct PrimaryParticle
   G4int pid0[MaxPrimaryParticle];
 };
 
-
+//_____________________________________________________________________________
 struct PrimaryInfo
 {
   G4double mm_d;
@@ -318,46 +286,6 @@ private:
   TPCAnaManager& operator=( const TPCAnaManager& );
 
 private:
-  /*
-////sako-san's code
-static const bool debug = false;
-double pad_size;
-double pad_length;
-double threshold;
-
-static const double y_resolution = 0.5;
-
-//sigma/amp ratio of max amp dist (from Run 238)
-static const double sigma_amp = 13.3/53.9;
-//  static const double neff = 38;//proton T=400MeV (RCNP test)
-static const double neff = 26;//MIP
-
-static const double neff_nmpv_correction = 0.7*1.2;
-
-double diffusion_T;//mm/sqrt(cm)
-double const_smearing;
-static const double diffuse_GEM = 0.1;
-
-double nmpv;
-double ncutoff;
-double nsigma;
-
-double n_sum;
-double x_mean;
-double x2_mean;
-
-TF1 *f_n_drift_electron;
-TF1 *f_diffusion;
-TF1 *f_GEM_avalanche;
-TF1 *f_const_smearing;
-
-void init() {
-nmpv = neff * neff_nmpv_correction;
-ncutoff = nmpv * 5;
-nsigma = nmpv * sigma_amp;
-};
-////sako-san's code end
-*/
   TargetData targetData[MaxTrack];
   CounterData counterData[MaxTrack];
   TPCData tpcData[MAXtpctrNum];
@@ -393,7 +321,6 @@ nsigma = nmpv * sigma_amp;
   //  int tpctrNum_K;
   int HitNumTarget_K;
 
-
   int HitNum_p;
   int HitNumAC_p;
   int HitNumNBAR_p;
@@ -403,15 +330,13 @@ nsigma = nmpv * sigma_amp;
   int HitNumScint_p;  //  int tpctrNum_K;
   int HitNumTarget_p;
 
+  // G4double vtxxfit[MAXtpctrNum];//read fit parameters
+  // G4double vtxyfit[MAXtpctrNum];//read fit parameters
+  // G4double vtxzfit[MAXtpctrNum];//read fit parameters
 
-
-  G4double vtxxfit[MAXtpctrNum];//read fit parameters
-  G4double vtxyfit[MAXtpctrNum];//read fit parameters
-  G4double vtxzfit[MAXtpctrNum];//read fit parameters
-
-  G4double vtxpxfit[MAXtpctrNum];//read fit parameters
-  G4double vtxpyfit[MAXtpctrNum];//read fit parameters
-  G4double vtxpzfit[MAXtpctrNum];//read fit parameters
+  // G4double vtxpxfit[MAXtpctrNum];//read fit parameters
+  // G4double vtxpyfit[MAXtpctrNum];//read fit parameters
+  // G4double vtxpzfit[MAXtpctrNum];//read fit parameters
 
 
   G4double mean[MAXtpctrNum];//read fit parameters
@@ -455,30 +380,8 @@ nsigma = nmpv * sigma_amp;
   G4double pad_in[40];
   G4double pad_out[40];
   G4double tpc_rad;
+
 public:
-  /*  //sako-san's code start
-      ResHypTPC(double pad_size=2., double pad_length=10., double threshold=0.1, double diff_T=0.18, double smearing=0);
-      ~ResHypTPC() {};
-
-      double getXDeviation(int &n_electron, int &n_pad, double &x_rms, double x, double y, double dxdz, double dydz);
-      double getYDeviation(double y);
-
-      double getDiffusionX(double y) const {
-      if (y>=0) {
-      return diffusion_T*sqrt(y/10.);
-      } else {
-      return -1;
-      }
-      };
-      double getNsum() {
-      return n_sum;
-      };
-
-      double getNcutoff() {
-      return ncutoff;
-      }
-      //sako-san's code end*/
-
   void BeginOfRunAction(int runnum);
   void EndOfRunAction();
   void BeginOfEventAction();

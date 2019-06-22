@@ -302,13 +302,13 @@ TPCAnaRoot::BeginOfEventAction( void )
     tree1ev.trpztpcfit[i]  = -9999.9999;
 
     tree1ev.trpmtpc[i]  = -9999.9999;
-    tree1ev.trqqtpc[i]  = -9999.9999;
+    tree1ev.trqqtpc[i]  = -9999;
 
     tree1ev.trdetpc[i]  = -9999.9999;
     tree1ev.trlentpc[i]  = -9999.9999;
     tree1ev.trdedxtpc[i]  = -9999.9999;
     tree1ev.trdedxtrtpc[i]  = -9999.9999;
-    tree1ev.trlaytpc[i]  = -9999.9999;
+    tree1ev.trlaytpc[i]  = -9999;
 
     tree1ev.cir_r[i]  = -9999.9999;
     tree1ev.cir_x[i]  = -9999.9999;

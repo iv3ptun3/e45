@@ -304,7 +304,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
 
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z, pbeam;
-  G4double rmk=0.493677;
+  // G4double rmk=0.493677;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonPlus;
@@ -389,7 +389,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   Thetakp = Hdibaryon.GetThetaCM(1);
   //  Phikp = Hdibaryon.GetPhi(5);
   //  G4cout<<Phikp<<G4endl;
-  G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4cout<<"phi test: "<<Phikp<<":"<<shphi<<G4endl;
@@ -425,7 +425,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  G4cout<<"Theta LAB :"<<":"<<acos(momk[2]/momkpp)*180/3.141592654<<G4endl;
   //  G4cout<<"Theta CM gen:"<<Thetakp<<G4endl;
   //  G4cout<<"Theta CM cal:"<<acos(momcmk[2]/momcmkpp)*180/3.141592654<<G4endl;
-  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
+  // G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
 
 //  G4cout<<"sh phi:"<<shphi<<G4endl;
 //  G4cout<<"cm phi:"<<cmphik<<G4endl;
@@ -447,13 +447,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   G4double hcm[4];
 
   test=lorentz(hlab,beta,hcm);
-  G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
+  // G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
   // cmh->Fill(acos(hcm[2]/hcmpp)/3.141592654*180);
 
   // coscmh->Fill(hcm[2]/hcmpp);
 
   //  G4double checkphi;
-  G4double hphi=atan2(hcm[1],hcm[0])/3.141592654*180;
+  // G4double hphi=atan2(hcm[1],hcm[0])/3.141592654*180;
   //  G4double hphilab=atan2(hlab[1],hlab[0])/3.141592654*180;
 
   // phih->Fill(hphi);
@@ -475,7 +475,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon2( G4Event* anEvent )
   //  G4cout<<"mom sum Y H:kp:"<<momH[1]<<":"<<mom_kp_y<<G4endl;
   //  G4cout<<"mom sum Z H:kp:"<<momH[2]<<":"<<mom_kp_z<<G4endl;
 
-  G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
+  // G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
   //  G4cout<<rmk<<G4endl;
   //  G4cout<<"MM(K+):"<<misskp<<G4endl;
   //  G4cout<<"pp:"<<pbeam<<G4endl;
@@ -640,7 +640,7 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
 
   test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
   // coscmk->Fill(momcmk[2]/momcmkpp);
@@ -648,7 +648,7 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
+  // G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
   //  phik->Fill(shphi);
 
 
@@ -688,8 +688,8 @@ TPCPrimaryGeneratorAction::Generate_hanul( G4Event* anEvent )
 
 
   G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  G4double rmk=0.493677;
-  G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
+  // G4double rmk=0.493677;
+  // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //  missk->Fill(misskp);
 
@@ -708,17 +708,17 @@ void
 TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
 {
 
-  G4double Energy_Be10,momentum_Be10[4]={0.};
-  G4double Energy_L1, momentum_L1[4]={0.};
-  G4double Energy_L2, momentum_L2[4]={0.};
-  G4double Energy_kp, momentum_kp[4]={0.};
+  // G4double Energy_Be10,momentum_Be10[4]={0.};
+  // G4double Energy_L1, momentum_L1[4]={0.};
+  // G4double Energy_L2, momentum_L2[4]={0.};
+  // G4double Energy_kp, momentum_kp[4]={0.};
 
-  G4double ThetaBe10, PhiBe10;
-  G4double ThetaL1, PhiL1;
-  G4double ThetaL2, PhiL2;
-  G4double Thetakp1, Phikp1;
+  // G4double ThetaBe10, PhiBe10;
+  // G4double ThetaL1, PhiL1;
+  // G4double ThetaL2, PhiL2;
+  // G4double Thetakp1, Phikp1;
 
-  G4double mom[3];
+  // G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
   G4double rmC12, rmBe10,rmL,rmkp;
 
@@ -744,7 +744,7 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
   //  kaonMinus->DumpTable();
 
   G4int Z = 6, A = 12;
-  G4double ionCharge   = 0.*eplus;
+  // G4double ionCharge   = 0.*eplus;
   G4double excitEnergy = 0.*keV;
   Carbon12 = G4IonTable::GetIonTable()->GetIon(Z,A,excitEnergy);
   //    Carbon12->DumpTable();
@@ -767,7 +767,7 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
   rmBe10=Beryllium10->GetPDGMass()/GeV;
   rmL=Lambda1->GetPDGMass()/GeV;
 
-  G4double W=sqrt(pow(Ebeam+rmC12,2)-pow(pbeam/GeV,2));
+  // G4double W=sqrt(pow(Ebeam+rmC12,2)-pow(pbeam/GeV,2));
   //  G4cout<<"C mass------->"<<Carbon12->GetPDGMass()/GeV<<G4endl;
   //  G4cout<<"Be mass------->"<<Beryllium10->GetPDGMass()/GeV<<G4endl;
   //  G4cout<<"W------->"<<W<<G4endl;
@@ -999,7 +999,7 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 {
-  G4double  momk[3], mom[3];
+  G4double  momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -1071,13 +1071,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -1125,7 +1125,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -1197,13 +1197,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -1252,7 +1252,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_S( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -1324,13 +1324,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -1378,7 +1378,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_PHSG_LL( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
 {
-  G4double  momk[3], mom[3];
+  G4double  momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -1453,11 +1453,11 @@ TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
 
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
@@ -1619,13 +1619,13 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(2.*0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -1751,7 +1751,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -1916,7 +1916,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -2001,7 +2001,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam=0.;
 
   G4double pbm[4];
@@ -2058,12 +2058,12 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 
 
   */
-  G4double x0;
-  G4double y0;
-  G4double z0;
-  G4double mom_beam;
+  // G4double x0;
+  // G4double y0;
+  // G4double z0;
+  // G4double mom_beam;
   G4String particleName;
-  G4ParticleDefinition* particle;
+  // G4ParticleDefinition* particle;
 
   G4double vtx;
   G4double vty;
@@ -2109,7 +2109,6 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
   G4double p_proton[4]={0};
   //  gAnaMan.SetFermiMotion(p_proton);
 
- up:
   ///prepare real distribution
   Ebeam = sqrt(pbeam*pbeam+pipMass/GeV*pipMass/GeV);
   pbm[0]=pbeam_x;
@@ -2151,10 +2150,10 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pipMass*pipMass);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0};
+  // G4double momcmk[4]={0};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -2186,7 +2185,7 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pip( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam=0.;
 
   G4double pbm[4];
@@ -2243,12 +2242,12 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
 
 
   */
-  G4double x0;
-  G4double y0;
-  G4double z0;
-  G4double mom_beam;
+  // G4double x0;
+  // G4double y0;
+  // G4double z0;
+  // G4double mom_beam;
   G4String particleName;
-  G4ParticleDefinition* particle;
+  // G4ParticleDefinition* particle;
 
   G4double vtx;
   G4double vty;
@@ -2294,7 +2293,6 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
   G4double p_proton[4]={0};
   //  gAnaMan.SetFermiMotion(p_proton);
 
- up:
   ///prepare real distribution
   Ebeam = sqrt(pbeam*pbeam+pinMass/GeV*pinMass/GeV);
   pbm[0]=pbeam_x;
@@ -2336,10 +2334,10 @@ TPCPrimaryGeneratorAction::Generate_E45_elastic_pin( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+pinMass*pinMass);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0};
+  // G4double momcmk[4]={0};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -2447,7 +2445,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode1( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   G4double e1=0.,e2=0.,e3=0,etot=0.,invm2=0.,ptot=0.,invm=0.;
@@ -2590,7 +2588,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode2( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -2763,7 +2761,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode3( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -2936,7 +2934,7 @@ TPCPrimaryGeneratorAction::Generate_hybrid3body_mode4( G4Event* anEvent )
   mom_pi2_z = mom[2];
 
   Thetapi2 = Hybrid.GetThetaCM(1);
-  G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_pro_y,mom_pro_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -3040,7 +3038,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
   G4double mom[3];
   G4double Ebeam,pg_x,pg_y,pg_z;
   G4double pbeam;
-  G4double rmk=0.493677;
+  // G4double rmk=0.493677;
 
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* kaonPlus;
@@ -3114,7 +3112,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
   mom_kp_z = mom[2];
 
   Thetakp = Hdibaryon.GetThetaCM(1);
-  G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   G4double beta= sqrt(pbeam*pbeam)/(2.*0.938272013+Ebeam);
@@ -3138,7 +3136,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon1( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
+  // G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
   //missk->Fill(misskp);
 
   //cal for invariant mass
@@ -3589,13 +3587,13 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
   //  G4cout<<"mom_ks:"<<mom_ksp_x<<":"<<mom_ksp_y<<":"<<mom_ksp_z<<G4endl;
-  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -3605,7 +3603,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad1( G4Event* anEvent )
   //coscmk->Fill(momcmk[2]/momcmkpp);
 
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
   //  G4double misskp = missks(pbeam,kstar0->GetPDGMass()/GeV,momks);
   //  G4cout<<"missing mass : "<<misskp<<G4endl;
 
@@ -3727,13 +3725,13 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
   //  G4cout<<"mom_ks:"<<mom_ksp_x<<":"<<mom_ksp_y<<":"<<mom_ksp_z<<G4endl;
-  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -3743,7 +3741,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_rad2( G4Event* anEvent )
   //coscmk->Fill(momcmk[2]/momcmkpp);
 
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
   //  G4double misskp = missks(pbeam,kstar0->GetPDGMass()/GeV,momks);
   //  G4cout<<"missing mass : "<<misskp<<G4endl;
 
@@ -3805,17 +3803,19 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   G4double Thetakp;//, Phikp;
 
   G4double mom[3];
-  G4double Ebeam,pg_x,pg_y,pg_z, pbeam;
-  G4double rmk=0.493677;
+  G4double Ebeam;
+  // G4double pg_x, pg_y, pg_z;
+  G4double pbeam;
+  // G4double rmk=0.493677;
 
   //  G4cout<<"check111"<<G4endl;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
-  G4ParticleDefinition* sigmaPlus;
-  G4ParticleDefinition* sigmaMinus;
-  G4ParticleDefinition* sigmaZero;
+  // G4ParticleDefinition* sigmaPlus;
+  // G4ParticleDefinition* sigmaMinus;
+  // G4ParticleDefinition* sigmaZero;
   G4ParticleDefinition* piPlus;
-  G4ParticleDefinition* piZero;
+  // G4ParticleDefinition* piZero;
   G4ParticleDefinition* piMinus;
   G4ParticleDefinition* proton;
   G4ParticleDefinition* kaonZero;
@@ -3930,7 +3930,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   Thetakp = Hdibaryon.GetThetaCM(1);
   //  Phikp = Hdibaryon.GetPhi(5);
   //  G4cout<<Phikp<<G4endl;
-  G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4cout<<"phi test: "<<Phikp<<":"<<shphi<<G4endl;
@@ -3961,7 +3961,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180.);
 
 
-  G4double cmphik=atan2(momk[1],momk[0])*180./3.141592654;
+  // G4double cmphik=atan2(momk[1],momk[0])*180./3.141592654;
 
 
   // coscmk->Fill((momcmk[2]/momcmkpp));
@@ -3980,13 +3980,13 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   G4double hcm[4];
 
   test=lorentz(hlab,beta,hcm);
-  G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
+  // G4double hcmpp=sqrt(pow(hcm[0],2)+pow(hcm[1],2)+pow(hcm[2],2));
   // cmh->Fill(acos(hcm[2]/hcmpp)/3.141592654*180);
 
   // coscmh->Fill(hcm[2]/hcmpp);
 
   //  G4double checkphi;
-  G4double hphi=atan2(hcm[1],hcm[0])/3.141592654*180;
+  // G4double hphi=atan2(hcm[1],hcm[0])/3.141592654*180;
 
   // phih->Fill(hphi);
   // thetadiff->Fill(acos(hcm[2]/hcmpp)/3.141592654*180+acos(momcmk[2]/momcmkpp)/3.141592654*180);
@@ -4003,7 +4003,7 @@ TPCPrimaryGeneratorAction::Generate_Lambda1405_reso( G4Event* anEvent )
   momH[1]=mom_L1_y+mom_L2_y;
   momH[2]=mom_L1_z+mom_L2_z;
 
-  G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
+  // G4double misskp = miss1(pbeam,rmk,momk);//pbeam, mass, momk
 
   //missk->Fill(misskp);
 
@@ -4135,13 +4135,13 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
   //  G4cout<<"mom_ks:"<<mom_ksp_x<<":"<<mom_ksp_y<<":"<<mom_ksp_z<<G4endl;
-  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -4151,7 +4151,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385_rad( G4Event* anEvent )
   //coscmk->Fill(momcmk[2]/momcmkpp);
 
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
   //  G4double misskp = missks(pbeam,kstar0->GetPDGMass()/GeV,momks);
   //  G4cout<<"missing mass : "<<misskp<<G4endl;
 
@@ -4273,13 +4273,13 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
   //  G4cout<<"momks:"<<momks[0]<<":"<<momks[1]<<":"<<momks[2]<<":"<<momks[3]<<G4endl;
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
   //  G4cout<<"mom_ks:"<<mom_ksp_x<<":"<<mom_ksp_y<<":"<<mom_ksp_z<<G4endl;
-  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -4289,7 +4289,7 @@ TPCPrimaryGeneratorAction::Generate_Sigma1385( G4Event* anEvent )
   //coscmk->Fill(momcmk[2]/momcmkpp);
 
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,k0->GetPDGMass()/GeV,momks);
   //  G4double misskp = missks(pbeam,kstar0->GetPDGMass()/GeV,momks);
   //  G4cout<<"missing mass : "<<misskp<<G4endl;
 
@@ -4419,13 +4419,13 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
   //  G4cout<<"Energy_ksp:  "<<Energy_ksp<<G4endl;
   //  G4cout<<"mom_ks:"<<mom_ksp_x<<":"<<mom_ksp_y<<":"<<mom_ksp_z<<G4endl;
   //  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
 
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -4470,7 +4470,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KsL( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
 {
-  G4double  momks[3], mom[3];
+  G4double  momks[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   //  G4double rmks=0.896;
@@ -4542,13 +4542,13 @@ TPCPrimaryGeneratorAction::Generate_pip_KsS( G4Event* anEvent )
   momks[2]=mom_ksp_z;
   momks[3]=sqrt(mom_ksp_x*mom_ksp_x+mom_ksp_y*mom_ksp_y+mom_ksp_z*mom_ksp_z+0.896*0.896);
   //  G4double momkpp=sqrt(pow(mom_ksp_x,2)+pow(mom_ksp_y,2)+pow(mom_ksp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
 
   //  G4double test=lorentz(momks,beta,momcmk);
   //  G4cout<<"test:"<<test<<G4endl;
   //  G4cout<<"beta:"<<beta<<G4endl;
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //  G4cout<<"mom comp-----------------------"<<G4endl;
   //  G4cout<<"mom comp:"<<momk[2]<<":"<<momcmk[2]<<G4endl;
   //  G4cout<<"mom comp:"<<momk[3]<<":"<<momcmk[3]<<G4endl;
@@ -4684,7 +4684,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarL( G4Event* anEvent )
   mom_kp_z = mom[2];
 
   Thetakp = Hdibaryon.GetThetaCM(1);
-  G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -4708,7 +4708,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarL( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,Lambda->GetPDGMass()/GeV,momk);//pbeam, mass, momk
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,Lambda->GetPDGMass()/GeV,momk);//pbeam, mass, momk
   //missk->Fill(misskp);
 
   //cal for invariant mass
@@ -4851,7 +4851,7 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
   mom_kp_z = mom[2];
 
   Thetakp = Hdibaryon.GetThetaCM(1);
-  G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
+  // G4double shphi=(atan2(mom_kp_y,mom_kp_x))/3.141592654*180.;
   //phik->Fill(shphi);
 
   G4double beta= sqrt(pbeam*pbeam)/(0.938272013+Ebeam);
@@ -4875,7 +4875,8 @@ TPCPrimaryGeneratorAction::Generate_pip_KstarS( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,Lambda->GetPDGMass()/GeV,momk);//pbeam, mass, momk
+  // G4double misskp = missks(pbeam,piMinus->GetPDGMass()/GeV,Lambda->GetPDGMass()/GeV,
+  // 			   momk);//pbeam, mass, momk
   //  missk->Fill(misskp);
 
   //cal for invariant mass
@@ -5030,7 +5031,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
 
   test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
   // coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5038,7 +5039,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
+  // G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
   //phik->Fill(shphi);
 
   //  G4cout<<pka[1]<<G4endl;
@@ -5066,8 +5067,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study( G4Event* anEvent )
   //  gAnaMan.SetPrimaryVertex(1,0.,0.,vtx[2]);
 
   G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  G4double rmk=0.493677;
-  G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
+  // G4double rmk=0.493677;
+  // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //  missk->Fill(misskp);
 
@@ -5372,7 +5373,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   momkpp=sqrt(pow(momk[0],2)+pow(momk[1],2)+pow(momk[2],2));
 
   test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
 
   // cmk->Fill(acos(momcmk[2]/momcmkpp)*180/3.141592654);
   // coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5380,7 +5381,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   // labk->Fill(acos(momk[2]/momkpp)*180/3.141592654);
   // coslabk->Fill(momk[2]/momkpp);
 
-  G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
+  // G4double shphi=(atan2(momk[1],momk[0]))/3.141592654*180.;
   //phik->Fill(shphi);
 
   // ---- proton -------------------
@@ -5442,8 +5443,8 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
   //  gAnaMan.SetPrimaryVertex(2,0.,0.,vtx[2]);
 
   G4double e1=0.,e2=0.,etot=0.,invm2=0.,ptot=0.,invm=0.;
-  G4double rmk=0.493677;
-  G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
+  // G4double rmk=0.493677;
+  // G4double misskp = miss1(pbm,rmk,momk);//pbeam, mass, momk
 
   //missk->Fill(misskp);
   ptot=pow(pL1[0]+pL2[0],2)+pow(pL1[1]+pL2[1],2)+pow(pL1[2]+pL2[2],2);
@@ -5459,7 +5460,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_all( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 {
-  G4double  momk[3], mom[3];
+  G4double  momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -5518,11 +5519,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5562,7 +5563,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -5622,11 +5623,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(0.938272013+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5666,7 +5667,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_knp_beam( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -5731,11 +5732,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   // cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5775,7 +5776,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -5838,11 +5839,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEven
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5882,7 +5883,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi_beam_only_kp( G4Event* anEven
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[4];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -5953,11 +5954,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180.);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);
@@ -5997,7 +5998,7 @@ TPCPrimaryGeneratorAction::Generate_E07_study_kpxi1530( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
 {
-  G4double momk[3], mom[3];
+  G4double momk[4], mom[3];
   G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
   G4double pbm[4];
@@ -6083,11 +6084,11 @@ TPCPrimaryGeneratorAction::Generate_E07_study_Takahashi( G4Event* anEvent )
   momk[2]=mom_kp_z;
   momk[3]=sqrt(mom_kp_x*mom_kp_x+mom_kp_y*mom_kp_y+mom_kp_z*mom_kp_z+0.493677*0.493677);
   //  G4double momkpp=sqrt(pow(mom_kp_x,2)+pow(mom_kp_y,2)+pow(mom_kp_z,2));
-  G4double momcmk[4]={0.};
+  // G4double momcmk[4]={0.};
   //  G4double beta= pbeam/(proton->GetPDGMass()/GeV+Ebeam);
 
   //  G4double test=lorentz(momk,beta,momcmk);
-  G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
+  // G4double momcmkpp=sqrt(pow(momcmk[0],2)+pow(momcmk[1],2)+pow(momcmk[2],2));
   //cmk->Fill(acos(momcmk[2]/momcmkpp)/3.141592654*180);
   //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
   //coscmk->Fill(momcmk[2]/momcmkpp);

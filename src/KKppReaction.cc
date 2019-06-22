@@ -7,31 +7,33 @@
 
 #include "KKppReaction.hh"
 
+#include <G4Event.hh>
+#include <G4IonConstructor.hh>
+#include <G4LorentzVector.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleGun.hh>
+#include <G4ParticleTable.hh>
+#include <G4ParticleTypes.hh>
+#include <G4UImanager.hh>
+#include <Randomize.hh>
+
+#include <TTree.h>
+
+#include "AngDisGenerator.hh"
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
-#include "TPCPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
-#include "Kinema3Resonance.hh"
-#include "KinemaHResonance.hh"
-#include "Kinema3Body.hh"
-#include "Kinema4Body.hh"
-#include "KinemaHybrid.hh"
-#include "KinemaHweak.hh"
-#include "KinemaFermi.hh"
-#include "KinemaKstar.hh"
-#include "G4Event.hh"
-#include "G4ParticleGun.hh"
-#include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4UImanager.hh"
-#include "Randomize.hh"
-#include "G4ParticleTypes.hh"
-#include "G4IonConstructor.hh"
 #include "GeneratorHelper.hh"
-#include "AngDisGenerator.hh"
-#include <TTree.h>
+#include "Kinema3Body.hh"
+#include "Kinema3Resonance.hh"
+#include "Kinema4Body.hh"
+#include "KinemaFermi.hh"
+#include "KinemaHResonance.hh"
+#include "KinemaHweak.hh"
+#include "KinemaHybrid.hh"
+#include "KinemaKstar.hh"
 #include "TPCAnaManager.hh"
+#include "TPCPrimaryGeneratorAction.hh"
 
 namespace
 {

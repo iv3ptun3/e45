@@ -6,11 +6,9 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <libgen.h>
 #include <sstream>
 #include <vector>
-
-#include <TString.h>
-#include <TSystem.h>
 
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
@@ -35,7 +33,7 @@ ConfMan::~ConfMan( void )
 }
 
 //_____________________________________________________________________________
-Bool_t
+G4bool
 ConfMan::Initialize( void )
 {
   if( m_is_ready ){
@@ -54,30 +52,24 @@ ConfMan::Initialize( void )
   std::cout << "#D " << FUNC_NAME << std::endl
 	      << " open file : " << m_file[m_conf_key] << std::endl;
 
-  m_conf_dir = gSystem->DirName( m_file[m_conf_key] );
+  m_conf_dir = ::dirname( const_cast<char*>( m_file[m_conf_key].data() ) );
 
-  TString line;
-  while( ifs.good() && line.ReadLine( ifs ) ){
+  G4String line;
+  while( ifs.good() && line.readLine( ifs ) ){
     if( line[0]=='#' ) continue;
-    line.ReplaceAll(",",  ""); // remove ,
-    line.ReplaceAll(":",  ""); // remove :
-    line.ReplaceAll("\"", ""); // remove "
-
-    std::istringstream iss( line.Data() );
-    TString key, val;
+    std::istringstream iss( line );
+    G4String key, val;
     iss >> key >> val;
-    if( key.IsNull() || val.IsNull() )
+    if( key.isNull() || val.isNull() )
       continue;
-
     std::cout << " key = "   << std::setw(20) << std::left << key
 	      << " value = " << std::setw(30) << std::left << val
 	      << std::endl;
-
     m_file[key]   = FilePath(val);
     m_string[key] = val;
-    m_double[key] = val.Atof();
-    m_int[key]    = val.Atoi();
-    m_bool[key]   = (Bool_t)val.Atoi();
+    m_double[key] = std::strtod( val, nullptr );
+    m_int[key]    = std::strtol( val, nullptr, 10 );
+    m_bool[key]   = static_cast<G4bool>( std::strtol( val, nullptr, 10 ) );
   }
 
   if ( !InitializeParameterFiles() || !InitializeHistograms() )
@@ -91,22 +83,22 @@ ConfMan::Initialize( void )
 }
 
 //_____________________________________________________________________________
-Bool_t
-ConfMan::Initialize( const TString& file_name )
+G4bool
+ConfMan::Initialize( const G4String& file_name )
 {
   m_file[m_conf_key] = file_name;
   return Initialize();
 }
 
 //_____________________________________________________________________________
-Bool_t
+G4bool
 ConfMan::InitializeHistograms( void )
 {
   return true;
 }
 
 //_____________________________________________________________________________
-Bool_t
+G4bool
 ConfMan::InitializeParameterFiles( void )
 {
   return ( InitializeParameter<DCGeomMan>("DCGEO") &&
@@ -114,15 +106,15 @@ ConfMan::InitializeParameterFiles( void )
 }
 
 //_____________________________________________________________________________
-// Bool_t
+// G4bool
 // ConfMan::Finalize( void )
 // {
 //   return FinalizeProcess();
 // }
 
 //_____________________________________________________________________________
-TString
-ConfMan::FilePath( const TString& src ) const
+G4String
+ConfMan::FilePath( const G4String& src ) const
 {
   std::ifstream tmp( src );
   if ( tmp.good() )

@@ -19,7 +19,7 @@ class DCGeomRecord;
 class DCGeomMan
 {
 public:
-  static TString    ClassName( void );
+  static G4String   ClassName( void );
   static DCGeomMan& GetInstance( void );
   ~DCGeomMan( void );
 
@@ -89,10 +89,10 @@ public:
 };
 
 //_____________________________________________________________________________
-inline TString
+inline G4String
 DCGeomMan::ClassName( void )
 {
-  static const TString s_name("DCGeomMan");
+  static const G4String s_name("DCGeomMan");
   return s_name;
 }
 

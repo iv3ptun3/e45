@@ -32,7 +32,7 @@ private:
   double dudz[2];
   double dudw[2][5];
   double ddudw[2][5];
-  double qp;
+  // double qp;
 
   double z0;
   double u0[2];
@@ -63,13 +63,13 @@ private:
   double dK1[2],dK2[2],dK3[2],dK4[2];
 
   ///rungekutta hits
-  double rk_hits[50][30];//[par][nhit]
+  // double rk_hits[50][30];//[par][nhit]
   double RKHits[50][22];
 
   //  F-matrix
   //  double F[5][5];
 
-  double kmf_par[30][5];
+  // double kmf_par[30][5];
 
   /////kmf function
   int KMFinit1();

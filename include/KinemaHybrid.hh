@@ -1,9 +1,14 @@
-#ifndef __KINEMAHYBRID_HH__
-#define __KINEMAHYBRID_HH__
+// -*- C++ -*-
+
+#ifndef KINEMA_HYBRID_HH
+#define KINEMA_HYBRID_HH
 
 #include "Kinema2Body.hh"
 #include "Kinema3Body.hh"
-struct KINEMA_HYBRID{
+
+//_____________________________________________________________________________
+struct KINEMA_HYBRID
+{
   double E_1_lab;
   double p_1_lab;
   double M_1;
@@ -46,29 +51,36 @@ struct KINEMA_HYBRID{
   double Phi1,Phi2;
 };
 
-class KinemaHybrid {
+//_____________________________________________________________________________
+class KinemaHybrid
+{
+public:
+  KinemaHybrid( double m1, double m2, double m3, double m4, double m5,
+		double m_res, double width, double p1, double p2 );
+  ~KinemaHybrid( void );
+
 private:
   Kinema2Body kin1;
-  Kinema3Body kin2; // change.... shhwang
+  // Kinema3Body kin2; // change.... shhwang
   KINEMA_HYBRID kin3;
 
 public:
-  KinemaHybrid(double m1, double m2, double m3, double m4, double m5, double m_res, double width, double p1, double p2);
-  double p2E(double p,double m);
-  void CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi);
-  double deg2rad(double theta);
-  double rag2deg(double rag);
-  double RandSin(void);
-  void Dump(void);
-  double GetEnergy(int i);
-  double GetMomentum(int i);
-  void GetMomentum(int i, double *mom);
-  double GetTheta(int i);
-  double GetPhi(int i);
-  double GetThetaCM(int i);
-  double GetPhiCM(int i);
-  void  RotateMom(int i, double deg, double *mom);
-  double GetResMass(void);
+  double p2E( double p,double m );
+  void   CalcDistoribution( double unitx, double unity, double unitz,
+			    double *theta, double *phi );
+  double deg2rad( double theta );
+  double rag2deg( double rag );
+  double RandSin( void );
+  void   Dump( void );
+  double GetEnergy( int i );
+  double GetMomentum( int i );
+  void   GetMomentum( int i, double *mom );
+  double GetTheta( int i );
+  double GetPhi( int i );
+  double GetThetaCM( int i );
+  double GetPhiCM( int i );
+  void   RotateMom( int i, double deg, double *mom );
+  double GetResMass( void );
 };
 
 #endif

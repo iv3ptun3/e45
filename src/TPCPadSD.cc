@@ -26,7 +26,7 @@ namespace
 
 //_____________________________________________________________________________
 TPCPadSD::TPCPadSD( const G4String& name )
-  : G4VSensitiveDetector(name),
+  : G4VSensitiveDetector( name ),
     m_gem_discharge( gConf.Get<G4int>( "GemDischarge" ) ),
     m_gem_fix_dead( gConf.Get<G4int>( "GemFixDead" ) ),
     m_gem_dead_plane( gConf.Get<G4int>( "GemDeadPlane" ) ),
@@ -358,7 +358,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   //  G4double deltaep = aStep->GetDeltaEnergy();
   G4double tlength = aStep->GetTrack()-> GetTrackLength();
   G4double slength = aStep->GetTrack()-> GetStepLength();
-  G4double length = aStep-> GetStepLength();
+  // G4double length = aStep-> GetStepLength();
   G4int parentID =  aStep-> GetTrack()-> GetParentID();
 
   G4int parentID_pid = aStep-> GetTrack()->GetDynamicParticle()->GetDefinition()->GetPDGEncoding();

@@ -1,34 +1,40 @@
+// -*- C++ -*-
+
+#include "KinemaHybrid.hh"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "KinemaHybrid.hh"
-#include "Randomize.hh"
-#include "G4ios.hh"
+#include <CLHEP/Units/SystemOfUnits.h>
 
-#define PI 3.141592654
+#include <G4ios.hh>
+#include <Randomize.hh>
 
-KinemaHybrid::KinemaHybrid(double m1, double m2, double m3, double m4, double m5, double m_res, double width, double p1, double p2)
+//_____________________________________________________________________________
+KinemaHybrid::KinemaHybrid( double m1, double m2, double m3, double m4,
+			    double m5, double m_res, double width,
+			    double p1, double p2 )
 {
   double ECM;
   double vx_res, vy_res, vz_res;   /* unit vector */
-  double vx3, vy3, vz3;            /* unit vector */
-  double vx4, vy4, vz4;            /* unit vector */
-  double vx5, vy5, vz5;            /* unit vector */
-  double theta1, theta2;           /* tmpolary; theta1 represents 1st kinematics of 
-	                                         m1,m2,m_res, and m5.
-			             theta2 represents 2nd kinematics of m_res, m3, and m4*/
-
-  double phi3;                     /* 2phi(CM system)*/ 
-  double phi6;              /* log note p.43 */
+  // double vx3, vy3, vz3;            /* unit vector */
+  // double vx4, vy4, vz4;            /* unit vector */
+  // double vx5, vy5, vz5;            /* unit vector */
+  // double theta1, theta2;           /* tmpolary; theta1 represents
+  // 				      1st kinematics of m1, m2, m_res, and m5.
+  // 				      theta2 represents 2nd kinematics of
+  // 				      m_res, m3, and m4 */
+  // double phi3;                     /* 2phi(CM system)*/
+  double phi6;                     /* log note p.43 */
   double theta_res;                /* log note p.43 */
-  double Theta3,Phi3;              /*heta,Ph*/
-  double Theta4,Phi4;              /* eta,Ph*/
-  double Theta5,Phi5;              /* Ph*/
+  // double Theta3,Phi3;              /*heta,Ph*/
+  // double Theta4,Phi4;              /* eta,Ph*/
+  // double Theta5,Phi5;              /* Ph*/
   double Theta_res,Phi_res;        /* Theta,Ph*/
 
-  double m12;                      /* */
+  // double m12;                      /* */
   double mom[3];                      /* */
 
   //  G4cout<<"m1"<<m1<<G4endl;
@@ -70,9 +76,9 @@ KinemaHybrid::KinemaHybrid(double m1, double m2, double m3, double m4, double m5
   /* calculate m_res */
   theta_res = kin1.GetThetaLab();
 
-  vx_res = sin(PI*theta_res/180.0)*cos(PI*phi6/180.0);
+  vx_res = sin(CLHEP::pi*theta_res/180.0)*cos(CLHEP::pi*phi6/180.0);
   vy_res = -sin(deg2rad(theta_res))*sin(deg2rad(phi6));
-  vz_res = cos(PI*theta_res/180.0);
+  vz_res = cos(CLHEP::pi*theta_res/180.0);
 
   CalcDistoribution(vx_res, vy_res, vz_res, &Theta_res, &Phi_res);
 
@@ -159,19 +165,19 @@ KinemaHybrid::KinemaHybrid(double m1, double m2, double m3, double m4, double m5
     theta1 = kin1.GetThetaLab();
     theta2 = kin2.GetThetaLab();
 
-    vx3 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) - 
+    vx3 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) -
       sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vy3 = cos(deg2rad(phi6))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) +
       cos(deg2rad(theta1))*cos(deg2rad(phi6))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       sin(deg2rad(phi6))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vz3 = -sin(deg2rad(phi6))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) -
       cos(deg2rad(theta1))*sin(deg2rad(phi6))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       cos(deg2rad(phi6))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     CalcDistoribution(vx3, vy3, vz3, &Theta3, &Phi3);
-    
+
     kin3.E_3_lab = kin2.GetEnergyLab(3);
     kin3.p_3_lab = kin2.GetMomentumLab(3);
     kin3.P_3_lab[0] = kin3.p_3_lab*vx3;
@@ -179,24 +185,24 @@ KinemaHybrid::KinemaHybrid(double m1, double m2, double m3, double m4, double m5
     kin3.P_3_lab[2] = kin3.p_3_lab*vz3;
     kin3.theta3 = Theta3;
     kin3.phi3 = Phi3;
-    
+
     // m4 //
     theta1 = kin1.GetThetaLab();
     theta2 = -kin2.GetPhiLab();
-    
-    vx4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) - 
+
+    vx4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) -
       sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vy4 = cos(deg2rad(phi6))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) +
       cos(deg2rad(theta1))*cos(deg2rad(phi6))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       sin(deg2rad(phi6))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vz4 = -sin(deg2rad(phi6))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) -
       cos(deg2rad(theta1))*sin(deg2rad(phi6))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
     cos(deg2rad(phi6))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     CalcDistoribution(vx4, vy4, vz4, &Theta4, &Phi4);
-    
+
     kin3.E_4_lab = kin2.GetEnergyLab(4);
     kin3.p_4_lab = kin2.GetMomentumLab(4);
     kin3.P_4_lab[0] = kin3.p_4_lab*vx4;
@@ -209,22 +215,32 @@ KinemaHybrid::KinemaHybrid(double m1, double m2, double m3, double m4, double m5
   //Dump();
 }
 
-double KinemaHybrid::p2E(double p,double m)
+//_____________________________________________________________________________
+KinemaHybrid::~KinemaHybrid( void )
+{
+}
+
+//_____________________________________________________________________________
+double
+KinemaHybrid::p2E( double p,double m )
 {
   return sqrt(p*p + m*m);
 }
 
-void KinemaHybrid::CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi)
+//_____________________________________________________________________________
+void
+KinemaHybrid::CalcDistoribution( double unitx, double unity, double unitz,
+				 double *theta, double *phi )
 {
   *theta = rag2deg(acos(unitx));
 
-  if (unity>=0.0 && unitz>0.0) 
+  if (unity>=0.0 && unitz>0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<0.0 && unitz>=0.0) 
+  else if (unity<0.0 && unitz>=0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<=0.0 && unitz<0.0) 
+  else if (unity<=0.0 && unitz<0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity>0.0 && unitz<=0.0) 
+  else if (unity>0.0 && unitz<=0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
   else {
     fprintf(stderr,
@@ -236,18 +252,22 @@ void KinemaHybrid::CalcDistoribution(double unitx, double unity, double unitz, d
   return;
 }
 
-
-double KinemaHybrid::deg2rad(double theta) {
-  return 3.141592654*theta/180.0;
-}
-
-double KinemaHybrid::rag2deg(double rag)
+//_____________________________________________________________________________
+double KinemaHybrid::deg2rad( double theta )
 {
-  return 360.0 * rag/ (2.0 * 3.141592654);
+  return CLHEP::pi*theta/180.0;
 }
 
-    
-double KinemaHybrid::RandSin(void)
+//_____________________________________________________________________________
+double
+KinemaHybrid::rag2deg( double rag )
+{
+  return 360.0 * rag/ (2.0 * CLHEP::pi);
+}
+
+//_____________________________________________________________________________
+double
+KinemaHybrid::RandSin( void )
 {
   int success=0;
   double x,fx;
@@ -263,7 +283,9 @@ double KinemaHybrid::RandSin(void)
   return x;
 }
 
-void KinemaHybrid::Dump(void)
+//_____________________________________________________________________________
+void
+KinemaHybrid::Dump( void )
 {
   printf("======KinemaHybrid Dump======\n");
   printf("--Particle1--\n");
@@ -300,7 +322,9 @@ void KinemaHybrid::Dump(void)
   return;
 }
 
-double KinemaHybrid::GetEnergy(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetEnergy( int i )
 {
   switch (i) {
   case 1:
@@ -324,7 +348,9 @@ double KinemaHybrid::GetEnergy(int i)
   }
 }
 
-double KinemaHybrid::GetMomentum(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetMomentum( int i )
 {
   switch (i) {
   case 1:
@@ -348,7 +374,9 @@ double KinemaHybrid::GetMomentum(int i)
   }
 }
 
-void KinemaHybrid::GetMomentum(int i, double *mom)
+//_____________________________________________________________________________
+void
+KinemaHybrid::GetMomentum( int i, double *mom )
 {
   switch (i) {
   case 1:
@@ -382,7 +410,9 @@ void KinemaHybrid::GetMomentum(int i, double *mom)
   }
 }
 
-double KinemaHybrid::GetTheta(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetTheta( int i )
 {
   switch (i) {
   case 1:
@@ -406,7 +436,9 @@ double KinemaHybrid::GetTheta(int i)
   }
 }
 
-double KinemaHybrid::GetPhi(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetPhi( int i )
 {
   switch (i) {
   case 1:
@@ -430,7 +462,9 @@ double KinemaHybrid::GetPhi(int i)
   }
 }
 
-double KinemaHybrid::GetThetaCM(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetThetaCM( int i )
 {
   switch (i) {
   case 1:
@@ -445,7 +479,9 @@ double KinemaHybrid::GetThetaCM(int i)
   }
 }
 
-double KinemaHybrid::GetPhiCM(int i)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetPhiCM( int i )
 {
   switch (i) {
   case 1:
@@ -460,8 +496,9 @@ double KinemaHybrid::GetPhiCM(int i)
   }
 }
 
-
-void KinemaHybrid::RotateMom(int i, double deg, double *mom)
+//_____________________________________________________________________________
+void
+KinemaHybrid::RotateMom( int i, double deg, double *mom )
 {
   double Sin,Cos;
 
@@ -489,7 +526,9 @@ void KinemaHybrid::RotateMom(int i, double deg, double *mom)
   }
 }
 
-double KinemaHybrid::GetResMass(void)
+//_____________________________________________________________________________
+double
+KinemaHybrid::GetResMass( void )
 {
   return kin3.M_res;
 }

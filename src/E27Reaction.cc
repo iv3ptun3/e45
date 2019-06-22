@@ -7,11 +7,21 @@
 
 #include "E27Reaction.hh"
 
+#include <G4Event.hh>
+#include <G4IonConstructor.hh>
+#include <G4IonTable.hh>
+#include <G4LorentzVector.hh>
+#include <G4ParticleGun.hh>
+#include <G4ParticleGun.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4ParticleTypes.hh>
+#include <G4UImanager.hh>
+#include <Randomize.hh>
+
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
 #include "TPCPrimaryGeneratorAction.hh"
-#include "G4ParticleGun.hh"
 #include "Kinema3Resonance.hh"
 #include "KinemaHResonance.hh"
 #include "Kinema3Body.hh"
@@ -20,14 +30,6 @@
 #include "KinemaHweak.hh"
 #include "KinemaFermi.hh"
 #include "KinemaKstar.hh"
-#include "G4Event.hh"
-#include "G4ParticleGun.hh"
-#include "G4IonTable.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4UImanager.hh"
-#include "Randomize.hh"
-#include "G4ParticleTypes.hh"
-#include "G4IonConstructor.hh"
 #include "GeneratorHelper.hh"
 #include "AngDisGenerator.hh"
 #include "TPCAnaManager.hh"
@@ -955,7 +957,7 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   Lv_targ_p.setVectM(G4ThreeVector(0.,0.,0.), Mp);
   Lv_p.setVectM(LPf1, Mf1);
 
-  double mm = (Lv_beam + Lv_targ + (-1.)*Lv_p).mag();
+  double mm1 = (Lv_beam + Lv_targ + (-1.)*Lv_p).mag();
   double mm_p = (Lv_beam + Lv_targ_p + (-1.)*Lv_p).mag();
 
   gAnaMan.SetPrimaryBeam(beam_mom.x(),beam_mom.y(),beam_mom.z());
@@ -993,7 +995,7 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
 
   gAnaMan.SetNumberOfPrimaryParticle(3);
 
-  gAnaMan.SetPrimaryInfo(mm, mm_p, thetap, theta_scat, theta_CM);
+  gAnaMan.SetPrimaryInfo(mm1, mm_p, thetap, theta_scat, theta_CM);
   gAnaMan.SetPrimaryParticle(0,LPf1.x(),LPf1.y(),LPf1.z(),Proton->GetPDGMass()/GeV);
   gAnaMan.SetPrimaryParticle(1,LPf2.x(),LPf2.y(),LPf2.z(),Lambda->GetPDGMass()/GeV);
   gAnaMan.SetPrimaryParticle(2,LPf3.x(),LPf3.y(),LPf3.z(),Be10->GetPDGMass()/GeV);

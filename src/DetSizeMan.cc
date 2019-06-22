@@ -24,7 +24,7 @@ DetSizeMan::~DetSizeMan( void )
 }
 
 //_____________________________________________________________________________
-Bool_t
+G4bool
 DetSizeMan::Initialize( void )
 {
   std::ifstream ifs( m_file_name );
@@ -34,17 +34,17 @@ DetSizeMan::Initialize( void )
     return false;
   }
 
-  TString line;
-  while( ifs.good() && line.ReadLine(ifs) ){
+  G4String line;
+  while( ifs.good() && line.readLine(ifs) ){
     if( line[0]=='#' ) continue;
-    std::istringstream input_line( line.Data() );
+    std::istringstream input_line( line );
 
-    TString first_param;
+    G4String first_param;
     input_line >> first_param;
 
-    TString key = first_param;
+    G4String key = first_param;
     ParamArray param_array;
-    Double_t   param;
+    G4double   param;
     while( input_line >> param ){
       param_array.push_back( param );
     }
@@ -56,20 +56,20 @@ DetSizeMan::Initialize( void )
 }
 
 //_____________________________________________________________________________
-Bool_t
-DetSizeMan::Initialize( const TString& filename )
+G4bool
+DetSizeMan::Initialize( const G4String& filename )
 {
   m_file_name = filename;
   return Initialize();
 }
 
 //_____________________________________________________________________________
-Int_t
-DetSizeMan::GetSize( const TString& key ) const
+G4int
+DetSizeMan::GetSize( const G4String& key ) const
 {
   PIterator itr = m_param_map.find(key);
   if( itr==m_param_map.end() ){
-    Print(m_file_name);
+    Print();
     std::cerr << "#E " << FUNC_NAME << " "
 		<< "No such key : " << key << std::endl;
     return 0;
@@ -79,8 +79,8 @@ DetSizeMan::GetSize( const TString& key ) const
 }
 
 //_____________________________________________________________________________
-Double_t
-DetSizeMan::Get( const TString& key, Int_t i ) const
+G4double
+DetSizeMan::Get( const G4String& key, G4int i ) const
 {
   std::stringstream param;
   param << key << "(" << i << ")";
@@ -88,7 +88,7 @@ DetSizeMan::Get( const TString& key, Int_t i ) const
   PIterator itr = m_param_map.find(key);
 
   if( itr==m_param_map.end() ||
-      i+1 > (Int_t)itr->second.size() ){
+      i+1 > (G4int)itr->second.size() ){
     throw std::invalid_argument( std::string(FUNC_NAME+" No such key : "+key) );
   }
 
@@ -97,16 +97,16 @@ DetSizeMan::Get( const TString& key, Int_t i ) const
 
 //_____________________________________________________________________________
 void
-DetSizeMan::Print( Option_t* ) const
+DetSizeMan::Print( void ) const
 {
   std::cout << "#D " << FUNC_NAME << std::endl;
 
-  const Int_t w = 20;
+  const G4int w = 20;
   PIterator itr, end=m_param_map.end();
   for( itr=m_param_map.begin(); itr!=end; ++itr){
     std::cout << " key = " << std::setw(w) << std::left
 		<< itr->first << itr->second.size() << " : ";
-    for( Int_t i=0, n=itr->second.size(); i<n; ++i ){
+    for( G4int i=0, n=itr->second.size(); i<n; ++i ){
       std::cout << std::setw(5) << std::right
 		  << itr->second.at(i) << " ";
     }

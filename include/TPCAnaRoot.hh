@@ -1,9 +1,8 @@
 // -*- C++ -*-
 
-#ifndef TPCANAROOT_HH
-#define TPCANAROOT_HH
+#ifndef TPC_ANA_ROOT_HH
+#define TPC_ANA_ROOT_HH
 
-#include <globals.hh>
 #include <G4ThreeVector.hh>
 
 class TH1F;

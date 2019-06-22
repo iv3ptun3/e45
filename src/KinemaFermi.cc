@@ -1,26 +1,32 @@
+// -*- C++ -*-
+
+#include "KinemaFermi.hh"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include "KinemaFermi.hh"
-#include "Randomize.hh"
-#include "G4ios.hh"
+#include <G4ios.hh>
+#include <Randomize.hh>
 
-#define PI acos(-1.)
+#include <CLHEP/Units/SystemOfUnits.h>
 
-KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1, double *p2,double cos_theta)
+//_____________________________________________________________________________
+KinemaFermi::KinemaFermi( double m1, double m2, double m3, double m4,
+			  double *p1, double *p2,double cos_theta )
 {
   double ECM;
   //  double vx0, vy0, vz0;            /* unit vector */
   double vx3, vy3, vz3;            /* unit vector */
   double vx4, vy4, vz4;            /* unit vector */
   double theta3, theta4;
-  double theta2,phi5, phi4;
-  double phi3;                     /* 2phi(CM system)*/ 
+  // double theta2,phi5;
+  double phi4;
+  double phi3;                     /* 2phi(CM system)*/
   double Theta3,Phi3;              /*heta,Ph*/
   double Theta4,Phi4;              /* eta,Ph*/
-  double P_Theta,P_Phi;              /* production angle*/
+  // double P_Theta,P_Phi;              /* production angle*/
   double theta1, phi1;
   //
   /// Let's think about vector
@@ -65,16 +71,16 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   G4cout<<"p2:"<<p2[0]<<", "<<p2[1]<<", "<<p2[2]<<G4endl;
   */
 
-  //  theta1=atan(sqrt(p12_sum[0]*p12_sum[0]+p12_sum[1]*p12_sum[1]),p12_sum[2])*180./PI);
+  //  theta1=atan(sqrt(p12_sum[0]*p12_sum[0]+p12_sum[1]*p12_sum[1]),p12_sum[2])*180./CLHEP::pi);
   //  G4cout<<"theta atan2:"<<theta1<<G4endl;
 
 
   //  G4cout<<"theta acos:"<<theta1<<G4endl;
 
-  theta1=atan2(sqrt(pow(p12_sum[0],2)+pow(p12_sum[1],2)),p12_sum[2])*180./PI;
-  phi1=atan2(p12_sum[1],p12_sum[0])*180./PI;
-  // theta1=acos(fabs(p12_sum[2])/p12_sum[3])*180./PI;
-  //  phi1=atan(p12_sum[1]/p12_sum[0])*180./PI;
+  theta1=atan2(sqrt(pow(p12_sum[0],2)+pow(p12_sum[1],2)),p12_sum[2])*180./CLHEP::pi;
+  phi1=atan2(p12_sum[1],p12_sum[0])*180./CLHEP::pi;
+  // theta1=acos(fabs(p12_sum[2])/p12_sum[3])*180./CLHEP::pi;
+  //  phi1=atan(p12_sum[1]/p12_sum[0])*180./CLHEP::pi;
 
   //  if(phi1<0) phi1+180.;
   //  G4cout<<"phi1:"<<phi1<<G4endl;
@@ -109,7 +115,7 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   //  } while (kin3.M_3+kin3.M_4 > kin3.M_res || kin3.M_res > ECM-kin3.M_5);
   //  kin3.M_res = m_res;
 
-  
+
   if(ECM<m3+m4){
     G4cout<<"Center of energy less than the mass sum for the produced particles"<<G4endl;
     return;
@@ -134,16 +140,16 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
     theta_p1_p2=acos((p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2])/(Plab1*Plab2));
   }
   /*
-  G4cout<<"theta_p1_psum:"<<theta_p1_psum<<G4endl;  
-  G4cout<<"theta_p2_psum:"<<theta_p2_psum<<G4endl;  
+  G4cout<<"theta_p1_psum:"<<theta_p1_psum<<G4endl;
+  G4cout<<"theta_p2_psum:"<<theta_p2_psum<<G4endl;
   G4cout<<"comp theta_p1_p2:"<<theta_p1_p2<<":"<<theta_p1_psum+theta_p2_psum<<G4endl;
   */
   /*
   G4cout<<"------------->"<<( p1[0]*p12_sum[0] + p1[1]*p12_sum[1] +p1[2]*p12_sum[2])<<G4endl;
   G4cout<<"------------->"<<Plab1*p12_sum[3]<<G4endl;
-  G4cout<<"------------->"<<PI<<G4endl;
+  G4cout<<"------------->"<<CLHEP::pi<<G4endl;
 
-  G4cout<<"theta_p1_p2:"<<theta_p1_p2*180./PI<<G4endl;
+  G4cout<<"theta_p1_p2:"<<theta_p1_p2*180./CLHEP::pi<<G4endl;
   G4cout<<"cos(theta_p1_psum)*Plab1:"<<cos(theta_p1_psum)*Plab1<<G4endl;
   G4cout<<"cos(theta_p2_psum)*Plab2:"<<cos(theta_p2_psum)*Plab2<<G4endl;
   //    G4cout<<p12_sum[3]<<":"<<cos(theta_p1_psum)*Plab1+cos(theta_p2_psum)*Plab2<<G4endl;
@@ -175,15 +181,15 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   G4cout<<"cos(theta_p2_psum)*Plab2:"<<cos(theta_p2_psum)*Plab2<<G4endl;
   */
   ///////////  kin1.SetThetaCM((double)RandSin()); //set to zero
-  kin1.SetThetaCM(acos(cos_theta)*180./PI); //input cross section value
+  kin1.SetThetaCM(acos(cos_theta)*180./CLHEP::pi); //input cross section value
 
   //  kin1.SetThetaCM(170.); //input cross section value
-  //  G4cout<<"rand sin:cos_theta-->"<<(double)RandSin()<<", "<<acos(cos_theta)*180./PI <<G4endl;
+  //  G4cout<<"rand sin:cos_theta-->"<<(double)RandSin()<<", "<<acos(cos_theta)*180./CLHEP::pi <<G4endl;
   kin1.calc_kinema();
   //  phi3 = (-180.+360.0*(double)CLHEP::RandFlat::shoot());
   phi3 = (360.0*(double)CLHEP::RandFlat::shoot());
 
-  
+
   kin3.Theta1CM = kin1.GetThetaCM();
   kin3.Phi1     = phi3;
   /*
@@ -200,11 +206,6 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
     vy3 = sin(deg2rad(theta3))*sin(deg2rad(phi3));
     vz3 = cos(deg2rad(theta3));
   */
-  G4double tmp;
-  theta1=theta1;
-  phi1=phi1;
-
-
 
 //////////new cal by shhwang
 /*
@@ -240,7 +241,7 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
     cos(deg2rad(theta1))*cos(deg2rad(phi1))*cos(deg2rad(phi3))*sin(deg2rad(theta3)) -
     sin(deg2rad(phi1))*sin(deg2rad(phi3))*sin(deg2rad(theta3)));
   vy3 = (sin(deg2rad(phi1))*cos(deg2rad(theta3))*sin(deg2rad(theta1)) +
-    cos(deg2rad(theta1))*sin(deg2rad(phi1))*cos(deg2rad(phi3))*sin(deg2rad(theta3))+ 
+    cos(deg2rad(theta1))*sin(deg2rad(phi1))*cos(deg2rad(phi3))*sin(deg2rad(theta3))+
     cos(deg2rad(phi1))*sin(deg2rad(phi3))*sin(deg2rad(theta3)));
   vz3 = cos(deg2rad(theta3))*cos(deg2rad(theta1)) -
     sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta3));
@@ -284,7 +285,7 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   vy4 = -sin(deg2rad(phi5))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) -
     cos(deg2rad(theta1))*sin(deg2rad(phi5))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
     cos(deg2rad(phi5))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-  vz4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) - 
+  vz4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) -
       sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta2));
   */
 
@@ -326,7 +327,7 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   CalcDistoribution(vx4, vy4, vz4, &Theta4, &Phi4);
 
   //  G4cout<<"vx4, vy4, vz4:"<<vx4<<", "<<vy4<<", "<<vz4<<G4endl;
-  //  G4cout<<"atan2"<<atan2(vy5,vx5)/PI*180.<<G4endl;
+  //  G4cout<<"atan2"<<atan2(vy5,vx5)/CLHEP::pi*180.<<G4endl;
   kin3.E_4_lab = kin1.GetEnergyLab(4);
   kin3.p_4_lab = kin1.GetMomentumLab(4);
   //  G4cout<<"kin3.p_4_lab:"<<kin3.p_4_lab<<G4endl;
@@ -345,22 +346,32 @@ KinemaFermi::KinemaFermi(double m1, double m2, double m3, double m4, double *p1,
   //Dump();
 }
 
-double KinemaFermi::p2E(double p,double m)
+//_____________________________________________________________________________
+KinemaFermi::~KinemaFermi( void )
+{
+}
+
+//_____________________________________________________________________________
+double
+KinemaFermi::p2E( double p,double m )
 {
   return sqrt(p*p + m*m);
 }
 
-void KinemaFermi::CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi)
+//_____________________________________________________________________________
+void
+KinemaFermi::CalcDistoribution( double unitx, double unity, double unitz,
+				double *theta, double *phi )
 {
   *theta = rag2deg(acos(unitx));
   *phi=rag2deg(atan2(unity,unitx));
-  /*  if (unity>=0.0 && unitz>0.0) 
+  /*  if (unity>=0.0 && unitz>0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<0.0 && unitz>=0.0) 
+  else if (unity<0.0 && unitz>=0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<=0.0 && unitz<0.0) 
+  else if (unity<=0.0 && unitz<0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity>0.0 && unitz<=0.0) 
+  else if (unity>0.0 && unitz<=0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
   else {
     fprintf(stderr,
@@ -373,18 +384,23 @@ void KinemaFermi::CalcDistoribution(double unitx, double unity, double unitz, do
   return;
 }
 
-
-double KinemaFermi::deg2rad(double theta) {
-  return PI*theta/180.0;
-}
-
-double KinemaFermi::rag2deg(double rag)
+//_____________________________________________________________________________
+double
+KinemaFermi::deg2rad( double theta )
 {
-  return 360.0 * rag/ (2.0 * PI);
+  return CLHEP::pi*theta/180.0;
 }
 
-    
-double KinemaFermi::RandSin(void)
+//_____________________________________________________________________________
+double
+KinemaFermi::rag2deg( double rag )
+{
+  return 360.0 * rag/ (2.0 * CLHEP::pi);
+}
+
+//_____________________________________________________________________________
+double
+KinemaFermi::RandSin( void )
 {
   int success=0;
   double x,fx;
@@ -400,7 +416,9 @@ double KinemaFermi::RandSin(void)
   return x;
 }
 
-void KinemaFermi::Dump(void)
+//_____________________________________________________________________________
+void
+KinemaFermi::Dump( void )
 {
   printf("======KinemaFermi Dump======\n");
   printf("--Particle1--\n");
@@ -430,7 +448,9 @@ void KinemaFermi::Dump(void)
   return;
 }
 
-double KinemaFermi::GetEnergy(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetEnergy( int i )
 {
   switch (i) {
   case 1:
@@ -451,7 +471,9 @@ double KinemaFermi::GetEnergy(int i)
   }
 }
 
-double KinemaFermi::GetMomentum(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetMomentum( int i )
 {
   switch (i) {
   case 1:
@@ -472,7 +494,9 @@ double KinemaFermi::GetMomentum(int i)
   }
 }
 
-void KinemaFermi::GetMomentum(int i, double *mom)
+//_____________________________________________________________________________
+void
+KinemaFermi::GetMomentum( int i, double *mom )
 {
   switch (i) {
   case 1:
@@ -501,7 +525,9 @@ void KinemaFermi::GetMomentum(int i, double *mom)
   }
 }
 
-double KinemaFermi::GetTheta(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetTheta( int i )
 {
   switch (i) {
   case 1:
@@ -522,7 +548,9 @@ double KinemaFermi::GetTheta(int i)
   }
 }
 
-double KinemaFermi::GetPhi(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetPhi( int i )
 {
   switch (i) {
   case 1:
@@ -543,7 +571,9 @@ double KinemaFermi::GetPhi(int i)
   }
 }
 
-double KinemaFermi::GetThetaCM(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetThetaCM( int i )
 {
   switch (i) {
   case 1:
@@ -555,7 +585,9 @@ double KinemaFermi::GetThetaCM(int i)
   }
 }
 
-double KinemaFermi::GetPhiCM(int i)
+//_____________________________________________________________________________
+double
+KinemaFermi::GetPhiCM( int i )
 {
   switch (i) {
   case 1:
@@ -567,8 +599,9 @@ double KinemaFermi::GetPhiCM(int i)
   }
 }
 
-
-void KinemaFermi::RotateMom(int i, double deg, double *mom)
+//_____________________________________________________________________________
+void
+KinemaFermi::RotateMom( int i, double deg, double *mom )
 {
   double Sin,Cos;
 
@@ -590,4 +623,3 @@ void KinemaFermi::RotateMom(int i, double deg, double *mom)
     exit(1);
   }
 }
-

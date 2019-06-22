@@ -394,19 +394,19 @@ TPCDetectorConstruction::ConstructHTOF( void )
   //    posMOut1.rotateY(dangleOut*0.5-(360/8./2.)*deg);
   //    G4cout<<DZ_SCINT1<<" "<<num_one_plane<<" "<<plane_width<<G4endl;
 
-  for(G4int k=0;k<8; k++){
-    for(G4int m=0;m<num_one_plane;m++){
-      G4ThreeVector posMOut1(337.*mm,0.*mm,+plane_width/2-DZ_SCINT1-DZ_SCINT1*2*m); //x,z,y??
+  for(G4int i=0;i<8; i++){
+    for(G4int j=0;j<num_one_plane;j++){
+      G4ThreeVector posMOut1(337.*mm,0.*mm,+plane_width/2-DZ_SCINT1-DZ_SCINT1*2*j); //x,z,y??
       G4RotationMatrix* rotMOutP = new G4RotationMatrix;
-      G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut*(k)), posMOut1.rotateY(dangleOut*(k)));
+      G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut*(i)), posMOut1.rotateY(dangleOut*(i)));
 
-      scintLV[k*num_one_plane+m] = new G4LogicalVolume(scintSolid1, m_material_map["Air"],
-						       Form("ScintLV%d",k*num_one_plane+m));//Scinti-->Air
-      G4int copyno=k*num_one_plane+m+6;
+      scintLV[i*num_one_plane+j] = new G4LogicalVolume(scintSolid1, m_material_map["Air"],
+						       Form("ScintLV%d",i*num_one_plane+j));//Scinti-->Air
+      G4int copyno=i*num_one_plane+j+6;
       if(copyno>31) copyno=copyno-32;
-      new G4PVPlacement( transformMP1, Form("ScintPV%d",k*num_one_plane+m), scintLV[k*num_one_plane+m], m_world_pv, FALSE, copyno );
-      scintVisAtt[k*num_one_plane+m] = new G4VisAttributes(true, G4Colour(0.,0.8,1.));
-      scintLV[k*num_one_plane+m]->SetVisAttributes(scintVisAtt[k*num_one_plane+m]);
+      new G4PVPlacement( transformMP1, Form("ScintPV%d",i*num_one_plane+j), scintLV[i*num_one_plane+j], m_world_pv, FALSE, copyno );
+      scintVisAtt[i*num_one_plane+j] = new G4VisAttributes(true, G4Colour(0.,0.8,1.));
+      scintLV[i*num_one_plane+j]->SetVisAttributes(scintVisAtt[i*num_one_plane+j]);
     }
   }
 
@@ -1757,35 +1757,28 @@ TPCDetectorConstruction::ConstructNBAR( void )
 
     const G4double DZ_NBAR1 = (n_bar_radius-DX_NBAR1)*tan(22.5*deg)*2/num_one_plane_nbar/2*mm;
     const G4double DY_NBAR1 = 500.0*mm;
-
-
     G4Box* nbarSolid1= new G4Box("SIDE NBAR1", DX_NBAR1,
 				 DY_NBAR1,  DZ_NBAR1);
-
-
     // 16 NBAR
-
     const G4double dangleOut_nbar = 22.5*2*deg;
     G4ThreeVector posMOut1_nbar(n_bar_radius*mm,0.*mm,(-DZ_NBAR1)); //x,z,y??
     G4ThreeVector posMOut2_nbar(n_bar_radius*mm,0.*mm,(+DZ_NBAR1)); //x,z,y??
     G4RotationMatrix* rotMOutP_nbar = new G4RotationMatrix;
     rotMOutP_nbar->rotateY(dangleOut_nbar*0.5-22.5*deg);
-
     posMOut1_nbar.rotateY(dangleOut_nbar*0.5-22.5*deg);
     posMOut2_nbar.rotateY(dangleOut_nbar*0.5-22.5*deg);
-
-    for(G4int k=0;k<8; k++){
-      for(G4int m=0;m<num_one_plane_nbar;m++){
-	G4ThreeVector posMOut1(n_bar_radius*mm,0.*mm,+plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*m); //x,z,y??
+    for(G4int i=0;i<8; i++){
+      for(G4int j=0;j<num_one_plane_nbar;j++){
+	G4ThreeVector posMOut1(n_bar_radius*mm,0.*mm,+plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*j); //x,z,y??
 	G4RotationMatrix* rotMOutP = new G4RotationMatrix;
-	G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut_nbar*(k)), posMOut1.rotateY(dangleOut_nbar*(k)));
-	nbarLV[k*num_one_plane_nbar+m] = new G4LogicalVolume(nbarSolid1, m_material_map["Scintillator"], Form("NBARLV%d",k*num_one_plane_nbar+m));
+	G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut_nbar*(i)), posMOut1.rotateY(dangleOut_nbar*(i)));
+	nbarLV[i*num_one_plane_nbar+j] = new G4LogicalVolume(nbarSolid1, m_material_map["Scintillator"], Form("NBARLV%d",i*num_one_plane_nbar+j));
 	/////id 0 is start forward scintillator
-	G4int copyno=k*num_one_plane_nbar+m+6;
+	G4int copyno=i*num_one_plane_nbar+j+6;
 	if(copyno>31) copyno=copyno-32;
-	new G4PVPlacement( transformMP1, Form("NBARPV%d",k*num_one_plane_nbar+m), nbarLV[k*num_one_plane_nbar+m], m_world_pv, FALSE, copyno );
-	nbarVisAtt[k*num_one_plane_nbar+m]= new G4VisAttributes(true, G4Colour(0.,0.8,1.));
-	nbarLV[k*num_one_plane_nbar+m]->SetVisAttributes(nbarVisAtt[k*num_one_plane_nbar+m]);
+	new G4PVPlacement( transformMP1, Form("NBARPV%d",i*num_one_plane_nbar+j), nbarLV[i*num_one_plane_nbar+j], m_world_pv, FALSE, copyno );
+	nbarVisAtt[i*num_one_plane_nbar+j]= new G4VisAttributes(true, G4Colour(0.,0.8,1.));
+	nbarLV[i*num_one_plane_nbar+j]->SetVisAttributes(nbarVisAtt[i*num_one_plane_nbar+j]);
       }
     }
   }
