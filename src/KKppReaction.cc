@@ -1,7 +1,6 @@
 // -*- C++ -*-
 
 /**
- * KKppReaction.cc
  * for the EventGeneration for the KKpp reaction
  */
 
@@ -43,6 +42,17 @@ namespace
   const auto& gConf = ConfMan::GetInstance();
   const auto& gGeom = DCGeomMan::GetInstance();
   const auto& gSize = DetSizeMan::GetInstance();
+}
+
+//_____________________________________________________________________________
+KKppReaction::KKppReaction( TPCPrimaryGeneratorAction * PGAction )
+  : pGen(PGAction)
+{
+}
+
+//_____________________________________________________________________________
+KKppReaction::~KKppReaction( void )
+{
 }
 
 //_____________________________________________________________________________

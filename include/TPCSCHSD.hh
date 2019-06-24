@@ -1,25 +1,25 @@
 // -*- C++ -*-
 
-#ifndef TPC_CH_SD_HH
-#define TPC_CH_SD_HH
+#ifndef TPC_SCH_SD_HH
+#define TPC_SCH_SD_HH
 
 #include <G4VSensitiveDetector.hh>
 
-#include "TPCCHHit.hh"
+#include "TPCSCHHit.hh"
 
 class G4HCofThisEvent;
 class G4Step;
 class G4TouchableHistory;
 
 //_____________________________________________________________________________
-class TPCCHSD : public G4VSensitiveDetector
+class TPCSCHSD : public G4VSensitiveDetector
 {
 public:
-  TPCCHSD( const G4String& name );
-  virtual ~TPCCHSD( void );
+  TPCSCHSD( const G4String& name );
+  virtual ~TPCSCHSD( void );
 
 private:
-  G4THitsCollection<TPCCHHit>* hitsCollection;
+  G4THitsCollection<TPCSCHHit>* hitsCollection;
 
 public:
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );

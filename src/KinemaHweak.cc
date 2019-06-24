@@ -56,7 +56,7 @@ KinemaHweak::KinemaHweak( double m1, double m2, double m3,
   kin1.SetMomentum(1, p1);
   kin1.SetMomentum(2, p2);
   kin1.SetThetaCM((double)RandSin()); //set to zero
-  kin1.calc_kinema();
+  kin1.CalcKinema();
   phi3 = (-180+360.0*(double)CLHEP::RandFlat::shoot());
 
   kin3.Theta1CM = kin1.GetThetaCM();

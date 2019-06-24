@@ -236,7 +236,7 @@ TPCAnaRoot::BeginOfEventAction( void )
   tree1ev.ntnbar = 0;
   tree1ev.ntsc = 0;
   tree1ev.ntdc = 0;
-  tree1ev.ntch = 0;
+  tree1ev.ntsch = 0;
   tree1ev.ntftof = 0;
   tree1ev.npid = 0;
   tree1ev.ntrtpc = 0;
@@ -250,7 +250,7 @@ TPCAnaRoot::BeginOfEventAction( void )
   tree1ev.HitNumNBAR_K=-1;
   tree1ev.HitNumDC_K=-1;
   tree1ev.HitNumFTOF_K=-1;
-  tree1ev.HitNumCH_K=-1;
+  tree1ev.HitNumSCH_K=-1;
   tree1ev.HitNumScint_K=-1;
   tree1ev.HitNumTarget_K=-1;
 
@@ -260,7 +260,7 @@ TPCAnaRoot::BeginOfEventAction( void )
   tree1ev.HitNumNBAR_p=-1;
   tree1ev.HitNumDC_p=-1;
   tree1ev.HitNumFTOF_p=-1;
-  tree1ev.HitNumCH_p=-1;
+  tree1ev.HitNumSCH_p=-1;
   tree1ev.HitNumScint_p=-1;
   tree1ev.HitNumTarget_p=-1;
 
@@ -456,33 +456,31 @@ TPCAnaRoot::BeginOfEventAction( void )
     tree1ev.trvtxydc[i]  = -9999.9999;
     tree1ev.trvtxzdc[i]  = -9999.9999;
   }
-
-
-  ///ch
+  // SCH
   for(int i=0; i<MaxTrig; i++){
-    tree1ev.xch[i] = -9999.9;
-    tree1ev.ych[i] = -9999.9;
-    tree1ev.zch[i] = -9999.9;
-    tree1ev.pxch[i] = -9999.9;
-    tree1ev.pych[i] = -9999.9;
-    tree1ev.pzch[i] = -9999.9;
-    tree1ev.tofch[i] = -9999.9;
-    tree1ev.chpID[i] = -9999;
+    tree1ev.xsch[i] = -9999.9;
+    tree1ev.ysch[i] = -9999.9;
+    tree1ev.zsch[i] = -9999.9;
+    tree1ev.pxsch[i] = -9999.9;
+    tree1ev.pysch[i] = -9999.9;
+    tree1ev.pzsch[i] = -9999.9;
+    tree1ev.tofsch[i] = -9999.9;
+    tree1ev.schpID[i] = -9999;
 
-    tree1ev.tidch[i] = -1;
-    tree1ev.pidch[i] = -1;
-    tree1ev.didch[i] = -1;
-    tree1ev.massch[i] = -1;
-    tree1ev.qqch[i] = -1;
+    tree1ev.tidsch[i] = -1;
+    tree1ev.pidsch[i] = -1;
+    tree1ev.didsch[i] = -1;
+    tree1ev.masssch[i] = -1;
+    tree1ev.qqsch[i] = -1;
 
-    tree1ev.trvtxppch[i]  = -9999.9999;
-    tree1ev.trvtxpxch[i]  = -9999.9999;
-    tree1ev.trvtxpych[i]  = -9999.9999;
-    tree1ev.trvtxpzch[i]  = -9999.9999;
+    tree1ev.trvtxppsch[i]  = -9999.9999;
+    tree1ev.trvtxpxsch[i]  = -9999.9999;
+    tree1ev.trvtxpysch[i]  = -9999.9999;
+    tree1ev.trvtxpzsch[i]  = -9999.9999;
 
-    tree1ev.trvtxxch[i]  = -9999.9999;
-    tree1ev.trvtxych[i]  = -9999.9999;
-    tree1ev.trvtxzch[i]  = -9999.9999;
+    tree1ev.trvtxxsch[i]  = -9999.9999;
+    tree1ev.trvtxysch[i]  = -9999.9999;
+    tree1ev.trvtxzsch[i]  = -9999.9999;
   }
 
   ///ftof
@@ -799,14 +797,14 @@ TPCAnaRoot::FillPrimaryInfo( double mm_d, double mm_p, double theta,
 //_____________________________________________________________________________
 void
 TPCAnaRoot::FillNumOfK( int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
-			int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
+			int HitNumDC_K, int HitNumSCH_K, int HitNumFTOF_K,
 			int HitNumScint_K, int HitNumTarget_K )
 {
   tree1ev.HitNum_K = HitNum_K;
   tree1ev.HitNumAC_K = HitNumAC_K;
   tree1ev.HitNumNBAR_K = HitNumNBAR_K;
   tree1ev.HitNumDC_K = HitNumDC_K;
-  tree1ev.HitNumCH_K = HitNumCH_K;
+  tree1ev.HitNumSCH_K = HitNumSCH_K;
   tree1ev.HitNumFTOF_K = HitNumFTOF_K;
   tree1ev.HitNumScint_K = HitNumScint_K;
   tree1ev.HitNumTarget_K = HitNumTarget_K;
@@ -815,14 +813,14 @@ TPCAnaRoot::FillNumOfK( int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
 //_____________________________________________________________________________
 void
 TPCAnaRoot::FillNumOfp( int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
-			int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
+			int HitNumDC_p, int HitNumSCH_p, int HitNumFTOF_p,
 			int HitNumScint_p, int HitNumTarget_p )
 {
   tree1ev.HitNum_p = HitNum_p;
   tree1ev.HitNumAC_p = HitNumAC_p;
   tree1ev.HitNumNBAR_p = HitNumNBAR_p;
   tree1ev.HitNumDC_p = HitNumDC_p;
-  tree1ev.HitNumCH_p = HitNumCH_p;
+  tree1ev.HitNumSCH_p = HitNumSCH_p;
   tree1ev.HitNumFTOF_p = HitNumFTOF_p;
   tree1ev.HitNumScint_p = HitNumScint_p;
   tree1ev.HitNumTarget_p = HitNumTarget_p;
@@ -1000,43 +998,43 @@ TPCAnaRoot::FillDCData( G4double time, G4double *pos, G4double *mom,
 
 //_____________________________________________________________________________
 void
-TPCAnaRoot::FillCHData( G4double time, G4double *pos, G4double *mom,
+TPCAnaRoot::FillSCHData( G4double time, G4double *pos, G4double *mom,
 			G4int tid, G4int pid, G4int did,G4double mass,
 			G4int qq,G4int parentID,
 			G4double vtxpx,G4double vtxpy,G4double vtxpz,
 			G4double vtxx,G4double vtxy,G4double vtxz,
 			G4double tlength )
 {
-  tree1ev.tofch[tree1ev.ntch] = time;
-  tree1ev.chpID[tree1ev.ntch] = parentID;
+  tree1ev.tofsch[tree1ev.ntsch] = time;
+  tree1ev.schpID[tree1ev.ntsch] = parentID;
   //  G4cout<<"particle:parentid :"<<pid<<":"<<parentID<<G4endl;
-  tree1ev.xch[tree1ev.ntch] = pos[0];
-  tree1ev.ych[tree1ev.ntch] = pos[1];
-  tree1ev.zch[tree1ev.ntch] = pos[2];
+  tree1ev.xsch[tree1ev.ntsch] = pos[0];
+  tree1ev.ysch[tree1ev.ntsch] = pos[1];
+  tree1ev.zsch[tree1ev.ntsch] = pos[2];
 
-  tree1ev.pxch[tree1ev.ntch] = mom[0]/GeV;
-  tree1ev.pych[tree1ev.ntch] = mom[1]/GeV;
-  tree1ev.pzch[tree1ev.ntch] = mom[2]/GeV;
-  tree1ev.ppch[tree1ev.ntch] = sqrt(pow(mom[0]/GeV,2)+pow(mom[1]/GeV,2)+pow(mom[2]/GeV,2));
+  tree1ev.pxsch[tree1ev.ntsch] = mom[0]/GeV;
+  tree1ev.pysch[tree1ev.ntsch] = mom[1]/GeV;
+  tree1ev.pzsch[tree1ev.ntsch] = mom[2]/GeV;
+  tree1ev.ppsch[tree1ev.ntsch] = sqrt(pow(mom[0]/GeV,2)+pow(mom[1]/GeV,2)+pow(mom[2]/GeV,2));
 
-  tree1ev.tidch[tree1ev.ntch] = tid;
-  tree1ev.pidch[tree1ev.ntch] = pid;
-  tree1ev.massch[tree1ev.ntch] = mass/GeV;
-  tree1ev.qqch[tree1ev.ntch] = qq;
-  tree1ev.didch[tree1ev.ntch] = did;
+  tree1ev.tidsch[tree1ev.ntsch] = tid;
+  tree1ev.pidsch[tree1ev.ntsch] = pid;
+  tree1ev.masssch[tree1ev.ntsch] = mass/GeV;
+  tree1ev.qqsch[tree1ev.ntsch] = qq;
+  tree1ev.didsch[tree1ev.ntsch] = did;
 
-  tree1ev.trvtxpxch[tree1ev.ntch] = vtxpx/GeV;
-  tree1ev.trvtxpych[tree1ev.ntch] = vtxpy/GeV;
-  tree1ev.trvtxpzch[tree1ev.ntch] = vtxpz/GeV;
-  tree1ev.trvtxppch[tree1ev.ntch] = sqrt(pow(vtxpx,2)+pow(vtxpy,2)+pow(vtxpz,2))/GeV;
+  tree1ev.trvtxpxsch[tree1ev.ntsch] = vtxpx/GeV;
+  tree1ev.trvtxpysch[tree1ev.ntsch] = vtxpy/GeV;
+  tree1ev.trvtxpzsch[tree1ev.ntsch] = vtxpz/GeV;
+  tree1ev.trvtxppsch[tree1ev.ntsch] = sqrt(pow(vtxpx,2)+pow(vtxpy,2)+pow(vtxpz,2))/GeV;
 
-  tree1ev.trvtxxch[tree1ev.ntch] = vtxx;
-  tree1ev.trvtxych[tree1ev.ntch] = vtxy;
-  tree1ev.trvtxzch[tree1ev.ntch] = vtxz;
+  tree1ev.trvtxxsch[tree1ev.ntsch] = vtxx;
+  tree1ev.trvtxysch[tree1ev.ntsch] = vtxy;
+  tree1ev.trvtxzsch[tree1ev.ntsch] = vtxz;
 
-  tree1ev.lengthch[tree1ev.ntch] = tlength+CLHEP::RandGauss::shoot(0.,20.);
+  tree1ev.lengthsch[tree1ev.ntsch] = tlength+CLHEP::RandGauss::shoot(0.,20.);
 
-  tree1ev.ntch++;
+  tree1ev.ntsch++;
 }
 
 //_____________________________________________________________________________

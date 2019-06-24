@@ -1,7 +1,11 @@
-#ifndef __KINEMA_CM2LAB__
-#define __KINEMA_CM2LAB__
+// -*- C++ -*-
 
-struct KINEMA_CM2LAB{
+#ifndef KINEMA_CM2LAB_HH
+#define KINEMA_CM2LAB_HH
+
+//_____________________________________________________________________________
+struct KinemaCM2Lab
+{
   double E_1_lab;
   double p_1_lab;
   double p_1_theta;

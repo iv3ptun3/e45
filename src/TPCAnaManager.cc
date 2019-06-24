@@ -231,7 +231,7 @@ void TPCAnaManager::BeginOfEventAction()
   HitNumAC=0;
   HitNumNBAR=0;
   HitNumDC=0;
-  HitNumCH=0;
+  HitNumSCH=0;
   HitNumFTOF=0;
   HitNumScint=0;
   HitNumTarget=0;
@@ -242,7 +242,7 @@ void TPCAnaManager::BeginOfEventAction()
   HitNumAC_K=0;
   HitNumNBAR_K=0;
   HitNumDC_K=0;
-  HitNumCH_K=0;
+  HitNumSCH_K=0;
   HitNumFTOF_K=0;
   HitNumScint_K=0;
   HitNumTarget_K=0;
@@ -253,7 +253,7 @@ void TPCAnaManager::BeginOfEventAction()
   HitNumAC_p=0;
   HitNumNBAR_p=0;
   HitNumDC_p=0;
-  HitNumCH_p=0;
+  HitNumSCH_p=0;
   HitNumFTOF_p=0;
   HitNumScint_p=0;
   HitNumTarget_p=0;
@@ -271,11 +271,11 @@ int TPCAnaManager::EndOfEventAction()
   anaRoot.FillGenMode(primaryBeam.gen, primaryBeam.mode);
 
   // anaRoot.FillNumOfK(HitNum_K, HitNumAC_K, HitNumNBAR_K,
-  // 		     HitNumDC_K, HitNumCH_K, HitNumFTOF_K,
+  // 		     HitNumDC_K, HitNumSCH_K, HitNumFTOF_K,
   // 		     HitNumScint_K, HitNumTarget_K);
   //  std::cout<<"HitNumDC_K="<<HitNumDC_K<<", HitNumFTOF_K="<<HitNumFTOF_K<<std::endl;
   // anaRoot.FillNumOfp(HitNum_p, HitNumAC_p, HitNumNBAR_p,
-  // 		     HitNumDC_p, HitNumCH_p, HitNumFTOF_p,
+  // 		     HitNumDC_p, HitNumSCH_p, HitNumFTOF_p,
   // 		     HitNumScint_p, HitNumTarget_p);
   // std::cout<<"HitNumDC_p="<<HitNumDC_p<<", HitNumFTOF_p="<<HitNumFTOF_p<<std::endl;
 
@@ -980,17 +980,17 @@ int TPCAnaManager::EndOfEventAction()
 
 
     //
-    // CH
+    // SCH
     //
 
-    for( G4int i=0; i<HitNumCH; i++){
-      anaRoot.FillCHData(chData[i].time, chData[i].pos,
-			 chData[i].mom,
-			 chData[i].trackID, chData[i].particleID,
-			 chData[i].detectorID,chData[i].massSH,chData[i].qqSH,chData[i].parentID,
-			 chData[i].vtxpx,chData[i].vtxpy,chData[i].vtxpz,
-			 chData[i].vtxx,chData[i].vtxy,chData[i].vtxz,
-			 chData[i].length
+    for( G4int i=0; i<HitNumSCH; i++){
+      anaRoot.FillSCHData(schData[i].time, schData[i].pos,
+			 schData[i].mom,
+			 schData[i].trackID, schData[i].particleID,
+			 schData[i].detectorID,schData[i].massSH,schData[i].qqSH,schData[i].parentID,
+			 schData[i].vtxpx,schData[i].vtxpy,schData[i].vtxpz,
+			 schData[i].vtxx,schData[i].vtxy,schData[i].vtxz,
+			 schData[i].length
 			 );
 
     }
@@ -1002,7 +1002,7 @@ int TPCAnaManager::EndOfEventAction()
 
     //    std::cout<<"tof:"<<HitNumFTOF<<std::endl;
     //    std::cout<<"dc:"<<HitNumDC<<std::endl;
-    //    std::cout<<"CH:"<<HitNumCH<<std::endl;
+    //    std::cout<<"SCH:"<<HitNumSCH<<std::endl;
 
     for( G4int i=0; i<HitNumFTOF; i++){
       anaRoot.FillFTOFData(ftofData[i].time, ftofData[i].pos,
@@ -1743,54 +1743,54 @@ void TPCAnaManager::SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mo
 }
 
 
-void TPCAnaManager::SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
+void TPCAnaManager::SetSCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,
 			      G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
 {
 
-  G4int hitnum = HitNumCH;
+  G4int hitnum = HitNumSCH;
 
   if (hitnum >= MaxTrack) {
     fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
 	    hitnum);
     return;
   }
-  chData[hitnum].time = time;
-  chData[hitnum].pos[ThreeVector::X] = pos.getX();
-  chData[hitnum].pos[ThreeVector::Y] = pos.getY();
-  chData[hitnum].pos[ThreeVector::Z] = pos.getZ();
-  chData[hitnum].mom[ThreeVector::X] = mom.getX();
-  chData[hitnum].mom[ThreeVector::Y] = mom.getY();
-  chData[hitnum].mom[ThreeVector::Z] = mom.getZ();
-  chData[hitnum].trackID = track;
-  //  std::cout<<"CH"<<std::endl;
+  schData[hitnum].time = time;
+  schData[hitnum].pos[ThreeVector::X] = pos.getX();
+  schData[hitnum].pos[ThreeVector::Y] = pos.getY();
+  schData[hitnum].pos[ThreeVector::Z] = pos.getZ();
+  schData[hitnum].mom[ThreeVector::X] = mom.getX();
+  schData[hitnum].mom[ThreeVector::Y] = mom.getY();
+  schData[hitnum].mom[ThreeVector::Z] = mom.getZ();
+  schData[hitnum].trackID = track;
+  //  std::cout<<"SCH"<<std::endl;
   //  std::cout<<track<<std::endl;
-  chData[hitnum].massSH = mass;
-  chData[hitnum].qqSH = qq;
-  chData[hitnum].particleID = particle;
-  chData[hitnum].detectorID = detector;
-  chData[hitnum].parentID = parentid;
-  chData[hitnum].length = tlength;
+  schData[hitnum].massSH = mass;
+  schData[hitnum].qqSH = qq;
+  schData[hitnum].particleID = particle;
+  schData[hitnum].detectorID = detector;
+  schData[hitnum].parentID = parentid;
+  schData[hitnum].length = tlength;
 
   //kine E = sqrt(p^2+m^2)-m
   //p=sqrt((E+m)^2-m^2)
   //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
   G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
-  chData[hitnum].vtxpx = totalmom*double(vtxmom.getX());
-  chData[hitnum].vtxpy = totalmom*double(vtxmom.getY());
-  chData[hitnum].vtxpz = totalmom*double(vtxmom.getZ());
-  chData[hitnum].vtxx = double(vtxpos.getX());
-  chData[hitnum].vtxy = double(vtxpos.getY());
-  chData[hitnum].vtxz = double(vtxpos.getZ());
+  schData[hitnum].vtxpx = totalmom*double(vtxmom.getX());
+  schData[hitnum].vtxpy = totalmom*double(vtxmom.getY());
+  schData[hitnum].vtxpz = totalmom*double(vtxmom.getZ());
+  schData[hitnum].vtxx = double(vtxpos.getX());
+  schData[hitnum].vtxy = double(vtxpos.getY());
+  schData[hitnum].vtxz = double(vtxpos.getZ());
 
   //  G4cout<<"particle:parentid :"<<particle<<":"<<parentid<<G4endl;
-  HitNumCH++;
+  HitNumSCH++;
 
   if(particle==321)//kaon
-    HitNumCH_K++;
+    HitNumSCH_K++;
 
   if(particle==2212)//proton
-    HitNumCH_p++;
+    HitNumSCH_p++;
 
   return;
 }

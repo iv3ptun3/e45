@@ -1,7 +1,6 @@
 // -*- C++ -*-
 
 /**
- * E27Reaction.cc
  * for the EventGeneration for the E27 experiment
  */
 

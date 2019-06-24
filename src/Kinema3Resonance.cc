@@ -16,11 +16,11 @@ Kinema3Resonance::Kinema3Resonance(double m1, double m2, double m3, double m4, d
   double vx3, vy3, vz3;            /* unit vector */
   double vx4, vy4, vz4;            /* unit vector */
   double vx5, vy5, vz5;            /* unit vector */
-  double theta1, theta2;           /* tmpolary; theta1 represents 1st kinematics of 
+  double theta1, theta2;           /* tmpolary; theta1 represents 1st kinematics of
 	                                         m1,m2,m_res, and m5.
 			             theta2 represents 2nd kinematics of m_res, m3, and m4*/
 
-  double phi3;                     /* 2phi(CM system)*/ 
+  double phi3;                     /* 2phi(CM system)*/
   double theta5,phi5;              /* log note p.43 */
   double theta_res;                /* log note p.43 */
   double Theta3,Phi3;              /*heta,Ph*/
@@ -63,7 +63,7 @@ Kinema3Resonance::Kinema3Resonance(double m1, double m2, double m3, double m4, d
 
   kin1.SetThetaCM((double)RandSin());
   //  kin1.SetThetaCM(acos(CLHEP::RandFlat::shoot(-1.,1.)));
-  kin1.calc_kinema();
+  kin1.CalcKinema();
   phi5 = (-180.+360.0*(double)CLHEP::RandFlat::shoot());
   kin3.Theta1CM = kin1.GetThetaCM();
   kin3.Phi1     = phi5;
@@ -138,14 +138,14 @@ Kinema3Resonance::Kinema3Resonance(double m1, double m2, double m3, double m4, d
     kin2.SetTheta(1,0.);
     kin2.SetTheta(2,0.);
     kin2.SetThetaCM((double)RandSin());
-    kin2.calc_kinema();
-    
+    kin2.CalcKinema();
+
     phi3 = (360.0*(double)CLHEP::RandFlat::shoot());
     //phi3 = 360.0*(double)rand()/(RAND_MAX+1.0);
-    
+
     kin3.Theta2CM = kin2.GetThetaCM();
     kin3.Phi2     = phi3;
-    
+
     /* m3 */
     theta1 = kin1.GetThetaLab();
     theta2 = kin2.GetThetaLab();
@@ -153,16 +153,16 @@ Kinema3Resonance::Kinema3Resonance(double m1, double m2, double m3, double m4, d
     vx3 = cos(deg2rad(phi5))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) +
       cos(deg2rad(theta1))*cos(deg2rad(phi5))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       sin(deg2rad(phi5))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vy3 = -sin(deg2rad(phi5))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) -
       cos(deg2rad(theta1))*sin(deg2rad(phi5))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       cos(deg2rad(phi5))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
 
-    vz3 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) - 
+    vz3 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) -
       sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     CalcDistoribution(vx3, vy3, vz3, &Theta3, &Phi3);
-    
+
     kin3.E_3_lab = kin2.GetEnergyLab(3);
     kin3.p_3_lab = kin2.GetMomentumLab(3);
     kin3.P_3_lab[0] = kin3.p_3_lab*vx3;
@@ -170,25 +170,25 @@ Kinema3Resonance::Kinema3Resonance(double m1, double m2, double m3, double m4, d
     kin3.P_3_lab[2] = kin3.p_3_lab*vz3;
     kin3.theta3 = Theta3;
     kin3.phi3 = Phi3;
-    
+
     /* m4 */
     theta1 = kin1.GetThetaLab();
     theta2 = -kin2.GetPhiLab();
-    
+
     vx4 = cos(deg2rad(phi5))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) +
       cos(deg2rad(theta1))*cos(deg2rad(phi5))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
       sin(deg2rad(phi5))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
-    
+
     vy4 = -sin(deg2rad(phi5))*cos(deg2rad(theta2))*sin(deg2rad(theta1)) -
       cos(deg2rad(theta1))*sin(deg2rad(phi5))*cos(deg2rad(phi3))*sin(deg2rad(theta2)) -
     cos(deg2rad(phi5))*sin(deg2rad(phi3))*sin(deg2rad(theta2));
 
-    vz4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) - 
+    vz4 = cos(deg2rad(theta2))*cos(deg2rad(theta1)) -
       sin(deg2rad(theta1))*cos(deg2rad(phi3))*sin(deg2rad(theta2));
 
-    
+
     CalcDistoribution(vx4, vy4, vz4, &Theta4, &Phi4);
-    
+
     kin3.E_4_lab = kin2.GetEnergyLab(4);
     kin3.p_4_lab = kin2.GetMomentumLab(4);
     kin3.P_4_lab[0] = kin3.p_4_lab*vx4;
@@ -209,13 +209,13 @@ void Kinema3Resonance::CalcDistoribution(double unitx, double unity, double unit
 {
   *theta = rag2deg(acos(unitz));
   *phi=rag2deg(atan2(unity,unitx));
-  /*  if (unity>=0.0 && unitz>0.0) 
+  /*  if (unity>=0.0 && unitz>0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<0.0 && unitz>=0.0) 
+  else if (unity<0.0 && unitz>=0.0)
     *phi = rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity<=0.0 && unitz<0.0) 
+  else if (unity<=0.0 && unitz<0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
-  else if (unity>0.0 && unitz<=0.0) 
+  else if (unity>0.0 && unitz<=0.0)
     *phi = 360.0-rag2deg(acos(unity/sin(deg2rad(*theta))));
   else {
 
@@ -240,7 +240,7 @@ double Kinema3Resonance::rag2deg(double rag)
   return 360.0 * rag/ (2.0 * 3.141592654);
 }
 
-    
+
 double Kinema3Resonance::RandSin(void)
 {
   int success=0;

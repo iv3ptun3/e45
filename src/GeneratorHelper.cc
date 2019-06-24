@@ -1,7 +1,6 @@
 // -*- C++ -*-
 
 /**
- * GeneratorHelper.cc
  * for the EventGeneration for the E27 experiment
  */
 

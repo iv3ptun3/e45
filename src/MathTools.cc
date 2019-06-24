@@ -1,24 +1,22 @@
-/*
-  MathTools.cc
-
-  2012/1/24
-*/
+// -*- C++ -*-
 
 #include "MathTools.hh"
 
+#include <cmath>
 #include <string>
 #include <iostream>
 #include <iomanip>
-
-#include <cmath>
 #include <limits>
 
-#define ERROROUT 1 
+namespace
+{
+  const double Infinity = std::numeric_limits<double>::infinity();
+  const double Tiny = std::numeric_limits<double>::epsilon();
+}
 
-const double Infinity = std::numeric_limits<double>::infinity();
-const double TINY = std::numeric_limits<double>::epsilon();
-
-bool MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
+//_____________________________________________________________________________
+bool
+MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
 {
   static const std::string funcname = "[MathTools::GaussElim]";
   double big,c,pivinv,sum,c2;
@@ -32,7 +30,7 @@ bool MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
         if((c=fabs(a[j][i]))>=big){ big=c; irow=j; }
       }
       else if(ipiv[j]>1){
-#ifdef ERROROUT
+#ifdef DEBUG
 	std::cerr << funcname << ": Singular Matrix" << std::endl;
 #endif
         return false;
@@ -40,13 +38,13 @@ bool MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
     }
     ++(ipiv[irow]); indx[i]=irow;
     if(a[irow][i]==0.0){
-#ifdef ERROROUT
+#ifdef DEBUG
       std::cerr << funcname << ": Singular Matrix" << std::endl;
 #endif
       return false;
     }
     pivinv=1.0/a[irow][i];
-    
+
     for(int j=0; j<n; ++j){
       if(ipiv[j]==0){
         c=a[j][i]; a[j][i]=0.0;
@@ -55,8 +53,8 @@ bool MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
         b[j]-=b[irow]*pivinv*c;
       }
     }
-  }        
-          
+  }
+
   b[indx[n-1]]/=a[indx[n-1]][n-1];
   for(int i=n-2; i>=0; --i){
     sum=b[indx[i]];
@@ -75,8 +73,10 @@ bool MathTools::GaussElim( double **a, int n, double *b, int *indx, int *ipiv )
   return true;
 }
 
-bool MathTools::GaussJordan( double **a, int n, double *b, 
-			     int *indxr, int *indxc, int *ipiv )
+//_____________________________________________________________________________
+bool
+MathTools::GaussJordan( double **a, int n, double *b,
+			int *indxr, int *indxc, int *ipiv )
 {
   static const std::string funcname = "[MathTools::GaussJordan]";
 
@@ -94,15 +94,15 @@ bool MathTools::GaussJordan( double **a, int n, double *b,
 	    }
 	  }
 	  else if( ipiv[k]>1 ){
-#ifdef ERROROUT
-	    std::cerr << funcname << ": Singular Matrix" 
+#ifdef DEBUG
+	    std::cerr << funcname << ": Singular Matrix"
 		      << std::endl;
 #endif
 	    return false;
 	  }
 	}
     ++(ipiv[icol]);
-    
+
     if( irow!=icol ){
       for( int k=0; k<n; ++k ){
 	double ta=a[irow][k];
@@ -113,11 +113,11 @@ bool MathTools::GaussJordan( double **a, int n, double *b,
       b[irow]=b[icol];
       b[icol]=tb;
     }
-    
+
     indxr[i]=irow; indxc[i]=icol;
 
     if(a[icol][icol]==0.0){
-#ifdef ERROROUT
+#ifdef DEBUG
       std::cerr << funcname << ": Singular Matrix"  << std::endl;
 #endif
       return false;
@@ -144,13 +144,15 @@ bool MathTools::GaussJordan( double **a, int n, double *b,
 	a[k][indxc[l]]=t;
       }
     }
-  }	  
+  }
   return true;
 }
 
-bool MathTools::InterpolateRatio( int n, const double *xa, const double *ya, 
-				  double *w1, double *w2,
-				  double x, double &y, double &dy )
+//_____________________________________________________________________________
+bool
+MathTools::InterpolateRatio( int n, const double *xa, const double *ya,
+			     double *w1, double *w2,
+			     double x, double &y, double &dy )
 {
   static const std::string funcname = "[MathTools::InterpolateRatio]";
   int i, m, ns=1;
@@ -160,8 +162,8 @@ bool MathTools::InterpolateRatio( int n, const double *xa, const double *ya,
   for(i=1; i<=n; ++i){
     h=fabs(x-xa[i-1]);
     if(h==0.0) { y=ya[i-1]; dy=0.0; return true; }
-    else if(h<hh){ ns=i; hh=h; } 
-    w1[i-1]=ya[i-1]; w2[i-1]=ya[i-1]*(1.+TINY);
+    else if(h<hh){ ns=i; hh=h; }
+    w1[i-1]=ya[i-1]; w2[i-1]=ya[i-1]*(1.+Tiny);
   }
   y=ya[ns-1]; ns--;
   for(m=1; m<n; ++m){
@@ -169,7 +171,7 @@ bool MathTools::InterpolateRatio( int n, const double *xa, const double *ya,
       w=w1[i]-w2[i-1]; h=xa[i+m-1]-x;
       t=(xa[i-1]-x)*w2[i-1]/h; dd=t-w1[i];
       if(dd==0.0){
-#ifdef ERROROUT
+#ifdef DEBUG
         std::cerr << funcname << ": Error" << std::endl;
 #endif
         y=Infinity; dy=Infinity; return false;
@@ -181,15 +183,17 @@ bool MathTools::InterpolateRatio( int n, const double *xa, const double *ya,
     y+=dy;
   }
 #if 0
-  std::cout << funcname << ": x=" << std::setw(10) << x 
-	    << " y=" << std::setw(10) << y << std::endl; 
+  std::cout << funcname << ": x=" << std::setw(10) << x
+	    << " y=" << std::setw(10) << y << std::endl;
 #endif
   return true;
 }
 
-bool MathTools::InterpolatePol( int n, const double *xa, const double *ya,
-				double *w1, double *w2, 
-				double x, double &y, double &dy )
+//_____________________________________________________________________________
+bool
+MathTools::InterpolatePol( int n, const double *xa, const double *ya,
+			   double *w1, double *w2,
+			   double x, double &y, double &dy )
 {
   static const std::string funcname = "[MathTools::InterpolatePol]";
   int i, m, ns=1;
@@ -207,7 +211,7 @@ bool MathTools::InterpolatePol( int n, const double *xa, const double *ya,
       w=w1[i]-w2[i-1];
       den=ho-hp;
       if(den==0.0){
-#ifdef ERROROUT
+#ifdef DEBUG
 	std::cerr << funcname << ": Error" << std::endl;
 #endif
 	y=Infinity; dy=Infinity; return false;
@@ -222,8 +226,10 @@ bool MathTools::InterpolatePol( int n, const double *xa, const double *ya,
   return false;
 }
 
-bool MathTools::SVDksb( double **u, const double *w, double **v,
-			int m, int n, const double *b, double *x, double *wv )
+//_____________________________________________________________________________
+bool
+MathTools::SVDksb( double **u, const double *w, double **v,
+		   int m, int n, const double *b, double *x, double *wv )
 {
   static const std::string funcname = "[MathTools::SVDksb]";
 
@@ -245,11 +251,11 @@ bool MathTools::SVDksb( double **u, const double *w, double **v,
   return true;
 }
 
-
+//_____________________________________________________________________________
 inline double pythag( double a, double b )
 {
   double aa=fabs(a), ab=fabs(b);
-  if( aa>ab ) 
+  if( aa>ab )
     return aa*sqrt(1.+(ab/aa)*(ab/aa));
   else if( ab!=0. )
     return ab*sqrt(1.+(aa/ab)*(aa/ab));
@@ -257,8 +263,10 @@ inline double pythag( double a, double b )
     return 0.0;
 }
 
-bool MathTools::SVDcmp( double **a, int m, int n, double *w, 
-			double **v, double *wv )
+//_____________________________________________________________________________
+bool
+MathTools::SVDcmp( double **a, int m, int n, double *w,
+		   double **v, double *wv )
 {
   static const std::string funcname = "[MathTools::SVDcmp]";
 
@@ -275,12 +283,12 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
   {
     std::ios::fmtflags oldFlags = std::cout.flags();
     std::size_t oldPrec = std::cout.precision();
-    std::cout.setf( std::ios::scientific ); 
-    std::cout.precision(3); 
+    std::cout.setf( std::ios::scientific );
+    std::cout.precision(3);
     std::cout << funcname << ": A in SVDcmp 1" <<  std::endl;
     for( int ii=0; ii<m; ++ii ){
       for( int ij=0; ij<n; ++ij ){
-	std::cout << std::setw(12) << a[ii][ij]; 
+	std::cout << std::setw(12) << a[ii][ij];
 	if( ij!=n-1 ) std::cout << ",";
       }
       std::cout << std::endl;
@@ -299,7 +307,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       if( ij!=n-1 ) std::cout << ",";
     }
     std::cout << std::endl;
-    
+
     std::cout << funcname << ": WV in SVDcmp 1" << std::endl;
     for( int ij=0; ij<n; ++ij ){
       std::cout << std::setw(12) << wv[ij];
@@ -307,7 +315,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }
     std::cout << std::endl;
     std::cout << std::endl;
-   
+
     std::cout.flags( oldFlags );
     std::cout.precision( oldPrec );
   }
@@ -369,12 +377,12 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
   {
     std::ios::fmtflags oldFlags = std::cout.flags();
     std::size_t oldPrec = std::cout.precision();
-    std::cout.setf( std::ios::scientific ); 
-    std::cout.precision(3); 
+    std::cout.setf( std::ios::scientific );
+    std::cout.precision(3);
     std::cout << funcname << ": A in SVDcmp 2" <<  std::endl;
     for( int ii=0; ii<m; ++ii ){
       for( int ij=0; ij<n; ++ij ){
-	std::cout << std::setw(12) << a[ii][ij]; 
+	std::cout << std::setw(12) << a[ii][ij];
 	if( ij!=n-1 ) std::cout << ",";
       }
       std::cout << std::endl;
@@ -393,7 +401,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       if( ij!=n-1 ) std::cout << ",";
     }
     std::cout << std::endl;
-    
+
     std::cout << funcname << ": WV in SVDcmp 2" << std::endl;
     for( int ij=0; ij<n; ++ij ){
       std::cout << std::setw(12) << wv[ij];
@@ -401,7 +409,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }
     std::cout << std::endl;
     std::cout << std::endl;
-   
+
     std::cout.flags( oldFlags );
     std::cout.precision( oldPrec );
   }
@@ -427,12 +435,12 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
   {
     std::ios::fmtflags oldFlags = std::cout.flags();
     std::size_t oldPrec = std::cout.precision();
-    std::cout.setf( std::ios::scientific ); 
-    std::cout.precision(3); 
+    std::cout.setf( std::ios::scientific );
+    std::cout.precision(3);
     std::cout << funcname << ": A in SVDcmp 3" <<  std::endl;
     for( int ii=0; ii<m; ++ii ){
       for( int ij=0; ij<n; ++ij ){
-	std::cout << std::setw(12) << a[ii][ij]; 
+	std::cout << std::setw(12) << a[ii][ij];
 	if( ij!=n-1 ) std::cout << ",";
       }
       std::cout << std::endl;
@@ -451,7 +459,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       if( ij!=n-1 ) std::cout << ",";
     }
     std::cout << std::endl;
-    
+
     std::cout << funcname << ": WV in SVDcmp 3" << std::endl;
     for( int ij=0; ij<n; ++ij ){
       std::cout << std::setw(12) << wv[ij];
@@ -459,7 +467,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }
     std::cout << std::endl;
     std::cout << std::endl;
-   
+
     std::cout.flags( oldFlags );
     std::cout.precision( oldPrec );
   }
@@ -480,7 +488,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       }
       for( int j=i; j<m; ++j ) a[j][i] *= g;
     }
-    else 
+    else
       for( int j=i; j<m; ++j ) a[j][i] = 0.0;
 
     a[i][i] += 1.0;
@@ -490,12 +498,12 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
   {
     std::ios::fmtflags oldFlags = std::cout.flags();
     std::size_t oldPrec = std::cout.precision();
-    std::cout.setf( std::ios::scientific ); 
-    std::cout.precision(3); 
+    std::cout.setf( std::ios::scientific );
+    std::cout.precision(3);
     std::cout << funcname << ": A in SVDcmp 4" <<  std::endl;
     for( int ii=0; ii<m; ++ii ){
       for( int ij=0; ij<n; ++ij ){
-	std::cout << std::setw(12) << a[ii][ij]; 
+	std::cout << std::setw(12) << a[ii][ij];
 	if( ij!=n-1 ) std::cout << ",";
       }
       std::cout << std::endl;
@@ -514,7 +522,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       if( ij!=n-1 ) std::cout << ",";
     }
     std::cout << std::endl;
-    
+
     std::cout << funcname << ": WV in SVDcmp 4" << std::endl;
     for( int ij=0; ij<n; ++ij ){
       std::cout << std::setw(12) << wv[ij];
@@ -522,12 +530,11 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }
     std::cout << std::endl;
     std::cout << std::endl;
-   
+
     std::cout.flags( oldFlags );
     std::cout.precision( oldPrec );
   }
 #endif
-
 
   int ll=1;
 
@@ -549,7 +556,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
 	  f = s*wv[i]; wv[i] *= c;
 	  if( fabs(f)+anorm == anorm )
 	    break;
-	  g=w[i]; h=pythag(f,g); w[i]=h; 
+	  g=w[i]; h=pythag(f,g); w[i]=h;
 	  h=1./h; c=g*h; s=-f*h;
 	  for( int j=0; j<m; ++j ){
 	    double y=a[j][nm], z=a[j][i];
@@ -566,9 +573,9 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
 	}
 	break;
       }
-#ifdef ERROROUT
+#ifdef DEBUG
       if( its==30 ){
-// 	std::cerr << funcname 
+// 	std::cerr << funcname
 // 		  << ": -- no convergence in 30 dvdcmp iterations --"
 // 		  << std::endl;
 	return false;
@@ -605,17 +612,16 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }   /* for( int its ... ) */
   }     /* for( int k= ... ) */
 
-
-#ifdef DebugPrint 
+#ifdef DebugPrint
   {
     std::ios::fmtflags oldFlags = std::cout.flags();
     std::size_t oldPrec = std::cout.precision();
-    std::cout.setf( std::ios::scientific ); 
-    std::cout.precision(3); 
+    std::cout.setf( std::ios::scientific );
+    std::cout.precision(3);
     std::cout << funcname << ": A in SVDcmp 5" <<  std::endl;
     for( int ii=0; ii<m; ++ii ){
       for( int ij=0; ij<n; ++ij ){
-	std::cout << std::setw(12) << a[ii][ij]; 
+	std::cout << std::setw(12) << a[ii][ij];
 	if( ij!=n-1 ) std::cout << ",";
       }
       std::cout << std::endl;
@@ -634,7 +640,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
       if( ij!=n-1 ) std::cout << ",";
     }
     std::cout << std::endl;
-    
+
     std::cout << funcname << ": WV in SVDcmp 5" << std::endl;
     for( int ij=0; ij<n; ++ij ){
       std::cout << std::setw(12) << wv[ij];
@@ -642,7 +648,7 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
     }
     std::cout << std::endl;
     std::cout << std::endl;
-   
+
     std::cout.flags( oldFlags );
     std::cout.precision( oldPrec );
   }
@@ -650,4 +656,3 @@ bool MathTools::SVDcmp( double **a, int m, int n, double *w,
 
   return true;
 }
-

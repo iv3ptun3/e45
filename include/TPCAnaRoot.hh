@@ -44,7 +44,7 @@ struct Tree1Ev
   G4int HitNumNBAR_K;
   G4int HitNumDC_K;
   G4int HitNumFTOF_K;
-  G4int HitNumCH_K;
+  G4int HitNumSCH_K;
   G4int HitNumScint_K;
   //  int tpctrNum_K;
   G4int HitNumTarget_K;
@@ -55,7 +55,7 @@ struct Tree1Ev
   G4int HitNumNBAR_p;
   G4int HitNumDC_p;
   G4int HitNumFTOF_p;
-  G4int HitNumCH_p;
+  G4int HitNumSCH_p;
   G4int HitNumScint_p;
   //  int tpctrNum_p;
   G4int HitNumTarget_p;
@@ -267,33 +267,32 @@ struct Tree1Ev
   G4double trvtxppdc[MaxTrig];
   G4double lengthdc[MaxTrig];
 
+  // SCH
+  G4int ntsch;                 // Number of Hit in Chint.
+  G4int tidsch[MaxTrig];       // Trchk ID
+  G4int pidsch[MaxTrig];	    // Particle ID
+  G4int didsch[MaxTrig];	    // detector ID
+  G4double masssch[MaxTrig];	    // particle mass ID
+  G4int qqsch[MaxTrig];	    // particle mass ID
+  G4double xsch[MaxTrig];      // coordinates
+  G4double ysch[MaxTrig];      // coordinates
+  G4double zsch[MaxTrig];      // coordinates
+  G4double pxsch[MaxTrig];     // momentum
+  G4double pysch[MaxTrig];     // momentum
+  G4double pzsch[MaxTrig];     // momentum
+  G4double ppsch[MaxTrig];     // momentum
+  G4double tofsch[MaxTrig];    // tof
+  G4int schpID[MaxTrig];    //parent id
 
-  ///ch
-  G4int ntch;                 // Number of Hit in Chint.
-  G4int tidch[MaxTrig];       // Trchk ID
-  G4int pidch[MaxTrig];	    // Particle ID
-  G4int didch[MaxTrig];	    // detector ID
-  G4double massch[MaxTrig];	    // particle mass ID
-  G4int qqch[MaxTrig];	    // particle mass ID
-  G4double xch[MaxTrig];      // coordinates
-  G4double ych[MaxTrig];      // coordinates
-  G4double zch[MaxTrig];      // coordinates
-  G4double pxch[MaxTrig];     // momentum
-  G4double pych[MaxTrig];     // momentum
-  G4double pzch[MaxTrig];     // momentum
-  G4double ppch[MaxTrig];     // momentum
-  G4double tofch[MaxTrig];    // tof
-  G4int chpID[MaxTrig];    //parent id
+  G4double trvtxxsch[MaxTrig];
+  G4double trvtxysch[MaxTrig];
+  G4double trvtxzsch[MaxTrig];
 
-  G4double trvtxxch[MaxTrig];
-  G4double trvtxych[MaxTrig];
-  G4double trvtxzch[MaxTrig];
-
-  G4double trvtxpxch[MaxTrig];
-  G4double trvtxpych[MaxTrig];
-  G4double trvtxpzch[MaxTrig];
-  G4double trvtxppch[MaxTrig];
-  G4double lengthch[MaxTrig];
+  G4double trvtxpxsch[MaxTrig];
+  G4double trvtxpysch[MaxTrig];
+  G4double trvtxpzsch[MaxTrig];
+  G4double trvtxppsch[MaxTrig];
+  G4double lengthsch[MaxTrig];
 
 
 
@@ -404,11 +403,11 @@ public:
 
   void FillPrimaryParticle(int id, double* x0, double* p0, int pid);
   void FillNumOfK(int HitNum_K, int HitNumAC_K, int HitNumNBAR_K,
-		  int HitNumDC_K, int HitNumCH_K, int HitNumFTOF_K,
+		  int HitNumDC_K, int HitNumSCH_K, int HitNumFTOF_K,
 		  int HitNumScint_K, int HitNumTarget_K);
 
   void FillNumOfp(int HitNum_p, int HitNumAC_p, int HitNumNBAR_p,
-		  int HitNumDC_p, int HitNumCH_p, int HitNumFTOF_p,
+		  int HitNumDC_p, int HitNumSCH_p, int HitNumFTOF_p,
 		  int HitNumScint_p, int HitNumTarget_p);
 
   void FillBeam(G4double px, G4double py, G4double pz);
@@ -455,7 +454,7 @@ public:
 		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1,
 		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);
 
-  void FillCHData(G4double time, G4double* pos, G4double* mom,
+  void FillSCHData(G4double time, G4double* pos, G4double* mom,
 		     G4int tid, G4int pid, G4int did, G4double mass,G4int qq,G4int parentid,
 		     G4double vtxpx1,G4double vtxpy1, G4double vtxqz1,
 		     G4double vtxx1,G4double vtxy1, G4double vtxz1, G4double tlength1);

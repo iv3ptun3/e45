@@ -185,7 +185,7 @@ KinemaFermi::KinemaFermi( double m1, double m2, double m3, double m4,
 
   //  kin1.SetThetaCM(170.); //input cross section value
   //  G4cout<<"rand sin:cos_theta-->"<<(double)RandSin()<<", "<<acos(cos_theta)*180./CLHEP::pi <<G4endl;
-  kin1.calc_kinema();
+  kin1.CalcKinema();
   //  phi3 = (-180.+360.0*(double)CLHEP::RandFlat::shoot());
   phi3 = (360.0*(double)CLHEP::RandFlat::shoot());
 

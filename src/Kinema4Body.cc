@@ -62,7 +62,7 @@ Kinema4Body::Kinema4Body( double m1, double m2,
   kin1.SetMomentum(1, p1);
   kin1.SetMomentum(2, p2);
   kin1.SetThetaCM((double)RandSin());
-  kin1.calc_kinema();
+  kin1.CalcKinema();
   phi5 = (360.0*(double)CLHEP::RandFlat::shoot());
   //phi5 = 360.0*(double)rand()/(RAND_MAX+1.0);
 
@@ -91,7 +91,7 @@ Kinema4Body::Kinema4Body( double m1, double m2,
   kin2.SetMomentum(1, kin1.GetMomentumLab(3));
   kin2.SetMomentum(2, 0.0);
   kin2.SetThetaCM((double)RandSin());
-  kin2.calc_kinema();
+  kin2.CalcKinema();
 
   phi3 = (360.0*(double)CLHEP::RandFlat::shoot());
   //phi3 = 360.0*(double)rand()/(RAND_MAX+1.0);

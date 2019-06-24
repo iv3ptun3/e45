@@ -1,31 +1,31 @@
 // -*- C++ -*-
 
-#include "TPCCHSD.hh"
+#include "TPCSCHSD.hh"
 
 #include <G4VPhysicalVolume.hh>
 #include <G4Step.hh>
 #include <G4Track.hh>
 #include <G4VTouchable.hh>
 #include <G4TouchableHistory.hh>
-#include "TPCCHHit.hh"
+#include "TPCSCHHit.hh"
 
 //_____________________________________________________________________________
-TPCCHSD::TPCCHSD( const G4String& name )
+TPCSCHSD::TPCSCHSD( const G4String& name )
   : G4VSensitiveDetector( name )
 {
   collectionName.insert("hit");
 }
 
 //_____________________________________________________________________________
-TPCCHSD::~TPCCHSD( void )
+TPCSCHSD::~TPCSCHSD( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCCHSD::Initialize( G4HCofThisEvent* HCTE )
+TPCSCHSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  hitsCollection = new G4THitsCollection<TPCCHHit>( SensitiveDetectorName,
+  hitsCollection = new G4THitsCollection<TPCSCHHit>( SensitiveDetectorName,
 						    collectionName[0] );
   G4int hcid = GetCollectionID(0);
   HCTE->AddHitsCollection( hcid, hitsCollection );
@@ -33,7 +33,7 @@ TPCCHSD::Initialize( G4HCofThisEvent* HCTE )
 
 //_____________________________________________________________________________
 G4bool
-TPCCHSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
+TPCSCHSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   G4String particleName;
@@ -95,12 +95,12 @@ TPCCHSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   G4String name = physVol->GetName();
   //  G4cout << name << G4endl;
 
-  //  sscanf(name,"CHPV%d",&iDet);
+  //  sscanf(name,"SCHPV%d",&iDet);
   G4int copyNo = preStepPoint -> GetPhysicalVolume()->GetCopyNo();
   iDet=copyNo;
 
   // create a new hit and push them to "Hit Coleltion"
-  TPCCHHit* ahit= new TPCCHHit(pos, mom, tof, tid, pid, iDet, mass, qq,
+  TPCSCHHit* ahit= new TPCSCHHit(pos, mom, tof, tid, pid, iDet, mass, qq,
 			       parentID, VertexPosition, VertexMomentum,
 			       VertexEnergy, tlength );
   hitsCollection-> insert(ahit);
@@ -110,19 +110,19 @@ TPCCHSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 
 //_____________________________________________________________________________
 void
-TPCCHSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
+TPCSCHSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCCHSD::DrawAll( void )
+TPCSCHSD::DrawAll( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCCHSD::PrintAll( void )
+TPCSCHSD::PrintAll( void )
 {
   hitsCollection-> PrintAllHits();
 }

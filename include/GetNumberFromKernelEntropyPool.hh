@@ -1,9 +1,7 @@
-/*
-  GetNumberFromKernelEntropyPool.hh
-*/
+// -*- C++ -*-
 
-#ifndef GetNumberFromKernalEntropyPool_h 
-#define GetNumberFromKernalEntropyPool_h 1 
+#ifndef GET_NUMBER_FROM_KERNEL_ENTROPY_POOL_HH
+#define GET_NUMBER_FROM_KERNEL_ENTROPY_POOL_HH
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,7 +9,7 @@ extern "C" {
 
   int   GetIntFromKernelEntropyPool( void );
   short GetShortFromKernelEntropyPool( void );
-  long  GetLongFromKernelEntropyPool( void ); 
+  long  GetLongFromKernelEntropyPool( void );
 
 #ifdef __cplusplus
 }

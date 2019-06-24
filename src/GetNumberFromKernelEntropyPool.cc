@@ -1,13 +1,11 @@
-/*
-  GetNumberFromKernelEntropyPool.cc
-*/
+// -*- C++ -*-
 
 #include "GetNumberFromKernelEntropyPool.hh"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h> 
+#include <unistd.h>
 #include <stdio.h>
 
 const char * const device = "/dev/random";

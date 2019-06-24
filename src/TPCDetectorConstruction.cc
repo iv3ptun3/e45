@@ -23,10 +23,9 @@
 #include "DCGeomMan.hh"
 #include "DetectorID.hh"
 #include "DetSizeMan.hh"
-#include "Spectrometer_par.hh"
 #include "ThreeVector.hh"
 #include "TPCACSD.hh"
-#include "TPCCHSD.hh"
+#include "TPCSCHSD.hh"
 #include "TPCDCSD.hh"
 #include "TPCField.hh"
 #include "TPCFTOFSD.hh"
@@ -91,12 +90,12 @@ TPCDetectorConstruction::Construct( void )
 {
   ConstructElements();
   ConstructMaterials();
-  auto world_solid = new G4Box("EXP_HALL", 4.0*m, 3.0*m, 8.0*m);
+  auto world_solid = new G4Box("world_s", 4.0*m, 3.0*m, 8.0*m);
   m_world_lv = new G4LogicalVolume( world_solid, m_material_map["Air"],
-				   "expHallLV" );
+				    "world_lv" );
   auto world_vis_attr = new G4VisAttributes( false, BLACK );
   m_world_lv->SetVisAttributes( world_vis_attr );
-  m_world_pv = new G4PVPlacement( 0, G4ThreeVector(), "EXP_HALL_PV",
+  m_world_pv = new G4PVPlacement( 0, G4ThreeVector(), "world_pv",
 				  m_world_lv, 0, false, 0 );
   ConstructHypTPC();
   ConstructHTOF();
@@ -123,23 +122,32 @@ TPCDetectorConstruction::ConstructElements( void )
   G4String name, symbol;
   G4double Z, A;
   name = "Hydrogen";
-  m_element_map[name] = new G4Element( name, symbol="H",  Z=1.,  A=1.00794 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="H",  Z=1.,
+				       A=1.00794 *g/mole );
   name = "Carbon";
-  m_element_map[name] = new G4Element( name, symbol="C",  Z=6.,  A=12.011 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="C",  Z=6.,
+				       A=12.011 *g/mole );
   name = "Nitrogen";
-  m_element_map[name] = new G4Element( name, symbol="N",  Z=7.,  A=14.00674 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="N",  Z=7.,
+				       A=14.00674 *g/mole );
   name = "Oxygen";
-  m_element_map[name] = new G4Element( name, symbol="O",  Z=8.,  A=15.9994 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="O",  Z=8.,
+				       A=15.9994 *g/mole );
   name = "Argon";
-  m_element_map[name] = new G4Element( name, symbol="Ar", Z=18., A=39.948 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="Ar", Z=18.,
+				       A=39.948 *g/mole );
   name = "Silicon";
-  m_element_map[name] = new G4Element( name, symbol="Si", Z=14., A=28.0855 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="Si", Z=14.,
+				       A=28.0855 *g/mole );
   name = "Iodine";
-  m_element_map[name] = new G4Element( name, symbol="I",  Z=53., A=126.90447 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="I",  Z=53.,
+				       A=126.90447 *g/mole );
   name = "Cesium";
-  m_element_map[name] = new G4Element( name, symbol="Cs", Z=55., A=132.90543 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="Cs", Z=55.,
+				       A=132.90543 *g/mole );
   name = "Sodium";
-  m_element_map[name] = new G4Element( name, symbol="Na", Z=11., A=22.989768 *g/mole );
+  m_element_map[name] = new G4Element( name, symbol="Na", Z=11.,
+				       A=22.989768 *g/mole );
 }
 
 //_____________________________________________________________________________
@@ -153,10 +161,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   G4String name;
   G4double Z, A, density, massfraction;
   G4int natoms, nel, ncomponents;
-
-  // temperature of experimental hall is controlled at 20 degree.
-  const G4double expTemp = STP_Temperature + 20.*kelvin;
-
+  const G4double room_temp = STP_Temperature + 20.*kelvin;
   // Vacuum
   name = "Vacuum";
   m_material_map[name] = new G4Material( name, density=universe_mean_density,
@@ -166,7 +171,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   // Air
   name = "Air";
   m_material_map[name] = new G4Material( name, density=1.2929e-03*g/cm3,
-					 nel=3, kStateGas, expTemp );
+					 nel=3, kStateGas, room_temp );
   G4double fracN  = 75.47;
   G4double fracO  = 23.20;
   G4double fracAr =  1.28;
@@ -203,31 +208,31 @@ TPCDetectorConstruction::ConstructMaterials( void )
 					 density=166.0*mg/cm3 );
   // Ar gas
   name = "Argon";
-  G4double densityAr = 1.782e-03 * g/cm3 * STP_Temperature / expTemp;
+  G4double densityAr = 1.782e-03 * g/cm3 * STP_Temperature / room_temp;
   density = densityAr;
   m_material_map[name] = new G4Material( name, Z=18., A=39.948*g/mole,
-					 density, kStateGas, expTemp );
+					 density, kStateGas, room_temp );
   // Ethane (C2H6)
   name = "Ethane";
-  G4double densityEthane = 1.356e-3 *g/cm3 * STP_Temperature / expTemp;
+  G4double densityEthane = 1.356e-3 *g/cm3 * STP_Temperature / room_temp;
   density = densityEthane;
   m_material_map[name] = new G4Material( name, density, nel=2,
-					 kStateGas, expTemp );
+					 kStateGas, room_temp );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=2 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=6 );
   // Methane (CH4)
   name = "Methane";
-  G4double densityMethane = 0.717e-3 *g/cm3 * STP_Temperature / expTemp;
+  G4double densityMethane = 0.717e-3 *g/cm3 * STP_Temperature / room_temp;
   density = densityMethane;
   m_material_map[name] = new G4Material( name, density, nel=2,
-					 kStateGas, expTemp );
+					 kStateGas, room_temp );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=4 );
   // Ar(50%) + Ethane(50%) mixture
   name = "ArEthane";
   density = 0.5*( densityAr + densityEthane );
   m_material_map[name] = new G4Material( name, density, ncomponents=2,
-					 kStateGas, expTemp );
+					 kStateGas, room_temp );
   m_material_map[name]->AddMaterial( m_material_map["Argon"],
 				     massfraction=0.5*densityAr/density );
   m_material_map[name]->AddMaterial( m_material_map["Ethane"],
@@ -236,7 +241,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   name = "P10";
   density = 0.9*densityAr + 0.1*densityMethane;
   m_material_map[name] = new G4Material( name, density, nel=2,
-					 kStateGas, expTemp );
+					 kStateGas, room_temp );
   m_material_map[name]->AddMaterial( m_material_map["Argon"],
 				     massfraction=0.9*densityAr/density );
   m_material_map[name]->AddMaterial( m_material_map["Methane"],
@@ -289,7 +294,7 @@ TPCDetectorConstruction::ConstructFTOF( void )
 {
   const auto& tof_pos = gGeom.GetGlobalPosition("TOF");
   const auto& tof_ra2 = gGeom.GetRotAngle2("TOF") * deg;
-  G4LogicalVolume* FTOF_log[FTOFMAX];
+  G4LogicalVolume* FTOF_log[NumOfSegTOF];
   G4double size_FTOF[3];
   size_FTOF[ThreeVector::X] = 40.0*mm;
   size_FTOF[ThreeVector::Y] = 900.0*mm;
@@ -314,19 +319,19 @@ TPCDetectorConstruction::ConstructFTOF( void )
 
   ////end mother volume of FTOF
   G4Box* FTOF_box = new G4Box("FTOF_box",size_FTOF[ThreeVector::X],size_FTOF[ThreeVector::Y],size_FTOF[ThreeVector::Z]);
-  //  G4LogicalVolume* FTOF_log[FTOFMAX];
+  //  G4LogicalVolume* FTOF_log[NumOfSegTOF];
 
   //  G4RotationMatrix* rot_FTOF = new G4RotationMatrix();
   //  rot_FTOF->rotateY(-tof_ra2 - m_rotation_angle );
   G4double FTOF_Overlap=5.*mm;
   G4double pos_FTOF_bar[3];
-  for (int i=0; i<FTOFMAX; i++) {
+  for (int i=0; i<NumOfSegTOF; i++) {
     FTOF_log[i] = new G4LogicalVolume(FTOF_box, m_material_map["Scintillator"],
 				      Form("FTOF%d_log", i),0,0,0);
     FTOF_log[i]->SetVisAttributes( AQUA );
     // maxStep=0.1*mm;
     // FTOF_log[i]->SetUserLimits(new G4UserLimits(maxStep));
-    pos_FTOF_bar[ThreeVector::X]=-FTOFMAX/2*(size_FTOF[ThreeVector::X]*2-FTOF_Overlap)+(size_FTOF[ThreeVector::X]*2-FTOF_Overlap)*i;
+    pos_FTOF_bar[ThreeVector::X]=-NumOfSegTOF/2*(size_FTOF[ThreeVector::X]*2-FTOF_Overlap)+(size_FTOF[ThreeVector::X]*2-FTOF_Overlap)*i;
     //    pos_FTOF[ThreeVector::Z]=pos_FTOF[ThreeVector::Z]-sin((size_FTOF[ThreeVector::X]*2.-FTOF_Overlap)*i);
     if( i%2==0 ){
       new G4PVPlacement( 0,
@@ -1846,27 +1851,27 @@ void
 TPCDetectorConstruction::ConstructSCH( void )
 {
   const auto& sch_pos = gGeom.GetGlobalPosition("SCH");
-  G4LogicalVolume* CH_log[CHMAX];
-  G4double size_CH[3];
-  size_CH[ThreeVector::X] = 11.5*mm;
-  size_CH[ThreeVector::Y] = 400.0*mm;
-  size_CH[ThreeVector::Z] = 2.0*mm;
-  G4Box* CH_box = new G4Box("CH_box",size_CH[ThreeVector::X]/2,size_CH[ThreeVector::Y]/2,size_CH[ThreeVector::Z]/2);
-  G4double CH_Overlap = 1.*mm;
-  //  G4LogicalVolume* CH_log[CHMAX];
-  for (int i=0; i<CHMAX; i++) {
-    CH_log[i] = new G4LogicalVolume(CH_box, m_material_map["Scintillator"], Form("CH%d_log", i),
+  G4LogicalVolume* SCH_log[NumOfSegSCH];
+  G4double size_SCH[3];
+  size_SCH[ThreeVector::X] = 11.5*mm;
+  size_SCH[ThreeVector::Y] = 400.0*mm;
+  size_SCH[ThreeVector::Z] = 2.0*mm;
+  G4Box* SCH_box = new G4Box("SCH_box",size_SCH[ThreeVector::X]/2,size_SCH[ThreeVector::Y]/2,size_SCH[ThreeVector::Z]/2);
+  G4double SCH_Overlap = 1.*mm;
+  //  G4LogicalVolume* SCH_log[NumOfSegSCH];
+  for (int i=0; i<NumOfSegSCH; i++) {
+    SCH_log[i] = new G4LogicalVolume(SCH_box, m_material_map["Scintillator"], Form("SCH%d_log", i),
 				    0, 0, 0 );
-    CH_log[i]->SetVisAttributes( AQUA );
-    //    par_cham->calpc((double *)pos_CH, CHx, (double)(i+1));
-    G4double ipos_x = -CHMAX/2.*(size_CH[ThreeVector::X]-CH_Overlap)+5.75*mm+(size_CH[ThreeVector::X]-CH_Overlap)*i;
+    SCH_log[i]->SetVisAttributes( AQUA );
+    //    par_cham->calpc((double *)pos_SCH, SCHx, (double)(i+1));
+    G4double ipos_x = -NumOfSegSCH/2.*(size_SCH[ThreeVector::X]-SCH_Overlap)+5.75*mm+(size_SCH[ThreeVector::X]-SCH_Overlap)*i;
     if(i%2==0){
       new G4PVPlacement( m_rotation_matrix,
 			 G4ThreeVector( ipos_x,
 					sch_pos[ThreeVector::Y],
 					sch_pos[ThreeVector::Z] - 1.*mm ).rotateY( m_rotation_angle ),
-			 CH_log[i],
-			 Form("CH%d", i),
+			 SCH_log[i],
+			 Form("SCH%d", i),
 			 m_world_lv,
 			 false,
 			 i );
@@ -1875,18 +1880,18 @@ TPCDetectorConstruction::ConstructSCH( void )
 			 G4ThreeVector( ipos_x,
 					sch_pos[ThreeVector::Y],
 					sch_pos[ThreeVector::Z] + 1.*mm ).rotateY( m_rotation_angle ),
-			 CH_log[i],
-			 Form("CH%d", i),
+			 SCH_log[i],
+			 Form("SCH%d", i),
 			 m_world_lv,
 			 false,
 			 i);
     }
   }
 
-  auto chSD = new TPCCHSD("/CH");
-  G4SDManager::GetSDMpointer()->AddNewDetector( chSD );
-  for( G4int i = 0; i<CHMAX; ++i ){
-    CH_log[i]->SetSensitiveDetector( chSD );
+  auto schSD = new TPCSCHSD("/SCH");
+  G4SDManager::GetSDMpointer()->AddNewDetector( schSD );
+  for( G4int i = 0; i<NumOfSegSCH; ++i ){
+    SCH_log[i]->SetSensitiveDetector( schSD );
   }
 }
 

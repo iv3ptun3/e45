@@ -21,7 +21,7 @@
 #include "TPCScintSD.hh"
 #include "TPCACSD.hh"
 #include "TPCDCSD.hh"
-#include "TPCCHSD.hh"
+#include "TPCSCHSD.hh"
 #include "TPCNBARSD.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCAnaManager.hh"
@@ -346,9 +346,9 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  static const G4int id_ch = SDManager->GetCollectionID("CH/hit");
+  static const G4int id_ch = SDManager->GetCollectionID("SCH/hit");
   if( id_ch > 0 ){
-    auto chHC = (G4THitsCollection<TPCCHHit>*)HCTE->GetHC( id_ch );
+    auto chHC = (G4THitsCollection<TPCSCHHit>*)HCTE->GetHC( id_ch );
     G4int nhits= chHC -> entries();
     for(G4int i=0; i< nhits; i++) {
       G4ThreeVector vtxpos = (*chHC)[i]-> GetVtxPosition();
@@ -364,7 +364,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4double mass = (*chHC)[i]-> GetParticleMassID();
       G4int qq = (*chHC)[i]-> GetParticleQqID();
       G4double tlength = (*chHC)[i]-> GetLength();
-      gAnaMan.SetCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetSCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
     }
   }
 

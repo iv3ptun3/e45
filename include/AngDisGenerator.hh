@@ -1,255 +1,247 @@
-//-----------------------------------------------------------
-// AngDisGenerator.hh
-// for the angular distribution for the E27 experiment
-//-----------------------------------------------------------
+// -*- C++ -*-
 
-#ifndef AngDisGenerator_H
-#define AngDisGenerator_H
+/**
+ *  for the angular distribution for the E27 experiment
+ */
 
-#include "G4ThreeVector.hh"
+#ifndef ANG_DIS_GENERATOR_HH
+#define ANG_DIS_GENERATOR_HH
 
+#include <G4ThreeVector.hh>
+
+//_____________________________________________________________________________
 class AngDisGenerator
 {
 public:
-  AngDisGenerator( double cost1=1.0, double cost2=-1.0 );
-  virtual ~AngDisGenerator() {};
-
-  virtual G4ThreeVector GenerateDirection( void ) const = 0;
-  virtual double GetDfuncVal( double x) const = 0;
+  AngDisGenerator( G4double cost1=1.0, G4double cost2=-1.0 );
+  virtual ~AngDisGenerator( void ) {};
 
 protected:
-  double cost1_, cost2_;
+  G4double m_cost1;
+  G4double m_cost2;
 
+public:
+  virtual G4ThreeVector GenerateDirection( void ) const = 0;
+  virtual G4double GetDfuncVal( G4double x ) const = 0;
 };
 
+//_____________________________________________________________________________
 class AGSWave : public AngDisGenerator
 {
   // D(x)=1/2
 public:
-  AGSWave( double cost1=1.0, double cost2=-1.0 );
-  ~AGSWave() {};
+  AGSWave( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGSWave( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
-  inline double Dfunc( double ) const { return 0.5; }
-
+  inline G4double Dfunc( G4double ) const { return 0.5; }
 };
 
 typedef AGSWave AGUniform;
 
-
+//_____________________________________________________________________________
 class AGPWaveFP : public AngDisGenerator
 {
   // D(x)=1/2*(1+x)
 public:
-  AGPWaveFP( double cost1=1.0, double cost2=-1.0 );
+  AGPWaveFP( G4double cost1=1.0, G4double cost2=-1.0 );
   ~AGPWaveFP() {};
 
   G4ThreeVector GenerateDirection( void ) const;
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
-  inline double Dfunc( double x ) const { return 0.5*(x+1.); }
+  inline G4double Dfunc( G4double x ) const { return 0.5*(x+1.); }
 };
 
-
+//_____________________________________________________________________________
 class AGPWaveBP : public AngDisGenerator
 {
   // D(x)=1/2*(1-x)
 public:
-  AGPWaveBP( double cost1=1.0, double cost2=-1.0 );
-  ~AGPWaveBP() {};
+  AGPWaveBP( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGPWaveBP( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x);}
 
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
-  inline double Dfunc( double x ) const { return 0.5*(1.-x); }
-
+  inline G4double Dfunc( G4double x ) const { return 0.5*(1.-x); }
 };
 
+//_____________________________________________________________________________
 class AGDWave1 : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGDWave1( double cost1=1.0, double cost2=-1.0 );
+  AGDWave1( G4double cost1=1.0, G4double cost2=-1.0 );
   ~AGDWave1() {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
-
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const { return 0.5*(x*x+1.); }
+  inline G4double Dfunc( G4double x ) const { return 0.5*(x*x+1.); }
 };
 
+//_____________________________________________________________________________
 class AGSigma1385Zero : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGSigma1385Zero( double cost1=1.0, double cost2=-1.0 );
-  ~AGSigma1385Zero() {};
+  AGSigma1385Zero( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGSigma1385Zero( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-      (6.1+
-       1.2*x+
-       (-5.2)/2.*(3*x*x-1))/10.;
+      ( 6.1 +
+	1.2*x +
+	(-5.2)/2.*(3*x*x-1) )/10.;
   }
 };
 
-
+//_____________________________________________________________________________
 class AGSigma1385Plus : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGSigma1385Plus( double cost1=1.0, double cost2=-1.0 );
-  ~AGSigma1385Plus() {};
+  AGSigma1385Plus( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGSigma1385Plus( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const { return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-      (30.6394+
-       (11.7159)*x+
-       (-9.52849)/2.*(3*x*x-1)+
-       (-13.9936)/2.*(5*x*x*x-3*x)+
-       (-7.13241)/8.*(35*x*x*x*x-30*x*x+3)+
-       (-3.61133)/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
-       (-2.21394)/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5))/51.;
-
-
+      ( 30.6394+
+	(11.7159)*x+
+	(-9.52849)/2.*(3*x*x-1)+
+	(-13.9936)/2.*(5*x*x*x-3*x)+
+	(-7.13241)/8.*(35*x*x*x*x-30*x*x+3)+
+	(-3.61133)/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
+	(-2.21394)/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5) )/51.;
   }
 };
 
-
-
+//_____________________________________________________________________________
 class AGLambda1405 : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGLambda1405( double cost1=1.0, double cost2=-1.0 );
-  ~AGLambda1405() {};
+  AGLambda1405( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGLambda1405( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-
-      (1.64+
-      1.02*x+
-      1.54/2.*(3*x*x-1)+
-      0.96/2.*(5*x*x*x-3*x)+
-      0.55/8.*(35*x*x*x*x-30*x*x+3)+
-       (-0.56)/8.*(63*x*x*x*x*x-70*x*x*x+15*x))/6.;
-
+      ( 1.64+
+	1.02*x+
+	1.54/2.*(3*x*x-1)+
+	0.96/2.*(5*x*x*x-3*x)+
+	0.55/8.*(35*x*x*x*x-30*x*x+3)+
+	(-0.56)/8.*(63*x*x*x*x*x-70*x*x*x+15*x) )/6.;
   }
 };
 
-
+//_____________________________________________________________________________
 class AGLambda : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGLambda( double cost1=1.0, double cost2=-1.0 );
-  ~AGLambda() {};
+  AGLambda( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGLambda( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const { return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-
-      (13.9+
-       9.8*x+
-       20.1/2.*(3*x*x-1)-
-       1.3/2.*(5*x*x*x-3*x)+
-       12.8/8.*(35*x*x*x*x-30*x*x+3))/53.;
-
+      ( 13.9+
+	9.8*x+
+	20.1/2.*(3*x*x-1)-
+	1.3/2.*(5*x*x*x-3*x)+
+	12.8/8.*(35*x*x*x*x-30*x*x+3) )/53.;
   }
 };
 
-
-
-
+//_____________________________________________________________________________
 class AGSigmaZ : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGSigmaZ( double cost1=1.0, double cost2=-1.0 );
-  ~AGSigmaZ() {};
+  AGSigmaZ( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGSigmaZ( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const { return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-
-      (9.6+
-       5.3*x+
-       8.0/2.*(3*x*x-1)+
-       16.2/2.*(5*x*x*x-3*x)+
-       6.7/8.*(35*x*x*x*x-30*x*x+3)+
-       10.4/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
-       8.0/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5))/61.;
+      ( 9.6+
+	5.3*x+
+	8.0/2.*(3*x*x-1)+
+	16.2/2.*(5*x*x*x-3*x)+
+	6.7/8.*(35*x*x*x*x-30*x*x+3)+
+	10.4/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
+	8.0/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5) )/61.;
   }
 };
 
-
-
+//_____________________________________________________________________________
 class AGSigmaP : public AngDisGenerator
 {
   // D(x)= 0.5*(x*x+1)
 public:
-  AGSigmaP( double cost1=1.0, double cost2=-1.0 );
-  ~AGSigmaP() {};
+  AGSigmaP( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGSigmaP( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
 private:
-  inline double Dfunc( double x ) const {
+  inline G4double Dfunc( G4double x ) const
+  {
     return
-
-      (37.5+
-       7.5*x+
-       19.0/2.*(3*x*x-1)+
-       23.1/2.*(5*x*x*x-3*x)+
-       40.4/8.*(35*x*x*x*x-30*x*x+3)+
-       14.6/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
-       31.3/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5))/190.;
+      ( 37.5+
+	7.5*x+
+	19.0/2.*(3*x*x-1)+
+	23.1/2.*(5*x*x*x-3*x)+
+	40.4/8.*(35*x*x*x*x-30*x*x+3)+
+	14.6/8.*(63*x*x*x*x*x-70*x*x*x+15*x)+
+	31.3/16.*(231*x*x*x*x*x*x-315*x*x*x*x+105*x*x-5) )/190.;
   }
 };
 
-
+//_____________________________________________________________________________
 class AGPol : public AngDisGenerator
 {
 public:
-  AGPol( double cost1=1.0, double cost2=-1.0 );
-  ~AGPol() {};
+  AGPol( G4double cost1=1.0, G4double cost2=-1.0 );
+  ~AGPol( void ) {};
 
   G4ThreeVector GenerateDirection( void ) const;
+  G4double GetDfuncVal( G4double x ) const{ return Dfunc(x); }
 
-  double GetDfuncVal( double x) const{ return Dfunc(x);}
 private:
-  inline double Dfunc( double x ) const { return (1 - 0.4*x)/2.; }
+  inline G4double Dfunc( G4double x ) const { return (1 - 0.4*x)/2.; }
 };
-
-
-
-
-
 
 #endif

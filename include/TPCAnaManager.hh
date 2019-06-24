@@ -194,7 +194,7 @@ struct DCData
 };
 
 //_____________________________________________________________________________
-struct CHData
+struct SCHData
 {
   G4int trackID;
   G4double massSH;
@@ -294,7 +294,7 @@ private:
   NBARData nbarData[MaxTrig];
 
   DCData dcData[MaxTrig];
-  CHData chData[MaxTrig];
+  SCHData schData[MaxTrig];
   FTOFData ftofData[MaxTrig];
 
   TPCAnaRoot    anaRoot;
@@ -306,7 +306,7 @@ private:
   int HitNumNBAR;
   int HitNumDC;
   int HitNumFTOF;
-  int HitNumCH;
+  int HitNumSCH;
   int HitNumScint;
   int tpctrNum;
   int HitNumTarget;
@@ -316,7 +316,7 @@ private:
   int HitNumNBAR_K;
   int HitNumDC_K;
   int HitNumFTOF_K;
-  int HitNumCH_K;
+  int HitNumSCH_K;
   int HitNumScint_K;
   //  int tpctrNum_K;
   int HitNumTarget_K;
@@ -326,7 +326,7 @@ private:
   int HitNumNBAR_p;
   int HitNumDC_p;
   int HitNumFTOF_p;
-  int HitNumCH_p;
+  int HitNumSCH_p;
   int HitNumScint_p;  //  int tpctrNum_K;
   int HitNumTarget_p;
 
@@ -417,9 +417,9 @@ public:
 		 G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
 		 G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
 
-  void SetCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		 G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
-		 G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
+  void SetSCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
+		  G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
+		  G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
 
   void SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 		   G4int track, G4int particle, G4int detector,G4double mass, G4int qq,

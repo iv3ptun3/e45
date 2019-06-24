@@ -1,8 +1,13 @@
-#ifndef __KINEMA3BODY_HH__
-#define __KINEMA3BODY_HH__
+// -*- C++ -*-
+
+#ifndef KINEMA_3BODY_HH
+#define KINEMA_3BODY_HH
 
 #include "Kinema2Body.hh"
-struct KINEMA_3BODY{
+
+//_____________________________________________________________________________
+struct KINEMA_3BODY
+{
   double E_1_lab;
   double p_1_lab;
   double M_1;
@@ -35,20 +40,26 @@ struct KINEMA_3BODY{
   double m34;
 };
 
-class Kinema3Body {
+//_____________________________________________________________________________
+class Kinema3Body
+{
+public:
+  Kinema3Body( void );
+  Kinema3Body( double m1, double m2, double m3, double m4, double m5,
+	       double p1, double p2 );
+  ~Kinema3Body( void );
+
 private:
   Kinema2Body kin1;
   Kinema2Body kin2;
-  struct KINEMA_3BODY kin3;
+  KINEMA_3BODY kin3;
 
 public:
-  Kinema3Body(void);
-  Kinema3Body(double m1, double m2, double m3, double m4, double m5, double p1, double p2);
   double p2E(double p,double m);
   void CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi);
   double deg2rad(double theta);
   double rag2deg(double rag);
-  double Calc_m12(double m1, double m2, double m3, double M);
+  double CalcM12(double m1, double m2, double m3, double M);
   double GetMaxFunc( double m1, double m2, double m3, double M);
   double ProFunction(double m12, double m1, double m2, double m3, double M);
   double RandSin(void);

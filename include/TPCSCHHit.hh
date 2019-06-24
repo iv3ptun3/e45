@@ -1,22 +1,21 @@
-// ====================================================================
-//   TPCCHHit.hh
-//
-// ====================================================================
-#ifndef TPC_CH_HIT_H
-#define TPC_CH_HIT_H
- 
+// -*- C++ -*-
+
+#ifndef TPC_SCH_HIT_HH
+#define TPC_SCH_HIT_HH
+
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 
-class TPCCHHit : public G4VHit {
-
+//_____________________________________________________________________________
+class TPCSCHHit : public G4VHit
+{
 private:
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
   G4double tof;
-  G4double edep; 
+  G4double edep;
   G4int trackID;
   G4int particleID;
   G4int detectorID;
@@ -27,24 +26,26 @@ private:
   G4ThreeVector vtxposi;
   G4double vtxene;
   G4double flength;
-public:
-  TPCCHHit();
-  //  TPCCHHit(G4ThreeVector& axyz, G4double t);
-  TPCCHHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t);
-  TPCCHHit(G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-	      G4int tid, G4int pid, G4int did,G4double mass, G4int qq, G4int parentid,
-	      G4ThreeVector& vtxmom, G4ThreeVector& vtxpos, G4double vtxene, G4double tlength);
 
-  virtual ~TPCCHHit();
+public:
+  TPCSCHHit( void );
+  //  TPCSCHHit(G4ThreeVector& axyz, G4double t);
+  TPCSCHHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t );
+  TPCSCHHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
+	    G4int tid, G4int pid, G4int did,G4double mass, G4int qq,
+	    G4int parentid,
+	    G4ThreeVector& vtxmom, G4ThreeVector& vtxpos,
+	    G4double vtxene, G4double tlength );
+  virtual ~TPCSCHHit( void );
 
   // copy constructor & assignment operator
-  TPCCHHit(const TPCCHHit& right);
-  const TPCCHHit& operator=(const TPCCHHit& right);
-  
+  TPCSCHHit(const TPCSCHHit& right);
+  const TPCSCHHit& operator=(const TPCSCHHit& right);
+
   // new/delete operators
   void* operator new(size_t);
   void operator delete(void* aHit);
-  
+
   const G4ThreeVector& GetVtxPosition() const { return vtxposi; }
   const G4ThreeVector& GetVtxMomentum() const { return vtxmome; }
   G4double GetVtxEnergy() const { return vtxene; }
@@ -69,10 +70,8 @@ public:
   virtual void Print();
 };
 
-// ====================================================================
-// inline functions
-// ====================================================================
-inline TPCCHHit::TPCCHHit(const TPCCHHit& right)
+//_____________________________________________________________________________
+inline TPCSCHHit::TPCSCHHit(const TPCSCHHit& right)
   : G4VHit()
 {
   xyz= right.xyz;
@@ -81,8 +80,9 @@ inline TPCCHHit::TPCCHHit(const TPCCHHit& right)
   edep = right.edep;
 }
 
-inline const TPCCHHit& TPCCHHit::operator=
-(const TPCCHHit& right)
+//_____________________________________________________________________________
+inline const TPCSCHHit& TPCSCHHit::operator=
+(const TPCSCHHit& right)
 {
   xyz= right.xyz;
   pxyz= right.pxyz;
@@ -91,18 +91,23 @@ inline const TPCCHHit& TPCCHHit::operator=
   return *this;
 }
 
+//_____________________________________________________________________________
 // externally instanciated.
-extern G4Allocator<TPCCHHit> TPCCHHitAllocator; 
+extern G4Allocator<TPCSCHHit> TPCSCHHitAllocator;
 
-inline void* TPCCHHit::operator new(size_t)
+//_____________________________________________________________________________
+inline void*
+TPCSCHHit::operator new(size_t)
 {
-  void* aHit= (void*)TPCCHHitAllocator.MallocSingle();
+  void* aHit= (void*)TPCSCHHitAllocator.MallocSingle();
   return aHit;
 }
 
-inline void TPCCHHit::operator delete(void* aHit)
+//_____________________________________________________________________________
+inline void
+TPCSCHHit::operator delete(void* aHit)
 {
-  TPCCHHitAllocator.FreeSingle((TPCCHHit*) aHit);
+  TPCSCHHitAllocator.FreeSingle((TPCSCHHit*) aHit);
 }
 
 #endif
