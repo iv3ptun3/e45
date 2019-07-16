@@ -8,6 +8,8 @@
 #______________________________________________________________________________
 # Name		X	Y	Z
 #  or
+# Name		Rin	Rout	DZ
+#  or
 # Name			Value
 #
 World		4000	3000	8000
@@ -30,5 +32,8 @@ TpcRinFieldCage		574.0
 TpcRoutFieldCage	654.0
 TpcDzFieldCage		400.0
 TpcPadCenterZ		-143.0 # upstream from HypTPC center
+TargetHolder		16.0	16.2	290.0
 ### HTOF
 HtofSeg		68.0	800.0	10.0
+### SHS
+ShsField	1550.0	950.0	1200.0

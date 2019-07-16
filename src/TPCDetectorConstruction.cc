@@ -55,17 +55,8 @@ namespace
   const auto& gGeom = DCGeomMan::GetInstance();
   const auto& gSize = DetSizeMan::GetInstance();
   // color
-  const G4Colour WHITE( 1., 1., 1. );
-  const G4Colour BLACK( 0., 0., 0. );
-  const G4Colour RED( 1.0, 0.0, 0.0 );
-  const G4Colour GREEN( 0.0, 1.0, 0.0 );
-  const G4Colour BLUE( 0.0, 0.0, 1.0 );
-  const G4Colour CYAN( 0.0, 1.0, 1.0 );
   const G4Colour AQUA( 0.247, 0.8, 1.0 );
-  const G4Colour MAGENTA( 1.0, 0.0, 1.0 );
-  const G4Colour YELLOW( 1.0, 1.0, 0.0 );
   const G4Colour ORANGE( 1.0, 0.55, 0.0 );
-  const G4Colour GRAY( 0.5, 0.5, 0.5 );
   const G4Colour LAVENDER( 0.901, 0.901, 0.98 );
   const G4Colour MAROON( 0.5, 0.0, 0.0 );
   const G4Colour PINK( 1.0, 0.753, 0.796 );
@@ -99,16 +90,16 @@ TPCDetectorConstruction::Construct( void )
   auto world_solid = new G4Box( "WorldSolid", 8.*m/2, 6.*m/2, 16.*m/2 );
   m_world_lv = new G4LogicalVolume( world_solid, m_material_map["Air"],
 				    "WorldLV" );
-  auto world_vis_attr = new G4VisAttributes( false, BLACK );
+  auto world_vis_attr = new G4VisAttributes( false, G4Colour::Black() );
   m_world_lv->SetVisAttributes( world_vis_attr );
   auto world_pv = new G4PVPlacement( nullptr, G4ThreeVector(), m_world_lv,
 				     "WorldPV", nullptr, false, 0 );
+  ConstructShsMagnet();
+  ConstructTarget();
   ConstructHypTPC();
   ConstructHTOF();
-  ConstructTarget();
   // ConstructPVAC2();
   // ConstructNBAR();
-  ConstructShsMagnet();
   if( gConf.Get<G4int>("ConstructKurama") ){
     ConstructKuramaMagnet();
     ConstructSDC1();
@@ -318,7 +309,7 @@ TPCDetectorConstruction::ConstructFTOF( void )
   pos.rotateY( m_rotation_angle );
   new G4PVPlacement( rot, pos, mother_lv,
 		     "FtofMotherPV", m_world_lv, false, 0 );
-  mother_lv->SetVisAttributes( new G4VisAttributes( false, RED ) );
+  mother_lv->SetVisAttributes( new G4VisAttributes( false, G4Colour::Red() ) );
   // Segment
   auto segment_solid = new G4Box( "FtofSegmentSolid", half_size.x(),
 				  half_size.y(), half_size.z() );
@@ -326,7 +317,7 @@ TPCDetectorConstruction::ConstructFTOF( void )
 					 m_material_map["Scintillator"],
 					 "FtofSegmentLV" );
   for( G4int i=0; i<NumOfSegTOF; ++i ){
-    segment_lv->SetVisAttributes( AQUA );
+    segment_lv->SetVisAttributes( G4Colour::Cyan() );
     // segment_lv->SetUserLimits( new G4UserLimits( maxStep ) );
     segment_lv->SetSensitiveDetector( ftofSD );
     pos = G4ThreeVector( ( -NumOfSegTOF/2 + i )*pitch,
@@ -352,7 +343,7 @@ TPCDetectorConstruction::ConstructHTOF( void )
   auto htof_lv = new G4LogicalVolume( htof_solid, m_material_map["Scintillator"],
 				      "HtofLV" );
   htof_lv->SetSensitiveDetector( htof_sd );
-  htof_lv->SetVisAttributes( CYAN );
+  htof_lv->SetVisAttributes( G4Colour::Cyan() );
   for( G4int i=0; i<NumOfPlaneHTOF; ++i ){
     for( G4int j=0; j<NumOfSegHTOFOnePlane; ++j ){
       G4int seg = i*NumOfSegHTOFOnePlane + j;
@@ -418,7 +409,7 @@ TPCDetectorConstruction::ConstructHTOF( void )
 
     TOFLGVisAtt= new G4VisAttributes(true, G4Colour(0.,0.8,0.));
     TOFLGLV->SetVisAttributes(TOFLGVisAtt);
-    //    TOFLGVisAtt[k*2+1]= new G4VisAttributes(true, AQUA );
+    //    TOFLGVisAtt[k*2+1]= new G4VisAttributes(true, G4Colour::Cyan() );
     TOFLGVisAtt= new G4VisAttributes(true, G4Colour(0.,0.8,0.));
     TOFLGLV->SetVisAttributes(TOFLGVisAtt);
 
@@ -456,7 +447,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     rot->rotateX( 90.*deg );
     new G4PVPlacement( rot, tpc_pos, m_tpc_lv, "TpcPV",
 		       m_world_lv, false, 0 );
-    m_tpc_lv->SetVisAttributes( WHITE );
+    m_tpc_lv->SetVisAttributes( G4Colour::White() );
     m_tpc_lv->SetSensitiveDetector( tpc_sd );
   }
   // Field Cage
@@ -476,7 +467,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 				      "FcLV" );
     new G4PVPlacement( nullptr, G4ThreeVector(), fc_lv,
 		       "FcPV", m_tpc_lv, false, 0 );
-    fc_lv->SetVisAttributes( RED );
+    fc_lv->SetVisAttributes( G4Colour::Red() );
   }
   // Virtual pads
   G4Tubs* pad_solid[NumOfPadTPC];
@@ -599,7 +590,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
       pad_lv[i]  = new G4LogicalVolume( pad_solid[i], m_material_map["P10"],
 					Form("TpcPadLV%d", i) );
     }
-    pad_lv[i]->SetVisAttributes( BLUE );
+    pad_lv[i]->SetVisAttributes( G4Colour::Blue() );
     if( pad_out[i] < below_target ){
       if( m_experiment == 42 ){
 	new G4PVPlacement( nullptr, G4ThreeVector( 0., -pad_center_z, (-120.-25.)*mm ),
@@ -636,7 +627,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   rotdead2->rotateZ( -45.*deg );
   new G4PVPlacement( rotdead2, G4ThreeVector( 0., 0.*mm, -300.1*mm ),
 		     dead_lv, "DeadPV2", m_tpc_lv, true, 1 );
-  dead_lv->SetVisAttributes( GRAY );
+  dead_lv->SetVisAttributes( G4Colour::Gray() );
   // Virtual pad
   G4Tubs* vpad_solid[NumOfPadTPC];
   G4LogicalVolume* vpad_lv[NumOfPadTPC];
@@ -645,7 +636,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 				pad_out[i]*mm, 0.5*mm, 0., 360.*deg );
     vpad_lv[i] = new G4LogicalVolume( vpad_solid[i], m_material_map["P10"],
 				      Form("TpcVPadLV%d", i) );
-    vpad_lv[i]->SetVisAttributes( BLUE );
+    vpad_lv[i]->SetVisAttributes( G4Colour::Blue() );
     new G4PVPlacement( nullptr,
 		       G4ThreeVector( 0., -pad_center_z, -302.*mm ),
 		       vpad_lv[i], Form("TpcVPadPV%d", i), m_tpc_lv, true, 0 );
@@ -672,7 +663,7 @@ void
 TPCDetectorConstruction::ConstructKuramaMagnet( void )
 {
   const auto field_size = gSize.GetSize("KuramaField") * 0.5 * mm;
-  const auto coil_color = RED;
+  const auto coil_color = G4Colour::Red();
   const auto yoke_color = LAVENDER;
 
   // size
@@ -774,7 +765,7 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
   // auto kurama_solid = new G4Box( "KuramaSolid", 4.*m/2, 3.*m/2, 4.*m/2 );
   // auto kurama_lv = new G4LogicalVolume( kurama_solid, m_material_map["Air"],
   // 					"KuramaLV" );
-  // kurama_lv->SetVisAttributes( new G4VisAttributes( false, BLACK ) );
+  // kurama_lv->SetVisAttributes( new G4VisAttributes( false, G4Colour::Black() ) );
   // auto kurama_pv = new G4PVPlacement( m_rotation_angle, G4ThreeVector(), "KuramaPV",
   // 				      kurama_lv, m_world_pv, false, 0 );
 
@@ -1603,7 +1594,7 @@ TPCDetectorConstruction::ConstructSCH( void )
   for (int i=0; i<NumOfSegSCH; i++) {
     SCH_log[i] = new G4LogicalVolume(SCH_box, m_material_map["Scintillator"], Form("SCH%d_log", i),
 				    0, 0, 0 );
-    SCH_log[i]->SetVisAttributes( AQUA );
+    SCH_log[i]->SetVisAttributes( G4Colour::Cyan() );
     //    par_cham->calpc((double *)pos_SCH, SCHx, (double)(i+1));
     G4double ipos_x = -NumOfSegSCH/2.*(size_SCH[ThreeVector::X]-SCH_Overlap)+5.75*mm+(size_SCH[ThreeVector::X]-SCH_Overlap)*i;
     if(i%2==0){
@@ -1665,7 +1656,7 @@ TPCDetectorConstruction::ConstructSDC1( void )
 
   G4Box* DC1_box = new G4Box("DC1_box",size_DC1[ThreeVector::X]/2.,size_DC1[ThreeVector::Y]/2,size_DC1[ThreeVector::Z]/2);
   G4LogicalVolume*  DC1_log = new G4LogicalVolume(DC1_box, m_material_map["Argon"], "DC1_log",0,0,0);
-  DC1_log->SetVisAttributes( GREEN );
+  DC1_log->SetVisAttributes( G4Colour::Green() );
   // G4double sdc1_pos[3];
   // sdc1_pos[ThreeVector::X] = par_cham->get_DCPlaneCenter(DC1X, ThreeVector::X)*mm;
   // sdc1_pos[ThreeVector::Y] = par_cham->get_DCPlaneCenter(DC1X, ThreeVector::Y)*mm;
@@ -1771,7 +1762,7 @@ TPCDetectorConstruction::ConstructSDC2( void )
   size_DC2Plane[ThreeVector::Z] = 0.0001*mm;
   G4Box* DC2_box = new G4Box("DC2_box",size_DC2[ThreeVector::X]/2,size_DC2[ThreeVector::Y]/2,size_DC2[ThreeVector::Z]/2);
   G4LogicalVolume*  DC2_log = new G4LogicalVolume(DC2_box, m_material_map["Argon"], "DC2_log",0,0,0);
-  DC2_log->SetVisAttributes( GREEN );
+  DC2_log->SetVisAttributes( G4Colour::Green() );
   new G4PVPlacement( m_rotation_matrix,
 		     G4ThreeVector( sdc2_pos[ThreeVector::X],
 				    sdc2_pos[ThreeVector::Y],
@@ -1866,7 +1857,7 @@ TPCDetectorConstruction::ConstructSDC3( void )
 			      size_DC3[ThreeVector::Z]/2 );
   G4LogicalVolume* DC3_log = new G4LogicalVolume( DC3_box, m_material_map["Argon"],
 						  "DC3_log", 0, 0, 0 );
-  DC3_log->SetVisAttributes( GREEN );
+  DC3_log->SetVisAttributes( G4Colour::Green() );
   new G4PVPlacement( m_rotation_matrix,
 		     G4ThreeVector( sdc3_pos[ThreeVector::X],
 				    sdc3_pos[ThreeVector::Y],
@@ -1935,155 +1926,214 @@ void
 TPCDetectorConstruction::ConstructShsMagnet( void )
 {
   const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
-  const G4double DPHI_TPC   = 360.*deg;
-  G4Tubs* HelmSolid_t =
-    new G4Tubs("HelmSolid_t",45.*cm,80.*cm,135./2.*cm,0.*deg,DPHI_TPC);
-
-  G4Box* HelmDHole =
-    new G4Box("HelmDHole",100./2.*cm,100./2.*cm,60./2.*cm);
+#if 0 // Old version
+  const G4double DPHI_TPC = 360.*deg;
+  auto tube_solid = new G4Tubs( "TubeSolid", 45.*cm, 80.*cm, 135./2.*cm, 0.*deg, DPHI_TPC);
+  auto hole_solid = new G4Box( "HoleSolid", 100./2.*cm, 100./2.*cm, 60./2.*cm );
   G4ThreeVector HTrans(0, -60.*cm, 0);
   G4RotationMatrix* yRot = new G4RotationMatrix;  // Rotates X and Z axes only
-
-  G4Transform3D transform(*yRot, HTrans);
-
-
-  G4SubtractionSolid* HelmSolid= new G4SubtractionSolid("HelmSolid",HelmSolid_t,HelmDHole,transform);
-
-  //    new G4Tubs("HelmSolid",40.*cm,50.*cm,5*cm,0.*deg,DPHI_TPC);
-  G4LogicalVolume* HelmLV=
-    new G4LogicalVolume(HelmSolid, m_material_map["Iron"], "HelmLV");
+  G4Transform3D transform( *yRot, HTrans );
+  auto coil_solid = new G4SubtractionSolid( "ShsMagnetCoilSolid",
+					    tube_solid, hole_solid, transform );
+  auto coil_lv = new G4LogicalVolume( coil_solid, m_material_map["Iron"],
+				      "ShsMagnetCoilLV" );
   G4RotationMatrix *rotHelm = new G4RotationMatrix();
-  rotHelm->rotateX(90.*deg);
+  rotHelm->rotateX( 90.*deg );
   rotHelm->rotateZ( - m_rotation_angle );
-  new G4PVPlacement( rotHelm, G4ThreeVector( 0.*mm, 0.*mm, tpc_pos.z()*mm ), HelmLV,
-		     "HelmPV", m_world_lv, FALSE, 0 );
-
-  //    new G4PVPlacement(rotHelm, G4ThreeVector(0,+20.*cm,0),
-  //		      "HelmPV", HelmLV, m_world_pv, FALSE, 0);
-
-  //  HelmPV[1] =
-  //    new G4PVPlacement(rotHelm, G4ThreeVector(0,-20.*cm,0),
-  //		      "HelmPV", HelmLV, m_world_pv, FALSE, 0);
-  G4VisAttributes* HelmVisAtt= new G4VisAttributes( true, PINK );
-  HelmLV->SetVisAttributes(HelmVisAtt);
-
-  /*  /////// supporter (from bottom to helmholtz)
-      G4Box* HelmSuSolid =
-      new G4Box("HelmSuSolid",3.*cm,60.*cm,3*cm);
-      G4LogicalVolume* HelmSuLV=
-      new G4LogicalVolume(HelmSuSolid, m_material_map["Iron"], "HelmSuLV");
-      G4PVPlacement* HelmSuPV[2];
-      HelmSuPV[0] =
-      new G4PVPlacement(0, G4ThreeVector(31*cm,-85.*cm,31*cm),
-      "HelmSuPV", HelmSuLV, m_world_pv, FALSE, 0);
-      HelmSuPV[1] =
-      new G4PVPlacement(0, G4ThreeVector(-31*cm,-85.*cm,31*cm),
-      "HelmSuPV", HelmSuLV, m_world_pv, FALSE, 0);
-      HelmSuPV[2] =
-      new G4PVPlacement(0, G4ThreeVector(-31*cm,-85.*cm,-31*cm),
-      "HelmSuPV", HelmSuLV, m_world_pv, FALSE, 0);
-      HelmSuPV[3] =
-      new G4PVPlacement(0, G4ThreeVector(31*cm,-85.*cm,-31*cm),
-      "HelmSuPV", HelmSuLV, m_world_pv, FALSE, 0);
-      G4VisAttributes* HelmSuVisAtt= new G4VisAttributes(true, G4Colour(0.,0.0,1.));
-      HelmSuLV->SetVisAttributes(HelmSuVisAtt);
-
-      /////// supporter (Between helmholtz coils)
-      G4Box* HelmSuBeSolid =
-      new G4Box("HelmSu1Solid",1.*cm,15.*cm,1*cm);
-      G4LogicalVolume* HelmSuBeLV=
-      new G4LogicalVolume(HelmSuBeSolid, m_material_map["Iron"], "HelmSuBeLV");
-      G4PVPlacement* HelmSuBePV[2];
-      HelmSuBePV[0] =
-      new G4PVPlacement(0, G4ThreeVector(31*cm,0.*cm,31*cm),
-      "HelmSuBePV", HelmSuBeLV, m_world_pv, FALSE, 0);
-      HelmSuBePV[1] =
-      new G4PVPlacement(0, G4ThreeVector(-31*cm,0.*cm,31*cm),
-      "HelmSuBePV", HelmSuBeLV, m_world_pv, FALSE, 0);
-      HelmSuBePV[2] =
-      new G4PVPlacement(0, G4ThreeVector(-31*cm,0.*cm,-31*cm),
-      "HelmSuBePV", HelmSuBeLV, m_world_pv, FALSE, 0);
-      HelmSuBePV[3] =
-      new G4PVPlacement(0, G4ThreeVector(31*cm,0.*cm,-31*cm),
-      "HelmSuBePV", HelmSuBeLV, m_world_pv, FALSE, 0);
-      G4VisAttributes* HelmSuBeVisAtt= new G4VisAttributes(true, G4Colour(0.,0.0,1.));
-      HelmSuBeLV->SetVisAttributes(HelmSuBeVisAtt);
-  */
-
+  new G4PVPlacement( rotHelm, tpc_pos, coil_lv, "ShsMagnetCoilPV",
+  		     m_world_lv, false, 0 );
+  coil_lv->SetVisAttributes( PINK );
+#else // Current version
+  const G4ThreeVector yoke_size( 1550./2.*mm, 950./2.*mm, 1200./2.*mm );
+  auto shs_solid = new G4Box( "ShsMagnetSolid", yoke_size.x(),
+			      yoke_size.y(), yoke_size.z() );
+  auto shs_lv = new G4LogicalVolume( shs_solid, m_material_map["Air"],
+				     "ShsMagnetLV" );
+  shs_lv->SetVisAttributes( G4VisAttributes( false ) );
+  auto shs_pv = new G4PVPlacement( nullptr, tpc_pos, shs_lv,
+				   "ShsMagnetPV", m_world_lv, false, 0 );
+  const G4int NumOfParams = 4;
+  G4double yoke_width[NumOfParams] = { 1550*mm, 1530*mm, 1480*mm, 1470*mm };
+  G4double yoke_depth[NumOfParams] = { 1200*mm, 1180*mm, 1140*mm, 1130*mm };
+  G4double yoke_height[NumOfParams] = { 950*mm, 890*mm, 732*mm, 712*mm };
+  G4double coner_size[NumOfParams] = { 1449.569*mm, 1429.569*mm,
+				       1357.645*mm, 1347.645*mm };
+  G4double chamber_rad[NumOfParams] = { 800./2.*mm, 820./2.*mm,
+					850./2.*mm, 860./2.*mm };
+  G4double hole_gap[NumOfParams] = { 300*mm, 320*mm, 348*mm, 358*mm };
+  G4double side_gap[NumOfParams];
+  for( G4int i=0 ; i<NumOfParams; ++i ){
+    side_gap[i] = yoke_depth[i]/2.0*std::sqrt(2.)*mm;
+  }
+  G4double dummy_size[3] = { 2000*mm, 2000*mm, 2000*mm };
+  G4double hole_pos[NumOfParams];
+  for( G4int i=0; i<NumOfParams; ++i ){
+    hole_pos[i] = yoke_depth[i]/2.;
+  }
+  G4Box* box_solid[NumOfParams];
+  G4Tubs* tube_solid[NumOfParams];
+  G4Box* box_outer_solid[NumOfParams];
+  G4Box* box_inner_solid[NumOfParams];
+  G4Box* box_side_solid[NumOfParams];
+  G4SubtractionSolid* octa_solid[NumOfParams];
+  G4SubtractionSolid* corner_solid[NumOfParams];
+  G4SubtractionSolid* side1_solid[NumOfParams];
+  G4SubtractionSolid* side2_solid[NumOfParams];
+  G4SubtractionSolid* chamber_solid[NumOfParams];
+  G4RotationMatrix* rot_magnet  = new G4RotationMatrix;
+  rot_magnet->rotateZ( 45.*deg );
+  for( G4int i=0; i<NumOfParams; ++i ){
+    box_solid[i] = new G4Box( Form( "Box%dSolid", i ), yoke_width[i]/2.,
+			      yoke_depth[i]/2., yoke_height[i]/2. );
+    box_outer_solid[i] = new G4Box( Form( "BoxOuter%dSolid", i ),
+				    dummy_size[0], dummy_size[1],
+				    dummy_size[2] );
+    box_inner_solid[i] = new G4Box( Form( "BoxInner%dSolid", i ),
+				    coner_size[i], coner_size[i],
+				    dummy_size[2] );
+    box_side_solid[i] = new G4Box( Form("BoxSide%dSolid", i ),
+				   side_gap[i]/2., side_gap[i]/2.,
+				   hole_gap[i]/2. );
+    tube_solid[i] = new G4Tubs( Form("Tube%dSolid", i ), 0., chamber_rad[i],
+				2000*mm, 0.*deg, 360.*deg );
+    corner_solid[i] = new G4SubtractionSolid( Form( "Corner%dSolid", i ),
+					      box_outer_solid[i],
+					      box_inner_solid[i],
+					      nullptr, G4ThreeVector() );
+    octa_solid[i] = new G4SubtractionSolid( Form( "Octa%dSolid", i ),
+					    box_solid[i], corner_solid[i],
+					    rot_magnet, G4ThreeVector() );
+    G4ThreeVector side1_size( 0., hole_pos[i], 0. );
+    side1_solid[i] = new G4SubtractionSolid( Form( "Side1-%dSolid", i ),
+					     octa_solid[i], box_side_solid[i],
+					     rot_magnet, side1_size );
+    G4ThreeVector side2_size( 0., -hole_pos[i], 0. );
+    side2_solid[i] = new G4SubtractionSolid( Form("Side2-%dSolid", i ),
+					     side1_solid[i], box_side_solid[i],
+					     rot_magnet, side2_size );
+    chamber_solid[i] = new G4SubtractionSolid( Form("Chamber%dSolid", i ),
+					       side2_solid[i], tube_solid[i],
+					       nullptr, G4ThreeVector() );
+  }
+  auto frame1_solid = new G4SubtractionSolid( "Frame1Solid", chamber_solid[0],
+					      chamber_solid[1], nullptr,
+					      G4ThreeVector() );
+  auto frame2_solid = new G4SubtractionSolid( "Frame2Solid", chamber_solid[2],
+					      chamber_solid[3], nullptr,
+					      G4ThreeVector() );
+  auto magnet_solid = new G4UnionSolid( "ShsMagnetSolid", frame1_solid,
+					frame2_solid, nullptr,
+					G4ThreeVector() );
+  auto magnet_lv = new G4LogicalVolume( magnet_solid,
+					m_material_map["Iron"],
+					"ShsMagnetLV" );
+  // magnet_lv->SetVisAttributes( G4VisAttributes( false ) );
+  magnet_lv->SetVisAttributes( PINK );
+  G4RotationMatrix rot_frame;
+  rot_frame.rotateX( 90.*deg );
+  new G4PVPlacement( G4Transform3D( rot_frame, G4ThreeVector() ),
+		     "ShsMagnetPV", magnet_lv, shs_pv, false, 0 );
+  // Coil Support
+  G4double CoilSupPos_height = 250*mm;
+  G4double RadIn = 445*mm;
+  G4double RadOut= 545*mm;
+  G4double GapRadIn = 465*mm;
+  G4double GapRadOut = 545*mm;
+  G4double SupHeight = 112*mm;
+  G4double GapHeight = 62*mm;
+  std::string fullNameCoilSup = "SCCoilSup";
+  auto solidTube_Sup = new G4Tubs( "CoilSupMainSolid", RadIn, RadOut, SupHeight/2.,
+				   0*deg, 360*deg );
+  auto solidTube_Sub = new G4Tubs( "CoilSupSubSolid", GapRadIn, GapRadOut+20*mm,
+				   GapHeight/2., 0*deg, 360*deg );
+  auto solidDetectorCS = new G4SubtractionSolid( "CoilSupSolid", solidTube_Sup,
+						 solidTube_Sub, nullptr,
+						 G4ThreeVector() );
+  auto logicDetectorCS = new G4LogicalVolume( solidDetectorCS,
+					      m_material_map["Iron"],
+					      "CoilSupLV" );
+  logicDetectorCS->SetVisAttributes( G4Color::Green() );
+  G4RotationMatrix rot_sup;
+  rot_sup.rotateX( 90.*deg );
+  new G4PVPlacement( G4Transform3D( rot_sup, G4ThreeVector( 0, CoilSupPos_height, 0 ) ),
+		     "CoilSupUpPV", logicDetectorCS, shs_pv, false, 0 );
+  new G4PVPlacement( G4Transform3D( rot_sup, G4ThreeVector( 0, -CoilSupPos_height, 0 ) ),
+		     "CoilSupDwPV", logicDetectorCS, shs_pv, false, 0 );
+  // Coil
+  const G4double coilRad_in = 466*mm;
+  const G4double coilRad_out = 535*mm;
+  const G4double coilHeight = 60*mm;
+  const G4ThreeVector coilu_pos( 0*mm, 250*mm, 0*mm );
+  const G4ThreeVector coild_pos( 0*mm, -250*mm, 0*mm );
+  auto solidDetectorCoil = new G4Tubs( "CoilSolid", coilRad_in, coilRad_out,
+				       coilHeight/2., 0*deg, 360*deg );
+  auto logicDetectorCoil = new G4LogicalVolume( solidDetectorCoil,
+						m_material_map["Copper"],
+						"CoilLV" );
+  logicDetectorCoil->SetVisAttributes( G4Color::Yellow() );
+  G4RotationMatrix rot_coil;
+  rot_coil.rotateX( 90.*deg );
+  new G4PVPlacement( G4Transform3D( rot_coil, coilu_pos ),
+		     "CoilUpPV", logicDetectorCoil, shs_pv, false, 0 );
+  new G4PVPlacement( G4Transform3D( rot_coil, coild_pos ),
+		     "CoilDwPV", logicDetectorCoil, shs_pv, false, 0 );
+#endif
   auto myfield = new TPCField("helmholtz_field.dat", "KuramaMap80cm.dat");
-  auto fieldMgr =
-    G4TransportationManager::GetTransportationManager()->GetFieldManager();
-  fieldMgr->SetDetectorField( myfield );
-  fieldMgr->CreateChordFinder( myfield );
+  auto fieldMan = ( G4TransportationManager::GetTransportationManager()->
+		    GetFieldManager() );
+  fieldMan->SetDetectorField( myfield );
+  fieldMan->CreateChordFinder( myfield );
 }
 
 //_____________________________________________________________________________
 void
 TPCDetectorConstruction::ConstructTarget( void )
 {
-  auto target_pos = gGeom.GetGlobalPosition( "Target" );
-  G4double target_pos_z = target_pos.z()*mm;
-  G4LogicalVolume* TargetLV = nullptr;
-  G4LogicalVolume* TargetHolderLV;
+  const auto target_pos = gGeom.GetGlobalPosition( "SHSTarget" ) * mm;
+  const auto target_size = gSize.GetSize( "Target" ) * 0.5 * mm;
+  const auto holder_size = gSize.GetSize( "TargetHolder" ) * mm;
+  G4ThreeVector holder_pos;
+  G4VSolid* target_solid = nullptr;
+  G4VSolid* holder_solid = nullptr;
+  G4LogicalVolume* target_lv = nullptr;
+  G4LogicalVolume* holder_lv = nullptr;
   switch( m_experiment ){
   case 42: {
-    G4double Target_x = gSize.Get( "Target", ThreeVector::X );
-    G4double Target_y = gSize.Get( "Target", ThreeVector::Y );
-    G4double Target_z = gSize.Get( "Target", ThreeVector::Z );
-    //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5
-
-    G4Box* TargetSolid = new G4Box("target", Target_x*mm/2,Target_z*mm/2,Target_y*mm/2); // 30 x 10 x 15
-    TargetLV=
-      new G4LogicalVolume(TargetSolid, m_material_map["Target"], "TargetLV");
-    new G4PVPlacement( 0, G4ThreeVector( 0*mm, target_pos_z, 0.*mm ),
-		       TargetLV, "TargetPV", m_world_lv, true, 0 );
-    G4VisAttributes* TargetVisAtt= new G4VisAttributes(true, G4Colour(1.,0.,0.));
-    TargetLV->SetVisAttributes(TargetVisAtt);
-    G4Tubs* TargetHolderSolid = new G4Tubs("TargetHolderSolid", 16.*mm, 16.2*mm,
-					   155.*mm, 0., 360*deg);
-    TargetHolderLV=
-      new G4LogicalVolume(TargetHolderSolid, m_material_map["P10"], "TargetHolderLV");
-
-    new G4PVPlacement( 0, G4ThreeVector( 0*mm, target_pos_z, 145.*mm ),
-		       TargetHolderLV, "TargetHolderPV", m_world_lv, true, 0 );
-    G4VisAttributes* TargetHolderVisAtt= new G4VisAttributes(true, G4Colour(0.1,0.1,0.));
-    TargetHolderLV->SetVisAttributes(TargetHolderVisAtt);
+    target_solid = new G4Box( "Target", target_size.x(),
+			      target_size.y(), target_size.z() );
+    holder_solid = new G4Tubs( "TargetHolderSolid", holder_size.x() /* Rin */,
+			       holder_size.y() /* Rout */,
+			       holder_size.z()/2 /* DZ */, 0., 360.*deg );
+    holder_pos = target_pos;
   }
     break;
   case 45: case 27: {
-    //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm); // 30 x 10 x 5
+    //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm);
     G4double Target_r = gSize.Get( "Target", ThreeVector::X );
     // G4double Target_y = gSize.Get( "Target", ThreeVector::Y );
     G4double Target_z = gSize.Get( "Target", ThreeVector::Z );
-
-    G4Tubs* TargetSolid = new G4Tubs("TargetSolid", 0.*mm,
-				     Target_r*mm,Target_z*mm, 0., 360*deg);
+    target_solid = new G4Tubs( "TargetSolid", 0.*mm,
+			       Target_r*mm,Target_z*mm, 0., 360*deg );
     //  G4Box* TargetSolid = new G4Box("target", 1.*cm,0.25*cm,1.*cm);
-    TargetLV=
-      new G4LogicalVolume(TargetSolid, m_material_map["Target"], "TargetLV");
-    new G4PVPlacement( 0, G4ThreeVector( 0*mm, target_pos_z, 0.*mm ),
-		       TargetLV, "TargetPV", m_world_lv, true, 0 );
-    G4VisAttributes* TargetVisAtt= new G4VisAttributes(true, G4Colour(1.,0.,0.));
-    TargetLV->SetVisAttributes(TargetVisAtt);
-    /////////////////////////////////////
-    ///////// target holder  ////////////
-    /////////////////////////////////////
-
-    G4Tubs* TargetHolderSolid = new G4Tubs("TargetHolderSolid", (Target_r+15.)*mm, (Target_r+15.2)*mm,
-					   200.*mm, 0., 360*deg);
-    TargetHolderLV=
-      new G4LogicalVolume(TargetHolderSolid, m_material_map["P10"], "TargetHolderLV");
-
-    new G4PVPlacement( 0, G4ThreeVector( 0*mm, target_pos_z, 100.*mm ),
-		       TargetHolderLV, "TargetHolderPV", m_world_lv, true, 0 );
-    G4VisAttributes* TargetHolderVisAtt= new G4VisAttributes(true, G4Colour(0.1,0.1,0.));
-    TargetHolderLV->SetVisAttributes(TargetHolderVisAtt);
+    holder_solid = new G4Tubs( "TargetHolderSolid", (Target_r + 15.)*mm,
+			       (Target_r + 15.2)*mm, 200.*mm, 0., 360*deg );
+    // holder_pos.set( 0*mm, 100.*mm, target_pos.z() );
   }
     break;
   default:
     return;
   }
-  TPCTargetSD* tarSD= new TPCTargetSD("/TAR");
-  G4SDManager::GetSDMpointer()->AddNewDetector(tarSD);
-  TargetLV->SetSensitiveDetector(tarSD);
+  target_lv = new G4LogicalVolume( target_solid, m_material_map["Target"],
+				   "TargetLV" );
+  target_lv->SetVisAttributes( G4Colour::Red() );
+  new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
+		     m_world_lv, true, 0 );
+  holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
+				   "TargetHolderLV");
+  holder_lv->SetVisAttributes( G4Colour::Blue() );
+  new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
+		     m_world_lv, true, 0 );
+  auto target_sd = new TPCTargetSD( "/TAR" );
+  G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
+  target_lv->SetSensitiveDetector( target_sd );
 }
