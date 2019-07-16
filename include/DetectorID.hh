@@ -172,7 +172,11 @@ const Int_t NumOfSegSFT_UV  = 320;
 // HypTPC _____________________________________________________________________
 const Int_t DetIdTPC  = 201;
 const Int_t DetIdHTOF = 202;
+const Int_t NumOfPadTPCIn  = 10;
+const Int_t NumOfPadTPCOut = 22;
+const Int_t NumOfPadTPC = NumOfPadTPCIn + NumOfPadTPCOut;
 const Int_t NumOfSegHTOF = 32;
-// const Int_t NumOfPlaneHTOF = 4;
+const Int_t NumOfPlaneHTOF = 8;
+const Int_t NumOfSegHTOFOnePlane = NumOfSegHTOF / NumOfPlaneHTOF;
 
 #endif

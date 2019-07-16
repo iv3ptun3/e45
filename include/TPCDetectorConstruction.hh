@@ -7,6 +7,7 @@
 
 #include <G4VUserDetectorConstruction.hh>
 #include <G4RotationMatrix.hh>
+#include <G4String.hh>
 
 class G4Element;
 class G4Material;
@@ -18,6 +19,7 @@ class TPCDCSD;
 class TPCDetectorConstruction : public G4VUserDetectorConstruction
 {
 public:
+  static G4String ClassName( void );
   TPCDetectorConstruction( void );
   ~TPCDetectorConstruction( void );
 
@@ -26,7 +28,6 @@ private:
   std::map<G4String, G4Element*>  m_element_map;
   std::map<G4String, G4Material*> m_material_map;
   G4LogicalVolume*                m_world_lv;
-  G4PVPlacement*                  m_world_pv;
   G4LogicalVolume*                m_tpc_lv;
   G4double                        m_rotation_angle;
   G4RotationMatrix*               m_rotation_matrix;
@@ -54,5 +55,13 @@ private:
   void ConstructShsMagnet( void );
   void ConstructTarget( void );
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCDetectorConstruction::ClassName( void )
+{
+  static G4String s_name("TPCDetectorConstruction");
+  return s_name;
+}
 
 #endif

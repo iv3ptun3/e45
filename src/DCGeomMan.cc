@@ -123,25 +123,6 @@ DCGeomMan::GetResolution( const TString& key ) const
 
 //_____________________________________________________________________________
 Double_t
-DCGeomMan::GetTiltAngle( Int_t lnum ) const
-{
-  const DCGeomRecord* record = GetRecord(lnum);
-  if( record ) return record->TiltAngle();
-  else{
-    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
-    throw std::invalid_argument( e );
-  }
-}
-
-//_____________________________________________________________________________
-Double_t
-DCGeomMan::GetTiltAngle( const TString& key ) const
-{
-  return GetTiltAngle( GetDetectorId( key ) );
-}
-
-//_____________________________________________________________________________
-Double_t
 DCGeomMan::GetRotAngle1( Int_t lnum ) const
 {
   const DCGeomRecord* record = GetRecord(lnum);
@@ -195,6 +176,44 @@ const ThreeVector&
 DCGeomMan::GetGlobalPosition( const TString& key ) const
 {
   return GetGlobalPosition( GetDetectorId( key ) );
+}
+
+//_____________________________________________________________________________
+Double_t
+DCGeomMan::GetTiltAngle( Int_t lnum ) const
+{
+  const DCGeomRecord* record = GetRecord(lnum);
+  if( record ) return record->TiltAngle();
+  else{
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
+  }
+}
+
+//_____________________________________________________________________________
+Double_t
+DCGeomMan::GetTiltAngle( const TString& key ) const
+{
+  return GetTiltAngle( GetDetectorId( key ) );
+}
+
+//_____________________________________________________________________________
+Double_t
+DCGeomMan::GetWirePitch( Int_t lnum ) const
+{
+  const DCGeomRecord* record = GetRecord(lnum);
+  if( record ) return record->WirePitch();
+  else{
+    std::string e(FUNC_NAME + Form( " No record : %d", lnum ) );
+    throw std::invalid_argument( e );
+  }
+}
+
+//_____________________________________________________________________________
+Double_t
+DCGeomMan::GetWirePitch( const TString& key ) const
+{
+  return GetWirePitch( GetDetectorId( key ) );
 }
 
 //_____________________________________________________________________________

@@ -62,6 +62,7 @@ public:
   Double_t           Length( void )         const { return m_length;     }
   Double_t           Resolution( void )     const { return m_resolution; }
   void               SetResolution( Double_t res ) { m_resolution = res; }
+  Double_t           WirePitch( void )      const { return m_dd;         }
 
   Double_t dsdx( void ) const { return m_dsdx; }
   Double_t dsdy( void ) const { return m_dsdy; }

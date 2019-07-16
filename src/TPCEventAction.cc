@@ -226,7 +226,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  static const G4int id_scint = SDManager-> GetCollectionID("SCINT/hit");
+  static const G4int id_scint = SDManager-> GetCollectionID("HTOF/hit");
   if( id_scint > 0 ){
     auto scintHC = (G4THitsCollection<TPCScintHit>*)HCTE->GetHC( id_scint );
     G4int nhits= scintHC -> entries();

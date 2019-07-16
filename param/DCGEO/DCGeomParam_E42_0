@@ -15,6 +15,7 @@
 #    BC34, BH2 -> from VO
 #    BAC, FBH  -> from VO
 #    Others    -> KURAMA coordinate
+#    HS is -1500.mm from KURAMA.
 #
 #    2017.11.07 second version for E07 Phase2
 #    2017.04.10 first version for E07 Phase2
@@ -97,7 +98,7 @@
 42	TOF-UY	246.88	0.00	2000.33	90.0	0.0	12.0	2000.33	14.00	12.5	75.0	0.0
 43	TOF-DX	253.12	0.00	2029.67	0.0	0.0	12.0	2029.67	21.178	12.5	75.0	0.0
 44	TOF-DY	253.12	0.00	2029.67	90.0	0.0	12.0	2029.67	14.00	12.5	75.0	0.0
-51	TOF	250.00	0.00	2215.00	0.0	0.0	12.0	2215.00	0.00	12.5	75.0	0.0
+51	TOF	250.00	0.00	2215.00	0.0	0.0	0.0	2215.00	0.00	12.5	75.0	0.0
 60	VTOF	0.00	0.00	2500.00	0.0	0.0	0.0	2500.00	0.00	1.0	0.0	0.0
 #
 #
@@ -160,3 +161,26 @@
 ### Misc
 501	NMR	0.00	-385.00	0.00	0.0	0.0	0.0	0.00	0.00	0.0	0.0	0.0
 502	EM-base	0.00	0.00	-1230.91 0.0	0.0	0.0	1707.49	0.00	1.0	0.0	0.0
+##############################################################################
+############  Hyperon Spectrometer part  #####################################
+##############################################################################
+# Name Explaination (use DCGeomRecord as refference):
+#             X:      x [mm]
+#             Y:      y [mm] (same as L)
+#             Z:      z [mm]
+#             TA:     tilt angle [deg]
+#             RA1:    rotation angle along x-axis [deg]
+#             RA2:    rotation angle aling y-axis [deg]
+#             L:      radial length from HS center [mm]
+#             Res:    resolution [mm]
+#             W0:     central wire # (1-origin)
+#             dXdW:   sense wire pitch [mm]
+#             Ofs:    offset [mm] (to be tuned by analysis)
+#
+#############################################################################
+#
+# Id	Name	X	Y	Z	TA	RA1	RA2	L	Res	W0	dXdW	Ofs
+#
+301	HypTPC	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+302	HTOF	0.0	0.0	0.0	0.0	0.0	0.0	337.0	0.0	0.0	68.0	0.0
+303	KURAMA	0.0	0.0	1500.0	0.0	0.0	0.0	1500.0	0.0	0.0	0.0	0.0

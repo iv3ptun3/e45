@@ -1,8 +1,13 @@
-#ifndef __KINEMA3RESONANCE_HH__
-#define __KINEMA3RESONANCE_HH__
+// -*- C++ -*-
+
+#ifndef KINEMA_3RESONANCE_HH
+#define KINEMA_3RESONANCE_HH
 
 #include "Kinema2Body.hh"
-struct KINEMA_3RESONANCE{
+
+//_____________________________________________________________________________
+struct KINEMA_3RESONANCE
+{
   double E_1_lab;
   double p_1_lab;
   double M_1;
@@ -39,29 +44,31 @@ struct KINEMA_3RESONANCE{
   double Phi1,Phi2;
 };
 
-class Kinema3Resonance {
+//_____________________________________________________________________________
+class Kinema3Resonance
+{
 private:
   Kinema2Body kin1;
   Kinema2Body kin2;
   KINEMA_3RESONANCE kin3;
 
 public:
-  Kinema3Resonance(double m1, double m2, double m3, double m4, double m5, double m_res, double width, double p1, double p2);
-  double p2E(double p,double m);
-  void CalcDistoribution(double unitx, double unity, double unitz, double *theta, double *phi);
-  double deg2rad(double theta);
-  double rag2deg(double rag);
-  double RandSin(void);
-  void Dump(void);
-  double GetEnergy(int i);
-  double GetMomentum(int i);
-  void GetMomentum(int i, double *mom);
-  double GetTheta(int i);
-  double GetPhi(int i);
-  double GetThetaCM(int i);
-  double GetPhiCM(int i);
-  void  RotateMom(int i, double deg, double *mom);
-  double GetResMass(void);
+  Kinema3Resonance( double m1, double m2, double m3, double m4, double m5,
+		    double m_res, double width, double p1, double p2 );
+  double p2E( double p,double m );
+  void   CalcDistoribution( double unitx, double unity, double unitz,
+			    double *theta, double *phi );
+  double RandSin( void );
+  void   Dump( void );
+  double GetEnergy( int i );
+  double GetMomentum( int i );
+  void   GetMomentum( int i, double *mom );
+  double GetTheta( int i );
+  double GetPhi( int i );
+  double GetThetaCM( int i );
+  double GetPhiCM( int i );
+  void   RotateMom( int i, double deg, double *mom );
+  double GetResMass( void );
 };
 
 #endif

@@ -62,6 +62,8 @@ public:
   Double_t            GetRotAngle2( const TString& key ) const;
   Double_t            GetTiltAngle( Int_t lnum ) const;
   Double_t            GetTiltAngle( const TString& key ) const;
+  Double_t            GetWirePitch( Int_t lnum ) const;
+  Double_t            GetWirePitch( const TString& key ) const;
   ThreeVector         Global2LocalDir( Int_t lnum, const ThreeVector &in ) const;
   ThreeVector         Global2LocalDir( const TString& key, const ThreeVector &in ) const;
   ThreeVector         Global2LocalPos( Int_t lnum, const ThreeVector &in ) const;

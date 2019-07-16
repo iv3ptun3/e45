@@ -9,6 +9,8 @@
 #include <iterator>
 #include <sstream>
 
+#include <G4ThreeVector.hh>
+
 #include "FuncName.hh"
 
 //_____________________________________________________________________________
@@ -64,21 +66,6 @@ DetSizeMan::Initialize( const G4String& filename )
 }
 
 //_____________________________________________________________________________
-G4int
-DetSizeMan::GetSize( const G4String& key ) const
-{
-  PIterator itr = m_param_map.find(key);
-  if( itr==m_param_map.end() ){
-    Print();
-    std::cerr << "#E " << FUNC_NAME << " "
-		<< "No such key : " << key << std::endl;
-    return 0;
-  }
-
-  return itr->second.size();
-}
-
-//_____________________________________________________________________________
 G4double
 DetSizeMan::Get( const G4String& key, G4int i ) const
 {
@@ -93,6 +80,15 @@ DetSizeMan::Get( const G4String& key, G4int i ) const
   }
 
   return itr->second.at(i);
+}
+
+//_____________________________________________________________________________
+G4ThreeVector
+DetSizeMan::GetSize( const G4String& key ) const
+{
+  return G4ThreeVector( Get( key, G4ThreeVector::X ),
+			Get( key, G4ThreeVector::Y ),
+			Get( key, G4ThreeVector::Z ) );
 }
 
 //_____________________________________________________________________________

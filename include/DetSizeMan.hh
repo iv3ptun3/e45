@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <globals.hh>
+#include <G4ThreeVector.hh>
 
 //_____________________________________________________________________________
 class DetSizeMan
@@ -31,12 +32,12 @@ private:
   ParamMap m_param_map;
 
 public:
-  G4bool   Initialize( void );
-  G4bool   Initialize( const G4String& filename );
-  G4bool   IsReady( void ) const { return m_is_ready; }
-  G4int    GetSize( const G4String& key ) const;
-  G4double Get( const G4String& key, G4int i=0 ) const;
-  void     Print( void ) const;
+  G4bool        Initialize( void );
+  G4bool        Initialize( const G4String& filename );
+  G4bool        IsReady( void ) const { return m_is_ready; }
+  G4double      Get( const G4String& key, G4int i=0 ) const;
+  G4ThreeVector GetSize( const G4String& key ) const;
+  void          Print( void ) const;
 };
 
 //_____________________________________________________________________________
