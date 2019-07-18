@@ -1534,14 +1534,22 @@ void TPCAnaManager::SetPrimaryVertex(G4int id, G4double x, G4double y, G4double 
   }
 }
 
-void TPCAnaManager::SetPrimaryBeam(G4double px, G4double py, G4double pz)
+//_____________________________________________________________________________
+void
+TPCAnaManager::SetPrimaryBeam( const G4ThreeVector& p )
+{
+  SetPrimaryBeam( p.x(), p.y(), p.z() );
+}
+
+//_____________________________________________________________________________
+void
+TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
 {
   primaryBeam.pg[0] = px;
   primaryBeam.pg[1] = py;
   primaryBeam.pg[2] = pz;
-  primaryBeam.pg[3] = sqrt(pow(px,2.0)+pow(py,2.0)+pow(pz,2.0));
+  primaryBeam.pg[3] = std::sqrt( px*px + py*py + pz*pz );
 }
-
 
 void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)

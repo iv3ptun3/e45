@@ -1,6 +1,7 @@
 // -*- C++ -*-
 
 #include <G4RunManager.hh>
+#include <G4TrajectoryDrawByCharge.hh>
 #include <G4UIterminal.hh>
 #include <G4UItcsh.hh>
 #include <QGSP_BERT.hh>
@@ -39,10 +40,12 @@ main( int argc, char** argv )
 
   new TFile( argv[kOutputName], "RECREATE" );
 
-  auto runManager= new G4RunManager;
+  auto runManager = new G4RunManager;
   runManager->SetUserInitialization( new TPCDetectorConstruction );
-  runManager-> SetUserInitialization( new QGSP_BERT );
-  // runManager->SetUserInitialization( new TPCPhysicsList );
+  if( gConf.Get<G4String>( "Physics" ) == "QGSP_BERT" )
+    runManager->SetUserInitialization( new QGSP_BERT );
+  else if( gConf.Get<G4String>( "Physics" ) == "USER" )
+    runManager->SetUserInitialization( new TPCPhysicsList );
   runManager->SetUserAction( new TPCPrimaryGeneratorAction );
   runManager->SetUserAction( new TPCRunAction );
   runManager->SetUserAction( new TPCSteppingAction );
@@ -52,11 +55,19 @@ main( int argc, char** argv )
   auto visManager = new TPCVisManager;
   // auto visManager = new G4VisExecutive;
   visManager->Initialize();
+# if 0
+  auto traj = new G4TrajectoryDrawByCharge;
+  const G4Colour Invisible( 0., 0., 0., 0. );
+  traj->Set( G4TrajectoryDrawByCharge::Charge::Negative, G4Colour::Blue() );
+  traj->Set( G4TrajectoryDrawByCharge::Charge::Neutral, Invisible );
+  traj->Set( G4TrajectoryDrawByCharge::Charge::Positive, G4Colour::Red() );
+  visManager->RegisterModel( traj );
+# endif
 #endif
 
   runManager->Initialize();
 
-  auto uiManager= G4UImanager::GetUIpointer();
+  auto uiManager = G4UImanager::GetUIpointer();
 
   // interactive session, if no arguments given
   if( argc == kArgc-1 ) {

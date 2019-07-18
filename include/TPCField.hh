@@ -3,10 +3,11 @@
 #ifndef TPC_FIELD_HH
 #define TPC_FIELD_HH
 
-#include "globals.hh"
-#include "G4MagneticField.hh"
-//#include "TPCParameters_getenv.hh"
-//const double solenoidOffset = 1617.0;
+#include <globals.hh>
+#include <G4MagneticField.hh>
+#include <G4String.hh>
+
+// const double solenoidOffset = 1617.0;
 
 const G4int MAX_DIM_X_OPERA3D = 121;
 const G4int MAX_DIM_Y_OPERA3D = 121;
@@ -25,8 +26,11 @@ const G4int MAX_KURAMA_Z_OPERA3D = 121;
 class TPCField : public G4MagneticField
 {
 public:
+  static G4String ClassName( void );
   TPCField( const G4String& fname, const G4String& fname2 );
-  //  TPCField(char* fname, char* fname2, G4int on_off, G4int on_off2, G4double spec_angle, G4double k_gap, G4double k_move, G4double h_field, G4double k_field);
+  // TPCField( char* fname, char* fname2, G4int on_off, G4int on_off2,
+  // 	    G4double spec_angle, G4double k_gap, G4double k_move,
+  // 	    G4double h_field, G4double k_field );
   ~TPCField( void );
 
 private:
@@ -56,7 +60,15 @@ private:
   // G4double env_k_pos_z;
 
 public:
-  void GetFieldValue(const  G4double Point[3],  G4double Bfield[3] ) const;
+  virtual void GetFieldValue( const G4double Point[4], G4double* Bfield ) const;
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCField::ClassName( void )
+{
+  static G4String s_name("TPCField");
+  return s_name;
+}
 
 #endif

@@ -4,26 +4,29 @@
 #define TPC_PRIMARY_GENERATOR_ACTION_HH
 
 #include <G4VUserPrimaryGeneratorAction.hh>
+#include <G4ThreeVector.hh>
 #include <G4Types.hh>
-
-#include "ThreeVector.hh"
 
 class G4ParticleGun;
 
-class TFile;
+class BeamInfo;
 
 //_____________________________________________________________________________
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
+  static G4String ClassName( void );
   TPCPrimaryGeneratorAction( void );
   ~TPCPrimaryGeneratorAction( void );
 
 private:
   G4ParticleGun* particleGun;   // particle gun provided by Geant4
-  ThreeVector m_target_size;
+  G4ThreeVector m_target_pos;
+  G4ThreeVector m_target_size;
+  BeamInfo*     m_beam;
+  G4double      m_beam_p0;
+
   G4double env_target_pos_z;
-  G4double env_Beam_mom;
   G4double env_Beam_width;
   G4double env_Beam_x0;
   G4double env_Beam_y0;
@@ -52,7 +55,7 @@ public:
   void Generate_hdibaryon_PHSG_S(G4Event* anEvent); //7
   void Generate_hdibaryon_PHSG_LL(G4Event* anEvent); //9
   void Generate_Kp_Kn(G4Event* anEvent); //10
-  void Generate_beam(G4Event* anEvent); //10
+  void GenerateBeam( G4Event* anEvent ); //10
   void Generate_hdibaryon_non_reso(G4Event* anEvent);
   void Generate_test(G4Event* anEvent);
   void Generate_test2(G4Event* anEvent);
@@ -98,5 +101,13 @@ public:
   friend class E27Reaction;
   friend class KKppReaction;
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCPrimaryGeneratorAction::ClassName( void )
+{
+  static G4String s_name("TPCPrimaryGeneratorAction");
+  return s_name;
+}
 
 #endif

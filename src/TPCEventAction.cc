@@ -16,6 +16,7 @@
 #include <G4UItcsh.hh>
 
 #include "ConfMan.hh"
+#include "FuncName.hh"
 #include "TPCTargetSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCScintSD.hh"
@@ -57,7 +58,8 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 {
   G4int eventID = anEvent-> GetEventID();
   if( eventID % 100 == 0 ){
-    G4cout << ">>> Event ID: " << eventID << G4endl;
+    G4cout << FUNC_NAME << G4endl
+	   << "   Event number = " << eventID << G4endl;
   }
   G4SDManager* SDManager= G4SDManager::GetSDMpointer();
 

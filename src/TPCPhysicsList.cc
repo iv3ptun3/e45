@@ -129,12 +129,12 @@ void
 TPCPhysicsList::ConstructProcess( void )
 {
   AddTransportation();
-  ConstructEM();
+  if( gConf.Get<G4bool>( "EM" ) )
+    ConstructEM();
   // ConstructGeneral(); // for test
-  ConstructHadron();
+  if( gConf.Get<G4bool>( "Hadron" ) )
+    ConstructHadron();
 }
-
-
 
 //_____________________________________________________________________________
 void
@@ -156,40 +156,34 @@ TPCPhysicsList::ConstructIons( void )
   //  G4ParticleDefinition* Be10=G4ParticleTable::FindIon(4,10,0.,0);
   //  G4double rmBe10= *G4IonTable::GetIonMass(4,10)/GeV;
 
-
-  G4ParticleDefinition* kaonMinus=G4ParticleTable::GetParticleTable()->FindParticle("kaon-");
-  //  G4ParticleDefinition* C12;
-  //  C12 = G4ParticleTable::GetParticleTable()->GetIon(6, 12,0.*keV);
-  //  G4ParticleDefinition* C12=G4ParticleTable::GetParticleTable()->FindParticle("C12[0,0]");
-  G4double rmkn=kaonMinus->GetPDGMass()/GeV;
-  G4double rmC12= 11.1749*GeV;
+  auto kaonMinus = G4ParticleTable::GetParticleTable()->FindParticle("kaon-");
+  // auto C12 = G4ParticleTable::GetParticleTable()->GetIon(6, 12,0.*keV);
+  // auto C12 = G4ParticleTable::GetParticleTable()->FindParticle("C12[0,0]");
+  G4double rmkn = kaonMinus->GetPDGMass()/GeV;
+  G4double rmC12 = 11.1749*GeV;
   //  G4double rmC12= C12->GetPDGMass()/GeV;
-
-  G4String char_beam_mom = gConf.Get<G4double>( "BeamMom" );
-
-  G4ParticleDefinition* particle;
-  G4double pbeam=atof(char_beam_mom.c_str());
-  G4double Ebeam = sqrt(pow(pbeam,2)+pow(rmkn,2));
-  G4double W=sqrt(pow(Ebeam+rmC12/GeV,2)-pow(pbeam,2));
-  G4cout<<"---------------------------------"<<G4endl;
-  G4cout<<"---------------------------------"<<G4endl;
-  G4cout<<"---------------------------------"<<G4endl;
-  G4cout<<"W:"<<W<<G4endl;
-  G4cout<<"Ebeam:"<<Ebeam<<G4endl;
-  G4cout<<"pbeam:"<<pbeam<<G4endl;
-  G4cout<<"rmC12:"<<rmC12/GeV<<G4endl;
-  G4cout<<"---------------------------------"<<G4endl;
-  G4cout<<"---------------------------------"<<G4endl;
-  G4cout<<"---------------------------------"<<G4endl;
-
-  particle = new G4ParticleDefinition("phaseLL", W*GeV, 0.*GeV, 0,
-				      0,              +0,             0,
-				      0,              +0,             0,
-				      "ion",        0,            +0,        101060120,
-				      false,  0.*ns,          NULL);
-
-  G4DecayTable* decayTable =  new G4DecayTable;
-  auto mode = new G4PhaseSpaceDecayChannel("phaseLL", 1.0,4,"lambda","lambda","Li8[0.0]","kaon+");
+  G4double pbeam = gConf.Get<G4double>( "BeamMom" );
+  G4double Ebeam = std::sqrt( std::pow( pbeam, 2 ) + std::pow( rmkn, 2 ) );
+  G4double W = std::sqrt( std::pow( Ebeam+rmC12/GeV, 2 ) -
+			  std::pow( pbeam, 2 ) );
+  G4cout << "---------------------------------" << G4endl;
+  G4cout << "---------------------------------" << G4endl;
+  G4cout << "---------------------------------" << G4endl;
+  G4cout << "W:" << W << G4endl;
+  G4cout << "Ebeam:" << Ebeam << G4endl;
+  G4cout << "pbeam:" << pbeam << G4endl;
+  G4cout << "rmC12:" << rmC12/GeV << G4endl;
+  G4cout << "---------------------------------" << G4endl;
+  G4cout << "---------------------------------" << G4endl;
+  G4cout << "---------------------------------" << G4endl;
+  auto particle = new G4ParticleDefinition( "phaseLL", W*GeV, 0.*GeV, 0,
+					    0, +0, 0,
+					    0, +0, 0,
+					    "ion", 0, +0, 101060120,
+					    false, 0.*ns, nullptr );
+  auto decayTable = new G4DecayTable;
+  auto mode = new G4PhaseSpaceDecayChannel( "phaseLL", 1.0, 4, "lambda",
+					    "lambda", "Li8[0.0]", "kaon+" );
   decayTable->Insert( mode );
   particle->SetDecayTable( decayTable );
 }
@@ -227,13 +221,9 @@ TPCPhysicsList::ConstructGeneral( void )
       pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
     }
 
-
     ////shhwang; include decay process
-
     G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
-
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-
     if(Lambda_decay==1){
       G4VDecayChannel* mode;
       G4DecayTable* Table = new G4DecayTable();
@@ -243,7 +233,6 @@ TPCPhysicsList::ConstructGeneral( void )
       particle->SetDecayTable(Table);
     }
     //////
-
 
     ////k0
     G4int Ks_decay = gConf.Get<G4int>( "KsDecay" );
@@ -301,172 +290,132 @@ void TPCPhysicsList::ConstructHadron( void )
 }
 
 //_____________________________________________________________________________
-void TPCPhysicsList::ConstructStableHyperons()
+void
+TPCPhysicsList::ConstructStableHyperons( void )
 {
+  G4ParticleDefinition* particle;
   G4DecayTable* decayTable;
   G4VDecayChannel* mode;
-  G4ParticleDefinition* particle;
+
+  // G4ParticleDefinition::G4ParticleDefinition(
+  // const G4String& aName, G4double mass, G4double width,
+  // G4double charge, G4int iSpin, G4int iParity, G4int iConjugation,
+  // G4int iIsospin, G4int  iIsospinZ, G4int gParity,
+  // const G4String& pType, G4int lepton, G4int baryon, G4int encoding,
+  // G4bool stable, G4double lifetime, G4DecayTable* decaytable,
+  // G4bool shortlived = false,
+  // const G4String& subType = "",
+  // G4int anti_encoding = 0,
+
+  // G4double magneticMoment = 0.0
+  // )
+  // G4DecayTable::G4DecayTable(
+  // G4bool shortlived = false,
+  // const G4String& subType = "",
+  // G4int anti_encoding = 0,
+  // G4double magneticMoment = 0.0
+  // )
 
   // ssigma+ non-decay sigma+
-  particle = new G4ParticleDefinition(
-				      "ssigma+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-				      1,              +1,             0,
-				      2,              +2,             0,
-				      "baryon",               0,            +1,        3222,
-				      true,                0,          NULL);
-
-
+  particle = new G4ParticleDefinition( "ssigma+", 1.18937*GeV, 8.209e-12*MeV,
+				       eplus, 1, +1, 0, 2, +2, 0,
+				       "baryon", 0, +1, 3222,
+				       true, 0, nullptr );
   // sigma1+  decay only to sigma+ -> pi+ neutron channel
-  particle = new G4ParticleDefinition(
-				      "sigma1+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-				      1,              +1,             0,
-				      2,              +2,             0,
-				      "baryon",               0,            +1,        3222,
-				      false,                0.0799*ns,          NULL);
-
-  decayTable =  new G4DecayTable();
+  particle = new G4ParticleDefinition( "sigma1+", 1.18937*GeV, 8.209e-12*MeV,
+				       eplus, 1, +1, 0, 2, +2, 0,
+				       "baryon", 0, +1, 3222,
+				       false, 0.0799*ns, nullptr );
+  decayTable =  new G4DecayTable;
   // sigma+ -> neutron + pi+
-  mode = new G4PhaseSpaceDecayChannel("sigma1+",1.0,2,"neutron","pi+");
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
+  mode = new G4PhaseSpaceDecayChannel( "sigma1+", 1.0, 2, "neutron", "pi+" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
   // sigma2+  decay only to sigma+ -> pi0 proton channel
-  particle = new G4ParticleDefinition(
-				      "sigma2+",    1.18937*GeV, 8.209e-12*MeV,       eplus,
-				      1,              +1,             0,
-				      2,              +2,             0,
-				      "baryon",               0,            +1,        3222,
-				      false,                0.0799*ns,          NULL);
-
-  decayTable =  new G4DecayTable();
+  particle = new G4ParticleDefinition( "sigma2+", 1.18937*GeV, 8.209e-12*MeV,
+				       eplus, 1, +1, 0, 2, +2, 0,
+				       "baryon", 0, +1, 3222,
+				       false, 0.0799*ns, nullptr );
+  decayTable =  new G4DecayTable;
   // sigma+ -> proton + pi0
-  mode = new G4PhaseSpaceDecayChannel("sigma2+", 1.0,2,"proton","pi0");
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
+  mode = new G4PhaseSpaceDecayChannel( "sigma2+", 1.0, 2, "proton", "pi0" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
   /// Lambda1405 radioactive decay
-  particle = new G4ParticleDefinition(
-				      "lambda1405r",    1.4051*GeV, 50.*MeV,       0,
-				      1,              -1,             0,
-				      0,              +0,             0,
-				      "baryon",               0,            +1,        13122,
-				      false,                0.*ns,          NULL);
-
-  decayTable =  new G4DecayTable();
-  mode = new G4PhaseSpaceDecayChannel("lambda1405r", 1.0,2,"lambda","gamma");
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
+  particle = new G4ParticleDefinition( "lambda1405r", 1.4051*GeV, 50.*MeV,
+				       0, 1, -1, 0, 0, +0, 0,
+				       "baryon", 0, +1, 13122,
+				       false, 0.*ns, nullptr );
+  decayTable =  new G4DecayTable;
+  mode = new G4PhaseSpaceDecayChannel( "lambda1405r", 1.0, 2,
+				       "lambda", "gamma" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
   /// Sigma1385 radioactive decay
-  particle = new G4ParticleDefinition(
-				      "sigma1385r",    1.3837*GeV, 36.*MeV,       0,
-				      3,              +1,             0,
-				      1,              +0,             0,
-				      "baryon",               0,            +1,        3214,
-				      false,                0.*ns,          NULL);
-
-  decayTable =  new G4DecayTable();
-  mode = new G4PhaseSpaceDecayChannel("sigma1385r", 1.0,2,"lambda","gamma");
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-  //		G4double mass, G4double	width,G4double charge,
-  //		G4int iSpin, G4int iParity,G4int iConjugation,
-  //		G4int iIsospin, G4int	iIsospinZ, G4int gParity,
-  //		const G4String &pType, G4int lepton, G4int baryon, G4int encoding,
-  //		G4bool 	stable,	G4double lifetime
-
-  //, G4DecayTable *decaytable,
-  //		G4bool  	shortlived = false,
-  //		const G4String &  	subType = "",
-  //		G4int  	anti_encoding = 0,
-  //		G4double  	magneticMoment = 0.0
-  /*
-    G4ParticleDefinition::G4ParticleDefinition 	( 	const G4String &  	aName,
-    G4double  	mass,
-    G4double  	width,
-    G4double  	charge,
-    G4int  	iSpin,
-    G4int  	iParity,
-    G4int  	iConjugation,
-    G4int  	iIsospin,
-    G4int  	iIsospinZ,
-    G4int  	gParity,
-    const G4String &  	pType,
-    G4int  	lepton,
-    G4int  	baryon,
-    G4int  	encoding,
-    G4bool  	stable,
-    G4double  	lifetime,
-    G4DecayTable *  	decaytable,
-    G4bool  	shortlived = false,
-    const G4String &  	subType = "",
-    G4int  	anti_encoding = 0,
-    G4double  	magneticMoment = 0.0
-    )
-  */
-
-
-  //hybrid baryon mode
-  //  particle = new G4ParticleDefinition(
-  //				      "hybridb",  1.22*GeV, 0.*MeV, eplus,
-  //				      0,              +0,             0,
-  //				      0,              +0,             0,
-  //				      "baryon",        0,            +1,        9223,
-  //				      false,      0.0*ns,          NULL);
-  //  decayTable =  new G4DecayTable();
-
-
-  //  mode = new G4PhaseSpaceDecayChannel("hybridb", 1.0,3,"neutron","pi+","pi-"); //pi- p --> n pi+ pi-
-  //  mode = new G4PhaseSpaceDecayChannel("hybridb", 1.0,3,"neutron","pi+","pi-"); //pi- p --> p pi0 pi-
-  //  mode = new G4PhaseSpaceDecayChannel("hybridb", 1.0,3,"neutron","pi+","pi-"); //pi+ p --> n pi+ pi+
-  //  mode = new G4PhaseSpaceDecayChannel("hybridb", 1.0,3,"proton","pi+","pi+"); //pi+ p --> p pi0 pi+
-  //  mode = new G4PhaseSpaceDecayChannel("hybridb", 1.0,3,"proton","pi+","pi-"); //pi+ p --> p pi- pi+
-  //  decayTable->Insert(mode);
-  //  particle->SetDecayTable(decayTable);
-
+  particle = new G4ParticleDefinition( "sigma1385r", 1.3837*GeV, 36.*MeV,
+				       0, 3, +1, 0, 1, +0, 0,
+				       "baryon", 0, +1, 3214,
+				       false, 0.*ns, nullptr );
+  decayTable =  new G4DecayTable;
+  mode = new G4PhaseSpaceDecayChannel( "sigma1385r", 1.0, 2, "lambda", "gamma" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
+  // hybrid baryon mode
+  // particle = new G4ParticleDefinition( "hybridb", 1.22*GeV, 0.*MeV,
+  // 				       eplus, 0, +0, 0, 0, +0, 0,
+  // 				       "baryon", 0, +1, 9223,
+  // 				       false, 0.*ns, nullptr );
+  // decayTable = new G4DecayTable;
+  // mode = new G4PhaseSpaceDecayChannel( "hybridb", 1.0, 3, "neutron",
+  // 				       "pi+", "pi-" ); // pi- p --> n pi+ pi-
+  // mode = new G4PhaseSpaceDecayChannel( "hybridb", 1.0, 3, "neutron",
+  // 				       "pi+", "pi-" ); // pi- p --> p pi0 pi-
+  // mode = new G4PhaseSpaceDecayChannel( "hybridb", 1.0, 3, "neutron",
+  // 				       "pi+", "pi-" ); // pi+ p --> n pi+ pi+
+  // mode = new G4PhaseSpaceDecayChannel( "hybridb", 1.0, 3, "proton",
+  // 				       "pi+", "pi+" ); // pi+ p --> p pi0 pi+
+  // mode = new G4PhaseSpaceDecayChannel( "hybridb", 1.0, 3, "proton",
+  // 				       "pi+", "pi-" ); // pi+ p --> p pi- pi+
+  // decayTable->Insert( mode );
+  // particle->SetDecayTable( decayTable );
 
   G4double h_lifetime = gConf.Get<G4double>("HdibaryonLifetime");
   G4double h_mass = gConf.Get<G4double>("HdibaryonMass") * GeV;
-  G4double h_width = gConf.Get<G4double>("HdibaryonWidth") *GeV;
-
-  particle = new G4ParticleDefinition( "hdibaryon",  h_mass, h_width, 0,
-				       0,              +0,             0,
-				       0,              +0,             0,
-				       "baryon",        0,            +2,        9223,
-				       false,  h_lifetime,          nullptr );
+  G4double h_width = gConf.Get<G4double>("HdibaryonWidth") * GeV;
+  particle = new G4ParticleDefinition( "hdibaryon", h_mass, h_width,
+				       0, 0, +0, 0, 0, +0, 0,
+				       "baryon", 0, +2, 9223,
+				       false, h_lifetime, nullptr );
   decayTable =  new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryon", 1.0, 3, "lambda", "proton", "pi-" );
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
-  particle = new G4ParticleDefinition( "hdibaryonS", h_mass, h_width, 0,
-				       0,              +0,             0,
-				       0,              +0,             0,
-				       "baryon",        0,            +2,        9224,
-				       false,  h_lifetime,          nullptr );
-  decayTable =  new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryonS", 1.0, 2, "sigma-", "proton" );
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
-
-  particle = new G4ParticleDefinition( "hdibaryonLL", h_mass, h_width, 0,
-				       0,              +0,             0,
-				       0,              +0,             0,
-				       "baryon",        0,            +2,        9225,
-				       false,  h_lifetime,          nullptr );
-  decayTable =  new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryonLL", 1.0, 2, "lambda", "lambda" );
-  decayTable->Insert(mode);
-  particle->SetDecayTable(decayTable);
+  mode = new G4PhaseSpaceDecayChannel( "hdibaryon", 1.0, 3, "lambda",
+				       "proton", "pi-" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
+  particle = new G4ParticleDefinition( "hdibaryonS", h_mass, h_width,
+				       0, 0, +0, 0, 0, +0, 0,
+				       "baryon", 0, +2, 9224,
+				       false, h_lifetime, nullptr );
+  decayTable = new G4DecayTable;
+  mode = new G4PhaseSpaceDecayChannel( "hdibaryonS", 1.0, 2,
+				       "sigma-", "proton" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
+  particle = new G4ParticleDefinition( "hdibaryonLL", h_mass, h_width,
+				       0, 0, +0, 0, 0, +0, 0,
+				       "baryon", 0, +2, 9225,
+				       false, h_lifetime, nullptr );
+  decayTable = new G4DecayTable;
+  mode = new G4PhaseSpaceDecayChannel( "hdibaryonLL", 1.0, 2,
+				       "lambda", "lambda" );
+  decayTable->Insert( mode );
+  particle->SetDecayTable( decayTable );
 }
 
 //_____________________________________________________________________________
 void
 TPCPhysicsList::SetCuts( void )
 {
-  /*
-    G4VUserPhysicsList::SetCutsWithDefault" method sets
-    the default cut value for all particle types
-  */
+  // G4VUserPhysicsList::SetCutsWithDefault" method sets
+  // the default cut value for all particle types
   SetCutsWithDefault();
 }

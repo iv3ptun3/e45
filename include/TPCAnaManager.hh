@@ -427,7 +427,8 @@ public:
 
   //  void SetFDCData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
   //				 G4int track, G4int particle, G4int detector);
-  void SetPrimaryBeam(G4double px, G4double py, G4double pz);
+  void SetPrimaryBeam( const G4ThreeVector& p );
+  void SetPrimaryBeam( G4double px, G4double py, G4double pz );
 
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);

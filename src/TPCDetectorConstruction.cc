@@ -1599,9 +1599,9 @@ TPCDetectorConstruction::ConstructSCH( void )
     G4double ipos_x = -NumOfSegSCH/2.*(size_SCH[ThreeVector::X]-SCH_Overlap)+5.75*mm+(size_SCH[ThreeVector::X]-SCH_Overlap)*i;
     if(i%2==0){
       new G4PVPlacement( m_rotation_matrix,
-			 G4ThreeVector( ipos_x,
-					sch_pos[ThreeVector::Y],
-					sch_pos[ThreeVector::Z] - 1.*mm ).rotateY( m_rotation_angle ),
+			 G4ThreeVector( sch_pos.x() + ipos_x,
+					sch_pos.y(),
+					sch_pos.z() - 1.*mm ).rotateY( m_rotation_angle ),
 			 SCH_log[i],
 			 Form("SCH%d", i),
 			 m_world_lv,
@@ -1609,9 +1609,9 @@ TPCDetectorConstruction::ConstructSCH( void )
 			 i );
     }else if(i%2==1){
       new G4PVPlacement( m_rotation_matrix,
-			 G4ThreeVector( ipos_x,
-					sch_pos[ThreeVector::Y],
-					sch_pos[ThreeVector::Z] + 1.*mm ).rotateY( m_rotation_angle ),
+			 G4ThreeVector( sch_pos.x() + ipos_x,
+					sch_pos.y(),
+					sch_pos.z() + 1.*mm ).rotateY( m_rotation_angle ),
 			 SCH_log[i],
 			 Form("SCH%d", i),
 			 m_world_lv,

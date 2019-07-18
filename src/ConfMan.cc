@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 
+#include "BeamMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
 #include "FuncName.hh"
@@ -101,7 +102,8 @@ ConfMan::InitializeHistograms( void )
 G4bool
 ConfMan::InitializeParameterFiles( void )
 {
-  return ( InitializeParameter<DCGeomMan>("DCGEO") &&
+  return ( InitializeParameter<BeamMan>("BEAM") &&
+	   InitializeParameter<DCGeomMan>("DCGEO") &&
 	   InitializeParameter<DetSizeMan>("DSIZE") );
 }
 

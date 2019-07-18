@@ -16,7 +16,8 @@
 //_____________________________________________________________________________
 DetSizeMan::DetSizeMan( void )
   : m_is_ready(false),
-    m_file_name()
+    m_file_name(),
+    m_param_map()
 {
 }
 

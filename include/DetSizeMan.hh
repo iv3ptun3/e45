@@ -14,7 +14,7 @@
 class DetSizeMan
 {
 public:
-  static G4String     ClassName( void );
+  static G4String    ClassName( void );
   static DetSizeMan& GetInstance( void );
   ~DetSizeMan( void );
 
@@ -24,11 +24,11 @@ private:
   DetSizeMan& operator =( const DetSizeMan& );
 
 private:
-  typedef std::vector<G4double>         ParamArray;
+  typedef std::vector<G4double>          ParamArray;
   typedef std::map<G4String, ParamArray> ParamMap;
-  typedef ParamMap::const_iterator      PIterator;
+  typedef ParamMap::const_iterator       PIterator;
   G4bool   m_is_ready;
-  G4String  m_file_name;
+  G4String m_file_name;
   ParamMap m_param_map;
 
 public:
