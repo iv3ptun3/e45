@@ -57,7 +57,7 @@ BeamMan::Initialize( void )
 {
   const G4double p0 = ConfMan::GetInstance().Get<G4double>( "BeamMom" );
 
-  m_file = TFile::Open( m_file_name );
+  m_file = new TFile( m_file_name );
   TTree* tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
 
   if( !m_file->IsOpen() || !tree )
