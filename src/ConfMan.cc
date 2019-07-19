@@ -10,6 +10,8 @@
 #include <sstream>
 #include <vector>
 
+#include <CLHEP/Units/SystemOfUnits.h>
+
 #include "BeamMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
@@ -71,6 +73,11 @@ ConfMan::Initialize( void )
     m_double[key] = std::strtod( val, nullptr );
     m_int[key]    = std::strtol( val, nullptr, 10 );
     m_bool[key]   = static_cast<G4bool>( std::strtol( val, nullptr, 10 ) );
+  }
+
+  if( Get<G4int>( "Generator" ) == 10 /* GenerateBeam */ ){
+    const G4double primary_z = -1000.*CLHEP::mm;
+    BeamMan::GetInstance().SetPrimaryZ( primary_z );
   }
 
   if ( !InitializeParameterFiles() || !InitializeHistograms() )

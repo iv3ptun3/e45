@@ -61,12 +61,12 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
   //  { return; }
 
   // check if particles enters to the calorimeter volume, the process will stop.
-  G4StepPoint * thePrePoint = theStep->GetPreStepPoint();
-  G4VPhysicalVolume * thePrePV = thePrePoint->GetPhysicalVolume();
+  G4StepPoint* thePrePoint = theStep->GetPreStepPoint();
+  G4VPhysicalVolume* thePrePV = thePrePoint->GetPhysicalVolume();
   G4String thePrePVname = thePrePV->GetName();
   //  G4cout<<"start stepping action:"<<thePrePVname<<G4endl;
 
-  G4Material * material =  thePrePoint -> GetMaterial();
+  G4Material* material =  thePrePoint -> GetMaterial();
   auto postStepPoint = theStep->GetPostStepPoint();
   auto process = postStepPoint->GetProcessDefinedStep()->GetProcessName();
 
@@ -81,12 +81,12 @@ void TPCSteppingAction::UserSteppingAction(const G4Step * theStep)
 #endif
 
   G4String m_name=material->GetName();
-  if(m_name=="Iron" ){
+  if( m_name == "Iron" ){
     theTrack->SetTrackStatus( fStopAndKill );
     return;
   }
 
-  if(thePrePVname=="HelmPV"){
+  if( thePrePVname.contains( "Coil" ) ){
     theTrack->SetTrackStatus( fStopAndKill );
     return;
   }

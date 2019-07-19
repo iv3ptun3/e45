@@ -42,7 +42,8 @@ BeamMan::BeamMan( void )
     m_file_name(),
     m_file(),
     m_param_array(),
-    m_n_param()
+    m_n_param(),
+    m_primary_z( 0. )
 {
 }
 
@@ -63,6 +64,8 @@ BeamMan::Initialize( void )
   if( !m_file->IsOpen() || !tree )
     return false;
 
+  m_param_array.clear();
+
   BeamInfo beam;
   tree->SetBranchAddress( "x", &beam.x );
   tree->SetBranchAddress( "y", &beam.y );
@@ -75,6 +78,8 @@ BeamMan::Initialize( void )
     G4double dydz = std::tan( beam.v*CLHEP::mrad );
     G4double pp = p0 * ( 1. + 0.01*beam.dp );
     G4double pz = pp / std::sqrt( dxdz*dxdz + dydz*dydz + 1. );
+    beam.x += dxdz * m_primary_z;
+    beam.y += dydz * m_primary_z;
     beam.p.set( pz*dxdz, pz*dydz, pz );
     m_param_array.push_back( beam );
   }

@@ -90,16 +90,19 @@ TPCDetectorConstruction::Construct( void )
   auto world_solid = new G4Box( "WorldSolid", 8.*m/2, 6.*m/2, 16.*m/2 );
   m_world_lv = new G4LogicalVolume( world_solid, m_material_map["Air"],
 				    "WorldLV" );
-  auto world_vis_attr = new G4VisAttributes( false, G4Colour::Black() );
-  m_world_lv->SetVisAttributes( world_vis_attr );
+  m_world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   auto world_pv = new G4PVPlacement( nullptr, G4ThreeVector(), m_world_lv,
 				     "WorldPV", nullptr, false, 0 );
+#if 1
   ConstructShsMagnet();
   ConstructTarget();
   ConstructHypTPC();
   ConstructHTOF();
-  // ConstructPVAC2();
-  // ConstructNBAR();
+#endif
+#if 0
+  ConstructPVAC2();
+  ConstructNBAR();
+#endif
   if( gConf.Get<G4int>("ConstructKurama") ){
     ConstructKuramaMagnet();
     ConstructSDC1();
@@ -309,7 +312,7 @@ TPCDetectorConstruction::ConstructFTOF( void )
   pos.rotateY( m_rotation_angle );
   new G4PVPlacement( rot, pos, mother_lv,
 		     "FtofMotherPV", m_world_lv, false, 0 );
-  mother_lv->SetVisAttributes( new G4VisAttributes( false, G4Colour::Red() ) );
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   // Segment
   auto segment_solid = new G4Box( "FtofSegmentSolid", half_size.x(),
 				  half_size.y(), half_size.z() );
@@ -664,24 +667,31 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 {
   const auto field_size = gSize.GetSize("KuramaField") * 0.5 * mm;
   const auto coil_color = G4Colour::Red();
-  const auto yoke_color = LAVENDER;
-
   // size
   const G4ThreeVector coil1_size( 900.*mm/2, 193.*mm/2, 280.*mm/2 );
   const G4ThreeVector coil2_size( 193.*mm/2, 117.*mm/2, 280.*mm/2 );
   const G4ThreeVector coil3_size( 193.*mm/2, 137.*mm/2, 280.*mm/2 );
   const G4ThreeVector coil4_size( 193.*mm/2, 280.*mm/2, 740.*mm/2 );
   const G4ThreeVector coil5_size( 900.*mm/2, 214.*mm/2, 280.*mm/2 );
+  const G4ThreeVector yoke_inner_size( field_size.x() + 193.*mm,
+				       field_size.y(), field_size.z() );
+  const G4ThreeVector yoke_outer_size( 1800.*mm/2, 2200.*mm/2,
+				       field_size.z() );
   const G4ThreeVector yoke_ud_size( 2200.*mm/2, 370.*mm/2, field_size.z() );
-  const G4ThreeVector yoke_lr_size( 200.*mm/2, field_size.y(), field_size.z() );
-  const G4ThreeVector uguard_ud_size( 1900.*mm/2, 620.*mm/2, 100.*mm/2 );
-  const G4ThreeVector uguard_lr_size( 800.*mm/2, 300.*mm/2, 100.*mm/2 );
-  const G4ThreeVector dguard_ud_size( 1600.*mm/2, 420.*mm/2, 100.*mm/2 );
-  const G4ThreeVector dguard_lr_size( 250.*mm/2,
-				      field_size.y() + 800.*mm/2,
-				      100.*mm/2 );
+  const G4ThreeVector yoke_lr_size( 200.*mm/2, field_size.y(),
+				    field_size.z() );
+  const G4ThreeVector uguard_inner_size( 600.*mm/2, 300.*mm/2, 100.*mm/2 );
+  const G4ThreeVector uguard_inner2_size( 50.*mm/2, 50.*mm/2, 100.*mm/2 );
+  const G4ThreeVector uguard_outer_size( 1600.*mm/2, 2200.*mm/2, 100.*mm/2 );
+  const G4ThreeVector dguard_inner_size( 1100.*mm/2, 1100.*mm/2, 100.*mm/2 );
+  const G4ThreeVector dguard_outer_size( 1600.*mm/2, 2200.*mm/2, 100.*mm/2 );
   // position
   const G4ThreeVector field_pos = gGeom.GetGlobalPosition("KURAMA");
+  const G4ThreeVector yoke_pos( field_pos );
+  const G4ThreeVector uguard_pos( field_pos.x(), field_pos.y(),
+				  field_pos.z() - ( 820. - 50. )*mm );
+  const G4ThreeVector dguard_pos( field_pos.x(), field_pos.y(),
+				  field_pos.z() + ( 820. - 50. )*mm );
   const G4ThreeVector coil1_pos =
     { field_pos.x(),
       field_size.y() + yoke_ud_size.y()*2. - ( coil1_size.y() + 20.*mm ),
@@ -728,44 +738,11 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
     { field_pos.x() - field_size.x() + yoke_lr_size.x() - 200.*mm,
       0.*mm,
       field_pos.z() };
-  const G4ThreeVector uguard_u_pos =
-    { 0.*mm,
-      uguard_lr_size.y() + uguard_ud_size.y(),
-      field_pos.z() - 820.*mm + uguard_ud_size.z() };
-  const G4ThreeVector uguard_d_pos =
-    { 0.*mm,
-      - uguard_lr_size.y() - uguard_ud_size.y(),
-      field_pos.z() - 820.*mm + uguard_ud_size.z() };
-  const G4ThreeVector uguard_l_pos =
-    { 300.0*mm + uguard_lr_size.x(), // 150 -->gap
-      0.*mm,
-      field_pos.z() - 820.*mm + uguard_lr_size.z() };
-  const G4ThreeVector uguard_r_pos =
-    { - 300.0*mm - uguard_lr_size.x(),
-      0.*mm,
-      field_pos.z() - 820.*mm + uguard_lr_size.z() };
-  const G4ThreeVector dguard_u_pos =
-    { field_pos.x(),
-      dguard_lr_size.y() + dguard_ud_size.y() - 200.*mm,
-      field_pos.z() + 820.*mm - dguard_ud_size.z() };
-  const G4ThreeVector dguard_d_pos =
-    { field_pos.x(),
-      - dguard_lr_size.y() - dguard_ud_size.y() + 200.*mm,
-      field_pos.z() + 820.*mm - dguard_ud_size.z() };
-  const G4ThreeVector dguard_l_pos =
-    { field_pos.x() + field_size.x() + 300.*mm + dguard_lr_size.x(),
-      0.*mm,
-      field_pos.z() + 820.*mm - dguard_lr_size.z() };
-  const G4ThreeVector dguard_r_pos =
-    { field_pos.x() - field_size.x() + 300.*mm + dguard_lr_size.x(),
-      0.*mm,
-      field_pos.z() + 820.*mm - dguard_lr_size.z() };
-
   // Construct KURAMA Magnet
   // auto kurama_solid = new G4Box( "KuramaSolid", 4.*m/2, 3.*m/2, 4.*m/2 );
   // auto kurama_lv = new G4LogicalVolume( kurama_solid, m_material_map["Air"],
   // 					"KuramaLV" );
-  // kurama_lv->SetVisAttributes( new G4VisAttributes( false, G4Colour::Black() ) );
+  // kurama_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   // auto kurama_pv = new G4PVPlacement( m_rotation_angle, G4ThreeVector(), "KuramaPV",
   // 				      kurama_lv, m_world_pv, false, 0 );
 
@@ -866,9 +843,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 				 size_COIL6[0],size_COIL6[1],size_COIL6[2],0.,size_COIL6[3]);
   G4LogicalVolume*  Coil6_log = new G4LogicalVolume(Coil6_tub, m_material_map["Copper"], "Coil6_log",0,0,0);
   Coil6_log->SetVisAttributes( coil_color );
-  // maxStep=0.00001*mm;
-  // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
-
   G4RotationMatrix *rotcoil6lu = new G4RotationMatrix();
   G4RotationMatrix *rotcoil6ru = new G4RotationMatrix();
   G4RotationMatrix *rotcoil6ld = new G4RotationMatrix();
@@ -957,9 +931,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 				 size_COIL8[0],size_COIL8[1],size_COIL8[2],0.,size_COIL8[3]);
   G4LogicalVolume*  Coil8_log = new G4LogicalVolume(Coil8_tub, m_material_map["Copper"], "Coil8_log",0,0,0);
   Coil8_log->SetVisAttributes( coil_color );
-  // maxStep=0.00001*mm;
-  // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
-
   G4RotationMatrix *rotcoil8lu = new G4RotationMatrix();
   G4RotationMatrix *rotcoil8ru = new G4RotationMatrix();
   G4RotationMatrix *rotcoil8ld = new G4RotationMatrix();
@@ -1073,8 +1044,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 				 size_COIL7[0],size_COIL7[1],size_COIL7[2],0.,size_COIL7[3]);
   G4LogicalVolume*  Coil7_log = new G4LogicalVolume(Coil7_tub, m_material_map["Copper"], "Coil7_log",0,0,0);
   Coil7_log->SetVisAttributes( coil_color );
-  // maxStep=0.00001*mm;
-  // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
   G4RotationMatrix *rotcoil7ulu = new G4RotationMatrix();
   G4RotationMatrix *rotcoil7uru = new G4RotationMatrix();
   G4RotationMatrix *rotcoil7uld = new G4RotationMatrix();
@@ -1197,8 +1166,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 				coil2_size.z() );
   G4LogicalVolume*  Coil2_log = new G4LogicalVolume(Coil2_box, m_material_map["Copper"], "Coil2_log",0,0,0);
   Coil2_log->SetVisAttributes( coil_color );
-  // maxStep=0.00001*mm;
-  // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
   new G4PVPlacement( m_rotation_matrix,
 		     G4ThreeVector( coil2l_pos.x(),
 				    coil2l_pos.y(),
@@ -1242,8 +1209,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 			       coil3_size.x(), coil3_size.y(), coil3_size.z() );
   G4LogicalVolume*  Coil3_log = new G4LogicalVolume(Coil3_box, m_material_map["Copper"], "Coil3_log",0,0,0);
   Coil3_log->SetVisAttributes( coil_color );
-  // maxStep=0.00001*mm;
-  // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
   new G4PVPlacement( m_rotation_matrix,
 		     G4ThreeVector( coil3l_pos.x(),
 				    coil3l_pos.y(),
@@ -1280,196 +1245,65 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 		     m_world_lv,
 		     false,
 		     0 );
-
-  //-------------------- Upstraam End Guard
-  if(m_experiment!=3 && m_experiment!=42 && m_experiment!=27){
-    G4Box* upGuard_UD_box = new G4Box("upGuard_UD_box",
-				      uguard_ud_size.x(),uguard_ud_size.y(),uguard_ud_size.z());
-    G4LogicalVolume*  upGuard_U_log = new G4LogicalVolume(upGuard_UD_box, m_material_map["Iron"], "upGuard_U_log",0,0,0);
-    upGuard_U_log->SetVisAttributes( yoke_color );
-    // maxStep=0.00001*mm;
-    // upGuard_U_log->SetUserLimits(new G4UserLimits(maxStep));
-    new G4PVPlacement( m_rotation_matrix,
-		       G4ThreeVector( uguard_u_pos.x(),
-				      uguard_u_pos.y(),
-				      uguard_u_pos.z() ).rotateY( m_rotation_angle ),
-		       upGuard_U_log,
-		       "upGuard_U_phys",
-		       m_world_lv,
-		       false,
-		       0 );
-
-    G4LogicalVolume*  upGuard_D_log = new G4LogicalVolume(upGuard_UD_box, m_material_map["Iron"], "upGuard_D_log",0,0,0);
-    upGuard_D_log->SetVisAttributes( yoke_color );
-    // maxStep=0.00001*mm;
-    // upGuard_D_log->SetUserLimits(new G4UserLimits(maxStep));
-    new G4PVPlacement( m_rotation_matrix,
-		       G4ThreeVector( uguard_d_pos.x(),
-				      uguard_d_pos.y(),
-				      uguard_d_pos.z() ).rotateY( m_rotation_angle ),
-		       upGuard_D_log,
-		       "upGuard_D_phys",
-		       m_world_lv,
-		       false,
-		       0 );
-
-    G4Box* upGuard_LR_box = new G4Box("upGuard_LR_box",
-				      uguard_lr_size.x(),uguard_lr_size.y(),uguard_lr_size.z());
-    G4LogicalVolume*  upGuard_L_log = new G4LogicalVolume(upGuard_LR_box, m_material_map["Iron"], "upGuard_L_log",0,0,0);
-    upGuard_L_log->SetVisAttributes( yoke_color );
-    // maxStep=0.00001*mm;
-    // upGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
-    new G4PVPlacement( m_rotation_matrix,
-		       G4ThreeVector( uguard_l_pos.x(),
-				      uguard_l_pos.y(),
-				      uguard_l_pos.z() ).rotateY( m_rotation_angle ),
-		       upGuard_L_log,
-		       "upGuard_L_phys",
-		       m_world_lv,
-		       false,
-		       0 );
-
-    G4LogicalVolume*  upGuard_R_log = new G4LogicalVolume(upGuard_LR_box, m_material_map["Iron"], "upGuard_R_log",0,0,0);
-    upGuard_R_log->SetVisAttributes( yoke_color );
-    // maxStep=0.00001*mm;
-    // upGuard_R_log->SetUserLimits(new G4UserLimits(maxStep));
-    new G4PVPlacement( m_rotation_matrix,
-		       G4ThreeVector( uguard_r_pos.x(),
-				      uguard_r_pos.y(),
-				      uguard_r_pos.z() ).rotateY( m_rotation_angle ),
-		       upGuard_R_log,
-		       "upGuard_R_phys",
-		       m_world_lv,
-		       false,
-		       0 );
-  }
-
-  //-------------------- Yoke
-  G4Box* Yoke_UD_box = new G4Box( "Yoke_UD_box",
-				  yoke_ud_size.x(), yoke_ud_size.y(), yoke_ud_size.z() );
-  G4LogicalVolume*  Yoke_U_log = new G4LogicalVolume(Yoke_UD_box, m_material_map["Iron"], "Yoke_U_log",0,0,0);
-
-  Yoke_U_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // Yoke_U_log->SetUserLimits(new G4UserLimits(maxStep));
+  // Upstraam End Guard
+  auto uguard_inner_solid = new G4Box( "UGuardInnerSolid",
+				       uguard_inner_size.x(),
+				       uguard_inner_size.y(),
+				       uguard_inner_size.z() );
+  auto uguard_inner2_solid = new G4Box( "UGuardInner2Solid",
+					uguard_inner2_size.x(),
+					uguard_inner2_size.y(),
+					uguard_inner2_size.z() );
+  auto uguard_outer_solid = new G4Box( "UGuardOuterSolid",
+				       uguard_outer_size.x(),
+				       uguard_outer_size.y(),
+				       uguard_outer_size.z() );
+  auto sub_solid = new G4SubtractionSolid( "SubSolid",
+					   uguard_outer_solid,
+					   uguard_inner_solid );
+  G4ThreeVector uhole( -uguard_inner_size.x()-uguard_inner2_size.x(), 0., 0. );
+  auto uguard_solid = new G4SubtractionSolid( "UGuardSolid",
+					      sub_solid, uguard_inner2_solid,
+					      nullptr, uhole );
+  auto uguard_lv = new G4LogicalVolume( uguard_solid, m_material_map["Iron"],
+					"UGuardLV" );
   new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( yoke_u_pos.x(),
-				    yoke_u_pos.y(),
-				    yoke_u_pos.z() ).rotateY( m_rotation_angle ),
-		     Yoke_U_log,
-		     "Yoke_U_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4LogicalVolume*  Yoke_D_log = new G4LogicalVolume(Yoke_UD_box, m_material_map["Iron"], "Yoke_D_log",0,0,0);
-  Yoke_D_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // Yoke_D_log->SetUserLimits(new G4UserLimits(maxStep));
+  		     G4ThreeVector( uguard_pos ).rotateY( m_rotation_angle ),
+  		     uguard_lv, "UGuardPV", m_world_lv, false, 0 );
+  // Yoke
+  auto yoke_inner_solid = new G4Box( "YokeInnerSolid",
+				     yoke_inner_size.x(),
+				     yoke_inner_size.y(),
+				     yoke_inner_size.z() );
+  auto yoke_outer_solid = new G4Box( "YokeOuterSolid",
+				     yoke_outer_size.x(),
+				     yoke_outer_size.y(),
+				     yoke_outer_size.z() );
+  auto yoke_solid = new G4SubtractionSolid( "YokeSolid",
+					    yoke_outer_solid,
+					    yoke_inner_solid );
+  auto yoke_lv = new G4LogicalVolume( yoke_solid, m_material_map["Iron"],
+				      "YokeLV" );
   new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( yoke_d_pos.x(),
-				    yoke_d_pos.y(),
-				    yoke_d_pos.z() ).rotateY( m_rotation_angle ),
-		     Yoke_D_log,
-		     "Yoke_D_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4Box* Yoke_LR_box = new G4Box( "Yoke_LR_box",
-				  yoke_lr_size.x(), yoke_lr_size.y(), yoke_lr_size.z() );
-  G4LogicalVolume*  Yoke_L_log = new G4LogicalVolume(Yoke_LR_box, m_material_map["Iron"], "Yoke_L_log",0,0,0);
-  Yoke_L_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // Yoke_L_log->SetUserLimits(new G4UserLimits(maxStep));
+  		     G4ThreeVector( yoke_pos ).rotateY( m_rotation_angle ),
+  		     yoke_lv, "YokePV", m_world_lv, false, 0 );
+  // Downstream End Guard
+  auto dguard_inner_solid = new G4Box( "DGuardInnerSolid",
+				       dguard_inner_size.x(),
+				       dguard_inner_size.y(),
+				       dguard_inner_size.z() );
+  auto dguard_outer_solid = new G4Box( "DGuardOuterSolid",
+				       dguard_outer_size.x(),
+				       dguard_outer_size.y(),
+				       dguard_outer_size.z() );
+  auto dguard_solid = new G4SubtractionSolid( "DGuardSolid",
+					      dguard_outer_solid,
+					      dguard_inner_solid );
+  auto dguard_lv = new G4LogicalVolume( dguard_solid, m_material_map["Iron"],
+					"DGuardLV" );
   new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( yoke_l_pos.x(),
-				    yoke_l_pos.y(),
-				    yoke_l_pos.z() ).rotateY( m_rotation_angle ),
-		     Yoke_L_log,
-		     "Yoke_L_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4LogicalVolume*  Yoke_R_log = new G4LogicalVolume(Yoke_LR_box, m_material_map["Iron"], "Yoke_R_log",0,0,0);
-  Yoke_R_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // Yoke_R_log->SetUserLimits(new G4UserLimits(maxStep));
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( yoke_r_pos.x(),
-				    yoke_r_pos.y(),
-				    yoke_r_pos.z() ).rotateY( m_rotation_angle ),
-		     Yoke_R_log,
-		     "Yoke_R_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-
-  //-------------------- Downstream End Guard
-  G4Box* downGuard_UD_box = new G4Box("downGuard_UD_box",
-				      dguard_ud_size.x(),dguard_ud_size.y(),dguard_ud_size.z());
-  G4LogicalVolume*  downGuard_U_log = new G4LogicalVolume(downGuard_UD_box,
-							  m_material_map["Iron"],
-							  "downGuard_U_log");
-  downGuard_U_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // downGuard_U_log->SetUserLimits(new G4UserLimits(maxStep));
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( dguard_u_pos.x(),
-				    dguard_u_pos.y(),
-				    dguard_u_pos.z() ).rotateY( m_rotation_angle ),
-		     downGuard_U_log,
-		     "downGuard_U_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4LogicalVolume*  downGuard_D_log = new G4LogicalVolume(downGuard_UD_box,
-							  m_material_map["Iron"],
-							  "downGuard_D_log");
-  downGuard_D_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // downGuard_D_log->SetUserLimits(new G4UserLimits(maxStep));
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( dguard_d_pos.x(),
-				    dguard_d_pos.y(),
-				    dguard_d_pos.z() ).rotateY( m_rotation_angle ),
-		     downGuard_D_log,
-		     "downGuard_D_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4Box* downGuard_LR_box = new G4Box("downGuard_LR_box",
-				      dguard_lr_size.x(),
-				      dguard_lr_size.y(),
-				      dguard_lr_size.z());
-  G4LogicalVolume*  downGuard_L_log = new G4LogicalVolume(downGuard_LR_box,
-							  m_material_map["Iron"],
-							  "downGuard_L_log");
-  downGuard_L_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // downGuard_L_log->SetUserLimits(new G4UserLimits(maxStep));
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( dguard_l_pos.x(),
-				    dguard_l_pos.y(),
-				    dguard_l_pos.z() ).rotateY( m_rotation_angle ),
-		     downGuard_L_log,
-		     "downGuard_L_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4LogicalVolume*  downGuard_R_log = new G4LogicalVolume( downGuard_LR_box,
-							   m_material_map["Iron"],
-							   "downGuard_R_log" );
-  downGuard_R_log->SetVisAttributes( yoke_color );
-  // maxStep=0.00001*mm;
-  // downGuard_R_log->SetUserLimits(new G4UserLimits(maxStep));
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( dguard_r_pos.x(),
-				    dguard_r_pos.y(),
-				    dguard_r_pos.z() ).rotateY( m_rotation_angle ),
-		     downGuard_R_log,
-		     "downGuard_R_phys",
-		     m_world_lv,
-		     false,
-		     0 );
+  		     G4ThreeVector( dguard_pos ).rotateY( m_rotation_angle ),
+  		     dguard_lv, "DGuardPV", m_world_lv, false, 0 );
 }
 
 //_____________________________________________________________________________
@@ -1949,7 +1783,7 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
 			      yoke_size.y(), yoke_size.z() );
   auto shs_lv = new G4LogicalVolume( shs_solid, m_material_map["Air"],
 				     "ShsMagnetLV" );
-  shs_lv->SetVisAttributes( G4VisAttributes( false ) );
+  shs_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   auto shs_pv = new G4PVPlacement( nullptr, tpc_pos, shs_lv,
 				   "ShsMagnetPV", m_world_lv, false, 0 );
   const G4int NumOfParams = 4;
@@ -2027,7 +1861,7 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   auto magnet_lv = new G4LogicalVolume( magnet_solid,
 					m_material_map["Iron"],
 					"ShsMagnetLV" );
-  // magnet_lv->SetVisAttributes( G4VisAttributes( false ) );
+  // magnet_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   magnet_lv->SetVisAttributes( PINK );
   G4RotationMatrix rot_frame;
   rot_frame.rotateX( 90.*deg );

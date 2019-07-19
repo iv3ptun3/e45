@@ -73,11 +73,12 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   E27Reaction E27Generator(this);
   KKppReaction KKppGenerator(this);
 
-  G4int generator = gConf.Get<G4int>( "Generator" );
+  const G4int generator = gConf.Get<G4int>( "Generator" );
 
   static G4bool first = true;
   if( first ){
-    G4cout << "   Generator : " << generator << G4endl;
+    G4cout << FUNC_NAME << G4endl
+	   << "   Generator# = " << generator << G4endl;
     first = false;
   }
 
@@ -1424,11 +1425,10 @@ TPCPrimaryGeneratorAction::GenerateBeam( G4Event* anEvent )
   static const auto particleTable = G4ParticleTable::GetParticleTable();
   static const auto kaonMinus = particleTable->FindParticle("kaon-");
   static const G4double mass = kaonMinus->GetPDGMass()/GeV;
-  // pbeam=G4RandGauss::shoot(m_beam_p0,m_beam_p0*3.3*0.0001/2.3548);
-  // pbeam=1.8;
+  static const G4double primary_z = gBeam.GetPrimaryZ();
   G4double energy = ( std::sqrt( mass*mass + m_beam->p.mag2() ) - mass )*GeV;
   gAnaMan.SetPrimaryBeam( m_beam->p );
-  G4ThreeVector gen_pos( m_beam->x, m_beam->y, m_target_pos.z() );
+  G4ThreeVector gen_pos( m_beam->x, m_beam->y, m_target_pos.z() + primary_z );
   particleGun->SetParticleDefinition( kaonMinus );
   particleGun->SetParticleMomentumDirection( m_beam->p );
   particleGun->SetParticleEnergy( energy );

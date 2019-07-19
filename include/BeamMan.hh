@@ -47,13 +47,16 @@ private:
   TFile*     m_file;
   ParamArray m_param_array;
   G4int      m_n_param;
+  G4double   m_primary_z; // from FF
 
 public:
   G4bool          Initialize( void );
   G4bool          Initialize( const G4String& filename );
   G4bool          IsReady( void ) const { return m_is_ready; }
   const BeamInfo& Get( void ) const;
+  G4double        GetPrimaryZ( void ) const { return m_primary_z; }
   void            Print( void ) const;
+  void            SetPrimaryZ( G4double z ){ m_primary_z = z; }
 };
 
 //_____________________________________________________________________________
