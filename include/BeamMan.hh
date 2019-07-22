@@ -17,13 +17,12 @@ class TFile;
 //_____________________________________________________________________________
 struct BeamInfo
 {
-  // beam information at FF position (VO+1200).
   Double_t x; // [mm]
   Double_t y; // [mm]
   Double_t u; // [mrad]
   Double_t v; // [mrad]
   Double_t dp; // [%]
-  G4ThreeVector p;
+  G4ThreeVector p; // [GeV/c]
   void Print( void ) const;
 };
 

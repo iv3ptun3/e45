@@ -66,17 +66,22 @@ BeamMan::Initialize( void )
 
   m_param_array.clear();
 
+  // beam information at FF position (VO+1200)
+  // given in turtle coordinate.
   BeamInfo beam;
   tree->SetBranchAddress( "x", &beam.x );
   tree->SetBranchAddress( "y", &beam.y );
   tree->SetBranchAddress( "u", &beam.u );
   tree->SetBranchAddress( "v", &beam.v );
   tree->SetBranchAddress( "p", &beam.dp );
+
   for( Long64_t i=0, n=tree->GetEntries(); i<n; ++i ){
     tree->GetEntry( i );
-    G4double dxdz = std::tan( beam.u*CLHEP::mrad );
-    G4double dydz = std::tan( beam.v*CLHEP::mrad );
-    G4double pp = p0 * ( 1. + 0.01*beam.dp );
+    beam.x *= -1.*CLHEP::cm; // -cm -> mm
+    beam.y *= -1.*CLHEP::cm; // -cm -> mm
+    G4double dxdz = std::tan( -1.*beam.u*CLHEP::mrad ); // -mrad -> tan
+    G4double dydz = std::tan( -1.*beam.v*CLHEP::mrad ); // -mrad -> tan
+    G4double pp = p0 * ( 1. + beam.dp*CLHEP::perCent ); // dp/p[%] -> GeV/c
     G4double pz = pp / std::sqrt( dxdz*dxdz + dydz*dydz + 1. );
     beam.x += dxdz * m_primary_z;
     beam.y += dydz * m_primary_z;

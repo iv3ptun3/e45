@@ -9,7 +9,7 @@
 
 class G4ParticleGun;
 
-class BeamInfo;
+struct BeamInfo;
 
 //_____________________________________________________________________________
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
