@@ -26,7 +26,6 @@ const G4int MaxPrimaryParticle = 10;
 //_____________________________________________________________________________
 struct Tree1Ev
 {
-
   G4int ev;        // Event number
   G4double pg[4];  // 4-momentum for inncident beam
   G4int gen;        // generator number
@@ -181,6 +180,30 @@ struct Tree1Ev
   G4double trvtxppscint[MaxTrig];
   G4double lengthsc[MaxTrig];
 
+  // HTOF
+  G4int nhHtof;
+  G4int tidHtof[MaxTrig];       // Track ID
+  G4int pidHtof[MaxTrig];	    // Particle ID
+  G4int didHtof[MaxTrig];	    // detector ID
+  G4double massHtof[MaxTrig];	    // particle mass ID
+  G4int qqHtof[MaxTrig];	    // particle mass ID
+  G4double xHtof[MaxTrig];      // coordinates
+  G4double yHtof[MaxTrig];      // coordinates
+  G4double zHtof[MaxTrig];      // coordinates
+  G4double pxHtof[MaxTrig];     // momentum
+  G4double pyHtof[MaxTrig];     // momentum
+  G4double pzHtof[MaxTrig];     // momentum
+  G4double ppHtof[MaxTrig];     // momentum
+  G4double tofHtof[MaxTrig];    // tof
+  G4int HtofpID[MaxTrig];    //parent id
+  G4double trvtxxHtof[MaxTrig];
+  G4double trvtxyHtof[MaxTrig];
+  G4double trvtxzHtof[MaxTrig];
+  G4double trvtxpxHtof[MaxTrig];
+  G4double trvtxpyHtof[MaxTrig];
+  G4double trvtxpzHtof[MaxTrig];
+  G4double trvtxppHtof[MaxTrig];
+  G4double lengthHtof[MaxTrig];
 
   ///ac
   G4int ntac;                 // Number of Hit in Acint.
@@ -363,11 +386,14 @@ private:
   Tree1Ev tree1ev;
 
 public:
-  void BeginOfRunAction(int runnum);
-  void EndOfRunAction();
-  void BeginOfEventAction();
-  void BeginOfTrackingAction();
+  void  BeginOfRunAction(int runnum);
+  void  EndOfRunAction();
+  void  BeginOfEventAction();
+  void  BeginOfTrackingAction();
   G4int EndOfTrackingAction();
+  void  FillHTOFData( G4double time, G4double *pos, G4double *mom,
+		      G4int tid, G4int pid, G4int did );
+
   void FillMom(G4double *mom);
   void FillPos(G4double *Pos);
   void FillNtrk(G4int ntrk);

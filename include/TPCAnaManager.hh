@@ -277,6 +277,7 @@ struct PrimaryInfo
 class TPCAnaManager
 {
 public:
+  static G4String ClassName( void );
   static TPCAnaManager& GetInstance( void );
   ~TPCAnaManager( void );
 
@@ -286,6 +287,10 @@ private:
   TPCAnaManager& operator=( const TPCAnaManager& );
 
 private:
+  G4int                   m_htof_nhits;
+  // hit container
+  std::vector<ScintData*> m_htof_hc;
+
   TargetData targetData[MaxTrack];
   CounterData counterData[MaxTrack];
   TPCData tpcData[MAXtpctrNum];
@@ -395,7 +400,11 @@ public:
 		      G4int track, G4int particle,
 		      G4int iLay, G4int iRow, G4double beta, G4double edep,
 		      G4int parentid, G4double tlength, G4double slength);
-
+  void SetHTOFData( G4double time, G4ThreeVector pos, G4ThreeVector mom,
+		    G4int track, G4int particle, G4int detector,
+		    G4double mass, G4int qq,G4int parentid,
+		    G4ThreeVector vtxpos, G4ThreeVector vtxmom,
+		    G4double vtxene, G4double tlength );
   void SetTargetData( G4int nhits, G4ThreeVector pos, G4ThreeVector mom,
 		      G4int track, G4int particle,
 		      G4int parentid, G4ThreeVector vtxpos,
@@ -403,8 +412,11 @@ public:
 
   //  void SetCounterData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
   //		      G4int track, G4int particle, G4int ilay, G4int iRaw);
-  void SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		    G4int track, G4int particle, G4int detector,G4double mass, G4int qq,G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
+  void SetScintData( G4double time, G4ThreeVector pos, G4ThreeVector mom,
+		     G4int track, G4int particle, G4int detector,
+		     G4double mass, G4int qq,G4int parentid,
+		     G4ThreeVector vtxpos, G4ThreeVector vtxmom,
+		     G4double vtxene, G4double tlength );
   void SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 		 G4int track, G4int particle, G4int detector,G4double mass, G4int qq,G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
 
@@ -689,6 +701,14 @@ public:
   }
 
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCAnaManager::ClassName( void )
+{
+  static G4String s_name("TPCAnaManager");
+  return s_name;
+}
 
 //_____________________________________________________________________________
 inline TPCAnaManager&

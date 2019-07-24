@@ -69,12 +69,14 @@ main( int argc, char** argv )
 
   auto uiManager = G4UImanager::GetUIpointer();
 
+  if( gConf.Get<G4bool>( "EVDISP" ) )
+    uiManager->ApplyCommand("/control/execute g4macro/vis.mac");
+
   // interactive session, if no arguments given
   if( argc == kArgc-1 ) {
     auto tcsh = new G4UItcsh( "HypTPC(%s)[%/][%h]: " );
     auto session = new G4UIterminal( tcsh );
     tcsh->SetLsColor( GREEN, CYAN );
-    uiManager->ApplyCommand("/control/execute g4macro/vis.mac");
     session->SessionStart();
     delete session;
   }

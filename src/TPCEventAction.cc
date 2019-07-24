@@ -17,15 +17,16 @@
 
 #include "ConfMan.hh"
 #include "FuncName.hh"
-#include "TPCTargetSD.hh"
-#include "TPCPadSD.hh"
+#include "TPCAnaManager.hh"
 #include "TPCScintSD.hh"
 #include "TPCACSD.hh"
 #include "TPCDCSD.hh"
-#include "TPCSCHSD.hh"
-#include "TPCNBARSD.hh"
 #include "TPCFTOFSD.hh"
-#include "TPCAnaManager.hh"
+#include "TPCHTOFSD.hh"
+#include "TPCNBARSD.hh"
+#include "TPCPadSD.hh"
+#include "TPCSCHSD.hh"
+#include "TPCTargetSD.hh"
 
 namespace
 {
@@ -92,6 +93,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4int laytpc[MaxTrackTPC]={0};
     G4double lentpc[MaxTrackTPC]={0};
     G4int nparticle=0;
+    // G4cout << "TPC  " << nhits << G4endl;
     for( G4int i=0; i<nhits; ++i ){
       G4ThreeVector vtxpos = (*padHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*padHC)[i]-> GetVtxMomentum();
@@ -230,23 +232,25 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 
   static const G4int id_scint = SDManager-> GetCollectionID("HTOF/hit");
   if( id_scint > 0 ){
-    auto scintHC = (G4THitsCollection<TPCScintHit>*)HCTE->GetHC( id_scint );
-    G4int nhits= scintHC -> entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4ThreeVector vtxpos = (*scintHC)[i]-> GetVtxPosition();
-      G4ThreeVector vtxmom = (*scintHC)[i]-> GetVtxMomentum();
-      G4double vtxene =(*scintHC)[i]-> GetVtxEnergy();
-      G4ThreeVector xyz = (*scintHC)[i]-> GetPosition();
-      G4ThreeVector mom = (*scintHC)[i]-> GetMomentum();
-      G4int ptid = (*scintHC)[i]-> GetParentID();
-      G4double tof= (*scintHC)[i]-> GetTOF();
-      G4int tid = (*scintHC)[i]-> GetTrackID();
-      G4int pid = (*scintHC)[i]-> GetParticleID();
-      G4int did = (*scintHC)[i]-> GetDetectorID();
-      G4double mass = (*scintHC)[i]-> GetParticleMassID();
-      G4int qq = (*scintHC)[i]-> GetParticleQqID();
-      G4double tlength = (*scintHC)[i]-> GetLength();
-      gAnaMan.SetScintData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+    const auto HC = (G4THitsCollection<TPCHTOFHit>*)HCTE->GetHC( id_scint );
+    G4int nhits = HC->entries();
+    for( G4int i=0; i<nhits; ++i ){
+      auto hit = (*HC)[i];
+      G4ThreeVector vtxpos = hit->GetVertexPosition();
+      G4ThreeVector vtxmom = hit->GetVertexMomentum();
+      G4double vtxene =hit->GetVertexKineticEnergy();
+      G4ThreeVector xyz = hit->GetPosition();
+      G4ThreeVector mom = hit->GetMomentum();
+      G4int ptid = hit->GetParentID();
+      G4double tof= hit->GetTime();
+      G4int tid = hit->GetTrackID();
+      G4int pid = hit->GetParticleID();
+      G4int did = hit->GetDetectorID();
+      G4double mass = hit->GetMass();
+      G4int charge = hit->GetCharge();
+      G4double tlength = hit->GetTrackLength();
+      gAnaMan.SetHTOFData(tof, xyz, mom, tid, pid,did,mass, charge,
+			  ptid,vtxpos,vtxmom,vtxene,tlength);
     }
   }
 

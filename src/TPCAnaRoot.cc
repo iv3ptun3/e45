@@ -38,7 +38,7 @@ TPCAnaRoot::BeginOfRunAction( int )
   int i;
   char histname1[40],histname2[40];
 
-  rootfile = gFile;
+  // rootfile = gFile;
 
   /* Time */
   htime = new TH1F("Time","Time",400, 0.0, 10.0);
@@ -206,6 +206,31 @@ TPCAnaRoot::BeginOfRunAction( int )
   // tree->Branch("targetpos",tree1ev.targetpos,"targetpos[targethits][3]/D");
   // tree->Branch("targetvtx",tree1ev.targetvtx,"targetvtx[targethits][3]/D");
 
+  // HTOF
+  tree->Branch("nhHtof",&tree1ev.nhHtof,"nhHtof/I");
+  tree->Branch("tidHtof",tree1ev.tidHtof,"tidHtof[nhHtof]/I");
+  tree->Branch("pidHtof",tree1ev.pidHtof,"pidHtof[nhHtof]/I");
+  tree->Branch("didHtof",tree1ev.didHtof,"didHtof[nhHtof]/I");
+  tree->Branch("massHtof",tree1ev.massHtof,"massHtof[nhHtof]/D");
+  tree->Branch("qqHtof",tree1ev.qqHtof,"qqHtof[nhHtof]/I");
+  tree->Branch("xHtof",tree1ev.xHtof,"xHtof[nhHtof]/D");
+  tree->Branch("yHtof",tree1ev.yHtof,"yHtof[nhHtof]/D");
+  tree->Branch("zHtof",tree1ev.zHtof,"zHtof[nhHtof]/D");
+  tree->Branch("pxHtof",tree1ev.pxHtof,"pxHtof[nhHtof]/D");
+  tree->Branch("pyHtof",tree1ev.pyHtof,"pyHtof[nhHtof]/D");
+  tree->Branch("pzHtof",tree1ev.pzHtof,"pzHtof[nhHtof]/D");
+  tree->Branch("ppHtof",tree1ev.ppHtof,"ppHtof[nhHtof]/D");
+  tree->Branch("tofHtof",tree1ev.tofHtof,"tofHtof[nhHtof]/D");
+  tree->Branch("HtofpID",tree1ev.HtofpID,"HtofpID[nhHtof]/I");
+  tree->Branch("trvtxpxHtof",tree1ev.trvtxpxHtof,"trvtxpxHtof[nhHtof]/D");
+  tree->Branch("trvtxpyHtof",tree1ev.trvtxpyHtof,"trvtxpyHtof[nhHtof]/D");
+  tree->Branch("trvtxpzHtof",tree1ev.trvtxpzHtof,"trvtxpzHtof[nhHtof]/D");
+  tree->Branch("trvtxppHtof",tree1ev.trvtxppHtof,"trvtxppHtof[nhHtof]/D");
+  tree->Branch("trvtxxHtof",tree1ev.trvtxxHtof,"trvtxxHtof[nhHtof]/D");
+  tree->Branch("trvtxyHtof",tree1ev.trvtxyHtof,"trvtxyHtof[nhHtof]/D");
+  tree->Branch("trvtxzHtof",tree1ev.trvtxzHtof,"trvtxzHtof[nhHtof]/D");
+  tree->Branch("lengthHtof",tree1ev.lengthHtof,"lengthHtof[nhHtof]/D");
+
   tree1ev.ev = 0;
 }
 
@@ -213,8 +238,8 @@ TPCAnaRoot::BeginOfRunAction( int )
 void
 TPCAnaRoot::EndOfRunAction( void )
 {
-  rootfile->Write();
-  rootfile->Close();
+  // rootfile->Write();
+  // rootfile->Close();
   tree1ev.ev = 0;
 }
 
@@ -229,6 +254,29 @@ TPCAnaRoot::BeginOfTrackingAction( void )
 void
 TPCAnaRoot::BeginOfEventAction( void )
 {
+  tree1ev.nhHtof = 0;
+  for( G4int i=0; i<MaxTrig; ++i ){
+    tree1ev.xHtof[i] = -9999.;
+    tree1ev.yHtof[i] = -9999.;
+    tree1ev.zHtof[i] = -9999.;
+    tree1ev.pxHtof[i] = -9999.;
+    tree1ev.pyHtof[i] = -9999.;
+    tree1ev.pzHtof[i] = -9999.;
+    tree1ev.tofHtof[i] = -9999.;
+    tree1ev.HtofpID[i] = -9999;
+    tree1ev.tidHtof[i] = -1;
+    tree1ev.pidHtof[i] = -1;
+    tree1ev.didHtof[i] = -1;
+    tree1ev.massHtof[i] = -1;
+    tree1ev.qqHtof[i] = -1;
+    tree1ev.trvtxppHtof[i] = -9999.;
+    tree1ev.trvtxpxHtof[i] = -9999.;
+    tree1ev.trvtxpyHtof[i] = -9999.;
+    tree1ev.trvtxpzHtof[i] = -9999.;
+    tree1ev.trvtxxHtof[i] = -9999.;
+    tree1ev.trvtxyHtof[i] = -9999.;
+    tree1ev.trvtxzHtof[i] = -9999.;
+  }
 
   tree1ev.ev++;
   tree1ev.nttpc = 0;
@@ -377,6 +425,7 @@ TPCAnaRoot::BeginOfEventAction( void )
     tree1ev.rowtpc[i] = -1;
     tree1ev.parentID[i] = -1;
   }
+
 
   for(int i=0; i<MaxTrig; i++){
     tree1ev.xsc[i] = -9999.9;
@@ -539,6 +588,19 @@ TPCAnaRoot::BeginOfEventAction( void )
     tree1ev.targetvtx[i][1]=-9999.9999;
     tree1ev.targetvtx[i][2]=-9999.9999;
   }
+}
+
+//_____________________________________________________________________________
+void
+TPCAnaRoot::FillHTOFData( G4double time, G4double *pos, G4double *mom,
+			  G4int tid, G4int pid, G4int did )
+{
+  tree1ev.tofHtof[tree1ev.nhHtof] = time;
+  tree1ev.xHtof[tree1ev.nhHtof] = pos[0];
+  tree1ev.yHtof[tree1ev.nhHtof] = pos[1];
+  tree1ev.zHtof[tree1ev.nhHtof] = pos[2];
+  tree1ev.pidHtof[tree1ev.nhHtof] = pid;
+  tree1ev.nhHtof++;
 }
 
 //_____________________________________________________________________________

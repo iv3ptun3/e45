@@ -9,6 +9,7 @@
 #include <Randomize.hh>
 
 #include "ConfMan.hh"
+#include "FuncName.hh"
 #include "ResHypTPC.hh"
 #include "RungeKuttaTracker.hh"
 #include "minuit2.hh"
@@ -59,6 +60,8 @@ enum ROTATION_MODE {G2L,L2G};
 
 //_____________________________________________________________________________
 TPCAnaManager::TPCAnaManager( void )
+  : m_htof_nhits(),
+    m_htof_hc()
 {
 }
 
@@ -223,9 +226,13 @@ void TPCAnaManager::EndOfRunAction()
   anaRoot.EndOfRunAction();
 }
 
-
-void TPCAnaManager::BeginOfEventAction()
+//_____________________________________________________________________________
+void
+TPCAnaManager::BeginOfEventAction( void )
 {
+  m_htof_nhits = 0;
+  m_htof_hc.clear();
+
   HitNum=0;
   tpctrNum=0;
   HitNumAC=0;
@@ -262,8 +269,16 @@ void TPCAnaManager::BeginOfEventAction()
 }
 
 
-int TPCAnaManager::EndOfEventAction()
+int TPCAnaManager::EndOfEventAction( void )
 {
+  // HTOF
+  for( G4int i=0; i<m_htof_nhits; ++i ){
+    anaRoot.FillHTOFData( m_htof_hc[i]->time, m_htof_hc[i]->pos,
+			  m_htof_hc[i]->mom,
+			  m_htof_hc[i]->trackID, m_htof_hc[i]->particleID,
+			  m_htof_hc[i]->detectorID );
+  }
+
   // Fill kaon minus energy distribution
 
   anaRoot.FillBeam(primaryBeam.pg[0], primaryBeam.pg[1], primaryBeam.pg[2]);
@@ -1396,6 +1411,52 @@ void TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 
 //_____________________________________________________________________________
 void
+TPCAnaManager::SetHTOFData( G4double time, G4ThreeVector pos,
+			    G4ThreeVector mom,
+			    G4int track, G4int particle, G4int detector,
+			    G4double mass, G4int qq, G4int parentid,
+			    G4ThreeVector vtxpos, G4ThreeVector vtxmom,
+			    G4double vtxene, G4double tlength )
+{
+  if( m_htof_nhits >= MaxTrack ){
+    G4cerr << FUNC_NAME << " too much nhit" << m_htof_nhits << G4endl;
+    return;
+  }
+
+  auto hit = new ScintData;
+  hit->time = time;
+  hit->pos[ThreeVector::X] = pos.getX();
+  hit->pos[ThreeVector::Y] = pos.getY();
+  hit->pos[ThreeVector::Z] = pos.getZ();
+  hit->mom[ThreeVector::X] = mom.getX();
+  hit->mom[ThreeVector::Y] = mom.getY();
+  hit->mom[ThreeVector::Z] = mom.getZ();
+  hit->trackID = track;
+  hit->massSH = mass;
+  hit->qqSH = qq;
+  hit->particleID = particle;
+  hit->detectorID = detector;
+  hit->parentID = parentid;
+  hit->length = tlength;
+
+  //kine E = sqrt(p^2+m^2)-m
+  //p=sqrt((E+m)^2-m^2)
+  //G4ThreeVecor vtxpos, G4ThreeVecor vtxmom, G4double vtxene
+  G4double totalmom=sqrt(pow(vtxene+mass,2)-pow(mass,2));
+  hit->scintvtxpx = totalmom*double(vtxmom.getX());
+  hit->scintvtxpy = totalmom*double(vtxmom.getY());
+  hit->scintvtxpz = totalmom*double(vtxmom.getZ());
+  hit->scintvtxx = double(vtxpos.getX());
+  hit->scintvtxy = double(vtxpos.getY());
+  hit->scintvtxz = double(vtxpos.getZ());
+
+  //  G4cout<<"particle:parentid :"<<particle<<":"<<parentid<<G4endl;
+  m_htof_hc.push_back( hit );
+  m_htof_nhits++;
+}
+
+//_____________________________________________________________________________
+void
 TPCAnaManager::SetTPCData( G4int tpctr2, G4int tpcpid2, G4int tpcparentid2,
 			   G4int tpcparentid_pid2, G4double tpcpx2,
 			   G4double tpcpy2, G4double tpcpz2,
@@ -1551,15 +1612,18 @@ TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
   primaryBeam.pg[3] = std::sqrt( px*px + py*py + pz*pz );
 }
 
-void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
+//_____________________________________________________________________________
+void
+TPCAnaManager::SetScintData( G4double time, G4ThreeVector pos,
+			     G4ThreeVector mom,
+			     G4int track, G4int particle, G4int detector,
+			     G4double mass, G4int qq, G4int parentid,
+			     G4ThreeVector vtxpos, G4ThreeVector vtxmom,
+			     G4double vtxene, G4double tlength )
 {
-
   G4int hitnum = HitNumScint;
-
   if (hitnum >= MaxTrack) {
-    fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
-	    hitnum);
+    G4cerr << FUNC_NAME << " too much nhit" << hitnum << G4endl;
     return;
   }
 
@@ -1593,7 +1657,6 @@ void TPCAnaManager::SetScintData(G4double time, G4ThreeVector pos, G4ThreeVector
   HitNumScint++;
   return;
 }
-
 
 void TPCAnaManager::SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
 				 G4int track, G4int particle, G4int detector, G4double mass,G4int qq,G4int parentid,G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength)
