@@ -25,12 +25,23 @@ namespace
 }
 
 //_____________________________________________________________________________
-TPCField::TPCField( const G4String& file1, const G4String& file2 )
+TPCField::TPCField( void )
+  : m_k18_status( false ),
+    m_kurama_status( false ),
+    m_shs_status( false ),
+    m_kurama_field_map(),
+    m_shs_field_map()
+{
+}
+
+//_____________________________________________________________________________
+G4bool
+TPCField::Initialize( void )
 {
   G4cout << FUNC_NAME << G4endl;
   if( gConf.Get<G4int>( "ShsFieldMap" ) == 1 ){
-    std::ifstream ifs( file1 );
-    G4cout << "   Reading " << file1 << G4endl;
+    std::ifstream ifs( m_shs_field_map );
+    G4cout << "   Reading " << m_shs_field_map << G4endl;
     for(int ix= 0; ix<MAX_DIM_X_OPERA3D; ix++){
       for(int iy= 0; iy<MAX_DIM_Y_OPERA3D; iy++){
 	for(int iz= 0; iz<MAX_DIM_Z_OPERA3D; iz++){
@@ -45,8 +56,8 @@ TPCField::TPCField( const G4String& file1, const G4String& file2 )
     G4cout << "   Finish reading OPERA3D file" << G4endl;
   }
   if( gConf.Get<G4int>( "KuramaFieldMap" ) == 1 ){
-    std::ifstream ifs( file2 );
-    G4cout << "   Reading " << file2 << G4endl;
+    std::ifstream ifs( m_kurama_field_map );
+    G4cout << "   Reading " << m_kurama_field_map << G4endl;
     for(int ix= 0; ix<MAX_KURAMA_X_OPERA3D; ix++){
       for(int iy= 0; iy<MAX_KURAMA_Y_OPERA3D; iy++){
 	for(int iz= 0; iz<MAX_KURAMA_Z_OPERA3D; iz++){
@@ -61,6 +72,7 @@ TPCField::TPCField( const G4String& file1, const G4String& file2 )
     G4cout << "   Finish reading OPERA3D file" << G4endl;
   }
   G4cout << "   Initialized" << G4endl;
+  return true;
 }
 
 //_____________________________________________________________________________
@@ -160,6 +172,10 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   //     Bfield[2] = 0.;
   //   }
   // }
+
+  // K18Beamline
+
+
 #if 0
   G4ThreeVector b( Bfield[0], Bfield[1], Bfield[2] );
   if( b.mag() > 0.01*tesla ){
@@ -174,5 +190,6 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 	   << std::setw(10) << Bfield[2]/tesla << " )" << G4endl;
   }
 #endif
+
   return;
 }

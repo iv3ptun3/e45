@@ -129,12 +129,14 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     Generate_hdibaryon_PHSG_LL(anEvent); // H gen by using phsg
     break;
   case 10:
-    // Generate_Kp_Kn(anEvent); // beam study
-    GenerateBeam( anEvent ); // beam study
+    GenerateBeamVI( anEvent );
     break;
   case 11:
-    Generate_pip_KsL(anEvent); // study pi-p --> KsL
+    GenerateBeamVO( anEvent );
     break;
+  // case 11:
+  //   Generate_pip_KsL(anEvent); // study pi-p --> KsL
+  //   break;
   case 12:
     Generate_pip_KsS(anEvent); // study pi-p --> KsS
     break;
@@ -1420,15 +1422,38 @@ TPCPrimaryGeneratorAction::Generate_Kp_Kn( G4Event* anEvent )
 
 //_____________________________________________________________________________
 void
-TPCPrimaryGeneratorAction::GenerateBeam( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateBeamVI( G4Event* anEvent )
 {
   static const auto particleTable = G4ParticleTable::GetParticleTable();
   static const auto kaonMinus = particleTable->FindParticle("kaon-");
   static const G4double mass = kaonMinus->GetPDGMass()/GeV;
-  static const G4double primary_z = gBeam.GetPrimaryZ();
+  static const G4double D4BendAngle = gSize.Get( "D4BendAngle" )*CLHEP::deg;
+  m_beam->p.rotateY( - D4BendAngle );
   G4double energy = ( std::sqrt( mass*mass + m_beam->p.mag2() ) - mass )*GeV;
   gAnaMan.SetPrimaryBeam( m_beam->p );
-  G4ThreeVector gen_pos( m_beam->x, m_beam->y, m_target_pos.z() + primary_z );
+  G4ThreeVector gen_pos( m_beam->x, m_beam->y, m_beam->z );
+  gen_pos.rotateY( - D4BendAngle );
+  gen_pos += gBeam.GetVIPosition();
+  particleGun->SetParticleDefinition( kaonMinus );
+  particleGun->SetParticleMomentumDirection( m_beam->p );
+  particleGun->SetParticleEnergy( energy );
+  particleGun->SetParticlePosition( gen_pos );
+  particleGun->GeneratePrimaryVertex( anEvent );
+  // gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  // gAnaMan.SetPrimaryParticle( 0, mom_kn_x, mom_kn_y, mom_kn_z, mass );
+  // gAnaMan.SetPrimaryVertex( 0, vtx, vty, vtz );
+}
+
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::GenerateBeamVO( G4Event* anEvent )
+{
+  static const auto particleTable = G4ParticleTable::GetParticleTable();
+  static const auto kaonMinus = particleTable->FindParticle("kaon-");
+  static const G4double mass = kaonMinus->GetPDGMass()/GeV;
+  G4double energy = ( std::sqrt( mass*mass + m_beam->p.mag2() ) - mass )*GeV;
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  G4ThreeVector gen_pos( m_beam->x, m_beam->y, m_target_pos.z() + m_beam->z );
   particleGun->SetParticleDefinition( kaonMinus );
   particleGun->SetParticleMomentumDirection( m_beam->p );
   particleGun->SetParticleEnergy( energy );

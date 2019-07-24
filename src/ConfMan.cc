@@ -75,11 +75,6 @@ ConfMan::Initialize( void )
     m_bool[key]   = static_cast<G4bool>( std::strtol( val, nullptr, 10 ) );
   }
 
-  if( Get<G4int>( "Generator" ) == 10 /* GenerateBeam */ ){
-    const G4double primary_z = -1000.*CLHEP::mm;
-    BeamMan::GetInstance().SetPrimaryZ( primary_z );
-  }
-
   if ( !InitializeParameterFiles() || !InitializeHistograms() )
     return false;
 
@@ -109,8 +104,8 @@ ConfMan::InitializeHistograms( void )
 G4bool
 ConfMan::InitializeParameterFiles( void )
 {
-  return ( InitializeParameter<BeamMan>("BEAM") &&
-	   InitializeParameter<DCGeomMan>("DCGEO") &&
+  return ( InitializeParameter<DCGeomMan>("DCGEO") &&
+	   InitializeParameter<BeamMan>("BEAM") &&
 	   InitializeParameter<DetSizeMan>("DSIZE") );
 }
 

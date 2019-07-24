@@ -1,9 +1,12 @@
 *.[ado]
 *~
 \#*\#
-*.swp
-*.pyc
 *.dev
+*.pcm
+*.pdf
+*.pyc
+*.so
+*.swp
 *.root
 backup/
 build/

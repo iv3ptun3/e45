@@ -16,7 +16,8 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <ConfMan.hh>
+#include "ConfMan.hh"
+#include "DCGeomMan.hh"
 #include "FuncName.hh"
 #include "PrintHelper.hh"
 
@@ -38,11 +39,12 @@ BeamInfo::Print( void ) const
 
 //_____________________________________________________________________________
 BeamMan::BeamMan( void )
-  : m_is_ready(false),
+  : m_is_ready( false ),
     m_file_name(),
     m_file(),
     m_param_array(),
     m_n_param(),
+    m_is_vi( false ),
     m_primary_z( 0. )
 {
 }
@@ -56,7 +58,9 @@ BeamMan::~BeamMan( void )
 G4bool
 BeamMan::Initialize( void )
 {
-  const G4double p0 = ConfMan::GetInstance().Get<G4double>( "BeamMom" );
+  const auto& gConf = ConfMan::GetInstance();
+  const auto& gGeom = DCGeomMan::GetInstance();
+  const G4double p0 = gConf.Get<G4double>( "BeamMom" );
 
   m_file = new TFile( m_file_name );
   TTree* tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
@@ -65,9 +69,10 @@ BeamMan::Initialize( void )
     return false;
 
   m_param_array.clear();
-
-  // beam information at FF position (VO+1200)
-  // given in turtle coordinate.
+  m_is_vi = ( gConf.Get<G4int>( "Generator" ) == 10 );
+  m_primary_z = gGeom.GetLocalZ( "Vertex" );
+  if( !m_is_vi )
+    m_primary_z -= 1200.*CLHEP::mm; // from VO
   BeamInfo beam;
   tree->SetBranchAddress( "x", &beam.x );
   tree->SetBranchAddress( "y", &beam.y );
@@ -85,6 +90,7 @@ BeamMan::Initialize( void )
     G4double pz = pp / std::sqrt( dxdz*dxdz + dydz*dydz + 1. );
     beam.x += dxdz * m_primary_z;
     beam.y += dydz * m_primary_z;
+    beam.z = m_primary_z;
     beam.p.set( pz*dxdz, pz*dydz, pz );
     m_param_array.push_back( beam );
   }

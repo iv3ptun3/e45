@@ -85,6 +85,9 @@ main( int argc, char** argv )
     uiManager->ApplyCommand( command + fileName );
   }
 
+  gFile->Write();
+  gFile->Close();
+
 #ifdef G4VIS_USE
   delete visManager;
 #endif

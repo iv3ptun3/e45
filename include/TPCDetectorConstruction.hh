@@ -41,10 +41,10 @@ private:
   void ConstructElements( void );
   void ConstructMaterials( void );
   // Detectors
-  void ConstructForwardSpectrometer( void );
   void ConstructFTOF( void );
   void ConstructHTOF( void );
   void ConstructHypTPC( void );
+  void ConstructK18BeamlineSpectrometer( void );
   void ConstructKuramaMagnet( void );
   void ConstructNBAR( void );
   void ConstructPVAC2( void );

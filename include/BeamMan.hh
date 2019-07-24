@@ -23,6 +23,7 @@ struct BeamInfo
   Double_t v; // [mrad]
   Double_t dp; // [%]
   G4ThreeVector p; // [GeV/c]
+  Double_t z; // [mm]
   void Print( void ) const;
 };
 
@@ -41,21 +42,25 @@ private:
 
 private:
   typedef std::vector<BeamInfo> ParamArray;
-  G4bool     m_is_ready;
-  G4String   m_file_name;
-  TFile*     m_file;
-  ParamArray m_param_array;
-  G4int      m_n_param;
-  G4double   m_primary_z; // from FF
+  G4bool        m_is_ready;
+  G4String      m_file_name;
+  TFile*        m_file;
+  ParamArray    m_param_array;
+  G4int         m_n_param;
+  G4bool        m_is_vi; // true:VI or false:VO
+  G4double      m_primary_z; // from VI or VO
+  G4ThreeVector m_vi_pos;
 
 public:
-  G4bool          Initialize( void );
-  G4bool          Initialize( const G4String& filename );
-  G4bool          IsReady( void ) const { return m_is_ready; }
-  const BeamInfo& Get( void ) const;
-  G4double        GetPrimaryZ( void ) const { return m_primary_z; }
-  void            Print( void ) const;
-  void            SetPrimaryZ( G4double z ){ m_primary_z = z; }
+  const BeamInfo&      Get( void ) const;
+  G4double             GetPrimaryZ( void ) const { return m_primary_z; }
+  const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
+  G4bool               Initialize( void );
+  G4bool               Initialize( const G4String& filename );
+  G4bool               IsReady( void ) const { return m_is_ready; }
+  void                 Print( void ) const;
+  void                 SetPrimaryZ( G4double z ){ m_primary_z = z; }
+  void                 SetVIPosition( G4ThreeVector pos ){ m_vi_pos = pos; }
 };
 
 //_____________________________________________________________________________

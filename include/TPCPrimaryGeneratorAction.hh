@@ -48,14 +48,15 @@ public:
   G4double lorentcmlab(G4double *v1,G4double betaz, G4double *v2);
   G4int HarmonicFermiMomentum(G4int Angular_mom, G4double *Kf);
   void Generate_hanul(G4Event* anEvent);
-  void Generate_PhaseSpace(G4Event* anEvent); ///#30
+  void Generate_PhaseSpace(G4Event* anEvent);
   void Generate_hdibaryon1(G4Event* anEvent);
   void Generate_hdibaryon2(G4Event* anEvent);
-  void Generate_hdibaryon_PHSG(G4Event* anEvent); //6
-  void Generate_hdibaryon_PHSG_S(G4Event* anEvent); //7
-  void Generate_hdibaryon_PHSG_LL(G4Event* anEvent); //9
-  void Generate_Kp_Kn(G4Event* anEvent); //10
-  void GenerateBeam( G4Event* anEvent ); //10
+  void Generate_hdibaryon_PHSG(G4Event* anEvent);
+  void Generate_hdibaryon_PHSG_S(G4Event* anEvent);
+  void Generate_hdibaryon_PHSG_LL(G4Event* anEvent);
+  void Generate_Kp_Kn(G4Event* anEvent);
+  void GenerateBeamVI( G4Event* anEvent );
+  void GenerateBeamVO( G4Event* anEvent );
   void Generate_hdibaryon_non_reso(G4Event* anEvent);
   void Generate_test(G4Event* anEvent);
   void Generate_test2(G4Event* anEvent);

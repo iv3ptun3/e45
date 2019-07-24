@@ -21,6 +21,7 @@
 #include <G4VisAttributes.hh>
 #include <tools/mathd>
 
+#include "BeamMan.hh"
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetectorID.hh"
@@ -93,6 +94,9 @@ TPCDetectorConstruction::Construct( void )
   m_world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   auto world_pv = new G4PVPlacement( nullptr, G4ThreeVector(), m_world_lv,
 				     "WorldPV", nullptr, false, 0 );
+
+  ConstructK18BeamlineSpectrometer();
+
 #if 1
   ConstructShsMagnet();
   ConstructTarget();
@@ -111,6 +115,14 @@ TPCDetectorConstruction::Construct( void )
     ConstructSDC3();
     ConstructFTOF();
   }
+
+  auto myfield = new TPCField;
+  myfield->Initialize();
+  auto transMan = G4TransportationManager::GetTransportationManager();
+  auto fieldMan = transMan->GetFieldManager();
+  fieldMan->SetDetectorField( myfield );
+  fieldMan->CreateChordFinder( myfield );
+
   return world_pv;
 }
 
@@ -345,8 +357,6 @@ TPCDetectorConstruction::ConstructHTOF( void )
 			       half_size.y(), half_size.z() );
   auto htof_lv = new G4LogicalVolume( htof_solid, m_material_map["Scintillator"],
 				      "HtofLV" );
-  htof_lv->SetSensitiveDetector( htof_sd );
-  htof_lv->SetVisAttributes( G4Colour::Cyan() );
   for( G4int i=0; i<NumOfPlaneHTOF; ++i ){
     for( G4int j=0; j<NumOfSegHTOFOnePlane; ++j ){
       G4int seg = i*NumOfSegHTOFOnePlane + j;
@@ -365,6 +375,8 @@ TPCDetectorConstruction::ConstructHTOF( void )
 			 m_world_lv, false, copy_no );
     }
   }
+  htof_lv->SetSensitiveDetector( htof_sd );
+  htof_lv->SetVisAttributes( G4Colour::Cyan() );
 
   // ==============================================================
   // light guide for Scintillators
@@ -659,6 +671,221 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   for( G4int i=0; i<NumOfPadTPC; ++i ){
     pad_lv[i]->SetSensitiveDetector( tpc_sd );
   }
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
+{
+  // D4 magnet
+  const G4double D4Rho = gSize.Get( "D4Rho" )*mm;
+  const G4double D4BendAngle = gSize.Get( "D4BendAngle" )*deg; // [deg]
+  const auto& D4FieldSize = gSize.GetSize( "D4Field" )*mm;
+  const G4double D4r1 = D4Rho - D4FieldSize.x()/2.;
+  const G4double D4r2 = D4Rho + D4FieldSize.x()/2.;
+  const G4double D4Width1 = 1700.*mm/2;
+  const auto& D4Coil1Size = gSize.GetSize( "D4Coil1" )*mm;
+  const G4double D4CoilWidth1 = 500.*mm/2;
+  const G4double D4CoilLength1 = 200.*mm/2;
+  const G4double D4CoilLength2 = 100.*mm/2;
+  // const G4double D4Length = 4.468*m;
+  // const G4double D4B0 = 15.010222; // [kG]
+  // const G4double alphaD4 = 23.5; // [deg]
+  // const G4double betaD4 = 0; // [deg]
+  // Q10 magnet
+  const auto& Q10Size = gSize.GetSize( "Q10" )*mm;
+  //const G4double Q10B0 = -9.814096; // [kG]  negative particle
+  // const G4double Q10a0 = 0.1*m;    // [m]
+  // Q11 magnet
+  const auto& Q11Size = gSize.GetSize( "Q11" )*mm;
+  // const G4double Q11B0 = 7.493605; // [kG]  negative particle
+  // const G4double Q11a0 = 0.1*m;      // [m]
+  // Q12 magnet
+  const auto& Q12Size = gSize.GetSize( "Q12" )*mm;
+  // const G4double Q12B0 = -5.87673; // [kG] negative particle
+  // const G4double Q12a0 = 0.1*m;      // [m]
+  // Q13 magnet
+  const auto& Q13Size = gSize.GetSize( "Q13" )*mm;
+  // const G4double Q13B0 = 0.; // [kG] negative particle
+  // const G4double Q13a0 = 0.1*m;      // [m]
+  const G4double driftL0 = gSize.Get( "K18L0" )*mm; // VI-Q10
+  const G4double driftL1 = gSize.Get( "K18L1" )*mm; // Q10-Q11
+  const G4double driftL2 = gSize.Get( "K18L2" )*mm; // Q11-D4
+  const G4double driftL3 = gSize.Get( "K18L3" )*mm; // D4-Q12
+  const G4double driftL4 = gSize.Get( "K18L4" )*mm; // Q12-Q13
+  const G4double driftL5 = gSize.Get( "K18L5" )*mm; // Q13-VO
+  const G4double driftL6 = gSize.Get( "K18L6" )*mm; // VO-FF:1200, VO-HS
+  // const G4double driftL7 = gSize.Get( "K18L7" )*mm; // HS-KURAMA
+  const G4ThreeVector VC1Size( Q10Size.x(), Q10Size.y()/2, driftL1 );
+  const G4ThreeVector VC2Size( Q10Size.x(), Q10Size.y()/2, driftL2 );
+  const G4ThreeVector VC3Size( Q12Size.x(), Q12Size.y()/2, driftL3 );
+  const G4ThreeVector VC4Size( Q13Size.x(), Q13Size.y()/2, driftL4 );
+
+  G4double x,y,z;
+  G4RotationMatrix rotZero;
+
+  // VI
+  x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
+	( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::sin( D4BendAngle ) );
+  y = 0.*m;
+  z = ( - D4Rho*std::sin( D4BendAngle )
+	- ( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::cos( D4BendAngle )
+	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
+  BeamMan::GetInstance().SetVIPosition( G4ThreeVector( x, y, z ) );
+
+  // Q10 magnet
+  auto Q10Solid = new G4Box( "Q10Solid", Q10Size.x()/2,
+			     Q10Size.y()/2, Q10Size.z()/2 );
+  auto Q10LV = new G4LogicalVolume( Q10Solid,
+				    m_material_map["Vacuum"],
+				    "Q10LV" );
+  Q10LV->SetVisAttributes( ORANGE );
+  x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
+	( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::sin( D4BendAngle ) );
+  y = 0.*m;
+  z = ( - D4Rho*std::sin( D4BendAngle )
+	- ( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::cos( D4BendAngle )
+	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
+  auto rotQ10 = new G4RotationMatrix;
+  rotQ10->rotateY( D4BendAngle );
+  new G4PVPlacement( rotQ10, G4ThreeVector( x, y, z ),
+		     Q10LV, "Q10PV", m_world_lv, false, 0 );
+  // Q11 magnet
+  auto Q11Solid = new G4Box( "Q11Solid", Q11Size.x()/2,
+			     Q11Size.y()/2, Q11Size.z()/2 );
+  auto Q11LV = new G4LogicalVolume( Q11Solid,
+				    m_material_map["Vacuum"],
+				    "Q11LV" );
+  Q11LV->SetVisAttributes( ORANGE );
+  x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
+	( VC2Size.z() + Q11Size.z()/2 ) * std::sin( D4BendAngle ) );
+  y = 0.*m;
+  z = ( - D4Rho*std::sin( D4BendAngle )
+	- ( VC2Size.z() + Q11Size.z()/2 ) * std::cos( D4BendAngle )
+	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
+  auto rotQ11 = new G4RotationMatrix;
+  rotQ11->rotateY( D4BendAngle );
+  new G4PVPlacement( rotQ11, G4ThreeVector( x, y, z ),
+		     Q11LV, "Q11PV", m_world_lv, false, 0 );
+  // D4 magnet
+  G4cout << "D4Rho = " << D4Rho << G4endl;
+  G4cout << "D4r1 = " << D4r1/m  << ", D4r2 = " << D4r2/m  << G4endl;
+  auto D4Solid = new G4Tubs( "D4Solid", D4r1, D4r2, D4FieldSize.y()/2,
+			     0.*deg, D4BendAngle );
+  auto D4OutSolid = new G4Tubs( "D4OutSolid", D4Rho - D4Width1,
+				D4Rho + D4Width1, Q13Size.y()/2,
+				0.*deg, D4BendAngle );
+  auto D4PoleSolid = new G4SubtractionSolid( "D4PoleSolid", D4OutSolid,
+					     D4Solid );
+  auto D4PoleLV = new G4LogicalVolume( D4OutSolid, // D4PoleSolid,
+				       m_material_map["Iron"],
+				       "D4PoleLV" );
+  D4PoleLV->SetVisAttributes( G4Colour::Green() );
+  x = D4Rho;
+  y = 0.*m;
+  z = - driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6;
+  auto D4Rot = new G4RotationMatrix;
+  D4Rot->rotateX( 90.*deg );
+  D4Rot->rotateZ( 180.*deg + D4BendAngle );
+  new G4PVPlacement( D4Rot, G4ThreeVector( x, y, z ),
+		     D4PoleLV, "D4PolePV", m_world_lv, false, 0 );
+  auto D4LV = new G4LogicalVolume( D4Solid,
+				   m_material_map["Vacuum"],
+				   "D4LV" );
+  D4LV->SetVisAttributes( G4Colour::White() );
+  new G4PVPlacement( D4Rot, G4ThreeVector( x, y, z ),
+		     D4LV, "D4PV", m_world_lv, false, 0 );
+#if 0
+  auto D4Coil1Solid = new G4Box( "D4Coil1Solid", D4Coil1Size.x()/2,
+				 D4Coil1Size.y()/2, D4Coil1Size.z()/2 );
+  auto D4Coil1LV = new G4LogicalVolume( D4Coil1Solid,
+					m_material_map["Iron"],
+					"D4Coil1LV" );
+  D4Coil1LV->SetVisAttributes( G4Colour::Red() );
+  x = 0.*m;
+  y = 0.*m;
+  z = ( D4Coil1Size.z()/2 - driftL3 - Q12Size.z() - driftL4 - Q13Size.z()
+	- driftL5 - driftL6 );
+  new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
+		     D4Coil1LV, "D4Coil1PV", m_world_lv, false, 0 );
+#endif
+  // Q12 magnet
+  auto Q12Solid = new G4Box( "Q12Solid", Q12Size.x()/2,
+			     Q12Size.y()/2, Q12Size.z()/2 );
+  auto Q12LV = new G4LogicalVolume( Q12Solid,
+				    m_material_map["Vacuum"],
+				    "Q12LV" );
+  Q12LV->SetVisAttributes( ORANGE );
+  x = 0.*m;
+  y = 0.*m;
+  z = - Q12Size.z()/2 - driftL4 - Q13Size.z() - driftL5 - driftL6;
+  new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
+		     Q12LV, "Q12PV", m_world_lv, false, 0 );
+  // Q13 magnet
+  auto Q13Solid = new G4Box( "Q13Solid", Q13Size.x()/2,
+			     Q13Size.y()/2, Q13Size.z()/2 );
+  auto Q13LV = new G4LogicalVolume( Q13Solid,
+				    m_material_map["Vacuum"],
+				    "Q13LV" );
+  Q13LV->SetVisAttributes( ORANGE );
+  x = 0.*m;
+  y = 0.*m;
+  z =  - Q13Size.z()/2 - driftL5 - driftL6;
+  new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
+		     Q13LV, "Q13PV", m_world_lv, false, 0 );
+  // Vacuum Chamber 1
+  auto VC1Solid = new G4Box( "VC1Solid", VC1Size.x()/2,
+			     VC1Size.y()/2, VC1Size.z()/2 );
+  auto VC1LV = new G4LogicalVolume( VC1Solid,
+				    m_material_map["Vacuum"],
+				    "VC1LV" );
+  x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
+	( VC1Size.z()/2 + Q11Size.z() + VC2Size.z() ) * std::sin( D4BendAngle ) );
+  y = 0.*m;
+  z = ( - D4Rho*std::sin( D4BendAngle )
+	- ( VC1Size.z()/2 + Q11Size.z() + VC2Size.z() ) * std::cos( D4BendAngle )
+	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
+  auto rotVC1 = new G4RotationMatrix;
+  rotVC1->rotateY( D4BendAngle );
+  new G4PVPlacement( rotVC1, G4ThreeVector( x, y, z ),
+		     VC1LV, "VC1PV", m_world_lv, false, 0 );
+  // Vacuum Chamber 2
+  auto VC2Solid = new G4Box( "slidVC2", VC2Size.x()/2,
+			     VC2Size.y()/2, VC2Size.z()/2 );
+  auto VC2LV = new G4LogicalVolume( VC2Solid,
+				    m_material_map["Vacuum"],
+				    "VC2LV" );
+  x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
+	VC2Size.z()/2 * std::sin( D4BendAngle ) );
+  y = 0.*m;
+  z = ( - D4Rho*std::sin( D4BendAngle )
+	- VC2Size.z()/2 * std::cos( D4BendAngle )
+	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
+  auto rotVC2 = new G4RotationMatrix;
+  rotVC2->rotateY( D4BendAngle );
+  new G4PVPlacement( rotVC2, G4ThreeVector( x, y, z ),
+		     VC2LV, "VC2PV", m_world_lv, false, 0 );
+  // Vacuum Chamber 3
+  auto VC3Solid = new G4Box( "VC3Solid", VC3Size.x()/2,
+			     VC3Size.y()/2, VC3Size.z()/2 );
+  auto VC3LV = new G4LogicalVolume( VC3Solid,
+				    m_material_map["Vacuum"],
+				    "VC3LV" );
+  x = 0.*m;
+  y = 0.*m;
+  z = -driftL3/2 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6;
+  new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
+		     VC3LV, "VC3PV", m_world_lv, false, 0 );
+  // Vacuum Chamber 4
+  auto VC4Solid = new G4Box( "VC4Solid", VC4Size.x()/2, VC4Size.y()/2, VC4Size.z()/2 );
+  auto VC4LV = new G4LogicalVolume( VC4Solid,
+				    m_material_map["Vacuum"],
+				    "VC4LV" );
+  x = 0.*m;
+  y = 0.*m;
+  z = - driftL4/2 - Q13Size.z() - driftL5 - driftL6;
+  new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
+		     VC4LV, "VC4PV", m_world_lv, false, 0 );
 }
 
 //_____________________________________________________________________________
@@ -1759,8 +1986,8 @@ TPCDetectorConstruction::ConstructSDC3( void )
 void
 TPCDetectorConstruction::ConstructShsMagnet( void )
 {
-  const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
 #if 0 // Old version
+  const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
   const G4double DPHI_TPC = 360.*deg;
   auto tube_solid = new G4Tubs( "TubeSolid", 45.*cm, 80.*cm, 135./2.*cm, 0.*deg, DPHI_TPC);
   auto hole_solid = new G4Box( "HoleSolid", 100./2.*cm, 100./2.*cm, 60./2.*cm );
@@ -1779,13 +2006,13 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   coil_lv->SetVisAttributes( PINK );
 #else // Current version
   const G4ThreeVector yoke_size( 1550./2.*mm, 950./2.*mm, 1200./2.*mm );
-  auto shs_solid = new G4Box( "ShsMagnetSolid", yoke_size.x(),
-			      yoke_size.y(), yoke_size.z() );
-  auto shs_lv = new G4LogicalVolume( shs_solid, m_material_map["Air"],
-				     "ShsMagnetLV" );
-  shs_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
-  auto shs_pv = new G4PVPlacement( nullptr, tpc_pos, shs_lv,
-				   "ShsMagnetPV", m_world_lv, false, 0 );
+  // auto shs_solid = new G4Box( "ShsMagnetSolid", yoke_size.x(),
+  // 			      yoke_size.y(), yoke_size.z() );
+  // auto shs_lv = new G4LogicalVolume( shs_solid, m_material_map["Air"],
+  // 				     "ShsMagnetLV" );
+  // shs_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  // auto shs_pv = new G4PVPlacement( nullptr, tpc_pos, shs_lv,
+  // 				   "ShsMagnetPV", m_world_lv, false, 0 );
   const G4int NumOfParams = 4;
   G4double yoke_width[NumOfParams] = { 1550*mm, 1530*mm, 1480*mm, 1470*mm };
   G4double yoke_depth[NumOfParams] = { 1200*mm, 1180*mm, 1140*mm, 1130*mm };
@@ -1866,7 +2093,7 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   G4RotationMatrix rot_frame;
   rot_frame.rotateX( 90.*deg );
   new G4PVPlacement( G4Transform3D( rot_frame, G4ThreeVector() ),
-		     "ShsMagnetPV", magnet_lv, shs_pv, false, 0 );
+		      magnet_lv, "ShsMagnetPV", m_world_lv, false, 0 );
   // Coil Support
   G4double CoilSupPos_height = 250*mm;
   G4double RadIn = 445*mm;
@@ -1890,9 +2117,9 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   G4RotationMatrix rot_sup;
   rot_sup.rotateX( 90.*deg );
   new G4PVPlacement( G4Transform3D( rot_sup, G4ThreeVector( 0, CoilSupPos_height, 0 ) ),
-		     "CoilSupUpPV", logicDetectorCS, shs_pv, false, 0 );
+		     logicDetectorCS, "CoilSupUpPV", m_world_lv, false, 0 );
   new G4PVPlacement( G4Transform3D( rot_sup, G4ThreeVector( 0, -CoilSupPos_height, 0 ) ),
-		     "CoilSupDwPV", logicDetectorCS, shs_pv, false, 0 );
+		     logicDetectorCS, "CoilSupDwPV", m_world_lv, false, 0 );
   // Coil
   const G4double coilRad_in = 466*mm;
   const G4double coilRad_out = 535*mm;
@@ -1908,15 +2135,10 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   G4RotationMatrix rot_coil;
   rot_coil.rotateX( 90.*deg );
   new G4PVPlacement( G4Transform3D( rot_coil, coilu_pos ),
-		     "CoilUpPV", logicDetectorCoil, shs_pv, false, 0 );
+		     logicDetectorCoil, "CoilUpPV", m_world_lv, false, 0 );
   new G4PVPlacement( G4Transform3D( rot_coil, coild_pos ),
-		     "CoilDwPV", logicDetectorCoil, shs_pv, false, 0 );
+		     logicDetectorCoil, "CoilDwPV", m_world_lv, false, 0 );
 #endif
-  auto myfield = new TPCField("helmholtz_field.dat", "KuramaMap80cm.dat");
-  auto fieldMan = ( G4TransportationManager::GetTransportationManager()->
-		    GetFieldManager() );
-  fieldMan->SetDetectorField( myfield );
-  fieldMan->CreateChordFinder( myfield );
 }
 
 //_____________________________________________________________________________
