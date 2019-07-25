@@ -3,8 +3,9 @@
 #ifndef RUNGE_KUTTA_TRACKER_HH
 #define RUNGE_KUTTA_TRACKER_HH
 
+#include <G4ThreeVector.hh>
+
 #include "track.hh"
-#include "ThreeVector.hh"
 #include "kmf.h"
 //#include "filter.h"
 
@@ -18,10 +19,10 @@ public:
 private:
   void RungeKuttaTracking(int c_use, Track* aTrack);
   void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par,
-			       ThreeVector &B);
+			       G4ThreeVector &B);
   void RungeKuttaFieldIntegral(int c_use, double *init_par,double *final_par,
-			       ThreeVector &B,
-			       ThreeVector &dBdY, ThreeVector &dBdZ);
+			       G4ThreeVector &B,
+			       G4ThreeVector &dBdY, G4ThreeVector &dBdZ);
   int RungeKuttaFit(int c_use, int iteration, Track* aTrack,double *rk_par0,
 		    double *rk_par, double* rk_hit );
   void RungeKuttaStep(int c_use, double qp0,double h,

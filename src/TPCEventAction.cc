@@ -72,26 +72,26 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
   if( idcounter > 0 ){
     auto padHC = (G4THitsCollection<TPCPadHit>*)HCTE->GetHC( idcounter );
     G4int nhits= padHC -> entries();
-    G4int pidtr[MaxTrackTPC]={0};
-    G4int ptidtpc[MaxTrackTPC]={0};
-    G4int ptidtpc_pid[MaxTrackTPC]={0};
-    G4double pmtpc[MaxTrackTPC]={0};
-    G4int qqtpc[MaxTrackTPC]={0};
-    G4double pxtpc[MaxTrackTPC]={0};
-    G4double pytpc[MaxTrackTPC]={0};
-    G4double pztpc[MaxTrackTPC]={0};
-    G4double pptpc[MaxTrackTPC]={0};
-    G4double vtxxtpc[MaxTrackTPC]={0};
-    G4double vtxytpc[MaxTrackTPC]={0};
-    G4double vtxztpc[MaxTrackTPC]={0};
-    G4double vtxpxtpc[MaxTrackTPC]={0};
-    G4double vtxpytpc[MaxTrackTPC]={0};
-    G4double vtxpztpc[MaxTrackTPC]={0};
-    // G4double vtxpptpc[MaxTrackTPC]={0};
-    G4double vtxenetpc[MaxTrackTPC]={0};
-    G4double detpc[MaxTrackTPC]={0};
-    G4int laytpc[MaxTrackTPC]={0};
-    G4double lentpc[MaxTrackTPC]={0};
+    G4int pidtr[MaxHitsTPC]={0};
+    G4int ptidtpc[MaxHitsTPC]={0};
+    G4int ptidtpc_pid[MaxHitsTPC]={0};
+    G4double pmtpc[MaxHitsTPC]={0};
+    G4int qqtpc[MaxHitsTPC]={0};
+    G4double pxtpc[MaxHitsTPC]={0};
+    G4double pytpc[MaxHitsTPC]={0};
+    G4double pztpc[MaxHitsTPC]={0};
+    G4double pptpc[MaxHitsTPC]={0};
+    G4double vtxxtpc[MaxHitsTPC]={0};
+    G4double vtxytpc[MaxHitsTPC]={0};
+    G4double vtxztpc[MaxHitsTPC]={0};
+    G4double vtxpxtpc[MaxHitsTPC]={0};
+    G4double vtxpytpc[MaxHitsTPC]={0};
+    G4double vtxpztpc[MaxHitsTPC]={0};
+    // G4double vtxpptpc[MaxHitsTPC]={0};
+    G4double vtxenetpc[MaxHitsTPC]={0};
+    G4double detpc[MaxHitsTPC]={0};
+    G4int laytpc[MaxHitsTPC]={0};
+    G4double lentpc[MaxHitsTPC]={0};
     G4int nparticle=0;
     // G4cout << "TPC  " << nhits << G4endl;
     for( G4int i=0; i<nhits; ++i ){
@@ -236,21 +236,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4int nhits = HC->entries();
     for( G4int i=0; i<nhits; ++i ){
       auto hit = (*HC)[i];
-      G4ThreeVector vtxpos = hit->GetVertexPosition();
-      G4ThreeVector vtxmom = hit->GetVertexMomentum();
-      G4double vtxene =hit->GetVertexKineticEnergy();
-      G4ThreeVector xyz = hit->GetPosition();
-      G4ThreeVector mom = hit->GetMomentum();
-      G4int ptid = hit->GetParentID();
-      G4double tof= hit->GetTime();
-      G4int tid = hit->GetTrackID();
-      G4int pid = hit->GetParticleID();
-      G4int did = hit->GetDetectorID();
-      G4double mass = hit->GetMass();
-      G4int charge = hit->GetCharge();
-      G4double tlength = hit->GetTrackLength();
-      gAnaMan.SetHTOFData(tof, xyz, mom, tid, pid,did,mass, charge,
-			  ptid,vtxpos,vtxmom,vtxene,tlength);
+      gAnaMan.SetHTOFData( hit );
     }
   }
 

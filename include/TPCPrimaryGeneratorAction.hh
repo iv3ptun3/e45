@@ -20,12 +20,11 @@ public:
   ~TPCPrimaryGeneratorAction( void );
 
 private:
-  G4ParticleGun* particleGun;   // particle gun provided by Geant4
-  G4ThreeVector m_target_pos;
-  G4ThreeVector m_target_size;
-  BeamInfo*     m_beam;
-  G4double      m_beam_p0;
-
+  G4ParticleGun* m_particle_gun;
+  G4ThreeVector  m_target_pos;
+  G4ThreeVector  m_target_size;
+  BeamInfo*      m_beam;
+  G4double       m_beam_p0;
   G4double env_target_pos_z;
   G4double env_Beam_width;
   G4double env_Beam_x0;
@@ -97,10 +96,8 @@ public:
   void Generate_E07_study_kp_04_15(G4Event* anEvent); //#79 k+ from 0.4 GeV to 1.5 GeV
   void Generate_E07_study_kpxi1530(G4Event* anEvent); //#80 knp --> kpxi1530-
   void Generate_E07_study_Takahashi(G4Event* anEvent); //#81 knp --> kpXi-, Takahashi-san's code
+  G4ParticleGun* GetParticleGun( void ){ return m_particle_gun; }
   double RandSin(void);
-
-  friend class E27Reaction;
-  friend class KKppReaction;
 };
 
 //_____________________________________________________________________________

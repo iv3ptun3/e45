@@ -13,7 +13,6 @@
 
 //#include "filter.h"
 #include "MathTools.hh"
-#include "ThreeVector.hh"
 #include "track.hh"
 
 //#include "nrutil.h"
@@ -220,7 +219,7 @@ void
 RungeKuttaTracker::RungeKuttaFieldIntegral( int /* c_use */,
 					    double* /* init_par */,
 					    double* /* final_par */,
-					    ThreeVector& /* B */ )
+					    G4ThreeVector& /* B */ )
 {
 }
 
@@ -229,9 +228,9 @@ void
 RungeKuttaTracker::RungeKuttaFieldIntegral( int /* c_use */,
 					    double* /* init_par */,
 					    double* /* final_par */,
-					    ThreeVector& /* B */,
-					    ThreeVector& /* dBdY */,
-					    ThreeVector& /* dBdZ */ )
+					    G4ThreeVector& /* B */,
+					    G4ThreeVector& /* dBdY */,
+					    G4ThreeVector& /* dBdZ */ )
 {
 }
 
