@@ -15,11 +15,12 @@ class G4TouchableHistory;
 class TPCSCHSD : public G4VSensitiveDetector
 {
 public:
+  static G4String ClassName( void );
   TPCSCHSD( const G4String& name );
   virtual ~TPCSCHSD( void );
 
 private:
-  G4THitsCollection<TPCSCHHit>* hitsCollection;
+  G4THitsCollection<TPCSCHHit>* m_hits_collection;
 
 public:
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );
@@ -28,5 +29,13 @@ public:
   virtual void   DrawAll( void );
   virtual void   PrintAll( void );
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCSCHSD::ClassName( void )
+{
+  static G4String s_name("TPCSCHSD");
+  return s_name;
+}
 
 #endif

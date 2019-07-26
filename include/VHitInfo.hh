@@ -1,5 +1,8 @@
 // -*- C++ -*-
 
+#ifndef VHIT_INFO_HH
+#define VHIT_INFO_HH
+
 #include <G4String.hh>
 #include <G4ThreeVector.hh>
 
@@ -59,3 +62,5 @@ VHitInfo::ClassName( void )
   static G4String s_name("VHitInfo");
   return s_name;
 }
+
+#endif

@@ -20,13 +20,11 @@ public:
   TPCHTOFHit( const G4String& name, G4Step* step );
   virtual ~TPCHTOFHit( void );
 
-  // copy constructor & assignment operator
-  TPCHTOFHit(const TPCHTOFHit& right);
-  const TPCHTOFHit& operator=(const TPCHTOFHit& right);
+  TPCHTOFHit( const TPCHTOFHit& right );
+  const TPCHTOFHit& operator=( const TPCHTOFHit& right );
 
-  // new/delete operators
-  void* operator new(size_t);
-  void operator delete(void* aHit);
+  void* operator new( size_t );
+  void operator delete( void* aHit );
 
 public:
   virtual void Draw( void );
@@ -65,7 +63,7 @@ TPCHTOFHit::operator new( size_t )
 inline void
 TPCHTOFHit::operator delete( void* aHit )
 {
-  TPCHTOFHitAllocator.FreeSingle((TPCHTOFHit*) aHit);
+  TPCHTOFHitAllocator.FreeSingle( (TPCHTOFHit*) aHit );
 }
 
 #endif

@@ -14,6 +14,7 @@ class VHitInfo;
 //_____________________________________________________________________________
 static const G4int MaxHits    = 500;
 static const G4int MaxHitsTPC = 500;
+static const G4int MaxPrimaryParticle = 10;
 
 //const int MaxTrack = 1560*4;
 //const int MaxTrack = 78*4;
@@ -22,7 +23,6 @@ const G4int MaxTrack = 54*20;
 const G4int MaxNthLay = 40;
 const G4int MaxNthPad = 250;
 
-const G4int MaxPrimaryParticle = 10;
 
 void initTrack(Track* aTrack);
 void initTrack_ku(Track* aTrack);
@@ -88,191 +88,6 @@ struct TPCData
   //  G4double tpcene2
 };
 
-struct TargetData
-{
-  G4int targettr;
-  G4double targetpx;
-  G4double targetpy;
-  G4double targetpz;
-  G4double targetpp;
-  G4int targetqq;
-
-  G4double targetpm;
-  G4double targetparticleid;
-  G4double targetparentid;
-  G4double targettrackid;
-
-  G4double targetde;
-  G4double targetlen;
-  G4double targetdedx;
-  G4ThreeVector targetvtxmom;
-  //  G4double targetvtxpy;
-  //  G4double targetvtxpz;
-  //  G4double targetvtxx;
-  //  G4double targetvtxy;
-  G4ThreeVector targetvtx;
-
-  //  G4double targetposx;
-  //  G4double targetposy;
-  //  G4double targetposz;
-  G4ThreeVector targetpos;
-
-};
-
-//_____________________________________________________________________________
-struct ScintData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double scintvtxpx;
-  G4double scintvtxpy;
-  G4double scintvtxpz;
-  G4double scintvtxx;
-  G4double scintvtxy;
-  G4double scintvtxz;
-};
-
-//_____________________________________________________________________________
-struct ACData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double acvtxpx;
-  G4double acvtxpy;
-  G4double acvtxpz;
-  G4double acvtxx;
-  G4double acvtxy;
-  G4double acvtxz;
-};
-
-//_____________________________________________________________________________
-struct NBARData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double nbarvtxpx;
-  G4double nbarvtxpy;
-  G4double nbarvtxpz;
-  G4double nbarvtxx;
-  G4double nbarvtxy;
-  G4double nbarvtxz;
-};
-
-//_____________________________________________________________________________
-struct DCData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double vtxpx;
-  G4double vtxpy;
-  G4double vtxpz;
-  G4double vtxx;
-  G4double vtxy;
-  G4double vtxz;
-};
-
-//_____________________________________________________________________________
-struct SCHData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double vtxpx;
-  G4double vtxpy;
-  G4double vtxpz;
-  G4double vtxx;
-  G4double vtxy;
-  G4double vtxz;
-};
-
-//_____________________________________________________________________________
-struct FTOFData
-{
-  G4int trackID;
-  G4double massSH;
-  G4int qqSH;
-  G4int particleID;
-  G4int detectorID;
-  G4int parentID;
-  G4double time;
-  G4double length;
-  G4double pos[3];
-  G4double mom[4];
-  G4double vtxpx;
-  G4double vtxpy;
-  G4double vtxpz;
-  G4double vtxx;
-  G4double vtxy;
-  G4double vtxz;
-};
-
-//_____________________________________________________________________________
-struct FDCData
-{
-  G4int trackID;
-  G4int particleID;
-  G4int detectorID;
-  G4double time;
-  G4double pos[3];
-  G4double mom[4];
-};
-
-//_____________________________________________________________________________
-struct PrimaryBeam
-{
-  G4double pg[4];                        // 4-mom 0: px, 1: py, 2: pz, 3: ene
-  G4int gen;
-  G4int mode;
-};
-
-//_____________________________________________________________________________
-struct PrimaryParticle
-{
-  G4int NumOfParticle;                   // Number of Primary particle
-  G4double x0[MaxPrimaryParticle][3];    // Vertex position  0: x, 1: y, 2: z
-  G4double p0[MaxPrimaryParticle][5];    // 4-mom, mass 0: px, 1: py, 2: pz, 3: ene, 4: mass
-  G4int pid0[MaxPrimaryParticle];
-};
-
 //_____________________________________________________________________________
 struct PrimaryInfo
 {
@@ -288,345 +103,225 @@ struct Event
 {
   Int_t evnum; // Event number
   TVector3* pb; // momentum of inncident beam
-  G4int gen;        // generator number
-  G4int mode;        // mode number
+  Int_t gen;        // generator number
+  Int_t mode;        // mode number
 
-  G4double mm_d; //missing-mass of d(pi,K) reaction
-  G4double mm_p;  //missing-mass for proton target kinematic
-  G4double mm; //missing-mass (should be same as mm_d)
-  G4double theta; //theta of scat K
-  G4double theta_scat; //theta of (pi, K) reaction
-  G4double theta_CM; //theta of (pi, K) reaction (CM flame)
+  Double_t mm_d; //missing-mass of d(pi,K) reaction
+  Double_t mm_p;  //missing-mass for proton target kinematic
+  Double_t mm; //missing-mass (should be same as mm_d)
+  Double_t theta; //theta of scat K
+  Double_t theta_scat; //theta of (pi, K) reaction
+  Double_t theta_CM; //theta of (pi, K) reaction (CM flame)
 
-  G4int HitNum_K;
-  G4int HitNumAC_K;
-  G4int HitNumNBAR_K;
-  G4int HitNumDC_K;
-  G4int HitNumFTOF_K;
-  G4int HitNumSCH_K;
-  G4int HitNumScint_K;
+  Int_t HitNum_K;
   //  int tpctrNum_K;
-  G4int HitNumTarget_K;
 
-
-  G4int HitNum_p;
-  G4int HitNumAC_p;
-  G4int HitNumNBAR_p;
-  G4int HitNumDC_p;
-  G4int HitNumFTOF_p;
-  G4int HitNumSCH_p;
-  G4int HitNumScint_p;
+  Int_t HitNum_p;
   //  int tpctrNum_p;
-  G4int HitNumTarget_p;
 
-
-  G4int npid;
-  G4double x0[MaxPrimaryParticle][3];
-  G4double p0[MaxPrimaryParticle][5];
-  G4double pt0[MaxPrimaryParticle];
-  G4double mass0[MaxPrimaryParticle];
-  G4int pid0[MaxPrimaryParticle];
-  G4double theta0[MaxPrimaryParticle];
+  Int_t nhPrm;
+  Int_t pidPrm[MaxPrimaryParticle];
+  Double_t xPrm[MaxPrimaryParticle];
+  Double_t yPrm[MaxPrimaryParticle];
+  Double_t zPrm[MaxPrimaryParticle];
+  Double_t pxPrm[MaxPrimaryParticle];
+  Double_t pyPrm[MaxPrimaryParticle];
+  Double_t pzPrm[MaxPrimaryParticle];
+  Double_t ptPrm[MaxPrimaryParticle];
+  Double_t mPrm[MaxPrimaryParticle];
+  Double_t thetaPrm[MaxPrimaryParticle];
 
   /* number of ntrks in TPC by shhwang*/
-  G4int ntrtpc;
-  G4double trpptpc[MaxHitsTPC];
-  G4double trpxtpc[MaxHitsTPC];
-  G4double trpytpc[MaxHitsTPC];
-  G4double trpztpc[MaxHitsTPC];
-  G4double trpttpc[MaxHitsTPC];
+  Int_t ntrtpc;
+  Double_t trpptpc[MaxHitsTPC];
+  Double_t trpxtpc[MaxHitsTPC];
+  Double_t trpytpc[MaxHitsTPC];
+  Double_t trpztpc[MaxHitsTPC];
+  Double_t trpttpc[MaxHitsTPC];
 
-  G4double trpptpcfit[MaxHitsTPC];
-  G4double trpxtpcfit[MaxHitsTPC];
-  G4double trpytpcfit[MaxHitsTPC];
-  G4double trpztpcfit[MaxHitsTPC];
-  G4double trpttpcfit[MaxHitsTPC];
+  Double_t trpptpcfit[MaxHitsTPC];
+  Double_t trpxtpcfit[MaxHitsTPC];
+  Double_t trpytpcfit[MaxHitsTPC];
+  Double_t trpztpcfit[MaxHitsTPC];
+  Double_t trpttpcfit[MaxHitsTPC];
 
-  G4int trqqtpc[MaxHitsTPC];
-  G4int trpidtpc[MaxHitsTPC];
-  G4int trparentidtpc[MaxHitsTPC];
-  G4int trparentid_pid_tpc[MaxHitsTPC];
-  G4double trpmtpc[MaxHitsTPC];
-  G4double trdetpc[MaxHitsTPC];
-  G4double trlentpc[MaxHitsTPC];
-  G4double trdedxtpc[MaxHitsTPC];
-  G4double trdedxtrtpc[MaxHitsTPC]; //trancated mean, but now just mean
+  Int_t trqqtpc[MaxHitsTPC];
+  Int_t trpidtpc[MaxHitsTPC];
+  Int_t trparentidtpc[MaxHitsTPC];
+  Int_t trparentid_pid_tpc[MaxHitsTPC];
+  Double_t trpmtpc[MaxHitsTPC];
+  Double_t trdetpc[MaxHitsTPC];
+  Double_t trlentpc[MaxHitsTPC];
+  Double_t trdedxtpc[MaxHitsTPC];
+  Double_t trdedxtrtpc[MaxHitsTPC]; //trancated mean, but now just mean
 
-  G4int trlaytpc[MaxHitsTPC];
+  Int_t trlaytpc[MaxHitsTPC];
 
+  Double_t vtpxtpc[MaxHitsTPC];
+  Double_t vtpytpc[MaxHitsTPC];
+  Double_t vtpztpc[MaxHitsTPC];
+  Double_t vtpptpc[MaxHitsTPC];
 
-  G4double trvtxpxtpc[MaxHitsTPC];
-  G4double trvtxpytpc[MaxHitsTPC];
-  G4double trvtxpztpc[MaxHitsTPC];
-  G4double trvtxpptpc[MaxHitsTPC];
+  Double_t vtxtpc[MaxHitsTPC];
+  Double_t vtytpc[MaxHitsTPC];
+  Double_t vtztpc[MaxHitsTPC];
 
-  G4double trvtxxtpc[MaxHitsTPC];
-  G4double trvtxytpc[MaxHitsTPC];
-  G4double trvtxztpc[MaxHitsTPC];
-
-  G4double trvtxxtpcfit[MaxHitsTPC];
-  G4double trvtxytpcfit[MaxHitsTPC];
-  G4double trvtxztpcfit[MaxHitsTPC];
+  Double_t vtxtpcfit[MaxHitsTPC];
+  Double_t vtytpcfit[MaxHitsTPC];
+  Double_t vtztpcfit[MaxHitsTPC];
 
   /////PAD multiplicity & ASAD multiplicy
-  G4int nthlay[MaxTrack];
-  G4int nthpad[MaxTrack];
-  G4int laypad[MaxTrack][MaxNthLay][MaxNthPad]; //[layer][pad number]
+  Int_t nthlay[MaxTrack];
+  Int_t nthpad[MaxTrack];
+  Int_t laypad[MaxTrack][MaxNthLay][MaxNthPad]; //[layer][pad number]
 
 
   ///////////////
-  G4int nttpc;                 // Number of Hit in Pads
-  G4int ntrk[MaxTrack];        // Number of Track
+  Int_t nttpc;                 // Number of Hit in Pads
+  Int_t ntrk[MaxTrack];        // Number of Track
 
-  G4int ititpc[MaxTrack];      // Track ID
-  G4int idtpc[MaxTrack];       // Particle ID
-  G4double xtpc[MaxTrack];     // coordinates
-  G4double ytpc[MaxTrack];     // coordinates
-  G4double ztpc[MaxTrack];     // coordinates
+  Int_t ititpc[MaxTrack];      // Track ID
+  Int_t idtpc[MaxTrack];       // Particle ID
+  Double_t xtpc[MaxTrack];     // coordinates
+  Double_t ytpc[MaxTrack];     // coordinates
+  Double_t ztpc[MaxTrack];     // coordinates
 
-  G4double x0tpc[MaxTrack];    // coordinates
-  G4double y0tpc[MaxTrack];    // coordinates
-  G4double z0tpc[MaxTrack];    // coordinates
-  G4double resoX[MaxTrack];    // coordinates
+  Double_t x0tpc[MaxTrack];    // coordinates
+  Double_t y0tpc[MaxTrack];    // coordinates
+  Double_t z0tpc[MaxTrack];    // coordinates
+  Double_t resoX[MaxTrack];    // coordinates
 
-  G4double pxtpc[MaxTrack];    // momentum
-  G4double pytpc[MaxTrack];    // momentum
-  G4double pztpc[MaxTrack];    // momentum
-  G4double pptpc[MaxTrack];    // momentum
-  G4double masstpc[MaxTrack];    // mass
+  Double_t pxtpc[MaxTrack];    // momentum
+  Double_t pytpc[MaxTrack];    // momentum
+  Double_t pztpc[MaxTrack];    // momentum
+  Double_t pptpc[MaxTrack];    // momentum
+  Double_t masstpc[MaxTrack];    // mass
 
-  G4double betatpc[MaxTrack];    // beta
+  Double_t betatpc[MaxTrack];    // beta
 
-  G4double edeptpc[MaxTrack];    // Energy deposit
-  G4double dedxtpc[MaxTrack];    // Energy deposit/dx
-  G4double slengthtpc[MaxTrack];    // Energy deposit/dx
+  Double_t edeptpc[MaxTrack];    // Energy deposit
+  Double_t dedxtpc[MaxTrack];    // Energy deposit/dx
+  Double_t slengthtpc[MaxTrack];    // Energy deposit/dx
 
-  G4int laytpc[MaxTrack];      // number of pad layer
-  G4int rowtpc[MaxTrack];      // number of pad raw
-  G4double toftpc[MaxTrack];   // tof
-  G4int parentID[MaxTrack];      // parent id
-  G4double cir_r[MaxTrack];   // fit radius
-  G4double cir_x[MaxTrack];   // fit center x
-  G4double cir_z[MaxTrack];   // fit center z
-  G4double cir_fit[MaxTrack];   // fit center fit
-  G4int vtx_flag[MaxTrack]; // flag, how to estimate vtx
-  G4double a_fory[MaxTrack]; // co-efficient a for linear track (y, theta)
-  G4double b_fory[MaxTrack]; // co-efficient b for linear track (y, theta)
+  Int_t laytpc[MaxTrack];      // number of pad layer
+  Int_t rowtpc[MaxTrack];      // number of pad raw
+  Double_t toftpc[MaxTrack];   // tof
+  Int_t parentID[MaxTrack];      // parent id
+  Double_t cir_r[MaxTrack];   // fit radius
+  Double_t cir_x[MaxTrack];   // fit center x
+  Double_t cir_z[MaxTrack];   // fit center z
+  Double_t cir_fit[MaxTrack];   // fit center fit
+  Int_t vtx_flag[MaxTrack]; // flag, how to estimate vtx
+  Double_t a_fory[MaxTrack]; // co-efficient a for linear track (y, theta)
+  Double_t b_fory[MaxTrack]; // co-efficient b for linear track (y, theta)
 
-
-  G4int ntsc;                 // Number of Hit in Scint.
-  G4int tidsc[MaxHits];       // Track ID
-  G4int pidsc[MaxHits];	    // Particle ID
-  G4int didsc[MaxHits];	    // detector ID
-  G4double masssc[MaxHits];	    // particle mass ID
-  G4int qqsc[MaxHits];	    // particle mass ID
-  G4double xsc[MaxHits];      // coordinates
-  G4double ysc[MaxHits];      // coordinates
-  G4double zsc[MaxHits];      // coordinates
-  G4double pxsc[MaxHits];     // momentum
-  G4double pysc[MaxHits];     // momentum
-  G4double pzsc[MaxHits];     // momentum
-  G4double ppsc[MaxHits];     // momentum
-  G4double tofsc[MaxHits];    // tof
-  G4int scpID[MaxHits];    //parent id
-
-  G4double trvtxxscint[MaxHits];
-  G4double trvtxyscint[MaxHits];
-  G4double trvtxzscint[MaxHits];
-
-  G4double trvtxpxscint[MaxHits];
-  G4double trvtxpyscint[MaxHits];
-  G4double trvtxpzscint[MaxHits];
-  G4double trvtxppscint[MaxHits];
-  G4double lengthsc[MaxHits];
-
+  // TARGET
+  Int_t nhTgt;
+  Int_t tidTgt[MaxHits];
+  Int_t pidTgt[MaxHits];
+  Int_t prtTgt[MaxHits];
+  Double_t xTgt[MaxHits];
+  Double_t yTgt[MaxHits];
+  Double_t zTgt[MaxHits];
+  Double_t vtxTgt[MaxHits];
+  Double_t vtyTgt[MaxHits];
+  Double_t vtzTgt[MaxHits];
   // HTOF
-  G4int nhHtof;
-  G4int tidHtof[MaxHits];       // Track ID
-  G4int pidHtof[MaxHits];	    // Particle ID
-  G4int didHtof[MaxHits];	    // detector ID
-  G4double massHtof[MaxHits];	    // particle mass ID
-  G4int qqHtof[MaxHits];	    // particle mass ID
-  G4double xHtof[MaxHits];      // coordinates
-  G4double yHtof[MaxHits];      // coordinates
-  G4double zHtof[MaxHits];      // coordinates
-  G4double pxHtof[MaxHits];     // momentum
-  G4double pyHtof[MaxHits];     // momentum
-  G4double pzHtof[MaxHits];     // momentum
-  G4double ppHtof[MaxHits];     // momentum
-  G4double tofHtof[MaxHits];    // tof
-  G4int HtofpID[MaxHits];    //parent id
-  G4double trvtxxHtof[MaxHits];
-  G4double trvtxyHtof[MaxHits];
-  G4double trvtxzHtof[MaxHits];
-  G4double trvtxpxHtof[MaxHits];
-  G4double trvtxpyHtof[MaxHits];
-  G4double trvtxpzHtof[MaxHits];
-  G4double trvtxppHtof[MaxHits];
-  G4double lengthHtof[MaxHits];
-
-  ///ac
-  G4int ntac;                 // Number of Hit in Acint.
-  G4int tidac[MaxHits];       // Track ID
-  G4int pidac[MaxHits];	    // Particle ID
-  G4int didac[MaxHits];	    // detector ID
-  G4double massac[MaxHits];	    // particle mass ID
-  G4int qqac[MaxHits];	    // particle mass ID
-  G4double xac[MaxHits];      // coordinates
-  G4double yac[MaxHits];      // coordinates
-  G4double zac[MaxHits];      // coordinates
-  G4double pxac[MaxHits];     // momentum
-  G4double pyac[MaxHits];     // momentum
-  G4double pzac[MaxHits];     // momentum
-  G4double ppac[MaxHits];     // momentum
-  G4double tofac[MaxHits];    // tof
-  G4int acpID[MaxHits];    //parent id
-
-  G4double trvtxxac[MaxHits];
-  G4double trvtxyac[MaxHits];
-  G4double trvtxzac[MaxHits];
-
-  G4double trvtxpxac[MaxHits];
-  G4double trvtxpyac[MaxHits];
-  G4double trvtxpzac[MaxHits];
-  G4double trvtxppac[MaxHits];
-  G4double lengthac[MaxHits];
-
-
-  ////////nbar
-  G4int ntnbar;                 // Number of Hit in Nbarint.
-  G4int tidnbar[MaxHits];       // Trnbark ID
-  G4int pidnbar[MaxHits];	    // Particle ID
-  G4int didnbar[MaxHits];	    // detector ID
-  G4double massnbar[MaxHits];	    // particle mass ID
-  G4int qqnbar[MaxHits];	    // particle mass ID
-  G4double xnbar[MaxHits];      // coordinates
-  G4double ynbar[MaxHits];      // coordinates
-  G4double znbar[MaxHits];      // coordinates
-  G4double pxnbar[MaxHits];     // momentum
-  G4double pynbar[MaxHits];     // momentum
-  G4double pznbar[MaxHits];     // momentum
-  G4double ppnbar[MaxHits];     // momentum
-  G4double tofnbar[MaxHits];    // tof
-  G4int nbarpID[MaxHits];    //parent id
-
-  G4double trvtxxnbar[MaxHits];
-  G4double trvtxynbar[MaxHits];
-  G4double trvtxznbar[MaxHits];
-
-  G4double trvtxpxnbar[MaxHits];
-  G4double trvtxpynbar[MaxHits];
-  G4double trvtxpznbar[MaxHits];
-  G4double trvtxppnbar[MaxHits];
-  G4double lengthnbar[MaxHits];
-
-
-
-
-  ///dc
-  G4int ntdc;                 // Number of Hit in Dcint.
-  G4int tiddc[MaxHits];       // Trdck ID
-  G4int piddc[MaxHits];	    // Particle ID
-  G4int diddc[MaxHits];	    // detector ID
-  G4double massdc[MaxHits];	    // particle mass ID
-  G4int qqdc[MaxHits];	    // particle mass ID
-  G4double xdc[MaxHits];      // coordinates
-  G4double ydc[MaxHits];      // coordinates
-  G4double zdc[MaxHits];      // coordinates
-  G4double pxdc[MaxHits];     // momentum
-  G4double pydc[MaxHits];     // momentum
-  G4double pzdc[MaxHits];     // momentum
-  G4double ppdc[MaxHits];     // momentum
-  G4double tofdc[MaxHits];    // tof
-  G4int dcpID[MaxHits];    //parent id
-
-  G4double trvtxxdc[MaxHits];
-  G4double trvtxydc[MaxHits];
-  G4double trvtxzdc[MaxHits];
-
-  G4double trvtxpxdc[MaxHits];
-  G4double trvtxpydc[MaxHits];
-  G4double trvtxpzdc[MaxHits];
-  G4double trvtxppdc[MaxHits];
-  G4double lengthdc[MaxHits];
-
+  Int_t nhHtof;
+  Int_t tidHtof[MaxHits];
+  Int_t pidHtof[MaxHits];
+  Int_t didHtof[MaxHits];
+  Int_t prtHtof[MaxHits];
+  Int_t qHtof[MaxHits];
+  Double_t massHtof[MaxHits];
+  Double_t xHtof[MaxHits];
+  Double_t yHtof[MaxHits];
+  Double_t zHtof[MaxHits];
+  Double_t pxHtof[MaxHits];
+  Double_t pyHtof[MaxHits];
+  Double_t pzHtof[MaxHits];
+  Double_t ppHtof[MaxHits];
+  Double_t tofHtof[MaxHits];
+  Double_t vtxHtof[MaxHits];
+  Double_t vtyHtof[MaxHits];
+  Double_t vtzHtof[MaxHits];
+  Double_t vtpxHtof[MaxHits];
+  Double_t vtpyHtof[MaxHits];
+  Double_t vtpzHtof[MaxHits];
+  Double_t vtppHtof[MaxHits];
+  Double_t lengthHtof[MaxHits];
+  // SDC
+  Int_t nhSdc;
+  Int_t tidSdc[MaxHits];
+  Int_t pidSdc[MaxHits];
+  Int_t didSdc[MaxHits];
+  Int_t prtSdc[MaxHits];
+  Int_t qSdc[MaxHits];
+  Double_t massSdc[MaxHits];
+  Double_t xSdc[MaxHits];
+  Double_t ySdc[MaxHits];
+  Double_t zSdc[MaxHits];
+  Double_t pxSdc[MaxHits];
+  Double_t pySdc[MaxHits];
+  Double_t pzSdc[MaxHits];
+  Double_t ppSdc[MaxHits];
+  Double_t tofSdc[MaxHits];
+  Double_t vtxSdc[MaxHits];
+  Double_t vtySdc[MaxHits];
+  Double_t vtzSdc[MaxHits];
+  Double_t vtpxSdc[MaxHits];
+  Double_t vtpySdc[MaxHits];
+  Double_t vtpzSdc[MaxHits];
+  Double_t vtppSdc[MaxHits];
+  Double_t lengthSdc[MaxHits];
   // SCH
-  G4int ntsch;                 // Number of Hit in Chint.
-  G4int tidsch[MaxHits];       // Trchk ID
-  G4int pidsch[MaxHits];	    // Particle ID
-  G4int didsch[MaxHits];	    // detector ID
-  G4double masssch[MaxHits];	    // particle mass ID
-  G4int qqsch[MaxHits];	    // particle mass ID
-  G4double xsch[MaxHits];      // coordinates
-  G4double ysch[MaxHits];      // coordinates
-  G4double zsch[MaxHits];      // coordinates
-  G4double pxsch[MaxHits];     // momentum
-  G4double pysch[MaxHits];     // momentum
-  G4double pzsch[MaxHits];     // momentum
-  G4double ppsch[MaxHits];     // momentum
-  G4double tofsch[MaxHits];    // tof
-  G4int schpID[MaxHits];    //parent id
-
-  G4double trvtxxsch[MaxHits];
-  G4double trvtxysch[MaxHits];
-  G4double trvtxzsch[MaxHits];
-
-  G4double trvtxpxsch[MaxHits];
-  G4double trvtxpysch[MaxHits];
-  G4double trvtxpzsch[MaxHits];
-  G4double trvtxppsch[MaxHits];
-  G4double lengthsch[MaxHits];
-
-
-
-  ///ftof
-  G4int ntftof;                 // Number of Hit in Ftofint.
-  G4int tidftof[MaxHits];       // Trftofk ID
-  G4int pidftof[MaxHits];	    // Particle ID
-  G4int didftof[MaxHits];	    // detector ID
-  G4double massftof[MaxHits];	    // particle mass ID
-  G4int qqftof[MaxHits];	    // particle mass ID
-  G4double xftof[MaxHits];      // coordinates
-  G4double yftof[MaxHits];      // coordinates
-  G4double zftof[MaxHits];      // coordinates
-  G4double pxftof[MaxHits];     // momentum
-  G4double pyftof[MaxHits];     // momentum
-  G4double pzftof[MaxHits];     // momentum
-  G4double ppftof[MaxHits];     // momentum
-  G4double tofftof[MaxHits];    // tof
-  G4int ftofpID[MaxHits];    //parent id
-
-  G4double trvtxxftof[MaxHits];
-  G4double trvtxyftof[MaxHits];
-  G4double trvtxzftof[MaxHits];
-
-  G4double trvtxpxftof[MaxHits];
-  G4double trvtxpyftof[MaxHits];
-  G4double trvtxpzftof[MaxHits];
-  G4double trvtxppftof[MaxHits];
-  G4double lengthftof[MaxHits];
-
-  /////////////It does not use in current G4
-  /*  G4int ntfdc;                     // Number of Hit in FDC
-  G4int tidfdc[MaxTrackFDC];       // Track ID
-  G4int pidfdc[MaxTrackFDC];	 // Particle ID
-  G4int didfdc[MaxTrackFDC];	 // detector ID
-  G4double xfdc[MaxTrackFDC];      // coordinates
-  G4double yfdc[MaxTrackFDC];      // coordinates
-  G4double zfdc[MaxTrackFDC];      // coordinates
-  G4double pxfdc[MaxTrackFDC];     // momentum
-  G4double pyfdc[MaxTrackFDC];     // momentum
-  G4double pzfdc[MaxTrackFDC];     // momentum
-  G4double toffdc[MaxTrackFDC];    // tof
-  */
-
-  G4int targethits;                     // Number of Hit in TARGET
-  G4int targetpid[MaxTrack];       // Track ID
-  G4int targetparentid[MaxTrack];	 // Particle ID
-  G4int targettid[MaxTrack];	 // detector ID
-  G4double targetpos[MaxTrack][3];      // coordinates
-  G4double targetvtx[MaxTrack][3];      // coordinates
-
+  Int_t nhSch;
+  Int_t tidSch[MaxHits];
+  Int_t pidSch[MaxHits];
+  Int_t didSch[MaxHits];
+  Int_t prtSch[MaxHits];
+  Int_t qSch[MaxHits];
+  Double_t massSch[MaxHits];
+  Double_t xSch[MaxHits];
+  Double_t ySch[MaxHits];
+  Double_t zSch[MaxHits];
+  Double_t pxSch[MaxHits];
+  Double_t pySch[MaxHits];
+  Double_t pzSch[MaxHits];
+  Double_t ppSch[MaxHits];
+  Double_t tofSch[MaxHits];
+  Double_t vtxSch[MaxHits];
+  Double_t vtySch[MaxHits];
+  Double_t vtzSch[MaxHits];
+  Double_t vtpxSch[MaxHits];
+  Double_t vtpySch[MaxHits];
+  Double_t vtpzSch[MaxHits];
+  Double_t vtppSch[MaxHits];
+  Double_t lengthSch[MaxHits];
+  // FTOF
+  Int_t nhFtof;
+  Int_t tidFtof[MaxHits];
+  Int_t pidFtof[MaxHits];
+  Int_t didFtof[MaxHits];
+  Int_t prtFtof[MaxHits];
+  Int_t qFtof[MaxHits];
+  Double_t massFtof[MaxHits];
+  Double_t xFtof[MaxHits];
+  Double_t yFtof[MaxHits];
+  Double_t zFtof[MaxHits];
+  Double_t pxFtof[MaxHits];
+  Double_t pyFtof[MaxHits];
+  Double_t pzFtof[MaxHits];
+  Double_t ppFtof[MaxHits];
+  Double_t tofFtof[MaxHits];
+  Double_t vtxFtof[MaxHits];
+  Double_t vtyFtof[MaxHits];
+  Double_t vtzFtof[MaxHits];
+  Double_t vtpxFtof[MaxHits];
+  Double_t vtpyFtof[MaxHits];
+  Double_t vtpzFtof[MaxHits];
+  Double_t vtppFtof[MaxHits];
+  Double_t lengthFtof[MaxHits];
 };
 
 //_____________________________________________________________________________
@@ -643,50 +338,17 @@ private:
   TPCAnaManager& operator=( const TPCAnaManager& );
 
 private:
-  std::vector<VHitInfo*> m_htof_hc;
-
-  TargetData targetData[MaxTrack];
   CounterData counterData[MaxTrack];
   TPCData tpcData[MAXtpctrNum];
-  ScintData scintData[MaxHits];
-  ACData acData[MaxHits];
-  NBARData nbarData[MaxHits];
 
-  DCData dcData[MaxHits];
-  SCHData schData[MaxHits];
-  FTOFData ftofData[MaxHits];
-
-  PrimaryBeam primaryBeam;
-  PrimaryParticle primaryParticle;
   PrimaryInfo primaryInfo;
   int HitNum;
-  int HitNumAC;
-  int HitNumNBAR;
-  int HitNumDC;
-  int HitNumFTOF;
-  int HitNumSCH;
-  int HitNumScint;
   int tpctrNum;
-  int HitNumTarget;
 
   int HitNum_K;
-  int HitNumAC_K;
-  int HitNumNBAR_K;
-  int HitNumDC_K;
-  int HitNumFTOF_K;
-  int HitNumSCH_K;
-  int HitNumScint_K;
   //  int tpctrNum_K;
-  int HitNumTarget_K;
 
   int HitNum_p;
-  int HitNumAC_p;
-  int HitNumNBAR_p;
-  int HitNumDC_p;
-  int HitNumFTOF_p;
-  int HitNumSCH_p;
-  int HitNumScint_p;  //  int tpctrNum_K;
-  int HitNumTarget_p;
 
   // G4double vtxxfit[MAXtpctrNum];//read fit parameters
   // G4double vtxyfit[MAXtpctrNum];//read fit parameters
@@ -715,7 +377,6 @@ private:
   G4double pad_out_num;
   G4double truncated_mean_cut;
   G4int trigger_env;
-  G4double target_pos_z;
   G4int env_on_off_helm;
   G4double env_helm_field;
   G4int env_pad_config;
@@ -740,10 +401,10 @@ private:
   G4double tpc_rad;
 
 public:
-  void BeginOfRunAction(int runnum);
-  void EndOfRunAction();
-  void BeginOfEventAction();
-  int  EndOfEventAction();
+  void BeginOfRunAction( G4int runnum );
+  void EndOfRunAction( void );
+  void BeginOfEventAction( void );
+  int  EndOfEventAction( void );
 
   void SetTPCData(G4int tpctr, G4int tpcpid, G4int tpcparentid, G4int tpcparentid_pid, G4double tpcpx, G4double tpcpy,G4double tpcpz,G4double tpcpp,  G4int tpcqq, G4double tpcpm, G4double tpcde, G4double tpclen, G4int tpclay,
 		  G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
@@ -754,52 +415,26 @@ public:
 		      G4int iLay, G4int iRow, G4double beta, G4double edep,
 		      G4int parentid, G4double tlength, G4double slength);
   void SetHTOFData( VHitInfo* hit );
-  void SetTargetData( G4int nhits, G4ThreeVector pos, G4ThreeVector mom,
-		      G4int track, G4int particle,
-		      G4int parentid, G4ThreeVector vtxpos,
-		      G4ThreeVector vtxmom, G4double vtxene );
+  void SetFTOFData( VHitInfo* hit );
+  void SetSCHData( VHitInfo* hit );
+  void SetSDCData( VHitInfo* hit );
+  void SetTargetData( VHitInfo* hit );
 
   //  void SetCounterData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
   //		      G4int track, G4int particle, G4int ilay, G4int iRaw);
-  void SetScintData( G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		     G4int track, G4int particle, G4int detector,
-		     G4double mass, G4int qq,G4int parentid,
-		     G4ThreeVector vtxpos, G4ThreeVector vtxmom,
-		     G4double vtxene, G4double tlength );
-  void SetACData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		 G4int track, G4int particle, G4int detector,G4double mass, G4int qq,G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
-
-
-  void SetNBARData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		   G4int track, G4int particle, G4int detector,G4double mass, G4int qq,G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
-
-
-  void SetDCData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		 G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
-		 G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
-
-  void SetSCHData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		  G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
-		  G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
-
-  void SetFTOFData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		   G4int track, G4int particle, G4int detector,G4double mass, G4int qq,
-		   G4int parentid, G4ThreeVector vtxpos, G4ThreeVector vtxmom, G4double vtxene, G4double tlength);
-
-  //  void SetFDCData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-  //				 G4int track, G4int particle, G4int detector);
   void SetPrimaryBeam( const G4ThreeVector& p );
   void SetPrimaryBeam( G4double px, G4double py, G4double pz );
 
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);
 
-  void SetNumberOfPrimaryParticle(G4int num);
-  void SetPrimaryParticle(G4double px, G4double py, G4double pz);
-  void SetPrimaryParticle(G4int id, G4double px, G4double py, G4double pz, G4double mass);
-  void SetPrimaryParticle(G4int id, G4double px, G4double py, G4double pz, G4double mass, G4int pid0);
-  void SetPrimaryVertex(G4int id, G4double x, G4double y, G4double z);
-  void SetPrimaryInfo(G4double mm_d, G4double mm_p, G4double theta, G4double theta_scat, G4double theta_cm);
+  void SetNumberOfPrimaryParticle( G4int n );
+  void SetPrimaryParticle( G4double px, G4double py, G4double pz );
+  void SetPrimaryParticle( G4int id, G4double px, G4double py, G4double pz,
+			   G4double mass, G4int pid=-9999 );
+  void SetPrimaryVertex( G4int id, G4double x, G4double y, G4double z );
+  void SetPrimaryInfo( G4double mm_d, G4double mm_p, G4double theta,
+		       G4double theta_scat, G4double theta_cm );
 
   //int CircleIntersect(double x1, double y1, double r1, double x2, double y2, double r2, double inter1[2], double inter2[2])
   int CircleIntersect(double x1, double y1, double r1, double x2, double y2, double r2,

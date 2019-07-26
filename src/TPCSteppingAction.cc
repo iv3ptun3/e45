@@ -70,7 +70,8 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
     return;
   }
 
-  //  G4cout<<"end stepping action:"<<prePVName<<G4endl;
+  if( prePVName.contains( "Target" ) )
+    G4cout<<"end stepping action = "<<prePVName<<G4endl;
   //  G4StepPoint * thePostPoint = theStep->GetPostStepPoint();
   //  G4VPhysicalVolume * thePostPV = thePostPoint->GetPhysicalVolume();
   //  G4String thePostPVname = thePostPV->GetName();

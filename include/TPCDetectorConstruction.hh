@@ -13,7 +13,7 @@ class G4Element;
 class G4Material;
 class G4LogicalVolume;
 class G4PVPlacement;
-class TPCDCSD;
+class TPCSDCSD;
 
 //_____________________________________________________________________________
 class TPCDetectorConstruction : public G4VUserDetectorConstruction
@@ -31,7 +31,7 @@ private:
   G4LogicalVolume*                m_tpc_lv;
   G4double                        m_rotation_angle;
   G4RotationMatrix*               m_rotation_matrix;
-  TPCDCSD*                        m_dc_sd;
+  TPCSDCSD*                       m_sdc_sd;
 
 private:
   virtual G4VPhysicalVolume* Construct( void );

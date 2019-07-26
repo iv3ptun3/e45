@@ -1,33 +1,33 @@
 // -*- C++ -*-
 
-#include "TPCTargetHit.hh"
+#include "TPCSDCHit.hh"
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <G4Step.hh>
 
-G4Allocator<TPCTargetHit> TPCTargetHitAllocator;
+G4Allocator<TPCSDCHit> TPCSDCHitAllocator;
 
 //_____________________________________________________________________________
-TPCTargetHit::TPCTargetHit( const G4String& name, G4Step* step )
+TPCSDCHit::TPCSDCHit( const G4String& name, G4Step* step )
   : G4VHit(),
     VHitInfo( name, step )
 {
 }
 
 //_____________________________________________________________________________
-TPCTargetHit::~TPCTargetHit( void )
+TPCSDCHit::~TPCSDCHit( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetHit::Draw( void )
+TPCSDCHit::Draw( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetHit::Print( void )
+TPCSDCHit::Print( void )
 {
   VHitInfo::Print();
 }

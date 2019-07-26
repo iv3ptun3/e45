@@ -15,11 +15,12 @@ class G4TouchableHistory;
 class TPCTargetSD : public G4VSensitiveDetector
 {
 public:
+  static G4String ClassName( void );
   TPCTargetSD( const G4String& name );
   virtual ~TPCTargetSD( void );
 
 private:
-  G4THitsCollection<TPCTargetHit>* hitsCollection;
+  G4THitsCollection<TPCTargetHit>* m_hits_collection;
 
 public:
   G4int ntrk;
@@ -30,5 +31,13 @@ public:
   virtual void   PrintAll( void );
 
 };
+
+//_____________________________________________________________________________
+inline G4String
+TPCTargetSD::ClassName( void )
+{
+  static G4String s_name("TPCTargetSD");
+  return s_name;
+}
 
 #endif

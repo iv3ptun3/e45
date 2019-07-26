@@ -1,6 +1,6 @@
 // -*- C++ -*-
 
-#include "TPCHTOFSD.hh"
+#include "TPCSDCSD.hh"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -9,10 +9,10 @@
 #include <G4VTouchable.hh>
 
 #include "FuncName.hh"
-#include "TPCHTOFHit.hh"
+#include "TPCSDCHit.hh"
 
 //_____________________________________________________________________________
-TPCHTOFSD::TPCHTOFSD( const G4String& name )
+TPCSDCSD::TPCSDCSD( const G4String& name )
   : G4VSensitiveDetector( name ),
     m_hits_collection()
 {
@@ -20,22 +20,22 @@ TPCHTOFSD::TPCHTOFSD( const G4String& name )
 }
 
 //_____________________________________________________________________________
-TPCHTOFSD::~TPCHTOFSD( void )
+TPCSDCSD::~TPCSDCSD( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCHTOFSD::Initialize( G4HCofThisEvent* HCTE )
+TPCSDCSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  m_hits_collection = new G4THitsCollection<TPCHTOFHit>( SensitiveDetectorName,
-							 collectionName[0] );
+  m_hits_collection = new G4THitsCollection<TPCSDCHit>( SensitiveDetectorName,
+							collectionName[0] );
   HCTE->AddHitsCollection( GetCollectionID(0), m_hits_collection );
 }
 
 //_____________________________________________________________________________
 G4bool
-TPCHTOFSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
+TPCSDCSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
   const auto preStepPoint = aStep->GetPreStepPoint();
   const auto aTrack = aStep->GetTrack();
@@ -62,26 +62,26 @@ TPCHTOFSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   // if( particleType == "lepton" )
   //   return false;
 
-  m_hits_collection->insert( new TPCHTOFHit( SensitiveDetectorName, aStep ) );
+  m_hits_collection->insert( new TPCSDCHit( SensitiveDetectorName, aStep ) );
 
   return true;
 }
 
 //_____________________________________________________________________________
 void
-TPCHTOFSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
+TPCSDCSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCHTOFSD::DrawAll( void )
+TPCSDCSD::DrawAll( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCHTOFSD::PrintAll( void )
+TPCSDCSD::PrintAll( void )
 {
   m_hits_collection->PrintAllHits();
 }

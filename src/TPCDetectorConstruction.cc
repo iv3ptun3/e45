@@ -29,14 +29,13 @@
 #include "FuncName.hh"
 #include "MathTools.hh"
 #include "TPCACSD.hh"
-#include "TPCDCSD.hh"
 #include "TPCField.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCNBARSD.hh"
 #include "TPCHTOFSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCSCHSD.hh"
-#include "TPCScintSD.hh"
+#include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
 
 namespace
@@ -72,7 +71,7 @@ TPCDetectorConstruction::TPCDetectorConstruction( void )
     m_tpc_lv(),
     m_rotation_angle( gConf.Get<Double_t>("SpectrometerAngle")*deg ),
     m_rotation_matrix( new G4RotationMatrix ),
-    m_dc_sd()
+    m_sdc_sd()
 {
   m_rotation_matrix->rotateY( - m_rotation_angle );
 }
@@ -333,7 +332,6 @@ TPCDetectorConstruction::ConstructFTOF( void )
 					 "FtofSegmentLV" );
   for( G4int i=0; i<NumOfSegTOF; ++i ){
     segment_lv->SetVisAttributes( G4Colour::Cyan() );
-    // segment_lv->SetUserLimits( new G4UserLimits( maxStep ) );
     segment_lv->SetSensitiveDetector( ftofSD );
     pos = G4ThreeVector( ( -NumOfSegTOF/2 + i )*pitch,
 			 0.0,
@@ -1692,9 +1690,9 @@ TPCDetectorConstruction::ConstructSCH( void )
 void
 TPCDetectorConstruction::ConstructSDC1( void )
 {
-  if( !m_dc_sd ){
-    m_dc_sd = new TPCDCSD("/DC");
-    G4SDManager::GetSDMpointer()->AddNewDetector( m_dc_sd );
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
   }
 
   const auto& sdc1_pos = ( gGeom.GetGlobalPosition("KURAMA") +
@@ -1795,7 +1793,7 @@ TPCDetectorConstruction::ConstructSDC1( void )
 		       101+i );
   }
   for(G4int i = 0; i<6; i++){
-    DC1Plane_log[i]->SetSensitiveDetector( m_dc_sd );
+    DC1Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
   }
 }
 
@@ -1803,9 +1801,9 @@ TPCDetectorConstruction::ConstructSDC1( void )
 void
 TPCDetectorConstruction::ConstructSDC2( void )
 {
-  if( !m_dc_sd ){
-    m_dc_sd = new TPCDCSD("/DC");
-    G4SDManager::GetSDMpointer()->AddNewDetector( m_dc_sd );
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
   }
 
   const auto& sdc2_pos = ( gGeom.GetGlobalPosition("KURAMA") +
@@ -1884,7 +1882,7 @@ TPCDetectorConstruction::ConstructSDC2( void )
   }
 
   for( G4int i = 0; i<4; ++i ){
-    DC2Plane_log[i]->SetSensitiveDetector( m_dc_sd );
+    DC2Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
   }
 }
 
@@ -1892,9 +1890,9 @@ TPCDetectorConstruction::ConstructSDC2( void )
 void
 TPCDetectorConstruction::ConstructSDC3( void )
 {
-  if( !m_dc_sd ){
-    m_dc_sd = new TPCDCSD("/DC");
-    G4SDManager::GetSDMpointer()->AddNewDetector( m_dc_sd );
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
   }
 
   const auto& sdc3_pos = ( gGeom.GetGlobalPosition("KURAMA") +
@@ -1978,7 +1976,7 @@ TPCDetectorConstruction::ConstructSDC3( void )
 		       131+i );
   }
   for( G4int i = 0; i<4; ++i ){
-    DC3Plane_log[i]->SetSensitiveDetector( m_dc_sd );
+    DC3Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
   }
 }
 
@@ -2185,11 +2183,11 @@ TPCDetectorConstruction::ConstructTarget( void )
   new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
 		     m_world_lv, true, 0 );
   holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
-				   "TargetHolderLV");
+  				   "TargetHolderLV");
   holder_lv->SetVisAttributes( G4Colour::Blue() );
   new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
-		     m_world_lv, true, 0 );
-  auto target_sd = new TPCTargetSD( "/TAR" );
+  		     m_tpc_lv, true, 0 );
+  auto target_sd = new TPCTargetSD( "/TGT" );
   G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
   target_lv->SetSensitiveDetector( target_sd );
 }

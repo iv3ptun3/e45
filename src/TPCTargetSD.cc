@@ -8,11 +8,13 @@
 #include <G4VPhysicalVolume.hh>
 #include <G4VTouchable.hh>
 
+#include "FuncName.hh"
 #include "TPCTargetHit.hh"
 
 //_____________________________________________________________________________
 TPCTargetSD::TPCTargetSD( const G4String& name )
-  : G4VSensitiveDetector( name )
+  : G4VSensitiveDetector( name ),
+    m_hits_collection()
 {
   collectionName.insert("hit");
 }
@@ -26,85 +28,50 @@ TPCTargetSD::~TPCTargetSD( void )
 void
 TPCTargetSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  hitsCollection = new G4THitsCollection<TPCTargetHit>( SensitiveDetectorName,
-							collectionName[0] );
-  G4int hcid = GetCollectionID(0);
-  HCTE->AddHitsCollection( hcid, hitsCollection );
+  m_hits_collection =
+    new G4THitsCollection<TPCTargetHit>( SensitiveDetectorName,
+					 collectionName[0] );
+  HCTE->AddHitsCollection( GetCollectionID(0), m_hits_collection );
 }
 
 //_____________________________________________________________________________
 G4bool
 TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
-  const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
-  const G4Track* aTrack = aStep->GetTrack();
+  // const auto preStepPoint = aStep->GetPreStepPoint();
+  const auto aTrack = aStep->GetTrack();
+  const auto Definition = aTrack->GetDefinition();
+  const G4String particleName = Definition->GetParticleName();
+  const G4String particleType = Definition->GetParticleType();
 
-  //  if(preStepPoint-> GetStepStatus() != fGeomBoundary) return false;
-
-  G4String particleName;
-  if(aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge() == 0.)
-    return false;
-  particleName = aStep-> GetTrack()-> GetDefinition()-> GetParticleName();
-
-  G4String particleType;
-  particleType = aTrack->GetDefinition()->GetParticleType();
-
-  ///lepton rejection
-  if(particleType == "lepton")
+  // if( preStepPoint->GetStepStatus() != fGeomBoundary )
+  //   return false;
+  if( Definition->GetPDGCharge() == 0. )
     return false;
 
+  // if( particleName == "e-" )
+  //   return false;
+  // if( particleName == "e+" )
+  //   return false;
+  // if( particleName != "kaon+" )
+  //   return false;
+  // if( particleName != "pi-" && particleName != "pi+" )
+  //   return false;
+  // if( particleName != "pi+" && particleName != "pi-" &&
+  //     particleName != "proton" )
+  //   return false;
 
-  //  G4cout<<"test2"<<G4endl;
+  if( particleType == "lepton" )
+    return false;
 
-  G4TouchableHistory* theTouchable
-    = (G4TouchableHistory*)(aStep->GetPreStepPoint()->GetTouchable());
-  G4VPhysicalVolume* physVol = theTouchable->GetVolume();
+  m_hits_collection->insert( new TPCTargetHit( SensitiveDetectorName, aStep ) );
 
-
-  //  G4cout<<"test3"<<G4endl;
-  G4ThreeVector pos= preStepPoint-> GetPosition();
-  G4ThreeVector VertexPosition = aTrack->GetVertexPosition();
-
-  G4ThreeVector VertexMomentum = aTrack->GetVertexMomentumDirection();
-  G4double VertexEnergy = aTrack -> GetVertexKineticEnergy(); // Ek = sqrt(p^2+m^2)-m
-
-  //  G4cout<<"test4"<<G4endl;
-
-  G4ThreeVector mom= preStepPoint-> GetMomentum();
-  // G4double tof= preStepPoint-> GetGlobalTime();
-  // G4double beta= preStepPoint-> GetBeta();
-  G4int tid =  aStep-> GetTrack()-> GetTrackID();
-  G4int pid =  aStep-> GetTrack()-> GetDefinition() -> GetPDGEncoding();
-  G4double mass = aStep -> GetTrack()->GetDynamicParticle()->GetMass();
-  G4int charge = aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge();
-  // G4double edep = aStep->GetTotalEnergyDeposit();
-  // G4double tlength = aStep->GetTrack()-> GetTrackLength();
-  G4int parentID =  aStep-> GetTrack()-> GetParentID();
-
-  //  G4cout<<"test1"<<G4endl;
-
-  ////kinetic energy (2012. 6. 30.)
-  //  G4ThreeVector momentum = aTrack->GetMomentum();
-  //  G4double kinEnergy     = aTrack->GetKineticEnergy();
-  //  G4double kinEnergy     = aTrack->GetKinEnergy();
-  G4double kinEnergy     = aTrack->GetKineticEnergy();
-  //  G4double globalTime    = track->GetGlobalTime();
-
-  //  G4cout<<pid<<":"<<kinEnergy<<G4endl;
-  G4String name = physVol->GetName();
-
-  TPCTargetHit* ahit= new TPCTargetHit( pos, mom, tid, pid, parentID,
-					mass, charge, VertexPosition,
-					VertexMomentum, VertexEnergy, kinEnergy );
-
-  hitsCollection-> insert(ahit);
   return true;
-
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetSD::EndOfEvent(G4HCofThisEvent* /* HCTE */ )
+TPCTargetSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
@@ -118,5 +85,5 @@ TPCTargetSD::DrawAll( void )
 void
 TPCTargetSD::PrintAll( void )
 {
-  hitsCollection-> PrintAllHits();
+  m_hits_collection->PrintAllHits();
 }

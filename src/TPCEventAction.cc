@@ -18,14 +18,13 @@
 #include "ConfMan.hh"
 #include "FuncName.hh"
 #include "TPCAnaManager.hh"
-#include "TPCScintSD.hh"
 #include "TPCACSD.hh"
-#include "TPCDCSD.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCHTOFSD.hh"
 #include "TPCNBARSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCSCHSD.hh"
+#include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
 
 namespace
@@ -230,155 +229,61 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  static const G4int id_scint = SDManager-> GetCollectionID("HTOF/hit");
-  if( id_scint > 0 ){
-    const auto HC = (G4THitsCollection<TPCHTOFHit>*)HCTE->GetHC( id_scint );
-    G4int nhits = HC->entries();
-    for( G4int i=0; i<nhits; ++i ){
-      auto hit = (*HC)[i];
-      gAnaMan.SetHTOFData( hit );
+  static const G4int id_target = SDManager->GetCollectionID("TGT/hit");
+  if( id_target >= 0 ){
+    const auto HC = (G4THitsCollection<TPCTargetHit>*)HCTE->GetHC( id_target );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetTargetData( (*HC)[i] );
     }
   }
 
-  if( gConf.Get<G4int>( "UseAC" ) == 1. ){
-    static const G4int id_ac = SDManager->GetCollectionID("AC/hit");
-    if( id_ac > 0 ){
-      auto acHC = (G4THitsCollection<TPCACHit>*)HCTE->GetHC( id_ac );
-      G4int nhits= acHC -> entries();
-      for(G4int i=0; i< nhits; i++) {
-	G4ThreeVector vtxpos = (*acHC)[i]-> GetVtxPosition();
-	G4ThreeVector vtxmom = (*acHC)[i]-> GetVtxMomentum();
-	G4double vtxene =(*acHC)[i]-> GetVtxEnergy();
-	G4ThreeVector xyz = (*acHC)[i]-> GetPosition();
-	G4ThreeVector mom = (*acHC)[i]-> GetMomentum();
-	G4int ptid = (*acHC)[i]-> GetParentID();
-	G4double tof= (*acHC)[i]-> GetTOF();
-	G4int tid = (*acHC)[i]-> GetTrackID();
-	G4int pid = (*acHC)[i]-> GetParticleID();
-	G4int did = (*acHC)[i]-> GetDetectorID();
-	G4double mass = (*acHC)[i]-> GetParticleMassID();
-	G4int qq = (*acHC)[i]-> GetParticleQqID();
-	G4double tlength = (*acHC)[i]-> GetLength();
-	gAnaMan.SetACData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-      }
+  static const G4int id_htof = SDManager-> GetCollectionID("HTOF/hit");
+  if( id_htof >= 0 ){
+    const auto HC = (G4THitsCollection<TPCHTOFHit>*)HCTE->GetHC( id_htof );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetHTOFData( (*HC)[i] );
     }
   }
 
-  static const G4int id_nbar = SDManager-> GetCollectionID("NBAR/hit");
-  if( id_nbar > 0 && gConf.Get<G4int>( "UseNBar" ) == 1. ){
-    auto nbarHC = (G4THitsCollection<TPCNBARHit>*)HCTE->GetHC( id_nbar );
-    G4int nhits = nbarHC->entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4ThreeVector vtxpos = (*nbarHC)[i]-> GetVtxPosition();
-      G4ThreeVector vtxmom = (*nbarHC)[i]-> GetVtxMomentum();
-      G4double vtxene =(*nbarHC)[i]-> GetVtxEnergy();
-      G4ThreeVector xyz = (*nbarHC)[i]-> GetPosition();
-      G4ThreeVector mom = (*nbarHC)[i]-> GetMomentum();
-      G4int ptid = (*nbarHC)[i]-> GetParentID();
-      G4double tof= (*nbarHC)[i]-> GetTOF();
-      G4int tid = (*nbarHC)[i]-> GetTrackID();
-      G4int pid = (*nbarHC)[i]-> GetParticleID();
-      G4int did = (*nbarHC)[i]-> GetDetectorID();
-      G4double mass = (*nbarHC)[i]-> GetParticleMassID();
-      G4int qq = (*nbarHC)[i]-> GetParticleQqID();
-      G4double tlength = (*nbarHC)[i]-> GetLength();
-      gAnaMan.SetNBARData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+  // static const G4int id_nbar = SDManager-> GetCollectionID("NBAR/hit");
+  // if( id_nbar >= 0 ){
+  //   const auto HC = (G4THitsCollection<TPCNBARHit>*)HCTE->GetHC( id_nbar );
+  //   for( G4int i=0, n=HC->entries(); i<n; ++i ){
+  //     gAnaMan.SetNbarData( (*HC)[i] );
+  //   }
+  // }
+
+  // if( gConf.Get<G4int>( "UseAC" ) == 1. ){
+  //   static const G4int id_ac = SDManager->GetCollectionID("AC/hit");
+  //   if( id_ac >= 0 ){
+  //     const auto HC = (G4THitsCollection<TPCACHit>*)HCTE->GetHC( id_ac );
+  //     for( G4int i=0, n=HC->entries(); i<n; ++i ){
+  // 	gAnaMan.SetACData( (*HC)[i] );
+  //     }
+  //   }
+  // }
+
+  static const G4int id_sdc = SDManager-> GetCollectionID("SDC/hit");
+  if( id_sdc >= 0 ){
+    const auto HC = (G4THitsCollection<TPCSDCHit>*)HCTE->GetHC( id_sdc );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetSDCData( (*HC)[i] );
     }
   }
 
-  static const G4int id_target = SDManager->GetCollectionID("TAR/hit");
-  if( id_target > 0 ){
-    auto targetHC = (G4THitsCollection<TPCTargetHit>*)HCTE->GetHC( id_target );
-    G4int nhits = targetHC->entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4double kinene =(*targetHC)[i]-> GetKinEnergy();;
-      G4ThreeVector mom = (*targetHC)[i]-> GetMomentum();
-      G4double test= sqrt(pow(mom.getX(),2)+pow(mom.getY(),2)+pow(mom.getZ(),2));
-      if(kinene==0.00000000000000000000 && test != 0.  ){
-	G4ThreeVector vtxpos = (*targetHC)[i]-> GetVtxPosition();
-	G4ThreeVector vtxmom = (*targetHC)[i]-> GetVtxMomentum();
-	G4double vtxene =(*targetHC)[i]-> GetVtxEnergy();
-	G4ThreeVector xyz = (*targetHC)[i]-> GetPosition();
-	// G4double tof= (*targetHC)[i]-> GetTOF();
-	G4int tid = (*targetHC)[i]-> GetTrackID();
-	G4int ptid = (*targetHC)[i]-> GetParentID();
-	G4int pid = (*targetHC)[i]-> GetParticleID();
-	// G4double mass = (*targetHC)[i]-> GetMass();
-	// G4int charge = (*targetHC)[i]-> GetCharge();
-	// // G4double mass = (*targetHC)[i]-> GetPDGMass(); //mass(GeV)
-	// G4int parentid = (*targetHC)[i]-> GetParentID();
-	// G4double tlength = (*targetHC)[i]-> GettLength();
-	// G4int irow=0.;
-	// G4double beta = (*targetHC)[i]-> GetBeta();
-	// G4double edep = (*targetHC)[i]-> GetEdep();
-	gAnaMan.SetTargetData(i,xyz, mom, tid, pid,ptid,vtxpos,vtxmom,vtxene);
-      }
+  static const G4int id_sch = SDManager-> GetCollectionID("SCH/hit");
+  if( id_sch >= 0 ){
+    const auto HC = (G4THitsCollection<TPCSCHHit>*)HCTE->GetHC( id_sch );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetSCHData( (*HC)[i] );
     }
   }
 
-  static const G4int id_dc = SDManager->GetCollectionID("DC/hit");
-  if( id_dc > 0 ){
-    auto dcHC = (G4THitsCollection<TPCDCHit>*)HCTE->GetHC( id_dc );
-    G4int nhits= dcHC -> entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4ThreeVector vtxpos = (*dcHC)[i]-> GetVtxPosition();
-      G4ThreeVector vtxmom = (*dcHC)[i]-> GetVtxMomentum();
-      G4double vtxene =(*dcHC)[i]-> GetVtxEnergy();
-      G4ThreeVector xyz = (*dcHC)[i]-> GetPosition();
-      G4ThreeVector mom = (*dcHC)[i]-> GetMomentum();
-      G4int ptid = (*dcHC)[i]-> GetParentID();
-      G4double tof= (*dcHC)[i]-> GetTOF();
-      G4int tid = (*dcHC)[i]-> GetTrackID();
-      G4int pid = (*dcHC)[i]-> GetParticleID();
-      G4int did = (*dcHC)[i]-> GetDetectorID();
-      G4double mass = (*dcHC)[i]-> GetParticleMassID();
-      G4int qq = (*dcHC)[i]-> GetParticleQqID();
-      G4double tlength = (*dcHC)[i]-> GetLength();
-      gAnaMan.SetDCData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-    }
-  }
-
-  static const G4int id_ch = SDManager->GetCollectionID("SCH/hit");
-  if( id_ch > 0 ){
-    auto chHC = (G4THitsCollection<TPCSCHHit>*)HCTE->GetHC( id_ch );
-    G4int nhits= chHC -> entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4ThreeVector vtxpos = (*chHC)[i]-> GetVtxPosition();
-      G4ThreeVector vtxmom = (*chHC)[i]-> GetVtxMomentum();
-      G4double vtxene =(*chHC)[i]-> GetVtxEnergy();
-      G4ThreeVector xyz = (*chHC)[i]-> GetPosition();
-      G4ThreeVector mom = (*chHC)[i]-> GetMomentum();
-      G4int ptid = (*chHC)[i]-> GetParentID();
-      G4double tof= (*chHC)[i]-> GetTOF();
-      G4int tid = (*chHC)[i]-> GetTrackID();
-      G4int pid = (*chHC)[i]-> GetParticleID();
-      G4int did = (*chHC)[i]-> GetDetectorID();
-      G4double mass = (*chHC)[i]-> GetParticleMassID();
-      G4int qq = (*chHC)[i]-> GetParticleQqID();
-      G4double tlength = (*chHC)[i]-> GetLength();
-      gAnaMan.SetSCHData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
-    }
-  }
-
-  static const G4int id_ftof = SDManager->GetCollectionID("FTOF/hit");
-  if( id_ftof > 0 ){
-    auto ftofHC = (G4THitsCollection<TPCFTOFHit>*)HCTE->GetHC( id_ftof );
-    G4int nhits = ftofHC->entries();
-    for(G4int i=0; i< nhits; i++) {
-      G4ThreeVector vtxpos = (*ftofHC)[i]-> GetVtxPosition();
-      G4ThreeVector vtxmom = (*ftofHC)[i]-> GetVtxMomentum();
-      G4double vtxene =(*ftofHC)[i]-> GetVtxEnergy();
-      G4ThreeVector xyz = (*ftofHC)[i]-> GetPosition();
-      G4ThreeVector mom = (*ftofHC)[i]-> GetMomentum();
-      G4int ptid = (*ftofHC)[i]-> GetParentID();
-      G4double tof= (*ftofHC)[i]-> GetTOF();
-      G4int tid = (*ftofHC)[i]-> GetTrackID();
-      G4int pid = (*ftofHC)[i]-> GetParticleID();
-      G4int did = (*ftofHC)[i]-> GetDetectorID();
-      G4double mass = (*ftofHC)[i]-> GetParticleMassID();
-      G4int qq = (*ftofHC)[i]-> GetParticleQqID();
-      G4double tlength = (*ftofHC)[i]-> GetLength();
-      gAnaMan.SetFTOFData(tof, xyz, mom, tid, pid,did,mass,qq,ptid,vtxpos,vtxmom,vtxene,tlength);
+  static const G4int id_ftof = SDManager-> GetCollectionID("FTOF/hit");
+  if( id_ftof >= 0 ){
+    const auto HC = (G4THitsCollection<TPCFTOFHit>*)HCTE->GetHC( id_ftof );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetFTOFData( (*HC)[i] );
     }
   }
 
