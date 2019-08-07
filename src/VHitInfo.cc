@@ -11,6 +11,7 @@
 //_____________________________________________________________________________
 VHitInfo::VHitInfo( const G4String& name, G4Step* step )
   : m_detector_name( name ),
+    m_particle_name(),
     m_position(),
     m_momentum(),
     m_time(),
@@ -18,6 +19,7 @@ VHitInfo::VHitInfo( const G4String& name, G4Step* step )
     m_track_id(),
     m_particle_id(),
     m_detector_id(),
+    m_step_length(),
     m_mass(),
     m_charge(),
     m_parent_id(),
@@ -29,6 +31,7 @@ VHitInfo::VHitInfo( const G4String& name, G4Step* step )
   if( step ){
     const auto track = step->GetTrack();
     const auto point = step->GetPreStepPoint();
+    m_particle_name = track->GetDefinition()->GetParticleName();
     m_position = point->GetPosition();
     m_momentum = point->GetMomentum();
     m_time = point->GetGlobalTime();
@@ -36,6 +39,7 @@ VHitInfo::VHitInfo( const G4String& name, G4Step* step )
     m_track_id = track->GetTrackID();
     m_particle_id = track->GetDefinition()->GetPDGEncoding();
     m_detector_id = point->GetPhysicalVolume()->GetCopyNo();
+    m_step_length = step->GetStepLength();
     m_mass = track->GetDynamicParticle()->GetMass();
     m_charge = track->GetDynamicParticle()->GetCharge();
     m_parent_id = track->GetParentID();
@@ -57,6 +61,7 @@ VHitInfo::Print( void ) const
 {
   PrintHelper helper( 3, std::ios::fixed, G4cout );
   G4cout << FUNC_NAME << " " << m_detector_name << G4endl
+	 << "   ParticleName        = " << m_particle_name << G4endl
 	 << "   Position            = " << m_position*(1/CLHEP::mm)
 	 << " mm" << G4endl
 	 << "   Momentum            = " << m_momentum*(1/CLHEP::GeV)
@@ -67,7 +72,10 @@ VHitInfo::Print( void ) const
 	 << "   TrackID             = " << m_track_id << G4endl
 	 << "   ParticleID          = " << m_particle_id << G4endl
 	 << "   DetectorID          = " << m_detector_id << G4endl
-	 << "   Mass                = " << m_mass/CLHEP::MeV << " MeV" << G4endl
+	 << "   StepLength          = " << m_step_length/CLHEP::mm
+	 << " mm" << G4endl
+	 << "   Mass                = " << m_mass/CLHEP::MeV
+	 << " MeV" << G4endl
 	 << "   Charge              = " << m_charge << G4endl
 	 << "   ParentID            = " << m_parent_id << G4endl
 	 << "   TrackLength         = " << m_track_length/CLHEP::mm

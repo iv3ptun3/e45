@@ -55,15 +55,14 @@ extern G4Allocator<TPCTargetHit> TPCTargetHitAllocator;
 inline void*
 TPCTargetHit::operator new( size_t )
 {
-  void* aHit = (void*)TPCTargetHitAllocator.MallocSingle();
-  return aHit;
+  return TPCTargetHitAllocator.MallocSingle();
 }
 
 //_____________________________________________________________________________
 inline void
 TPCTargetHit::operator delete( void* aHit )
 {
-  TPCTargetHitAllocator.FreeSingle( (TPCTargetHit*) aHit );
+  TPCTargetHitAllocator.FreeSingle( static_cast<TPCTargetHit*>( aHit ) );
 }
 
 #endif

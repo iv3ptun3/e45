@@ -1,39 +1,33 @@
 // -*- C++ -*-
 
-#ifndef TPC_PAD_SD_HH
-#define TPC_PAD_SD_HH
+#ifndef TPC_WC_SD_HH
+#define TPC_WC_SD_HH
 
 #include <G4VSensitiveDetector.hh>
 
-#include "TPCPadHit.hh"
+#include "TPCWCHit.hh"
 
 class G4HCofThisEvent;
 class G4Step;
 class G4TouchableHistory;
 
 //_____________________________________________________________________________
-class TPCPadSD : public G4VSensitiveDetector
+class TPCWCSD : public G4VSensitiveDetector
 {
 public:
   static G4String ClassName( void );
-  TPCPadSD( const G4String& name );
-  virtual ~TPCPadSD( void );
+  TPCWCSD( const G4String& name );
+  virtual ~TPCWCSD( void );
 
 private:
-  G4THitsCollection<TPCPadHit>* hitsCollection;
-  G4double select_plane;
-  G4int num_plane;
-  G4int num_deadarea;
-  G4int select_dead;
-
-  G4int m_gem_discharge;
-  G4int m_gem_fix_dead;
-  G4int m_gem_dead_plane;
-  G4int m_gem_dead_plane_division;
-  G4double m_dead_area;
+  G4THitsCollection<TPCWCHit>* m_hits_collection;
+  G4double                     m_refractive_index;
 
 public:
-  G4int ntrk;
+  G4double GetRefractiveIndex( void ) const { return m_refractive_index; }
+  void     SetRefractiveIndex( G4double index ){ m_refractive_index = index; }
+
+public:
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );
   virtual void   Initialize( G4HCofThisEvent* HCTE );
   virtual void   EndOfEvent( G4HCofThisEvent* HCTE );
@@ -43,9 +37,10 @@ public:
 
 //_____________________________________________________________________________
 inline G4String
-TPCPadSD::ClassName( void )
+TPCWCSD::ClassName( void )
 {
-  static G4String s_name("TPCPadSD");
+  static G4String s_name("TPCWCSD");
   return s_name;
 }
+
 #endif

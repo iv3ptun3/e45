@@ -40,20 +40,20 @@ G4bool
 ConfMan::Initialize( void )
 {
   if( m_is_ready ){
-    std::cerr << "#W " << FUNC_NAME
-	      << " already initialied" << std::endl;
+    G4cerr << FUNC_NAME
+	   << " already initialied" << G4endl;
     return false;
   }
 
   std::ifstream ifs( m_file[m_conf_key] );
   if( !ifs.is_open() ){
-    std::cerr << "#E " << FUNC_NAME
-	      << " cannot open file : " << m_file[m_conf_key] << std::endl;
+    G4cerr << FUNC_NAME
+	   << " cannot open file : " << m_file[m_conf_key] << G4endl;
     return false;
   }
 
-  std::cout << "#D " << FUNC_NAME << std::endl
-	      << " open file : " << m_file[m_conf_key] << std::endl;
+  G4cout << FUNC_NAME << G4endl
+	 << " open file : " << m_file[m_conf_key] << G4endl;
 
   m_conf_dir = ::dirname( const_cast<char*>( m_file[m_conf_key].data() ) );
 
@@ -65,9 +65,9 @@ ConfMan::Initialize( void )
     iss >> key >> val;
     if( key.isNull() || val.isNull() )
       continue;
-    std::cout << " key = "   << std::setw(20) << std::left << key
-	      << " value = " << std::setw(30) << std::left << val
-	      << std::endl;
+    G4cout << " key = "   << std::setw(20) << std::left << key
+	   << " value = " << std::setw(30) << std::left << val
+	   << G4endl;
     m_file[key]   = FilePath(val);
     m_string[key] = val;
     m_double[key] = std::strtod( val, nullptr );

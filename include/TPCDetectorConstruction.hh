@@ -34,9 +34,6 @@ private:
   TPCSDCSD*                       m_sdc_sd;
 
 private:
-  virtual G4VPhysicalVolume* Construct( void );
-
-private:
   // Materials
   void ConstructElements( void );
   void ConstructMaterials( void );
@@ -54,6 +51,10 @@ private:
   void ConstructSDC3( void );
   void ConstructShsMagnet( void );
   void ConstructTarget( void );
+  void ConstructWC( void );
+
+private:
+  virtual G4VPhysicalVolume* Construct( void );
 };
 
 //_____________________________________________________________________________

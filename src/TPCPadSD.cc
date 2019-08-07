@@ -17,6 +17,7 @@
 #include <Randomize.hh>
 
 #include "ConfMan.hh"
+#include "FuncName.hh"
 #include "TPCPadHit.hh"
 
 namespace
@@ -34,10 +35,11 @@ TPCPadSD::TPCPadSD( const G4String& name )
     m_dead_area( gConf.Get<G4double>( "DeadArea" ) )
 {
   collectionName.insert("hit");
-  G4cout << "Study on GEM discharge:" << m_gem_discharge << G4endl;
+  G4cout << FUNC_NAME << G4endl
+	 << "   Study on GEM discharge = " << m_gem_discharge << G4endl;
   if( m_gem_discharge == 5 ){
-    G4cout << "Designed a configuration of GEM discharge area" << G4endl;
-    G4cout << "Width of GEM electrodes are fixed!!!!" << G4endl;
+    G4cout << "   Designed a configuration of GEM discharge area" << G4endl;
+    G4cout << "   Width of GEM electrodes are fixed!!!!" << G4endl;
   }
 }
 
@@ -362,7 +364,6 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   G4int parentID =  aStep-> GetTrack()-> GetParentID();
 
   G4int parentID_pid = aStep-> GetTrack()->GetDynamicParticle()->GetDefinition()->GetPDGEncoding();
-
 
   //  G4int test =  aStep-> GetTrack()-> GetParentID() -> GetPDGCharge();
   //  G4cout<<"-------------------"<<G4endl;

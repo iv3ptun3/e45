@@ -26,10 +26,10 @@
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCWCSD.hh"
 
 namespace
 {
-  using CLHEP::MeV;
   auto& gAnaMan = TPCAnaManager::GetInstance();
   const auto& gConf = ConfMan::GetInstance();
 }
@@ -49,6 +49,7 @@ TPCEventAction::~TPCEventAction( void )
 void
 TPCEventAction::BeginOfEventAction( const G4Event* )
 {
+  // G4cout << FUNC_NAME << G4endl;
   gAnaMan.BeginOfEventAction();
 }
 
@@ -219,7 +220,9 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 	}
       //      if(ilay>-1){ //--> ilay 1 : target ilay 0 : TPC, layer is from 2 to 38.
       if(ilay>-1){ //-->  -1 : TPC, layer is from 0 to 38. 2012.10.30
-	gAnaMan.SetCounterData(nparticle-1,tof, xyz, mom, tid, pid,ilay,irow,beta,edep/MeV,parentid,tlength,slength);
+	gAnaMan.SetCounterData( nparticle-1,tof, xyz, mom, tid, pid, ilay,
+				irow, beta, edep/CLHEP::MeV, parentid,
+				tlength,slength );
       }
     }
     for(G4int i=0;i<nparticle;i++){
@@ -284,6 +287,14 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     const auto HC = (G4THitsCollection<TPCFTOFHit>*)HCTE->GetHC( id_ftof );
     for( G4int i=0, n=HC->entries(); i<n; ++i ){
       gAnaMan.SetFTOFData( (*HC)[i] );
+    }
+  }
+
+  static const G4int id_wc = SDManager-> GetCollectionID("WC/hit");
+  if( id_wc >= 0 ){
+    const auto HC = (G4THitsCollection<TPCWCHit>*)HCTE->GetHC( id_wc );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetWCData( (*HC)[i] );
     }
   }
 

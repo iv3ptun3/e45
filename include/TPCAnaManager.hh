@@ -241,7 +241,8 @@ struct Event
   Double_t pyHtof[MaxHits];
   Double_t pzHtof[MaxHits];
   Double_t ppHtof[MaxHits];
-  Double_t tofHtof[MaxHits];
+  Double_t deHtof[MaxHits];
+  Double_t tHtof[MaxHits];
   Double_t vtxHtof[MaxHits];
   Double_t vtyHtof[MaxHits];
   Double_t vtzHtof[MaxHits];
@@ -265,7 +266,8 @@ struct Event
   Double_t pySdc[MaxHits];
   Double_t pzSdc[MaxHits];
   Double_t ppSdc[MaxHits];
-  Double_t tofSdc[MaxHits];
+  Double_t deSdc[MaxHits];
+  Double_t tSdc[MaxHits];
   Double_t vtxSdc[MaxHits];
   Double_t vtySdc[MaxHits];
   Double_t vtzSdc[MaxHits];
@@ -289,7 +291,8 @@ struct Event
   Double_t pySch[MaxHits];
   Double_t pzSch[MaxHits];
   Double_t ppSch[MaxHits];
-  Double_t tofSch[MaxHits];
+  Double_t deSch[MaxHits];
+  Double_t tSch[MaxHits];
   Double_t vtxSch[MaxHits];
   Double_t vtySch[MaxHits];
   Double_t vtzSch[MaxHits];
@@ -313,7 +316,8 @@ struct Event
   Double_t pyFtof[MaxHits];
   Double_t pzFtof[MaxHits];
   Double_t ppFtof[MaxHits];
-  Double_t tofFtof[MaxHits];
+  Double_t deFtof[MaxHits];
+  Double_t tFtof[MaxHits];
   Double_t vtxFtof[MaxHits];
   Double_t vtyFtof[MaxHits];
   Double_t vtzFtof[MaxHits];
@@ -322,6 +326,31 @@ struct Event
   Double_t vtpzFtof[MaxHits];
   Double_t vtppFtof[MaxHits];
   Double_t lengthFtof[MaxHits];
+  // WC
+  Int_t nhWc;
+  Int_t tidWc[MaxHits];
+  Int_t pidWc[MaxHits];
+  Int_t didWc[MaxHits];
+  Int_t prtWc[MaxHits];
+  Int_t qWc[MaxHits];
+  Double_t massWc[MaxHits];
+  Double_t xWc[MaxHits];
+  Double_t yWc[MaxHits];
+  Double_t zWc[MaxHits];
+  Double_t pxWc[MaxHits];
+  Double_t pyWc[MaxHits];
+  Double_t pzWc[MaxHits];
+  Double_t ppWc[MaxHits];
+  Double_t deWc[MaxHits];
+  Double_t tWc[MaxHits];
+  Double_t vtxWc[MaxHits];
+  Double_t vtyWc[MaxHits];
+  Double_t vtzWc[MaxHits];
+  Double_t vtpxWc[MaxHits];
+  Double_t vtpyWc[MaxHits];
+  Double_t vtpzWc[MaxHits];
+  Double_t vtppWc[MaxHits];
+  Double_t lengthWc[MaxHits];
 };
 
 //_____________________________________________________________________________
@@ -344,20 +373,8 @@ private:
   PrimaryInfo primaryInfo;
   int HitNum;
   int tpctrNum;
-
   int HitNum_K;
-  //  int tpctrNum_K;
-
   int HitNum_p;
-
-  // G4double vtxxfit[MAXtpctrNum];//read fit parameters
-  // G4double vtxyfit[MAXtpctrNum];//read fit parameters
-  // G4double vtxzfit[MAXtpctrNum];//read fit parameters
-
-  // G4double vtxpxfit[MAXtpctrNum];//read fit parameters
-  // G4double vtxpyfit[MAXtpctrNum];//read fit parameters
-  // G4double vtxpzfit[MAXtpctrNum];//read fit parameters
-
 
   G4double mean[MAXtpctrNum];//read fit parameters
   G4double trmean[MAXtpctrNum];//read fit parameters
@@ -382,20 +399,10 @@ private:
   G4int env_pad_config;
   G4int env_Experiment_num;
 
-  /*
-    G4double angle[40]={0};
-    G4double seg_angle[40]={0};
-    G4int numpads[40]={0};
-
-    G4double pad_in[40]={0};
-    G4double pad_out[40]={0};
-    G4double tpc_rad=250;
-  */
   G4double angle[40];
   G4double seg_angle[40];
   G4double seg_width[40];
   G4int numpads[40];
-
   G4double pad_in[40];
   G4double pad_out[40];
   G4double tpc_rad;
@@ -405,38 +412,37 @@ public:
   void EndOfRunAction( void );
   void BeginOfEventAction( void );
   int  EndOfEventAction( void );
-
-  void SetTPCData(G4int tpctr, G4int tpcpid, G4int tpcparentid, G4int tpcparentid_pid, G4double tpcpx, G4double tpcpy,G4double tpcpz,G4double tpcpp,  G4int tpcqq, G4double tpcpm, G4double tpcde, G4double tpclen, G4int tpclay,
-		  G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
-		  G4double vtxxtpc2,G4double vtxytpc2,G4double vtxztpc2, G4double vtxenetpc2);
-
-  void SetCounterData(G4int ntrk, G4double time, G4ThreeVector pos, G4ThreeVector mom,
-		      G4int track, G4int particle,
-		      G4int iLay, G4int iRow, G4double beta, G4double edep,
-		      G4int parentid, G4double tlength, G4double slength);
+  void SetTPCData( G4int tpctr, G4int tpcpid, G4int tpcparentid,
+		   G4int tpcparentid_pid, G4double tpcpx, G4double tpcpy,
+		   G4double tpcpz,G4double tpcpp,  G4int tpcqq, G4double tpcpm,
+		   G4double tpcde, G4double tpclen, G4int tpclay,
+		   G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
+		   G4double vtxxtpc2,G4double vtxytpc2,G4double vtxztpc2,
+		   G4double vtxenetpc2 );
+  void SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
+		       G4ThreeVector mom, G4int track, G4int particle,
+		       G4int iLay, G4int iRow, G4double beta, G4double edep,
+		       G4int parentid, G4double tlength, G4double slength );
   void SetHTOFData( VHitInfo* hit );
   void SetFTOFData( VHitInfo* hit );
   void SetSCHData( VHitInfo* hit );
   void SetSDCData( VHitInfo* hit );
-  void SetTargetData( VHitInfo* hit );
-
-  //  void SetCounterData(G4double time, G4ThreeVector pos, G4ThreeVector mom,
-  //		      G4int track, G4int particle, G4int ilay, G4int iRaw);
-  void SetPrimaryBeam( const G4ThreeVector& p );
-  void SetPrimaryBeam( G4double px, G4double py, G4double pz );
-
+  void SetWCData( VHitInfo* hit );
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);
-
   void SetNumberOfPrimaryParticle( G4int n );
+  void SetTargetData( VHitInfo* hit );
+  void SetPrimaryBeam( const G4ThreeVector& p );
+  void SetPrimaryBeam( G4double px, G4double py, G4double pz );
   void SetPrimaryParticle( G4double px, G4double py, G4double pz );
+  void SetPrimaryParticle( G4int id, const G4ThreeVector& p, G4double mass,
+			   G4int pid=-9999 );
   void SetPrimaryParticle( G4int id, G4double px, G4double py, G4double pz,
 			   G4double mass, G4int pid=-9999 );
+  void SetPrimaryVertex( G4int id, const G4ThreeVector& x );
   void SetPrimaryVertex( G4int id, G4double x, G4double y, G4double z );
   void SetPrimaryInfo( G4double mm_d, G4double mm_p, G4double theta,
 		       G4double theta_scat, G4double theta_cm );
-
-  //int CircleIntersect(double x1, double y1, double r1, double x2, double y2, double r2, double inter1[2], double inter2[2])
   int CircleIntersect(double x1, double y1, double r1, double x2, double y2, double r2,
 		      double ca1, double cb1, double ct01, int qq1,
 		      double ca2, double cb2, double ct02, int qq2,

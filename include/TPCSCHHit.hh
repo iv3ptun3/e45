@@ -55,15 +55,14 @@ extern G4Allocator<TPCSCHHit> TPCSCHHitAllocator;
 inline void*
 TPCSCHHit::operator new( size_t )
 {
-  void* aHit = (void*)TPCSCHHitAllocator.MallocSingle();
-  return aHit;
+  return TPCSCHHitAllocator.MallocSingle();
 }
 
 //_____________________________________________________________________________
 inline void
 TPCSCHHit::operator delete( void* aHit )
 {
-  TPCSCHHitAllocator.FreeSingle( (TPCSCHHit*) aHit );
+  TPCSCHHitAllocator.FreeSingle( static_cast<TPCSCHHit*>( aHit ) );
 }
 
 #endif

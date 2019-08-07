@@ -38,7 +38,6 @@
 
 namespace
 {
-  using CLHEP::eplus;
   using CLHEP::GeV;
   using CLHEP::keV;
   using CLHEP::mm;
@@ -281,21 +280,6 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     G4cout << "Generator number error :" << generator << G4endl;
     break;
   }
-
-  // G4UImanager* UImanager= G4UImanager::GetUIpointer();
-  // UImanager-> ApplyCommand("/run/beamOn 3");
-  // G4cout<<"hoge"<<G4endl;
-  // getchar();
-
-
-  //  Generate_hanulcut(anEvent);            // shhwang
-  //  Generate_hybridPHSG(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //    Generate_hybrid(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //  Generate_hybrid3body(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //  Generate_hybrid3body_mode1(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //  Generate_hybrid3body_mode2(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //  Generate_hybrid3body_mode3(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
-  //  Generate_hybrid3body_mode4(anEvent);            // isotropic h-dibaryon, K+ < 15*deg --> LL
 }
 
 //_____________________________________________________________________________
@@ -712,7 +696,7 @@ TPCPrimaryGeneratorAction::Generate_PhaseSpace( G4Event* anEvent )
   auto LLphase = particleTable->FindParticle("phaseLL");
   // G4int Z, A;
   // G4double excitEnergy = 0.*keV;
-  // G4double ionCharge   = 0.*eplus;
+  // G4double ionCharge   = 0.*CLHEP::eplus;
   // auto Carbon12 = G4IonTable::GetIonTable()->GetIon( Z=6, A=12, excitEnergy );
   // auto Beryllium10 = G4IonTable::GetIonTable()->GetIon( Z=4, A=10, excitEnergy );
   // kaonMinus->DumpTable();
@@ -1458,9 +1442,9 @@ TPCPrimaryGeneratorAction::GenerateBeamVO( G4Event* anEvent )
   m_particle_gun->SetParticleEnergy( energy );
   m_particle_gun->SetParticlePosition( gen_pos );
   m_particle_gun->GeneratePrimaryVertex( anEvent );
-  // gAnaMan.SetNumberOfPrimaryParticle( 1 );
-  // gAnaMan.SetPrimaryParticle( 0, mom_kn_x, mom_kn_y, mom_kn_z, mass );
-  // gAnaMan.SetPrimaryVertex( 0, vtx, vty, vtz );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, m_beam->p, mass );
+  gAnaMan.SetPrimaryVertex( 0, gen_pos );
 }
 
 //_____________________________________________________________________________

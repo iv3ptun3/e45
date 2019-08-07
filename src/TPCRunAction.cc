@@ -8,6 +8,7 @@
 #include <G4RunManager.hh>
 #include <G4RunMessenger.hh>
 #include <G4StateManager.hh>
+#include <G4Timer.hh>
 #include <G4UIterminal.hh>
 #include <G4UItcsh.hh>
 
@@ -18,6 +19,7 @@
 namespace
 {
   TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
+  G4Timer timer;
 }
 
 //_____________________________________________________________________________
@@ -47,10 +49,6 @@ TPCRunAction::BeginOfRunAction( const G4Run* aRun )
   //      UI->ApplyCommand("/vis/scene/notifyHandlers");
   //    }
 
-  // Set the seed for randam function //Hwang-san
-  // the_time = time((time_t *)0);
-  // CLHEP::HepRandom::setTheSeed(the_time);
-
   // int initSeed = GetIntFromKernelEntropyPool()&0x7FFFFFFF;
   // G4Random::setTheSeed(initSeed);
   G4Random::setTheSeed( std::time( nullptr ) );
@@ -61,13 +59,17 @@ TPCRunAction::BeginOfRunAction( const G4Run* aRun )
   // G4StateManager* stateManager = G4StateManager::GetStateManager();
   // G4RunManager* RunManager = G4RunManager::GetRunManager();
   // RunManager->DoEventLoop(5, "run_tmp.mac", 1);
+  timer.Start();
 }
 
 //_____________________________________________________________________________
 void
 TPCRunAction::EndOfRunAction( const G4Run* aRun )
 {
+  timer.Stop();
   gAnaMan.EndOfRunAction();
   G4cout << FUNC_NAME << G4endl
-	 << "   Generated event# = " << aRun->GetNumberOfEvent() << G4endl;
+	 << "   Process end  = " << timer.GetClockTime()
+	 << "   Event number = " << aRun->GetNumberOfEvent() << G4endl
+	 << "   Elapsed time = " << timer << G4endl << G4endl;
 }

@@ -1,17 +1,16 @@
-// ====================================================================
-//   TPCACHit.hh
-//
-// ====================================================================
-#ifndef TPC_AC_HIT_H
-#define TPC_AC_HIT_H
+// -*- C++ -*-
+
+#ifndef TPC_AC_HIT_HH
+#define TPC_AC_HIT_HH
 
 #include "G4ThreeVector.hh"
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
 
-class TPCACHit : public G4VHit {
-
+//_____________________________________________________________________________
+class TPCACHit : public G4VHit
+{
 private:
   G4ThreeVector xyz;
   G4ThreeVector pxyz;
@@ -69,10 +68,9 @@ public:
   virtual void Print();
 };
 
-// ====================================================================
-// inline functions
-// ====================================================================
-inline TPCACHit::TPCACHit(const TPCACHit& right)
+//_____________________________________________________________________________
+inline
+TPCACHit::TPCACHit( const TPCACHit& right )
   : G4VHit()
 {
   xyz= right.xyz;
@@ -81,8 +79,9 @@ inline TPCACHit::TPCACHit(const TPCACHit& right)
   edep = right.edep;
 }
 
-inline const TPCACHit& TPCACHit::operator=
-(const TPCACHit& right)
+//_____________________________________________________________________________
+inline const TPCACHit&
+TPCACHit::operator =( const TPCACHit& right )
 {
   xyz= right.xyz;
   pxyz= right.pxyz;
@@ -91,18 +90,22 @@ inline const TPCACHit& TPCACHit::operator=
   return *this;
 }
 
+//_____________________________________________________________________________
 // externally instanciated.
 extern G4Allocator<TPCACHit> TPCACHitAllocator;
 
-inline void* TPCACHit::operator new(size_t)
+//_____________________________________________________________________________
+inline void*
+TPCACHit::operator new( size_t )
 {
-  void* aHit= (void*)TPCACHitAllocator.MallocSingle();
-  return aHit;
+  return TPCACHitAllocator.MallocSingle();
 }
 
-inline void TPCACHit::operator delete(void* aHit)
+//_____________________________________________________________________________
+inline void
+TPCACHit::operator delete( void* aHit )
 {
-  TPCACHitAllocator.FreeSingle((TPCACHit*) aHit);
+  TPCACHitAllocator.FreeSingle( static_cast<TPCACHit*>( aHit ) );
 }
 
 #endif

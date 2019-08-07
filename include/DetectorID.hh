@@ -17,6 +17,7 @@ const Int_t DetIdPVAC    =  5;
 const Int_t DetIdFAC     =  6;
 const Int_t DetIdSCH     =  7;
 const Int_t DetIdTOF     =  8;
+const Int_t DetIdWC      =  9;
 const Int_t NumOfSegBH1  = 11;
 const Int_t NumOfSegBH2  =  1;
 const Int_t NumOfSegBAC  =  2;
@@ -26,6 +27,7 @@ const Int_t NumOfSegPVAC =  1;
 const Int_t NumOfSegFAC  =  1;
 const Int_t NumOfSegSCH  = 64;
 const Int_t NumOfSegTOF  = 24;
+const Int_t NumOfSegWC   = 20;
 
 // Misc _______________________________________________________________________
 const Int_t DetIdTrig      =  21;

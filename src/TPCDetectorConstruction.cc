@@ -37,6 +37,7 @@
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCWCSD.hh"
 
 namespace
 {
@@ -113,6 +114,7 @@ TPCDetectorConstruction::Construct( void )
     ConstructSDC2();
     ConstructSDC3();
     ConstructFTOF();
+    ConstructWC();
   }
 
   auto myfield = new TPCField;
@@ -165,6 +167,7 @@ TPCDetectorConstruction::ConstructElements( void )
 void
 TPCDetectorConstruction::ConstructMaterials( void )
 {
+  G4cout << FUNC_NAME << G4endl;
   /*
     G4Material( name, density, nelement, state, temperature, pressure );
     G4Material( name, z, a, density, state, temperature, pressure );
@@ -193,6 +196,11 @@ TPCDetectorConstruction::ConstructMaterials( void )
 				    massfraction=fracO/denominator );
   m_material_map[name]->AddElement( m_element_map["Argon"],
 				    massfraction=fracAr/denominator );
+  // Water
+  name = "Water";
+  m_material_map[name] = new G4Material( name, density=1.*g/cm3, nel=2 );
+  m_material_map[name]->AddElement( m_element_map["Hydrogen"], 2 );
+  m_material_map[name]->AddElement( m_element_map["Oxygen"], 1 );
   // Iron
   name = "Iron";
   m_material_map[name] = new G4Material( name, Z=26., A=55.85*g/mole,
@@ -675,6 +683,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 void
 TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
 {
+  G4cout << FUNC_NAME << G4endl;
   // D4 magnet
   const G4double D4Rho = gSize.Get( "D4Rho" )*mm;
   const G4double D4BendAngle = gSize.Get( "D4BendAngle" )*deg; // [deg]
@@ -682,10 +691,10 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   const G4double D4r1 = D4Rho - D4FieldSize.x()/2.;
   const G4double D4r2 = D4Rho + D4FieldSize.x()/2.;
   const G4double D4Width1 = 1700.*mm/2;
-  const auto& D4Coil1Size = gSize.GetSize( "D4Coil1" )*mm;
-  const G4double D4CoilWidth1 = 500.*mm/2;
-  const G4double D4CoilLength1 = 200.*mm/2;
-  const G4double D4CoilLength2 = 100.*mm/2;
+  // const auto& D4Coil1Size = gSize.GetSize( "D4Coil1" )*mm;
+  // const G4double D4CoilWidth1 = 500.*mm/2;
+  // const G4double D4CoilLength1 = 200.*mm/2;
+  // const G4double D4CoilLength2 = 100.*mm/2;
   // const G4double D4Length = 4.468*m;
   // const G4double D4B0 = 15.010222; // [kG]
   // const G4double alphaD4 = 23.5; // [deg]
@@ -766,8 +775,8 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   new G4PVPlacement( rotQ11, G4ThreeVector( x, y, z ),
 		     Q11LV, "Q11PV", m_world_lv, false, 0 );
   // D4 magnet
-  G4cout << "D4Rho = " << D4Rho << G4endl;
-  G4cout << "D4r1 = " << D4r1/m  << ", D4r2 = " << D4r2/m  << G4endl;
+  G4cout << "   D4Rho = " << D4Rho << G4endl;
+  G4cout << "   D4r1 = " << D4r1/m  << ", D4r2 = " << D4r2/m  << G4endl;
   auto D4Solid = new G4Tubs( "D4Solid", D4r1, D4r2, D4FieldSize.y()/2,
 			     0.*deg, D4BendAngle );
   auto D4OutSolid = new G4Tubs( "D4OutSolid", D4Rho - D4Width1,
@@ -775,7 +784,7 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
 				0.*deg, D4BendAngle );
   auto D4PoleSolid = new G4SubtractionSolid( "D4PoleSolid", D4OutSolid,
 					     D4Solid );
-  auto D4PoleLV = new G4LogicalVolume( D4OutSolid, // D4PoleSolid,
+  auto D4PoleLV = new G4LogicalVolume( D4PoleSolid,
 				       m_material_map["Iron"],
 				       "D4PoleLV" );
   D4PoleLV->SetVisAttributes( G4Colour::Green() );
@@ -2190,4 +2199,47 @@ TPCDetectorConstruction::ConstructTarget( void )
   auto target_sd = new TPCTargetSD( "/TGT" );
   G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
   target_lv->SetSensitiveDetector( target_sd );
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructWC( void )
+{
+  const auto& ra2 = gGeom.GetRotAngle2("WC") * deg;
+  const auto& half_size = gSize.GetSize("WcSeg") * 0.5 * mm;
+  const G4double pitch = gGeom.GetWirePitch("WC");
+  auto wcSD = new TPCWCSD("/WC");
+  wcSD->SetRefractiveIndex( 1.33 );
+  G4SDManager::GetSDMpointer()->AddNewDetector( wcSD );
+  // Mother
+  auto mother_solid = new G4Box( "WcMotherSolid",
+				 half_size.x()*NumOfSegWC + 50.*mm,
+				 half_size.y() + 50.*mm,
+				 half_size.z()*2 + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+					m_material_map["Air"],
+					"WcMotherLV" );
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+	       gGeom.GetGlobalPosition("WC") );
+  pos.rotateY( m_rotation_angle );
+  new G4PVPlacement( rot, pos, mother_lv,
+		     "WcMotherPV", m_world_lv, false, 0 );
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  // Segment
+  auto segment_solid = new G4Box( "WcSegmentSolid", half_size.x(),
+				  half_size.y(), half_size.z() );
+  auto segment_lv = new G4LogicalVolume( segment_solid,
+					 m_material_map["Water"],
+					 "WcSegmentLV" );
+  for( G4int i=0; i<NumOfSegWC; ++i ){
+    segment_lv->SetVisAttributes( G4Colour::Cyan() );
+    segment_lv->SetSensitiveDetector( wcSD );
+    pos = G4ThreeVector( ( -NumOfSegWC/2 + i )*pitch,
+			 0.0,
+			 2.*( - i%2 + 0.5 )*half_size.z() );
+    new G4PVPlacement( nullptr, pos, segment_lv,
+		       "WcSegmentPV", mother_lv, false, i );
+  }
 }

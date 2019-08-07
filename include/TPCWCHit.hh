@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
-#ifndef TPC_FTOF_HIT_HH
-#define TPC_FTOF_HIT_HH
+#ifndef TPC_WC_HIT_HH
+#define TPC_WC_HIT_HH
 
 #include <G4Allocator.hh>
 #include <G4String.hh>
@@ -14,14 +14,14 @@
 class G4Step;
 
 //_____________________________________________________________________________
-class TPCFTOFHit : public G4VHit, public VHitInfo
+class TPCWCHit : public G4VHit, public VHitInfo
 {
 public:
-  TPCFTOFHit( const G4String& name, G4Step* step );
-  virtual ~TPCFTOFHit( void );
+  TPCWCHit( const G4String& name, G4Step* step );
+  virtual ~TPCWCHit( void );
 
-  TPCFTOFHit( const TPCFTOFHit& right );
-  const TPCFTOFHit& operator=( const TPCFTOFHit& right );
+  TPCWCHit( const TPCWCHit& right );
+  const TPCWCHit& operator=( const TPCWCHit& right );
 
   void* operator new( size_t );
   void operator delete( void* aHit );
@@ -33,15 +33,15 @@ public:
 
 //_____________________________________________________________________________
 inline
-TPCFTOFHit::TPCFTOFHit( const TPCFTOFHit& right )
+TPCWCHit::TPCWCHit( const TPCWCHit& right )
   : G4VHit( right ),
     VHitInfo( right )
 {
 }
 
 //_____________________________________________________________________________
-inline const TPCFTOFHit&
-TPCFTOFHit::operator =( const TPCFTOFHit& right )
+inline const TPCWCHit&
+TPCWCHit::operator =( const TPCWCHit& right )
 {
   VHitInfo::operator =( right );
   return *this;
@@ -49,20 +49,21 @@ TPCFTOFHit::operator =( const TPCFTOFHit& right )
 
 //_____________________________________________________________________________
 // externally instanciated.
-extern G4Allocator<TPCFTOFHit> TPCFTOFHitAllocator;
+extern G4Allocator<TPCWCHit> TPCWCHitAllocator;
 
 //_____________________________________________________________________________
 inline void*
-TPCFTOFHit::operator new( size_t )
+TPCWCHit::operator new( size_t )
 {
-  return TPCFTOFHitAllocator.MallocSingle();
+  void* aHit = (void*)TPCWCHitAllocator.MallocSingle();
+  return aHit;
 }
 
 //_____________________________________________________________________________
 inline void
-TPCFTOFHit::operator delete( void* aHit )
+TPCWCHit::operator delete( void* aHit )
 {
-  TPCFTOFHitAllocator.FreeSingle( static_cast<TPCFTOFHit*>( aHit ) );
+  TPCWCHitAllocator.FreeSingle( (TPCWCHit*) aHit );
 }
 
 #endif

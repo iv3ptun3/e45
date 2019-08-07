@@ -17,6 +17,8 @@ Target		30.0	10.0	15.0
 #
 ### FTOF
 FtofSeg		80.0	1800.0	30.0
+### WC
+WcSeg		240.0	1840.0	190.0
 #
 ### KURAMA
 KuramaField	1000.0	800.0	800.0

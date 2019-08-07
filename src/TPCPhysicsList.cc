@@ -56,7 +56,6 @@ TPCPhysicsList::TPCPhysicsList( void )
     m_hadron_physics_list()
 {
   SetDefaultCutValue( 0.001*CLHEP::mm );
-  SetVerboseLevel( 1 );
   m_em_physics_list = new G4EmStandardPhysics( verboseLevel );
 }
 
