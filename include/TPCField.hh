@@ -6,6 +6,7 @@
 #include <globals.hh>
 #include <G4MagneticField.hh>
 #include <G4String.hh>
+#include <G4ThreeVector.hh>
 
 // const double solenoidOffset = 1617.0;
 
@@ -22,13 +23,42 @@ const G4int MAX_KURAMA_Z_OPERA3D = 121;
 #define BFIELD_GRID_Z 0.5
 
 //_____________________________________________________________________________
-struct MagnetInfo
+class MagnetInfo
 {
-  enum EMagnetType { kDipole, kQuadrople };
+public:
+  static G4String ClassName( void );
+  MagnetInfo( G4String n="" )
+    : name( n )
+  {}
+  enum EMagnetType { kDipole, kQuadrupole, kShs, kKurama, NMagnetType };
+
+public:
   G4int    type;
   G4String name;
-  G4double ra1;
+  G4double b0;        // magnetic field
+  G4double l;         // length
+  G4double ra1;       // rotation angle around z-axis
+  G4ThreeVector pos;  // center position
+  G4ThreeVector size; // half width, height, and thickness
+  // for Dipole
+  G4double rho;   // bending radius
+  G4double bend;  // bending angle
+  G4double alpha; // angle between conetral track and entrance pole
+  G4double beta;  // angle between conetral track and exit pole
+  // for Quadrupole
+  G4double a0; // aperture
+
+public:
+  G4bool CalcField( const G4ThreeVector& point, G4double* bfield ) const;
 };
+
+//_____________________________________________________________________________
+inline G4String
+MagnetInfo::ClassName( void )
+{
+  static G4String s_name("MagnetInfo");
+  return s_name;
+}
 
 //_____________________________________________________________________________
 class TPCField : public G4MagneticField
@@ -48,6 +78,7 @@ private:
   G4bool   m_shs_status;
   G4String m_kurama_field_map;
   G4String m_shs_field_map;
+  std::map<G4String, MagnetInfo> m_magnet_map;
 
   G4double xOPERA3D[MAX_DIM_X_OPERA3D];
   G4double yOPERA3D[MAX_DIM_Y_OPERA3D];
@@ -63,6 +94,7 @@ public:
   virtual void GetFieldValue( const G4double Point[4], G4double* Bfield ) const;
 
 public:
+  void   AddMagnetInfo( const MagnetInfo& mag );
   G4bool GetStatusK18Field( void ) const { return m_k18_status; }
   G4bool GetStatusKuramaField( void ) const { return m_kurama_status; }
   G4bool GetStatusShsField( void ) const { return m_shs_status; }

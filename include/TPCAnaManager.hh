@@ -131,6 +131,32 @@ struct Event
   Double_t mPrm[MaxPrimaryParticle];
   Double_t thetaPrm[MaxPrimaryParticle];
 
+  // BH2
+  Int_t nhBh2;
+  Int_t tidBh2[MaxHits];
+  Int_t pidBh2[MaxHits];
+  Int_t didBh2[MaxHits];
+  Int_t prtBh2[MaxHits];
+  Int_t qBh2[MaxHits];
+  Double_t massBh2[MaxHits];
+  Double_t xBh2[MaxHits];
+  Double_t yBh2[MaxHits];
+  Double_t zBh2[MaxHits];
+  Double_t pxBh2[MaxHits];
+  Double_t pyBh2[MaxHits];
+  Double_t pzBh2[MaxHits];
+  Double_t ppBh2[MaxHits];
+  Double_t deBh2[MaxHits];
+  Double_t tBh2[MaxHits];
+  Double_t vtxBh2[MaxHits];
+  Double_t vtyBh2[MaxHits];
+  Double_t vtzBh2[MaxHits];
+  Double_t vtpxBh2[MaxHits];
+  Double_t vtpyBh2[MaxHits];
+  Double_t vtpzBh2[MaxHits];
+  Double_t vtppBh2[MaxHits];
+  Double_t lengthBh2[MaxHits];
+
   /* number of ntrks in TPC by shhwang*/
   Int_t ntrtpc;
   Double_t trpptpc[MaxHitsTPC];
@@ -419,19 +445,20 @@ public:
 		   G4double vtxpxtpc2,G4double vtxpytpc2,G4double vtxpztpc2,
 		   G4double vtxxtpc2,G4double vtxytpc2,G4double vtxztpc2,
 		   G4double vtxenetpc2 );
+  void SetBH2Data( const VHitInfo* hit );
   void SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		       G4ThreeVector mom, G4int track, G4int particle,
 		       G4int iLay, G4int iRow, G4double beta, G4double edep,
 		       G4int parentid, G4double tlength, G4double slength );
-  void SetHTOFData( VHitInfo* hit );
-  void SetFTOFData( VHitInfo* hit );
-  void SetSCHData( VHitInfo* hit );
-  void SetSDCData( VHitInfo* hit );
-  void SetWCData( VHitInfo* hit );
+  void SetHTOFData( const VHitInfo* hit );
+  void SetFTOFData( const VHitInfo* hit );
+  void SetSCHData( const VHitInfo* hit );
+  void SetSDCData( const VHitInfo* hit );
+  void SetWCData( const VHitInfo* hit );
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);
   void SetNumberOfPrimaryParticle( G4int n );
-  void SetTargetData( VHitInfo* hit );
+  void SetTargetData( const VHitInfo* hit );
   void SetPrimaryBeam( const G4ThreeVector& p );
   void SetPrimaryBeam( G4double px, G4double py, G4double pz );
   void SetPrimaryParticle( G4double px, G4double py, G4double pz );

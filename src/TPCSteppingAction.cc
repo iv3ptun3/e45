@@ -32,7 +32,7 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto prePoint = theStep->GetPreStepPoint();
   auto prePV = prePoint->GetPhysicalVolume();
   auto prePVName = prePV->GetName();
-  auto preMaterial = prePoint->GetMaterial();
+  // auto preMaterial = prePoint->GetMaterial();
   auto postPoint = theStep->GetPostStepPoint();
   auto theProcess = postPoint->GetProcessDefinedStep()->GetProcessName();
 
@@ -60,15 +60,15 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   }
 #endif
 
-  if( preMaterial->GetName() == "Iron" ){
-    theTrack->SetTrackStatus( fStopAndKill );
-    return;
-  }
+  // if( preMaterial->GetName() == "Iron" ){
+  //   theTrack->SetTrackStatus( fStopAndKill );
+  //   return;
+  // }
 
-  if( prePVName.contains( "Coil" ) ){
-    theTrack->SetTrackStatus( fStopAndKill );
-    return;
-  }
+  // if( prePVName.contains( "Coil" ) ){
+  //   theTrack->SetTrackStatus( fStopAndKill );
+  //   return;
+  // }
 
   // if( prePVName.contains( "Target" ) )
   //   G4cout<<"end stepping action = "<<prePVName<<G4endl;

@@ -57,6 +57,31 @@ TPCAnaManager::TPCAnaManager( void )
   //generator mode
   tree->Branch("gen",&event.gen,"gen/I");
   tree->Branch("mode",&event.mode,"mode/I");
+  // BH2
+  tree->Branch( "nhBh2", &event.nhBh2, "nhBh2/I" );
+  tree->Branch( "tidBh2", event.tidBh2, "tidBh2[nhBh2]/I" );
+  tree->Branch( "pidBh2", event.pidBh2, "pidBh2[nhBh2]/I" );
+  tree->Branch( "didBh2", event.didBh2, "didBh2[nhBh2]/I" );
+  tree->Branch( "prtBh2", event.prtBh2, "prtBh2[nhBh2]/I" );
+  tree->Branch( "qBh2", event.qBh2, "qBh2[nhBh2]/I" );
+  tree->Branch( "massBh2", event.massBh2, "massBh2[nhBh2]/D" );
+  tree->Branch( "xBh2", event.xBh2, "xBh2[nhBh2]/D" );
+  tree->Branch( "yBh2", event.yBh2, "yBh2[nhBh2]/D" );
+  tree->Branch( "zBh2", event.zBh2, "zBh2[nhBh2]/D" );
+  tree->Branch( "pxBh2", event.pxBh2, "pxBh2[nhBh2]/D" );
+  tree->Branch( "pyBh2", event.pyBh2, "pyBh2[nhBh2]/D" );
+  tree->Branch( "pzBh2", event.pzBh2, "pzBh2[nhBh2]/D" );
+  tree->Branch( "ppBh2", event.ppBh2, "ppBh2[nhBh2]/D" );
+  tree->Branch( "deBh2", event.deBh2, "deBh2[nhBh2]/D" );
+  tree->Branch( "tBh2", event.tBh2, "tBh2[nhBh2]/D" );
+  tree->Branch( "vtpxBh2", event.vtpxBh2, "vtpxBh2[nhBh2]/D" );
+  tree->Branch( "vtpyBh2", event.vtpyBh2, "vtpyBh2[nhBh2]/D" );
+  tree->Branch( "vtpzBh2", event.vtpzBh2, "vtpzBh2[nhBh2]/D" );
+  tree->Branch( "vtppBh2", event.vtppBh2, "vtppBh2[nhBh2]/D" );
+  tree->Branch( "vtxBh2", event.vtxBh2, "vtxBh2[nhBh2]/D" );
+  tree->Branch( "vtyBh2", event.vtyBh2, "vtyBh2[nhBh2]/D" );
+  tree->Branch( "vtzBh2", event.vtzBh2, "vtzBh2[nhBh2]/D" );
+  tree->Branch( "lengthBh2", event.lengthBh2, "lengthBh2[nhBh2]/D" );
 
   ///////shhwang tpc hit step
 
@@ -470,6 +495,7 @@ TPCAnaManager::BeginOfEventAction( void )
   HitNum_p=0;
   //  tpctrNum_K=0;
 
+  event.nhBh2 = 0;
   event.nhTgt = 0;
   event.nhHtof = 0;
   event.nhSdc = 0;
@@ -477,6 +503,27 @@ TPCAnaManager::BeginOfEventAction( void )
   event.nhFtof = 0;
   event.nhWc = 0;
   for( G4int i=0; i<MaxHits; ++i ){
+    // BH2
+    event.tidBh2[i] = -9999;
+    event.pidBh2[i] = -9999;
+    event.didBh2[i] = -9999;
+    event.prtBh2[i] = -9999;
+    event.qBh2[i] = -9999;
+    event.massBh2[i] = -9999.;
+    event.xBh2[i] = -9999.;
+    event.yBh2[i] = -9999.;
+    event.zBh2[i] = -9999.;
+    event.pxBh2[i] = -9999.;
+    event.pyBh2[i] = -9999.;
+    event.pzBh2[i] = -9999.;
+    event.tBh2[i] = -9999.;
+    event.vtppBh2[i] = -9999.;
+    event.vtpxBh2[i] = -9999.;
+    event.vtpyBh2[i] = -9999.;
+    event.vtpzBh2[i] = -9999.;
+    event.vtxBh2[i] = -9999.;
+    event.vtyBh2[i] = -9999.;
+    event.vtzBh2[i] = -9999.;
     // TARGET
     event.pidTgt[i] = -9999;
     event.tidTgt[i] = -9999;
@@ -1377,6 +1424,27 @@ TPCAnaManager::EndOfEventAction( void )
 
 //_____________________________________________________________________________
 void
+TPCAnaManager::SetBH2Data( const VHitInfo* hit )
+{
+  if( event.nhBh2 > MaxHits ){
+    G4cerr << FUNC_NAME << " too much nhit " << event.nhBh2 << G4endl;
+  } else {
+    Int_t i = event.nhBh2;
+    event.tidBh2[i] = hit->GetTrackID();
+    event.pidBh2[i] = hit->GetParticleID();
+    event.didBh2[i] = hit->GetDetectorID();
+    event.prtBh2[i] = hit->GetParentID();
+    event.deBh2[i] = hit->GetEnergyDeposit();
+    event.tBh2[i] = hit->GetTime();
+    event.xBh2[i] = hit->GetPosition().x();
+    event.yBh2[i] = hit->GetPosition().y();
+    event.zBh2[i] = hit->GetPosition().z();
+    event.nhBh2++;
+  }
+}
+
+//_____________________________________________________________________________
+void
 TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 			       G4ThreeVector mom,
 			       G4int track, G4int particle,
@@ -1598,7 +1666,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetFTOFData( VHitInfo* hit )
+TPCAnaManager::SetFTOFData( const VHitInfo* hit )
 {
   if( event.nhFtof > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhFtof << G4endl;
@@ -1619,7 +1687,7 @@ TPCAnaManager::SetFTOFData( VHitInfo* hit )
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetHTOFData( VHitInfo* hit )
+TPCAnaManager::SetHTOFData( const VHitInfo* hit )
 {
   if( event.nhHtof > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhHtof << G4endl;
@@ -1640,7 +1708,7 @@ TPCAnaManager::SetHTOFData( VHitInfo* hit )
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetSCHData( VHitInfo* hit )
+TPCAnaManager::SetSCHData( const VHitInfo* hit )
 {
   if( event.nhSch > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhSch << G4endl;
@@ -1661,7 +1729,7 @@ TPCAnaManager::SetSCHData( VHitInfo* hit )
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetSDCData( VHitInfo* hit )
+TPCAnaManager::SetSDCData( const VHitInfo* hit )
 {
   if( event.nhSdc > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhSdc << G4endl;
@@ -1682,7 +1750,7 @@ TPCAnaManager::SetSDCData( VHitInfo* hit )
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetWCData( VHitInfo* hit )
+TPCAnaManager::SetWCData( const VHitInfo* hit )
 {
   if( event.nhWc > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhWc << G4endl;
@@ -1878,7 +1946,7 @@ TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
 
 //_____________________________________________________________________________
 void
-TPCAnaManager::SetTargetData( VHitInfo* hit )
+TPCAnaManager::SetTargetData( const VHitInfo* hit )
 {
   if( event.nhTgt > MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhTgt << G4endl;

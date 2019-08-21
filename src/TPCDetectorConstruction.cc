@@ -3,6 +3,7 @@
 #include "TPCDetectorConstruction.hh"
 
 #include <G4Box.hh>
+#include <G4ChordFinder.hh>
 #include <G4Element.hh>
 #include <G4FieldManager.hh>
 #include <G4LogicalVolume.hh>
@@ -18,6 +19,7 @@
 #include <G4ThreeVector.hh>
 #include <G4Tubs.hh>
 #include <G4UnionSolid.hh>
+#include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
 #include <tools/mathd>
 
@@ -29,6 +31,7 @@
 #include "FuncName.hh"
 #include "MathTools.hh"
 #include "TPCACSD.hh"
+#include "TPCBH2SD.hh"
 #include "TPCField.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCNBARSD.hh"
@@ -55,6 +58,7 @@ namespace
   const auto& gConf = ConfMan::GetInstance();
   const auto& gGeom = DCGeomMan::GetInstance();
   const auto& gSize = DetSizeMan::GetInstance();
+  TPCField* myField = nullptr;
   // color
   const G4Colour AQUA( 0.247, 0.8, 1.0 );
   const G4Colour ORANGE( 1.0, 0.55, 0.0 );
@@ -88,14 +92,24 @@ TPCDetectorConstruction::Construct( void )
 {
   ConstructElements();
   ConstructMaterials();
-  auto world_solid = new G4Box( "WorldSolid", 8.*m/2, 6.*m/2, 16.*m/2 );
+  auto world_solid = new G4Box( "WorldSolid", 10.*m/2, 6.*m/2, 16.*m/2 );
   m_world_lv = new G4LogicalVolume( world_solid, m_material_map["Air"],
 				    "WorldLV" );
   m_world_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   auto world_pv = new G4PVPlacement( nullptr, G4ThreeVector(), m_world_lv,
 				     "WorldPV", nullptr, false, 0 );
 
+  myField = new TPCField;
+  myField->Initialize();
+  auto transMan = G4TransportationManager::GetTransportationManager();
+  auto fieldMan = transMan->GetFieldManager();
+  fieldMan->SetDetectorField( myField );
+  fieldMan->CreateChordFinder( myField );
+  // fieldMan->GetChordFinder()->SetDeltaChord( 1.e-3*mm );
+
   ConstructK18BeamlineSpectrometer();
+
+  ConstructBH2();
 
 #if 1
   ConstructShsMagnet();
@@ -107,6 +121,7 @@ TPCDetectorConstruction::Construct( void )
   ConstructPVAC2();
   ConstructNBAR();
 #endif
+#if 1
   if( gConf.Get<G4int>("ConstructKurama") ){
     ConstructKuramaMagnet();
     ConstructSDC1();
@@ -116,13 +131,7 @@ TPCDetectorConstruction::Construct( void )
     ConstructFTOF();
     ConstructWC();
   }
-
-  auto myfield = new TPCField;
-  myfield->Initialize();
-  auto transMan = G4TransportationManager::GetTransportationManager();
-  auto fieldMan = transMan->GetFieldManager();
-  fieldMan->SetDetectorField( myfield );
-  fieldMan->CreateChordFinder( myfield );
+#endif
 
   return world_pv;
 }
@@ -309,11 +318,53 @@ TPCDetectorConstruction::ConstructMaterials( void )
 
 //_____________________________________________________________________________
 void
+TPCDetectorConstruction::ConstructBH2( void )
+{
+  const auto& ra2 = gGeom.GetRotAngle2("BH2") * deg;
+  const auto& half_size = gSize.GetSize("Bh2Seg") * 0.5 * mm;
+  const G4double pitch = gGeom.GetWirePitch("BH2") *mm;
+  auto bh2SD = new TPCBH2SD("/BH2");
+  G4SDManager::GetSDMpointer()->AddNewDetector( bh2SD );
+  // Mother
+  auto mother_solid = new G4Box( "Bh2MotherSolid",
+				 half_size.x()*NumOfSegBH2 + 50.*mm,
+				 half_size.y() + 50.*mm,
+				 half_size.z()*2 + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+					m_material_map["Air"],
+					"Bh2MotherLV" );
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+	       gGeom.GetGlobalPosition("BH2") );
+  pos.rotateY( m_rotation_angle );
+  new G4PVPlacement( rot, pos, mother_lv,
+		     "Bh2MotherPV", m_world_lv, false, 0 );
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  // Segment
+  auto segment_solid = new G4Box( "Bh2SegmentSolid", half_size.x(),
+				  half_size.y(), half_size.z() );
+  auto segment_lv = new G4LogicalVolume( segment_solid,
+					 m_material_map["Scintillator"],
+					 "Bh2SegmentLV" );
+  for( G4int i=0; i<NumOfSegBH2; ++i ){
+    segment_lv->SetVisAttributes( G4Colour::Cyan() );
+    segment_lv->SetSensitiveDetector( bh2SD );
+    pos = G4ThreeVector( ( -NumOfSegBH2/2 + i )*pitch,
+			 0.*mm,
+			 0.*mm );
+    new G4PVPlacement( nullptr, pos, segment_lv,
+		       "Bh2SegmentPV", mother_lv, false, i );
+  }
+}
+
+//_____________________________________________________________________________
+void
 TPCDetectorConstruction::ConstructFTOF( void )
 {
   const auto& ra2 = gGeom.GetRotAngle2("TOF") * deg;
   const auto& half_size = gSize.GetSize("FtofSeg") * 0.5 * mm;
-  const G4double pitch = gGeom.GetWirePitch("TOF");
+  const G4double pitch = gGeom.GetWirePitch("TOF") * mm;
   auto ftofSD = new TPCFTOFSD("/FTOF");
   G4SDManager::GetSDMpointer()->AddNewDetector( ftofSD );
   // Mother
@@ -696,25 +747,25 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   // const G4double D4CoilLength1 = 200.*mm/2;
   // const G4double D4CoilLength2 = 100.*mm/2;
   // const G4double D4Length = 4.468*m;
-  // const G4double D4B0 = 15.010222; // [kG]
-  // const G4double alphaD4 = 23.5; // [deg]
-  // const G4double betaD4 = 0; // [deg]
+  const G4double D4B0 = 15.010222 * CLHEP::kilogauss;
+  const G4double D4alpha = 23.5; // [deg]
+  const G4double D4beta = 0; // [deg]
   // Q10 magnet
   const auto& Q10Size = gSize.GetSize( "Q10" )*mm;
-  //const G4double Q10B0 = -9.814096; // [kG]  negative particle
-  // const G4double Q10a0 = 0.1*m;    // [m]
+  const G4double Q10B0 = -9.814096 * CLHEP::kilogauss;
+  const G4double Q10a0 = 0.1*m;    // [m]
   // Q11 magnet
   const auto& Q11Size = gSize.GetSize( "Q11" )*mm;
-  // const G4double Q11B0 = 7.493605; // [kG]  negative particle
-  // const G4double Q11a0 = 0.1*m;      // [m]
+  const G4double Q11B0 = 7.493605 * CLHEP::kilogauss;
+  const G4double Q11a0 = 0.1*m;
   // Q12 magnet
   const auto& Q12Size = gSize.GetSize( "Q12" )*mm;
-  // const G4double Q12B0 = -5.87673; // [kG] negative particle
-  // const G4double Q12a0 = 0.1*m;      // [m]
+  const G4double Q12B0 = -5.87673 * CLHEP::kilogauss;
+  const G4double Q12a0 = 0.1*m;
   // Q13 magnet
   const auto& Q13Size = gSize.GetSize( "Q13" )*mm;
-  // const G4double Q13B0 = 0.; // [kG] negative particle
-  // const G4double Q13a0 = 0.1*m;      // [m]
+  const G4double Q13B0 = 0. * CLHEP::kilogauss;
+  const G4double Q13a0 = 0.1*m;      // [m]
   const G4double driftL0 = gSize.Get( "K18L0" )*mm; // VI-Q10
   const G4double driftL1 = gSize.Get( "K18L1" )*mm; // Q10-Q11
   const G4double driftL2 = gSize.Get( "K18L2" )*mm; // Q11-D4
@@ -733,10 +784,12 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
 
   // VI
   x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
-	( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::sin( D4BendAngle ) );
+	( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) *
+	std::sin( D4BendAngle ) );
   y = 0.*m;
   z = ( - D4Rho*std::sin( D4BendAngle )
-	- ( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::cos( D4BendAngle )
+	- ( driftL0 + Q10Size.z() + VC1Size.z() + Q11Size.z() + VC2Size.z() ) *
+	std::cos( D4BendAngle )
 	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
   BeamMan::GetInstance().SetVIPosition( G4ThreeVector( x, y, z ) );
 
@@ -748,15 +801,25 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
 				    "Q10LV" );
   Q10LV->SetVisAttributes( ORANGE );
   x = ( D4Rho*( 1. - std::cos( D4BendAngle ) ) +
-	( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::sin( D4BendAngle ) );
+	( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) *
+	std::sin( D4BendAngle ) );
   y = 0.*m;
   z = ( - D4Rho*std::sin( D4BendAngle )
-	- ( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) * std::cos( D4BendAngle )
+	- ( Q10Size.z()/2 + VC1Size.z() + Q11Size.z() + VC2Size.z() ) *
+	std::cos( D4BendAngle )
 	- driftL3 - Q12Size.z() - driftL4 - Q13Size.z() - driftL5 - driftL6 );
   auto rotQ10 = new G4RotationMatrix;
   rotQ10->rotateY( D4BendAngle );
   new G4PVPlacement( rotQ10, G4ThreeVector( x, y, z ),
 		     Q10LV, "Q10PV", m_world_lv, false, 0 );
+  MagnetInfo Q10Info( "Q10" );
+  Q10Info.type = MagnetInfo::kQuadrupole;
+  Q10Info.b0 = Q10B0;
+  Q10Info.a0 = Q10a0;
+  Q10Info.pos = G4ThreeVector( x, y, z );
+  Q10Info.size = Q10Size*0.5;
+  Q10Info.ra1 = -D4BendAngle;
+  myField->AddMagnetInfo( Q10Info );
   // Q11 magnet
   auto Q11Solid = new G4Box( "Q11Solid", Q11Size.x()/2,
 			     Q11Size.y()/2, Q11Size.z()/2 );
@@ -774,6 +837,14 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   rotQ11->rotateY( D4BendAngle );
   new G4PVPlacement( rotQ11, G4ThreeVector( x, y, z ),
 		     Q11LV, "Q11PV", m_world_lv, false, 0 );
+  MagnetInfo Q11Info( "Q11" );
+  Q11Info.type = MagnetInfo::kQuadrupole;
+  Q11Info.b0 = Q11B0;
+  Q11Info.a0 = Q11a0;
+  Q11Info.pos = G4ThreeVector( x, y, z );
+  Q11Info.size = Q11Size*0.5;
+  Q11Info.ra1 = -D4BendAngle;
+  myField->AddMagnetInfo( Q11Info );
   // D4 magnet
   G4cout << "   D4Rho = " << D4Rho << G4endl;
   G4cout << "   D4r1 = " << D4r1/m  << ", D4r2 = " << D4r2/m  << G4endl;
@@ -816,6 +887,17 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
 		     D4Coil1LV, "D4Coil1PV", m_world_lv, false, 0 );
 #endif
+  MagnetInfo D4Info( "D4" );
+  D4Info.type = MagnetInfo::kDipole;
+  D4Info.b0 = D4B0;
+  D4Info.rho = D4Rho;
+  D4Info.alpha = D4alpha;
+  D4Info.beta = D4beta;
+  D4Info.pos = G4ThreeVector( x, y, z );
+  D4Info.size = D4FieldSize*0.5;
+  D4Info.ra1 = -D4BendAngle;
+  D4Info.bend = D4BendAngle/deg;
+  myField->AddMagnetInfo( D4Info );
   // Q12 magnet
   auto Q12Solid = new G4Box( "Q12Solid", Q12Size.x()/2,
 			     Q12Size.y()/2, Q12Size.z()/2 );
@@ -828,6 +910,14 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   z = - Q12Size.z()/2 - driftL4 - Q13Size.z() - driftL5 - driftL6;
   new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
 		     Q12LV, "Q12PV", m_world_lv, false, 0 );
+  MagnetInfo Q12Info( "Q12" );
+  Q12Info.type = MagnetInfo::kQuadrupole;
+  Q12Info.b0 = Q12B0;
+  Q12Info.a0 = Q12a0;
+  Q12Info.pos = G4ThreeVector( x, y, z );
+  Q12Info.size = Q12Size*0.5;
+  Q12Info.ra1 = -D4BendAngle;
+  myField->AddMagnetInfo( Q12Info );
   // Q13 magnet
   auto Q13Solid = new G4Box( "Q13Solid", Q13Size.x()/2,
 			     Q13Size.y()/2, Q13Size.z()/2 );
@@ -840,6 +930,14 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   z =  - Q13Size.z()/2 - driftL5 - driftL6;
   new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
 		     Q13LV, "Q13PV", m_world_lv, false, 0 );
+  MagnetInfo Q13Info( "Q13" );
+  Q13Info.type = MagnetInfo::kQuadrupole;
+  Q13Info.b0 = Q13B0;
+  Q13Info.a0 = Q13a0;
+  Q13Info.pos = G4ThreeVector( x, y, z );
+  Q13Info.size = Q13Size*0.5;
+  Q13Info.ra1 = -D4BendAngle;
+  myField->AddMagnetInfo( Q13Info );
   // Vacuum Chamber 1
   auto VC1Solid = new G4Box( "VC1Solid", VC1Size.x()/2,
 			     VC1Size.y()/2, VC1Size.z()/2 );
@@ -893,6 +991,7 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
   z = - driftL4/2 - Q13Size.z() - driftL5 - driftL6;
   new G4PVPlacement( nullptr, G4ThreeVector( x, y, z ),
 		     VC4LV, "VC4PV", m_world_lv, false, 0 );
+  myField->SetStatusK18Field( true );
 }
 
 //_____________________________________________________________________________
@@ -1538,6 +1637,7 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
   new G4PVPlacement( m_rotation_matrix,
   		     G4ThreeVector( dguard_pos ).rotateY( m_rotation_angle ),
   		     dguard_lv, "DGuardPV", m_world_lv, false, 0 );
+  myField->SetStatusKuramaField( true );
 }
 
 //_____________________________________________________________________________
@@ -2146,6 +2246,7 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
   new G4PVPlacement( G4Transform3D( rot_coil, coild_pos ),
 		     logicDetectorCoil, "CoilDwPV", m_world_lv, false, 0 );
 #endif
+  myField->SetStatusShsField( true );
 }
 
 //_____________________________________________________________________________

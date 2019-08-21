@@ -19,6 +19,7 @@
 #include "FuncName.hh"
 #include "TPCAnaManager.hh"
 #include "TPCACSD.hh"
+#include "TPCBH2SD.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCHTOFSD.hh"
 #include "TPCNBARSD.hh"
@@ -67,6 +68,14 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
   // get "Hit Collection of This Event"
   G4HCofThisEvent* HCTE= anEvent-> GetHCofThisEvent();
   if(! HCTE) return;  // no hits in this events. nothing to do!
+
+  static const G4int id_bh2 = SDManager-> GetCollectionID("BH2/hit");
+  if( id_bh2 >= 0 ){
+    const auto HC = (G4THitsCollection<TPCBH2Hit>*)HCTE->GetHC( id_bh2 );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetBH2Data( (*HC)[i] );
+    }
+  }
 
   static const G4int idcounter = SDManager->GetCollectionID("TPC/hit");
   if( idcounter > 0 ){

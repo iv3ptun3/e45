@@ -38,6 +38,7 @@ private:
   void ConstructElements( void );
   void ConstructMaterials( void );
   // Detectors
+  void ConstructBH2( void );
   void ConstructFTOF( void );
   void ConstructHTOF( void );
   void ConstructHypTPC( void );

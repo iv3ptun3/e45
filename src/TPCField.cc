@@ -7,11 +7,13 @@
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <G4ThreeVector.hh>
+#include <G4TwoVector.hh>
 
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
 #include "FuncName.hh"
+#include "MathTools.hh"
 #include "PrintHelper.hh"
 
 namespace
@@ -25,13 +27,69 @@ namespace
 }
 
 //_____________________________________________________________________________
+G4bool
+MagnetInfo::CalcField( const G4ThreeVector& point, G4double* bfield ) const
+{
+  PrintHelper helper( 4, std::ios::scientific, G4cout );
+  G4ThreeVector dist = point - pos;
+  switch( type ){
+  case kDipole: {
+    G4double phi = G4TwoVector( dist.x(), dist.z() ).phi()*math::Rad2Deg();
+    if( std::abs( dist.mag() - rho ) < size.x() &&
+	std::abs( dist.y() ) < size.y() &&
+	( -180. < phi ) && ( phi < -180.+bend ) ){
+      bfield[0] = 0.*tesla;
+      bfield[1] = b0;
+      bfield[2] = 0.*tesla;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  case kQuadrupole: {
+    dist.rotateY( -ra1 );
+    if( dist.perp() < 2.*a0 &&
+	std::abs( dist.z() ) < size.z() ){
+      G4ThreeVector b( b0*dist.y()/a0, b0*dist.x()/a0, 0.*tesla );
+#ifdef DEBUG
+      G4cout << name << " " << dist << " " << b*(1/tesla) << G4endl;
+#endif
+      b.rotateY( ra1 );
+      bfield[0] = b.x();
+      bfield[1] = b.y();
+      bfield[2] = b.z();
+      return true;
+    }
+    return false;
+  }
+  default:
+    G4Exception( FUNC_NAME, "", RunMustBeAborted, "" );
+    return false;
+  }
+}
+
+//_____________________________________________________________________________
 TPCField::TPCField( void )
   : m_k18_status( false ),
     m_kurama_status( false ),
     m_shs_status( false ),
     m_kurama_field_map(),
-    m_shs_field_map()
+    m_shs_field_map(),
+    m_magnet_map()
 {
+}
+
+//_____________________________________________________________________________
+TPCField::~TPCField( void )
+{
+}
+
+//_____________________________________________________________________________
+void
+TPCField::AddMagnetInfo( const MagnetInfo& mag )
+{
+  G4cout << "   Add magnet info : " << mag.name << G4endl;
+  m_magnet_map[mag.name] = mag;
 }
 
 //_____________________________________________________________________________
@@ -71,13 +129,9 @@ TPCField::Initialize( void )
     }
     G4cout << "   Finish reading OPERA3D file" << G4endl;
   }
+
   G4cout << "   Initialized" << G4endl;
   return true;
-}
-
-//_____________________________________________________________________________
-TPCField::~TPCField( void )
-{
 }
 
 //_____________________________________________________________________________
@@ -174,11 +228,18 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   // }
 
   // K18Beamline
-
+  if( m_k18_status ){
+    for( auto& m : m_magnet_map ){
+      if( m.second.CalcField( G4ThreeVector( xp, yp, zp ), Bfield ) )
+	return;
+    }
+  }
 
 #if 0
   G4ThreeVector b( Bfield[0], Bfield[1], Bfield[2] );
-  if( b.mag() > 0.01*tesla ){
+  if( b.mag() > 0.01*tesla
+      // || true
+      ){
     PrintHelper helper( 4, std::ios::fixed, G4cout );
     G4cout << FUNC_NAME << " X=( "
 	   << std::setw(10) << Point[0] << " "
