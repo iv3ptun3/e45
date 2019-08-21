@@ -12,6 +12,13 @@
 #include <G4TrackStatus.hh>
 #include <G4VPhysicalVolume.hh>
 
+#include "ConfMan.hh"
+
+namespace
+{
+  const auto& gConf = ConfMan::GetInstance();
+}
+
 //_____________________________________________________________________________
 TPCSteppingAction::TPCSteppingAction( void )
 {
@@ -26,13 +33,14 @@ TPCSteppingAction::~TPCSteppingAction( void )
 void
 TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
 {
+  static const G4bool KillStepInIron = gConf.Get<G4bool>( "KillStepInIron" );
+
   auto theTrack = theStep->GetTrack();
   auto theParticle = theTrack->GetParticleDefinition();
   auto particleName = theParticle->GetParticleName();
   auto prePoint = theStep->GetPreStepPoint();
   auto prePV = prePoint->GetPhysicalVolume();
   auto prePVName = prePV->GetName();
-  // auto preMaterial = prePoint->GetMaterial();
   auto postPoint = theStep->GetPostStepPoint();
   auto theProcess = postPoint->GetProcessDefinedStep()->GetProcessName();
 
@@ -60,10 +68,13 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   }
 #endif
 
-  // if( preMaterial->GetName() == "Iron" ){
-  //   theTrack->SetTrackStatus( fStopAndKill );
-  //   return;
-  // }
+  if( KillStepInIron ){
+    auto preMaterial = prePoint->GetMaterial();
+    if( preMaterial->GetName() == "Iron" ){
+      theTrack->SetTrackStatus( fStopAndKill );
+      return;
+    }
+  }
 
   // if( prePVName.contains( "Coil" ) ){
   //   theTrack->SetTrackStatus( fStopAndKill );

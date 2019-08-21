@@ -2,14 +2,18 @@
 #  file: DCGeomParam_E42_0
 #  date: 2019.06.18
 #  note:
+#    FF is +1200.0mm from VO.
+#    VI is -170.0mm from a surface of Q10
+#    VO is +170.0mm from a surface of Q13
 #    the origin of KURAMA coordinate is the center of KURAMA.
 #    KURAMA-X is +150.0mm from beam axis. (E07)
 #    KURAMA-X is +50.0mm from beam axis. (E42)
 #    KURAMA-Z is +1738.4mm from FF. (E07)
 #    KURAMA-Z is +1838.4mm from FF. (E42)
-#    FF is +1200.0mm from VO.
-#    VI is -170.0mm from a surface of Q10
-#    VO is +170.0mm from a surface of Q13
+#    HS is +143.0mm from FF.
+#    Target position in TPC is -143.0mm from the center of TPC.
+#    KURAMA-Z is +1595.4mm from HS.
+#
 #    L is defined as follows
 #    BH1, BFT  -> from VI
 #    Target    -> KURAMA coordinate
@@ -17,8 +21,8 @@
 #    BC34, BH2 -> from VO
 #    BAC, FBH  -> from VO
 #    Others    -> KURAMA coordinate
-#    HS is -1500.mm from KURAMA.
 #
+#    2019.08.21 first version for E42
 #    2017.11.07 second version for E07 Phase2
 #    2017.04.10 first version for E07 Phase2
 #    2017.01.10 apply resolutions
@@ -42,7 +46,7 @@
 #	Zk   :	z on KURAMA coordinate [mm]
 #	TA   :	tilt angle [deg]
 #	RA1  :	rotation angle along x-axis [deg]
-#	RA2  :	rotation angle aling y-axis [deg]
+#	RA2  :	rotation angle along y-axis [deg]
 #	L    :	local length from target or TOF [mm]
 #	Res  :	resolution [mm]
 #	W0   :	central wire # (1-origin)
@@ -75,11 +79,11 @@
 14	SSD2-Y2	-50.00	0.00	-1018.06 -90.0	0.0	0.0	-1018.06 0.080	768.5	0.05	0.145
 #
 ### KURAMA Virtual Plane
-21	VP1	0.00	0.00	-400.00	0.0	0.0	0.0	-400.00	0.00	0.00	1.0	0.00
-22	VP2	0.00	0.00	-200.00	0.0	0.0	0.0	-200.00	0.00	0.00	1.0	0.00
+21	VP1	0.00	0.00	-820.00	0.0	0.0	0.0	-400.00	0.00	0.00	1.0	0.00
+22	VP2	0.00	0.00	-400.00	0.0	0.0	0.0	-200.00	0.00	0.00	1.0	0.00
 23	VP3	0.00	0.00	0.00	0.0	0.0	0.0	0.00	0.00	0.00	1.0	0.00
-24	VP4	0.00	0.00	200.00	0.0	0.0	0.0	200.00	0.00	0.00	1.0	0.00
-25	VP5	0.00	0.00	400.00	0.0	0.0	0.0	400.00	0.00	0.00	1.0	0.00
+24	VP4	0.00	0.00	400.00	0.0	0.0	0.0	200.00	0.00	0.00	1.0	0.00
+25	VP5	0.00	0.00	720.00	0.0	0.0	0.0	400.00	0.00	0.00	1.0	0.00
 #
 ### SDC2
 31	SDC2-X1	0.00	0.00	868.600	0.0	0.0	0.0	868.600	0.30	64.75	9.01755	-1.237
@@ -98,8 +102,9 @@
 42	TOF-UY	246.88	0.00	2000.33	90.0	0.0	0.0	2000.33	14.00	12.5	75.0	0.0
 43	TOF-DX	253.12	0.00	2029.67	0.0	0.0	0.0	2029.67	21.178	12.5	75.0	0.0
 44	TOF-DY	253.12	0.00	2029.67	90.0	0.0	0.0	2029.67	14.00	12.5	75.0	0.0
-45	TOF	250.00	0.00	1700.00	0.0	0.0	0.0	1700.00	0.00	12.5	75.0	0.0
-46	WC	250.00	0.00	2000.00	0.0	0.0	0.0	2000.00	0.00	10.5	120.0	0.0
+45	TOF	250.00	0.00	1500.00	0.0	0.0	0.0	1700.00	0.00	12.5	75.0	0.0
+46	LAC	250.00	0.00	2000.00	0.0	0.0	0.0	2000.00	0.00	10.5	120.0	0.0
+47	WC	250.00	0.00	2700.00	0.0	0.0	0.0	2000.00	0.00	10.5	120.0	0.0
 60	VTOF	0.00	0.00	2500.00	0.0	0.0	0.0	2500.00	0.00	1.0	0.0	0.0
 #
 #
@@ -108,11 +113,11 @@
 ##############################################################################
 # Name Explaination (use DCGeomRecord as refference):
 #             X:      x [mm]
-#             Y:      y [mm] (same as L)
+#             Y:      y [mm]
 #             Z:      z [mm]
 #             TA:     tilt angle [deg]
 #             RA1:    rotation angle along x-axis [deg]
-#             RA2:    rotation angle aling y-axis [deg]
+#             RA2:    rotation angle along y-axis [deg]
 #             L:      local length from VI or VO [mm]
 #             Res:    resolution [mm]
 #             W0:     central wire # (1-origin)
@@ -158,18 +163,18 @@
 ### Emulsion Upstream Surface
 131	Emulsion 0.0	0.00	-1041.215 0.0	0.0	0.0	-1041.215 0.00	1.0	0.0	0.0
 ### Misc
-501	NMR	0.00	-385.00	0.00	0.0	0.0	0.0	0.00	0.00	0.0	0.0	0.0
-502	EM-base	0.00	0.00	-1230.91 0.0	0.0	0.0	1707.49	0.00	1.0	0.0	0.0
+151	NMR	0.00	-385.00	0.00	0.0	0.0	0.0	0.00	0.00	0.0	0.0	0.0
+152	EM-base	0.00	0.00	-1230.91 0.0	0.0	0.0	1707.49	0.00	1.0	0.0	0.0
 ##############################################################################
 ############  Hyperon Spectrometer part  #####################################
 ##############################################################################
 # Name Explaination (use DCGeomRecord as refference):
 #             X:      x [mm]
-#             Y:      y [mm] (same as L)
+#             Y:      y [mm]
 #             Z:      z [mm]
 #             TA:     tilt angle [deg]
 #             RA1:    rotation angle along x-axis [deg]
-#             RA2:    rotation angle aling y-axis [deg]
+#             RA2:    rotation angle along y-axis [deg]
 #             L:      radial length from HS center [mm]
 #             Res:    resolution [mm]
 #             W0:     central wire # (1-origin)
@@ -180,9 +185,9 @@
 #
 # Id	Name	X	Y	Z	TA	RA1	RA2	L	Res	W0	dXdW	Ofs
 #
-300	SHSTarget 0.0	0.0	-143.0	0.0	0.0	0.0	0.0	0.00	1.0	1.0	0.0
-301	HypTPC	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
-302	HTOF	0.0	0.0	0.0	0.0	0.0	0.0	337.0	0.0	0.0	68.0	0.0
-303	KURAMA	50.0	0.0	1695.4	0.0	0.0	0.0	1695.4	0.0	0.0	0.0	0.0
+500	SHSTarget 0.0	0.0	-143.0	0.0	0.0	0.0	0.0	0.00	1.0	1.0	0.0
+501	HypTPC	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0
+502	HTOF	0.0	0.0	0.0	0.0	0.0	0.0	337.0	0.0	0.0	68.0	0.0
+503	KURAMA	50.0	0.0	1595.4	0.0	0.0	0.0	1595.4	0.0	0.0	0.0	0.0
 ### Primary Vertex
 1000	Vertex	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0

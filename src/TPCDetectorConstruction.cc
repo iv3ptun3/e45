@@ -21,7 +21,6 @@
 #include <G4UnionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
-#include <tools/mathd>
 
 #include "BeamMan.hh"
 #include "ConfMan.hh"
@@ -34,12 +33,14 @@
 #include "TPCBH2SD.hh"
 #include "TPCField.hh"
 #include "TPCFTOFSD.hh"
-#include "TPCNBARSD.hh"
 #include "TPCHTOFSD.hh"
+#include "TPCLACSD.hh"
+#include "TPCNBARSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
 
 namespace
@@ -107,7 +108,8 @@ TPCDetectorConstruction::Construct( void )
   fieldMan->CreateChordFinder( myField );
   // fieldMan->GetChordFinder()->SetDeltaChord( 1.e-3*mm );
 
-  ConstructK18BeamlineSpectrometer();
+  if( gConf.Get<G4int>("Generator") == 10 )
+    ConstructK18BeamlineSpectrometer();
 
   ConstructBH2();
 
@@ -129,6 +131,7 @@ TPCDetectorConstruction::Construct( void )
     ConstructSDC2();
     ConstructSDC3();
     ConstructFTOF();
+    ConstructLAC();
     ConstructWC();
   }
 #endif
@@ -155,21 +158,21 @@ TPCDetectorConstruction::ConstructElements( void )
   name = "Oxygen";
   m_element_map[name] = new G4Element( name, symbol="O",  Z=8.,
 				       A=15.9994 *g/mole );
-  name = "Argon";
-  m_element_map[name] = new G4Element( name, symbol="Ar", Z=18.,
-				       A=39.948 *g/mole );
+  name = "Sodium";
+  m_element_map[name] = new G4Element( name, symbol="Na", Z=11.,
+				       A=22.989768 *g/mole );
   name = "Silicon";
   m_element_map[name] = new G4Element( name, symbol="Si", Z=14.,
 				       A=28.0855 *g/mole );
+  name = "Argon";
+  m_element_map[name] = new G4Element( name, symbol="Ar", Z=18.,
+				       A=39.948 *g/mole );
   name = "Iodine";
   m_element_map[name] = new G4Element( name, symbol="I",  Z=53.,
 				       A=126.90447 *g/mole );
   name = "Cesium";
   m_element_map[name] = new G4Element( name, symbol="Cs", Z=55.,
 				       A=132.90543 *g/mole );
-  name = "Sodium";
-  m_element_map[name] = new G4Element( name, symbol="Na", Z=11.,
-				       A=22.989768 *g/mole );
 }
 
 //_____________________________________________________________________________
@@ -210,6 +213,10 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name] = new G4Material( name, density=1.*g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], 2 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"], 1 );
+  // Aluminum
+  name = "Aluminum";
+  m_material_map[name] = new G4Material( name, Z=13., A=26.9815*g/mole,
+					 density=2.699*g/cm3 );
   // Iron
   name = "Iron";
   m_material_map[name] = new G4Material( name, Z=26., A=55.85*g/mole,
@@ -292,6 +299,11 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name] = new G4Material( name, density=0.95*g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=2 );
+  // Silica Aerogel for LAC
+  name = "SilicaAerogelLAC";
+  m_material_map[name] = new G4Material( name, density=0.18 *g/cm3, nel=2 );
+  m_material_map[name]->AddElement( m_element_map["Silicon"], natoms=1 );
+  m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
   // Quartz (SiO2, crystalline)
   name = "Quartz";
   m_material_map[name] = new G4Material( name, density=2.64 *g/cm3, nel=2 );
@@ -538,7 +550,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     auto fc_lv = new G4LogicalVolume( fc_solid, m_material_map["P10"],
 				      "FcLV" );
     new G4PVPlacement( nullptr, G4ThreeVector(), fc_lv,
-		       "FcPV", m_tpc_lv, false, 0 );
+		       "FieldCagePV", m_tpc_lv, false, 0 );
     fc_lv->SetVisAttributes( G4Colour::Red() );
   }
   // Virtual pads
@@ -998,6 +1010,8 @@ TPCDetectorConstruction::ConstructK18BeamlineSpectrometer( void )
 void
 TPCDetectorConstruction::ConstructKuramaMagnet( void )
 {
+  auto vp_sd = new TPCVPSD("/VP");
+  G4SDManager::GetSDMpointer()->AddNewDetector( vp_sd );
   const auto field_size = gSize.GetSize("KuramaField") * 0.5 * mm;
   const auto coil_color = G4Colour::Red();
   // size
@@ -1578,7 +1592,7 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 		     m_world_lv,
 		     false,
 		     0 );
-  // Upstraam End Guard
+  // Upstream End Guard
   auto uguard_inner_solid = new G4Box( "UGuardInnerSolid",
 				       uguard_inner_size.x(),
 				       uguard_inner_size.y(),
@@ -1637,7 +1651,100 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
   new G4PVPlacement( m_rotation_matrix,
   		     G4ThreeVector( dguard_pos ).rotateY( m_rotation_angle ),
   		     dguard_lv, "DGuardPV", m_world_lv, false, 0 );
+  // Virtual Plane
+  auto vp_solid = new G4Box( "VPSolid", 2.*m/2, 2.*m/2, 0.001*mm/2 );
+  auto vp_lv = new G4LogicalVolume( vp_solid, m_material_map["Air"], "VPLV" );
+  vp_lv->SetSensitiveDetector( vp_sd );
+  vp_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  for( G4int i=0; i<NumOfSegVP; ++i ){
+    auto vp_pos = ( gGeom.GetGlobalPosition( "KURAMA" ) +
+		    gGeom.GetGlobalPosition( Form( "VP%d", i+1 ) ) );
+    new G4PVPlacement( m_rotation_matrix, vp_pos, vp_lv,
+		       Form( "VP%dPV", i+1 ), m_world_lv, false, i );
+  }
   myField->SetStatusKuramaField( true );
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructLAC( void )
+{
+  auto lac_sd = new TPCLACSD("/LAC");
+  lac_sd->SetRefractiveIndex( 1.05 );
+  G4SDManager::GetSDMpointer()->AddNewDetector( lac_sd );
+  const auto& ra2 = gGeom.GetRotAngle2("LAC") * deg;
+  const auto& frame_size = gSize.GetSize("LacFrame") * 0.5 * mm;
+  const auto& radiator_size = gSize.GetSize("LacRadiator") * 0.5 * mm;
+  // Mother
+  auto mother_solid = new G4Box( "LacMotherSolid",
+				 frame_size.x() + 50.*mm,
+				 frame_size.y() + 50.*mm,
+				 frame_size.z() + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+					m_material_map["Air"],
+					"LacMotherLV" );
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+	       gGeom.GetGlobalPosition("LAC") );
+  pos.rotateY( m_rotation_angle );
+  new G4PVPlacement( rot, pos, mother_lv,
+		     "LacMotherPV", m_world_lv, false, 0 );
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  // Frame
+  auto frame_solid = new G4Box( "LacFrameSolid", frame_size.x(),
+				frame_size.y(), frame_size.z() );
+  auto frame_lv = new G4LogicalVolume( frame_solid,
+				       m_material_map["Air"],
+				       "LacFrameLV" );
+  pos.setMag( 0. );
+  new G4PVPlacement( nullptr, pos, frame_lv,
+		     "LacFramePV", mother_lv, false, 0 );
+  // Radiator
+  auto radiator_solid = new G4Box( "LacRadiatorSolid", radiator_size.x(),
+				   radiator_size.y(), radiator_size.z() );
+  auto radiator_lv = new G4LogicalVolume( radiator_solid,
+					  m_material_map["SilicaAerogelLAC"],
+					  "LacRadiatorLV" );
+  radiator_lv->SetSensitiveDetector( lac_sd );
+  radiator_lv->SetVisAttributes( G4Color::Magenta() );
+  pos.set( 0., 0., -frame_size.z() + radiator_size.z() + 10.*mm );
+  new G4PVPlacement( nullptr, pos, radiator_lv,
+		     "LacRadiatorPV", frame_lv, false, 0 );
+  // Mirror
+  const G4double mirror_thickness = 1.*mm/2.;
+  const G4double mirror_space = 20.*mm;
+  const G4ThreeVector triangle_size( 710.59*mm, frame_size.y(), 500.*mm );
+  const G4double mirror_angle = std::atan2( triangle_size.z(),
+					    triangle_size.x() );
+  const G4ThreeVector mirror1_size( ( frame_size.x() - triangle_size.x() )/2.,
+				    triangle_size.y(), mirror_thickness );
+  const G4ThreeVector mirror2_size( std::hypot( triangle_size.x(),
+						triangle_size.z() )/2.,
+				    triangle_size.y(),
+				    mirror_thickness );
+  auto mirror1_solid = new G4Box( "LacMirror1Solid", mirror1_size.x(),
+				  mirror1_size.y(), mirror1_size.z() );
+  auto mirror1_lv = new G4LogicalVolume( mirror1_solid,
+					 m_material_map["Aluminum"],
+					"LacMirror1LV" );
+  auto mirror2_solid = new G4Box( "LacMirror2Solid", mirror2_size.x(),
+				  mirror2_size.y(), mirror2_size.z() );
+  auto mirror2_lv = new G4LogicalVolume( mirror2_solid,
+					 m_material_map["Aluminum"],
+					"LacMirror2LV" );
+  for( G4int i=0; i<2; ++i ){
+    pos.set( ( triangle_size.x() + mirror1_size.x() ) * ( i*2 - 1 ),
+	     0., frame_size.z() - mirror_space );
+    new G4PVPlacement( nullptr, pos, mirror1_lv,
+		       "LacMirrorPV", frame_lv, false, 0 );
+    pos.set( triangle_size.x()/2 * ( i*2 - 1 ),
+	     0., frame_size.z() - triangle_size.z()/2 - mirror_space );
+    rot = new G4RotationMatrix;
+    rot->rotateY( mirror_angle * ( i*2 - 1 ) );
+    new G4PVPlacement( rot, pos, mirror2_lv,
+		       "LacMirrorPV", frame_lv, false, 0 );
+  }
 }
 
 //_____________________________________________________________________________
@@ -1671,10 +1778,15 @@ TPCDetectorConstruction::ConstructNBAR( void )
     posMOut2_nbar.rotateY(dangleOut_nbar*0.5-22.5*deg);
     for(G4int i=0;i<8; i++){
       for(G4int j=0;j<num_one_plane_nbar;j++){
-	G4ThreeVector posMOut1(n_bar_radius*mm,0.*mm,+plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*j); //x,z,y??
+	G4ThreeVector posMOut1( n_bar_radius*mm, 0.*mm,
+				plane_width_nbar/2-DZ_NBAR1-DZ_NBAR1*2*j); //x,z,y??
 	G4RotationMatrix* rotMOutP = new G4RotationMatrix;
-	G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut_nbar*(i)), posMOut1.rotateY(dangleOut_nbar*(i)));
-	nbarLV[i*num_one_plane_nbar+j] = new G4LogicalVolume(nbarSolid1, m_material_map["Scintillator"], Form("NBARLV%d",i*num_one_plane_nbar+j));
+	G4Transform3D transformMP1(rotMOutP->rotateY(dangleOut_nbar*(i)),
+				   posMOut1.rotateY(dangleOut_nbar*(i)));
+	nbarLV[i*num_one_plane_nbar+j] =
+	  new G4LogicalVolume(nbarSolid1,
+			      m_material_map["Scintillator"],
+			      Form("NBARLV%d",i*num_one_plane_nbar+j));
 	/////id 0 is start forward scintillator
 	G4int copyno=i*num_one_plane_nbar+j+6;
 	if(copyno>31) copyno=copyno-32;
@@ -1751,47 +1863,27 @@ TPCDetectorConstruction::ConstructSCH( void )
 {
   const auto& sch_pos = ( gGeom.GetGlobalPosition("KURAMA") +
 			  gGeom.GetGlobalPosition("SCH") );
-  G4LogicalVolume* SCH_log[NumOfSegSCH];
-  G4double size_SCH[3];
-  size_SCH[ThreeVector::X] = 11.5*mm;
-  size_SCH[ThreeVector::Y] = 400.0*mm;
-  size_SCH[ThreeVector::Z] = 2.0*mm;
-  G4Box* SCH_box = new G4Box("SCH_box",size_SCH[ThreeVector::X]/2,size_SCH[ThreeVector::Y]/2,size_SCH[ThreeVector::Z]/2);
-  G4double SCH_Overlap = 1.*mm;
-  //  G4LogicalVolume* SCH_log[NumOfSegSCH];
-  for (int i=0; i<NumOfSegSCH; i++) {
-    SCH_log[i] = new G4LogicalVolume(SCH_box, m_material_map["Scintillator"], Form("SCH%d_log", i),
-				    0, 0, 0 );
-    SCH_log[i]->SetVisAttributes( G4Colour::Cyan() );
-    //    par_cham->calpc((double *)pos_SCH, SCHx, (double)(i+1));
-    G4double ipos_x = -NumOfSegSCH/2.*(size_SCH[ThreeVector::X]-SCH_Overlap)+5.75*mm+(size_SCH[ThreeVector::X]-SCH_Overlap)*i;
-    if(i%2==0){
-      new G4PVPlacement( m_rotation_matrix,
-			 G4ThreeVector( sch_pos.x() + ipos_x,
-					sch_pos.y(),
-					sch_pos.z() - 1.*mm ).rotateY( m_rotation_angle ),
-			 SCH_log[i],
-			 Form("SCH%d", i),
-			 m_world_lv,
-			 false,
-			 i );
-    }else if(i%2==1){
-      new G4PVPlacement( m_rotation_matrix,
-			 G4ThreeVector( sch_pos.x() + ipos_x,
-					sch_pos.y(),
-					sch_pos.z() + 1.*mm ).rotateY( m_rotation_angle ),
-			 SCH_log[i],
-			 Form("SCH%d", i),
-			 m_world_lv,
-			 false,
-			 i);
-    }
+  const auto& sch_size = gSize.GetSize( "SchSeg" ) * 0.5 * mm;
+  const G4double overlap = 1.*mm;
+  G4LogicalVolume* sch_lv[NumOfSegSCH];
+  auto sch_solid = new G4Box( "SchSolid", sch_size.x(),
+			      sch_size.y(), sch_size.z() );
+  for( G4int i=0; i<NumOfSegSCH; ++i ){
+    sch_lv[i] = new G4LogicalVolume( sch_solid, m_material_map["Scintillator"],
+				     Form( "SchSeg%dLV", i ), 0, 0, 0 );
+    sch_lv[i]->SetVisAttributes( G4Colour::Cyan() );
+    G4double ipos_x = ( -NumOfSegSCH/2. + i )*(sch_size.x()*2-overlap)+5.75*mm;
+    G4ThreeVector pos( sch_pos.x() + ipos_x,
+		       sch_pos.y(),
+		       sch_pos.z() + 1.*mm*( 2*(i%2) - 1 ) );
+    // pos.rotateY( m_rotation_angle );
+    new G4PVPlacement( m_rotation_matrix, pos, sch_lv[i],
+		       Form( "SchSeg%dPV", i ), m_world_lv, false, i );
   }
-
   auto schSD = new TPCSCHSD("/SCH");
   G4SDManager::GetSDMpointer()->AddNewDetector( schSD );
   for( G4int i = 0; i<NumOfSegSCH; ++i ){
-    SCH_log[i]->SetSensitiveDetector( schSD );
+    sch_lv[i]->SetSensitiveDetector( schSD );
   }
 }
 

@@ -352,6 +352,31 @@ struct Event
   Double_t vtpzFtof[MaxHits];
   Double_t vtppFtof[MaxHits];
   Double_t lengthFtof[MaxHits];
+  // LAC
+  Int_t nhLac;
+  Int_t tidLac[MaxHits];
+  Int_t pidLac[MaxHits];
+  Int_t didLac[MaxHits];
+  Int_t prtLac[MaxHits];
+  Int_t qLac[MaxHits];
+  Double_t massLac[MaxHits];
+  Double_t xLac[MaxHits];
+  Double_t yLac[MaxHits];
+  Double_t zLac[MaxHits];
+  Double_t pxLac[MaxHits];
+  Double_t pyLac[MaxHits];
+  Double_t pzLac[MaxHits];
+  Double_t ppLac[MaxHits];
+  Double_t deLac[MaxHits];
+  Double_t tLac[MaxHits];
+  Double_t vtxLac[MaxHits];
+  Double_t vtyLac[MaxHits];
+  Double_t vtzLac[MaxHits];
+  Double_t vtpxLac[MaxHits];
+  Double_t vtpyLac[MaxHits];
+  Double_t vtpzLac[MaxHits];
+  Double_t vtppLac[MaxHits];
+  Double_t lengthLac[MaxHits];
   // WC
   Int_t nhWc;
   Int_t tidWc[MaxHits];
@@ -377,6 +402,31 @@ struct Event
   Double_t vtpzWc[MaxHits];
   Double_t vtppWc[MaxHits];
   Double_t lengthWc[MaxHits];
+  // VP
+  Int_t nhVp;
+  Int_t tidVp[MaxHits];
+  Int_t pidVp[MaxHits];
+  Int_t didVp[MaxHits];
+  Int_t prtVp[MaxHits];
+  Int_t qVp[MaxHits];
+  Double_t massVp[MaxHits];
+  Double_t xVp[MaxHits];
+  Double_t yVp[MaxHits];
+  Double_t zVp[MaxHits];
+  Double_t pxVp[MaxHits];
+  Double_t pyVp[MaxHits];
+  Double_t pzVp[MaxHits];
+  Double_t ppVp[MaxHits];
+  Double_t deVp[MaxHits];
+  Double_t tVp[MaxHits];
+  Double_t vtxVp[MaxHits];
+  Double_t vtyVp[MaxHits];
+  Double_t vtzVp[MaxHits];
+  Double_t vtpxVp[MaxHits];
+  Double_t vtpyVp[MaxHits];
+  Double_t vtpzVp[MaxHits];
+  Double_t vtppVp[MaxHits];
+  Double_t lengthVp[MaxHits];
 };
 
 //_____________________________________________________________________________
@@ -452,8 +502,10 @@ public:
 		       G4int parentid, G4double tlength, G4double slength );
   void SetHTOFData( const VHitInfo* hit );
   void SetFTOFData( const VHitInfo* hit );
+  void SetLACData( const VHitInfo* hit );
   void SetSCHData( const VHitInfo* hit );
   void SetSDCData( const VHitInfo* hit );
+  void SetVPData( const VHitInfo* hit );
   void SetWCData( const VHitInfo* hit );
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);

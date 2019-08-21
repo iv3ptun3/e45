@@ -17,7 +17,8 @@ const Int_t DetIdPVAC    =  5;
 const Int_t DetIdFAC     =  6;
 const Int_t DetIdSCH     =  7;
 const Int_t DetIdTOF     =  8;
-const Int_t DetIdWC      =  9;
+const Int_t DetIdLAC     =  9;
+const Int_t DetIdWC      = 10;
 const Int_t NumOfSegBH1  = 11;
 const Int_t NumOfSegBH2  = 12;
 const Int_t NumOfSegBAC  =  2;
@@ -27,6 +28,7 @@ const Int_t NumOfSegPVAC =  1;
 const Int_t NumOfSegFAC  =  1;
 const Int_t NumOfSegSCH  = 64;
 const Int_t NumOfSegTOF  = 24;
+const Int_t NumOfSegLAC  = 30;
 const Int_t NumOfSegWC   = 20;
 
 // Misc _______________________________________________________________________
@@ -40,12 +42,14 @@ const Int_t DetIdHulSCH    =  27;
 const Int_t DetIdHulFBH    =  28;
 const Int_t DetIdVmeRm     =  81;
 const Int_t DetIdMsTRM     =  82;
+const Int_t DetIdVP        =  83;
 const Int_t NumOfSegTrig   =  32;
 const Int_t NumOfSegScaler =  32;
 const Int_t NumOfSegEMC    =   1;
 const Int_t NumOfSegSSDT   =  16;
 const Int_t SpillEndFlag   =  20;// 0-based
 const Int_t NumOfPlaneVmeRm = 11;
+const Int_t NumOfSegVP     =   5;
 
 enum eTriggerFlag
   {

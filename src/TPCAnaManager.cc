@@ -272,6 +272,31 @@ TPCAnaManager::TPCAnaManager( void )
   tree->Branch( "vtyFtof", event.vtyFtof, "vtyFtof[nhFtof]/D" );
   tree->Branch( "vtzFtof", event.vtzFtof, "vtzFtof[nhFtof]/D" );
   tree->Branch( "lengthFtof", event.lengthFtof, "lengthFtof[nhFtof]/D" );
+  // LAC
+  tree->Branch( "nhLac", &event.nhLac, "nhLac/I" );
+  tree->Branch( "tidLac", event.tidLac, "tidLac[nhLac]/I" );
+  tree->Branch( "pidLac", event.pidLac, "pidLac[nhLac]/I" );
+  tree->Branch( "didLac", event.didLac, "didLac[nhLac]/I" );
+  tree->Branch( "prtLac", event.prtLac, "prtLac[nhLac]/I" );
+  tree->Branch( "qLac", event.qLac, "qLac[nhLac]/I" );
+  tree->Branch( "massLac", event.massLac, "massLac[nhLac]/D" );
+  tree->Branch( "xLac", event.xLac, "xLac[nhLac]/D" );
+  tree->Branch( "yLac", event.yLac, "yLac[nhLac]/D" );
+  tree->Branch( "zLac", event.zLac, "zLac[nhLac]/D" );
+  tree->Branch( "pxLac", event.pxLac, "pxLac[nhLac]/D" );
+  tree->Branch( "pyLac", event.pyLac, "pyLac[nhLac]/D" );
+  tree->Branch( "pzLac", event.pzLac, "pzLac[nhLac]/D" );
+  tree->Branch( "ppLac", event.ppLac, "ppLac[nhLac]/D" );
+  tree->Branch( "deLac", event.deLac, "deLac[nhLac]/D" );
+  tree->Branch( "tLac", event.tLac, "tLac[nhLac]/D" );
+  tree->Branch( "vtpxLac", event.vtpxLac, "vtpxLac[nhLac]/D" );
+  tree->Branch( "vtpyLac", event.vtpyLac, "vtpyLac[nhLac]/D" );
+  tree->Branch( "vtpzLac", event.vtpzLac, "vtpzLac[nhLac]/D" );
+  tree->Branch( "vtppLac", event.vtppLac, "vtppLac[nhLac]/D" );
+  tree->Branch( "vtxLac", event.vtxLac, "vtxLac[nhLac]/D" );
+  tree->Branch( "vtyLac", event.vtyLac, "vtyLac[nhLac]/D" );
+  tree->Branch( "vtzLac", event.vtzLac, "vtzLac[nhLac]/D" );
+  tree->Branch( "lengthLac", event.lengthLac, "lengthLac[nhLac]/D" );
   // WC
   tree->Branch( "nhWc", &event.nhWc, "nhWc/I" );
   tree->Branch( "tidWc", event.tidWc, "tidWc[nhWc]/I" );
@@ -297,6 +322,31 @@ TPCAnaManager::TPCAnaManager( void )
   tree->Branch( "vtyWc", event.vtyWc, "vtyWc[nhWc]/D" );
   tree->Branch( "vtzWc", event.vtzWc, "vtzWc[nhWc]/D" );
   tree->Branch( "lengthWc", event.lengthWc, "lengthWc[nhWc]/D" );
+  // VP
+  tree->Branch( "nhVp", &event.nhVp, "nhVp/I" );
+  tree->Branch( "tidVp", event.tidVp, "tidVp[nhVp]/I" );
+  tree->Branch( "pidVp", event.pidVp, "pidVp[nhVp]/I" );
+  tree->Branch( "didVp", event.didVp, "didVp[nhVp]/I" );
+  tree->Branch( "prtVp", event.prtVp, "prtVp[nhVp]/I" );
+  tree->Branch( "qVp", event.qVp, "qVp[nhVp]/I" );
+  tree->Branch( "massVp", event.massVp, "massVp[nhVp]/D" );
+  tree->Branch( "xVp", event.xVp, "xVp[nhVp]/D" );
+  tree->Branch( "yVp", event.yVp, "yVp[nhVp]/D" );
+  tree->Branch( "zVp", event.zVp, "zVp[nhVp]/D" );
+  tree->Branch( "pxVp", event.pxVp, "pxVp[nhVp]/D" );
+  tree->Branch( "pyVp", event.pyVp, "pyVp[nhVp]/D" );
+  tree->Branch( "pzVp", event.pzVp, "pzVp[nhVp]/D" );
+  tree->Branch( "ppVp", event.ppVp, "ppVp[nhVp]/D" );
+  tree->Branch( "deVp", event.deVp, "deVp[nhVp]/D" );
+  tree->Branch( "tVp", event.tVp, "tVp[nhVp]/D" );
+  tree->Branch( "vtpxVp", event.vtpxVp, "vtpxVp[nhVp]/D" );
+  tree->Branch( "vtpyVp", event.vtpyVp, "vtpyVp[nhVp]/D" );
+  tree->Branch( "vtpzVp", event.vtpzVp, "vtpzVp[nhVp]/D" );
+  tree->Branch( "vtppVp", event.vtppVp, "vtppVp[nhVp]/D" );
+  tree->Branch( "vtxVp", event.vtxVp, "vtxVp[nhVp]/D" );
+  tree->Branch( "vtyVp", event.vtyVp, "vtyVp[nhVp]/D" );
+  tree->Branch( "vtzVp", event.vtzVp, "vtzVp[nhVp]/D" );
+  tree->Branch( "lengthVp", event.lengthVp, "lengthVp[nhVp]/D" );
 }
 
 //_____________________________________________________________________________
@@ -501,7 +551,9 @@ TPCAnaManager::BeginOfEventAction( void )
   event.nhSdc = 0;
   event.nhSch = 0;
   event.nhFtof = 0;
+  event.nhLac = 0;
   event.nhWc = 0;
+  event.nhVp = 0;
   for( G4int i=0; i<MaxHits; ++i ){
     // BH2
     event.tidBh2[i] = -9999;
@@ -618,6 +670,27 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxFtof[i] = -9999.;
     event.vtyFtof[i] = -9999.;
     event.vtzFtof[i] = -9999.;
+    // LAC
+    event.tidLac[i] = -9999;
+    event.pidLac[i] = -9999;
+    event.didLac[i] = -9999;
+    event.prtLac[i] = -9999;
+    event.qLac[i] = -9999;
+    event.massLac[i] = -9999.;
+    event.xLac[i] = -9999.;
+    event.yLac[i] = -9999.;
+    event.zLac[i] = -9999.;
+    event.pxLac[i] = -9999.;
+    event.pyLac[i] = -9999.;
+    event.pzLac[i] = -9999.;
+    event.tLac[i] = -9999.;
+    event.vtppLac[i] = -9999.;
+    event.vtpxLac[i] = -9999.;
+    event.vtpyLac[i] = -9999.;
+    event.vtpzLac[i] = -9999.;
+    event.vtxLac[i] = -9999.;
+    event.vtyLac[i] = -9999.;
+    event.vtzLac[i] = -9999.;
     // WC
     event.tidWc[i] = -9999;
     event.pidWc[i] = -9999;
@@ -639,6 +712,27 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxWc[i] = -9999.;
     event.vtyWc[i] = -9999.;
     event.vtzWc[i] = -9999.;
+    // VP
+    event.tidVp[i] = -9999;
+    event.pidVp[i] = -9999;
+    event.didVp[i] = -9999;
+    event.prtVp[i] = -9999;
+    event.qVp[i] = -9999;
+    event.massVp[i] = -9999.;
+    event.xVp[i] = -9999.;
+    event.yVp[i] = -9999.;
+    event.zVp[i] = -9999.;
+    event.pxVp[i] = -9999.;
+    event.pyVp[i] = -9999.;
+    event.pzVp[i] = -9999.;
+    event.tVp[i] = -9999.;
+    event.vtppVp[i] = -9999.;
+    event.vtpxVp[i] = -9999.;
+    event.vtpyVp[i] = -9999.;
+    event.vtpzVp[i] = -9999.;
+    event.vtxVp[i] = -9999.;
+    event.vtyVp[i] = -9999.;
+    event.vtzVp[i] = -9999.;
   }
 
   event.nttpc = 0;
@@ -1708,6 +1802,27 @@ TPCAnaManager::SetHTOFData( const VHitInfo* hit )
 
 //_____________________________________________________________________________
 void
+TPCAnaManager::SetLACData( const VHitInfo* hit )
+{
+  if( event.nhLac > MaxHits ){
+    G4cerr << FUNC_NAME << " too much nhit " << event.nhLac << G4endl;
+  } else {
+    Int_t i = event.nhLac;
+    event.tidLac[i] = hit->GetTrackID();
+    event.pidLac[i] = hit->GetParticleID();
+    event.didLac[i] = hit->GetDetectorID();
+    event.prtLac[i] = hit->GetParentID();
+    event.deLac[i] = hit->GetEnergyDeposit();
+    event.tLac[i] = hit->GetTime();
+    event.xLac[i] = hit->GetPosition().x();
+    event.yLac[i] = hit->GetPosition().y();
+    event.zLac[i] = hit->GetPosition().z();
+    event.nhLac++;
+  }
+}
+
+//_____________________________________________________________________________
+void
 TPCAnaManager::SetSCHData( const VHitInfo* hit )
 {
   if( event.nhSch > MaxHits ){
@@ -1745,6 +1860,27 @@ TPCAnaManager::SetSDCData( const VHitInfo* hit )
     event.ySdc[i] = hit->GetPosition().y();
     event.zSdc[i] = hit->GetPosition().z();
     event.nhSdc++;
+  }
+}
+
+//_____________________________________________________________________________
+void
+TPCAnaManager::SetVPData( const VHitInfo* hit )
+{
+  if( event.nhVp > MaxHits ){
+    G4cerr << FUNC_NAME << " too much nhit " << event.nhVp << G4endl;
+  } else {
+    Int_t i = event.nhVp;
+    event.tidVp[i] = hit->GetTrackID();
+    event.pidVp[i] = hit->GetParticleID();
+    event.didVp[i] = hit->GetDetectorID();
+    event.prtVp[i] = hit->GetParentID();
+    event.deVp[i] = hit->GetEnergyDeposit();
+    event.tVp[i] = hit->GetTime();
+    event.xVp[i] = hit->GetPosition().x();
+    event.yVp[i] = hit->GetPosition().y();
+    event.zVp[i] = hit->GetPosition().z();
+    event.nhVp++;
   }
 }
 

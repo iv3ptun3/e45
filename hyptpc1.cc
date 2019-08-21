@@ -58,9 +58,9 @@ main( int argc, char** argv )
 # if 0
   auto traj = new G4TrajectoryDrawByCharge;
   const G4Colour Invisible( 0., 0., 0., 0. );
-  traj->Set( G4TrajectoryDrawByCharge::Charge::Negative, G4Colour::Blue() );
   traj->Set( G4TrajectoryDrawByCharge::Charge::Neutral, Invisible );
-  traj->Set( G4TrajectoryDrawByCharge::Charge::Positive, G4Colour::Red() );
+  // traj->Set( G4TrajectoryDrawByCharge::Charge::Negative, G4Colour::Blue() );
+  // traj->Set( G4TrajectoryDrawByCharge::Charge::Positive, G4Colour::Red() );
   visManager->RegisterModel( traj );
 # endif
 #endif

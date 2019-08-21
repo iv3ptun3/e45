@@ -44,6 +44,7 @@ private:
   void ConstructHypTPC( void );
   void ConstructK18BeamlineSpectrometer( void );
   void ConstructKuramaMagnet( void );
+  void ConstructLAC( void );
   void ConstructNBAR( void );
   void ConstructPVAC2( void );
   void ConstructSCH( void );

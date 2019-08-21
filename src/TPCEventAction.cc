@@ -22,11 +22,13 @@
 #include "TPCBH2SD.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCHTOFSD.hh"
+#include "TPCLACSD.hh"
 #include "TPCNBARSD.hh"
 #include "TPCPadSD.hh"
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
 
 namespace
@@ -299,11 +301,27 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
+  static const G4int id_lac = SDManager-> GetCollectionID("LAC/hit");
+  if( id_lac >= 0 ){
+    const auto HC = (G4THitsCollection<TPCLACHit>*)HCTE->GetHC( id_lac );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetLACData( (*HC)[i] );
+    }
+  }
+
   static const G4int id_wc = SDManager-> GetCollectionID("WC/hit");
   if( id_wc >= 0 ){
     const auto HC = (G4THitsCollection<TPCWCHit>*)HCTE->GetHC( id_wc );
     for( G4int i=0, n=HC->entries(); i<n; ++i ){
       gAnaMan.SetWCData( (*HC)[i] );
+    }
+  }
+
+  static const G4int id_vp = SDManager-> GetCollectionID("VP/hit");
+  if( id_vp >= 0 ){
+    const auto HC = (G4THitsCollection<TPCVPHit>*)HCTE->GetHC( id_vp );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetVPData( (*HC)[i] );
     }
   }
 
