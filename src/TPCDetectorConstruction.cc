@@ -339,8 +339,12 @@ TPCDetectorConstruction::ConstructAreaTent( void )
 {
   const G4ThreeVector size( 5.0*m/2, 5.0*m/2, 6.0*m/2 );
   const G4ThreeVector pos( 0., 0., -143.-1200.-170.*mm+size.z() );
-  auto tent_solid = new G4Box( "AreaTentSolid",
-			       size.x(), size.y(), size.z() );
+  auto tent_out_solid = new G4Box( "AreaTentOutSolid",
+				   size.x(), size.y(), size.z() );
+  auto tent_in_solid = new G4Box( "AreaTentInSolid", size.x()-1.*mm,
+				  size.y()-1.*mm, size.z()-1.*mm );
+  auto tent_solid = new G4SubtractionSolid( "AreaTentSolid",
+					    tent_out_solid, tent_in_solid );
   auto tent_lv = new G4LogicalVolume( tent_solid,
 				      m_material_map["Air"],
 				      "AreaTentLV" );
