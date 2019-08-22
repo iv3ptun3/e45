@@ -111,7 +111,9 @@ TPCDetectorConstruction::Construct( void )
   if( gConf.Get<G4int>("Generator") == 10 )
     ConstructK18BeamlineSpectrometer();
 
+#if 1
   ConstructBH2();
+#endif
 
 #if 1
   ConstructShsMagnet();
@@ -128,8 +130,9 @@ TPCDetectorConstruction::Construct( void )
     ConstructKuramaMagnet();
     ConstructSDC1();
     ConstructSCH();
-    ConstructSDC2();
+    // ConstructSDC2();
     ConstructSDC3();
+    ConstructSDC4();
     ConstructFTOF();
     ConstructLAC();
     ConstructWC();
@@ -418,10 +421,10 @@ TPCDetectorConstruction::ConstructHTOF( void )
 {
   auto htof_sd = new TPCHTOFSD("/HTOF");
   G4SDManager::GetSDMpointer()->AddNewDetector( htof_sd );
-  const auto& htof_pos = gGeom.GetGlobalPosition("HTOF");
-  const auto& half_size = gSize.GetSize("HtofSeg") * 0.5 * mm;
-  const G4double L = gGeom.GetLocalZ("HTOF");
-  const G4double dXdW = gGeom.GetWirePitch("HTOF");
+  const auto& htof_pos = gGeom.GetGlobalPosition( "HTOF" );
+  const auto& half_size = gSize.GetSize( "HtofSeg" ) * 0.5 * mm;
+  const G4double L = gGeom.GetLocalZ( "HTOF" );
+  const G4double dXdW = gGeom.GetWirePitch( "HTOF" );
   auto htof_solid = new G4Box( "HtofSolid", half_size.x(),
 			       half_size.y(), half_size.z() );
   auto htof_lv = new G4LogicalVolume( htof_solid, m_material_map["Scintillator"],
@@ -1864,7 +1867,7 @@ TPCDetectorConstruction::ConstructSCH( void )
   const auto& sch_pos = ( gGeom.GetGlobalPosition("KURAMA") +
 			  gGeom.GetGlobalPosition("SCH") );
   const auto& sch_size = gSize.GetSize( "SchSeg" ) * 0.5 * mm;
-  const G4double overlap = 1.*mm;
+  const G4double dXdW = gGeom.GetWirePitch( "SCH" ) * mm;
   G4LogicalVolume* sch_lv[NumOfSegSCH];
   auto sch_solid = new G4Box( "SchSolid", sch_size.x(),
 			      sch_size.y(), sch_size.z() );
@@ -1872,10 +1875,10 @@ TPCDetectorConstruction::ConstructSCH( void )
     sch_lv[i] = new G4LogicalVolume( sch_solid, m_material_map["Scintillator"],
 				     Form( "SchSeg%dLV", i ), 0, 0, 0 );
     sch_lv[i]->SetVisAttributes( G4Colour::Cyan() );
-    G4double ipos_x = ( -NumOfSegSCH/2. + i )*(sch_size.x()*2-overlap)+5.75*mm;
+    G4double ipos_x = dXdW * ( i - ( NumOfSegSCH - 1 )/2. );
     G4ThreeVector pos( sch_pos.x() + ipos_x,
 		       sch_pos.y(),
-		       sch_pos.z() + 1.*mm*( 2*(i%2) - 1 ) );
+		       sch_pos.z() + 1.*mm*( 1- 2*(i%2) ) );
     // pos.rotateY( m_rotation_angle );
     new G4PVPlacement( m_rotation_matrix, pos, sch_lv[i],
 		       Form( "SchSeg%dPV", i ), m_world_lv, false, i );
@@ -1899,191 +1902,47 @@ TPCDetectorConstruction::ConstructSDC1( void )
   const auto& sdc1_pos = ( gGeom.GetGlobalPosition("KURAMA") +
 			   ( gGeom.GetGlobalPosition("SDC1-V1") +
 			     gGeom.GetGlobalPosition("SDC1-U2") ) * 0.5 );
-  G4LogicalVolume*    DC1Plane_log[6];
-  G4double size_DC1[3];
-  //  size_DC1[ThreeVector::X] = 289.0*2.*mm;
-  //  size_DC1[ThreeVector::Y] = 215.0*2.*mm;
-  //  size_DC1[ThreeVector::Z] = 146.0*mm;
-  ///Tanida DC1 is to small
-  size_DC1[ThreeVector::X] = 389.0*2.*mm;
-  size_DC1[ThreeVector::Y] = 315.0*2.*mm;
-  size_DC1[ThreeVector::Z] = 146.0*mm;
-
-  G4double size_DC1Plane[3];
-  size_DC1Plane[ThreeVector::X] = 6.0*127.0*0.5*mm;
-  size_DC1Plane[ThreeVector::Y] = 6.0*97.0*0.5*mm;
-  size_DC1Plane[ThreeVector::Z] = 0.0001*mm;
-
-  G4Box* DC1_box = new G4Box("DC1_box",size_DC1[ThreeVector::X]/2.,size_DC1[ThreeVector::Y]/2,size_DC1[ThreeVector::Z]/2);
-  G4LogicalVolume*  DC1_log = new G4LogicalVolume(DC1_box, m_material_map["Argon"], "DC1_log",0,0,0);
-  DC1_log->SetVisAttributes( G4Colour::Green() );
-  // G4double sdc1_pos[3];
-  // sdc1_pos[ThreeVector::X] = par_cham->get_DCPlaneCenter(DC1X, ThreeVector::X)*mm;
-  // sdc1_pos[ThreeVector::Y] = par_cham->get_DCPlaneCenter(DC1X, ThreeVector::Y)*mm;
-  // sdc1_pos[ThreeVector::Z] = (par_cham->get_DCPlaneCenter(DC1X, ThreeVector::Z)
-  //		    +par_cham->get_DCPlaneCenter(DC1U, ThreeVector::Z))*0.5*mm;
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( sdc1_pos[ThreeVector::X],
-				    sdc1_pos[ThreeVector::Y],
-				    sdc1_pos[ThreeVector::Z] ).rotateY( m_rotation_angle ),
-		     DC1_log,
-		     "DC1_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  //---------DC1 Planes
-  G4Box* DC1Plane_box = new G4Box("DC1Plane_box",
-				  size_DC1Plane[ThreeVector::X],size_DC1Plane[ThreeVector::Y],size_DC1Plane[ThreeVector::Z]);
-  // G4LogicalVolume*    DC1Plane_log[6];
-  G4double pos_DC1Plane[3]={0.};
-  G4String name1, name2;
-  for (int i=0; i<6; i++) {
+  const auto& frame_size = gSize.GetSize( "Sdc1Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Sdc1Drift" ) * 0.5 * mm;
+  auto sdc1_solid = new G4Box( "Sdc1Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto sdc1_lv = new G4LogicalVolume( sdc1_solid, m_material_map["Argon"],
+				      "Sdc1LV", 0, 0, 0 );
+  sdc1_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, sdc1_pos,
+		     sdc1_lv, "Sdc1PV", m_world_lv, false, 0 );
+  auto sdc1pl_solid = new G4Box( "Sdc1PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Sdc1V1", "Sdc1V2", "Sdc1X1",
+			    "Sdc1X2", "Sdc1U1", "Sdc1U2" };
+  for( G4int i=0; i<NumOfLayersSDC1; ++i ){
+    G4ThreeVector pos;
     switch (i) {
     case 0:
-      name1 = "DC1U_log";
-      name2 = "DC1U_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = -50.0*mm;
+      pos.setZ( -22.5985*mm );
       break;
     case 1:
-      name1 = "DC1Up_log";
-      name2 = "DC1Up_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = -30.*mm;
+      pos.setZ( -17.4015*mm );
       break;
     case 2:
-      name1 = "DC1X_log";
-      name2 = "DC1X_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = -10.0*mm;
+      pos.setZ( -2.5985*mm );
       break;
     case 3:
-      name1 = "DC1Xp_log";
-      name2 = "DC1Xp_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = 10.0*mm;
+      pos.setZ( 2.5985*mm );
       break;
     case 4:
-      name1 = "DC1V_log";
-      name2 = "DC1V_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = 30.0*mm;
+      pos.setZ( 17.4015*mm );
       break;
     case 5:
-      name1 = "DC1Vp_log";
-      name2 = "DC1Vp_phys";
-      pos_DC1Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC1Plane[ThreeVector::Z] = 50.0*mm;
+      pos.setZ( 22.5985*mm );
       break;
     }
-    DC1Plane_log[i] = new G4LogicalVolume(DC1Plane_box, m_material_map["Argon"], name1,0,0,0);
-    new G4PVPlacement( 0,
-		       G4ThreeVector( pos_DC1Plane[ThreeVector::X],
-				      pos_DC1Plane[ThreeVector::Y],
-				      pos_DC1Plane[ThreeVector::Z] ),
-		       DC1Plane_log[i],
-		       name2,
-		       DC1_log,
-		       false,
-		       101+i );
-  }
-  for(G4int i = 0; i<6; i++){
-    DC1Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCDetectorConstruction::ConstructSDC2( void )
-{
-  if( !m_sdc_sd ){
-    m_sdc_sd = new TPCSDCSD("/SDC");
-    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
-  }
-
-  const auto& sdc2_pos = ( gGeom.GetGlobalPosition("KURAMA") +
-			   ( gGeom.GetGlobalPosition("SDC2-X1") +
-			     gGeom.GetGlobalPosition("SDC2-Y2") ) * 0.5 );
-  G4LogicalVolume*    DC2Plane_log[6];
-  G4double size_DC2[3];
-  size_DC2[ThreeVector::X] = 1186.5*mm;//# of wires are 128
-  size_DC2[ThreeVector::Y] = 1186.5*mm;//# of wires are 128
-  //size_DC2[ThreeVector::Z] = 45.0*mm;
-  size_DC2[ThreeVector::Z] = 100.0*mm;
-  G4double size_DC2Plane[3];
-  size_DC2Plane[ThreeVector::X] = 9.0*128.0*0.5*mm;
-  size_DC2Plane[ThreeVector::Y] = 9.0*128.0*0.5*mm;
-  size_DC2Plane[ThreeVector::Z] = 0.0001*mm;
-  G4Box* DC2_box = new G4Box("DC2_box",size_DC2[ThreeVector::X]/2,size_DC2[ThreeVector::Y]/2,size_DC2[ThreeVector::Z]/2);
-  G4LogicalVolume*  DC2_log = new G4LogicalVolume(DC2_box, m_material_map["Argon"], "DC2_log",0,0,0);
-  DC2_log->SetVisAttributes( G4Colour::Green() );
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( sdc2_pos[ThreeVector::X],
-				    sdc2_pos[ThreeVector::Y],
-				    sdc2_pos[ThreeVector::Z] ).rotateY( m_rotation_angle ),
-		     DC2_log,
-		     "DC2_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-  G4Box* DC2Plane_box = new G4Box("DC2Plane_box",
-				  size_DC2Plane[ThreeVector::X],
-				  size_DC2Plane[ThreeVector::Y],
-				  size_DC2Plane[ThreeVector::Z]);
-  //  G4LogicalVolume* DC2Plane_log[4];
-  G4double pos_DC2Plane[3]={0.};
-  G4String name1, name2;
-  for (int i=0; i<4; i++) {
-    switch (i) {
-    case 0:
-      name1 = "DC2X_log";
-      name2 = "DC2X_phys";
-      pos_DC2Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Z] = -16.5*mm;
-      break;
-    case 1:
-      name1 = "DC2Xp_log";
-      name2 = "DC2Xp_phys";
-      pos_DC2Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Z] = -8.7*mm;
-      break;
-    case 2:
-      name1 = "DC2Y_log";
-      name2 = "DC2Y_phys";
-      pos_DC2Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Z] = 8.7*mm;
-      break;
-    case 3:
-      name1 = "DC2Yp_log";
-      name2 = "DC2Yp_phys";
-      pos_DC2Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC2Plane[ThreeVector::Z] = 16.5*mm;
-      break;
-    }
-    DC2Plane_log[i] = new G4LogicalVolume(DC2Plane_box, m_material_map["Argon"], name1,0,0,0);
-    new G4PVPlacement( 0,
-		       G4ThreeVector( pos_DC2Plane[ThreeVector::X],
-				      pos_DC2Plane[ThreeVector::Y],
-				      pos_DC2Plane[ThreeVector::Z] ),
-		       DC2Plane_log[i],
-		       name2,
-		       DC2_log,
-		       false,
-		       121+i );
-  }
-
-  for( G4int i = 0; i<4; ++i ){
-    DC2Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
+    auto sdc1pl_lv = new G4LogicalVolume( sdc1pl_solid,
+					  m_material_map["Argon"],
+					  plane_name[i] + "LV", 0, 0, 0 );
+    sdc1pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, sdc1pl_lv, plane_name[i] + "PV",
+		       sdc1_lv, false, 101+i );
   }
 }
 
@@ -2097,87 +1956,91 @@ TPCDetectorConstruction::ConstructSDC3( void )
   }
 
   const auto& sdc3_pos = ( gGeom.GetGlobalPosition("KURAMA") +
-			   ( gGeom.GetGlobalPosition("SDC3-Y1") +
-			     gGeom.GetGlobalPosition("SDC3-X2") ) * 0.5 );
-  G4LogicalVolume* DC3Plane_log[6];
-  G4double size_DC3[3];
-  size_DC3[ThreeVector::X] = 1900.0*mm;
-  size_DC3[ThreeVector::Y] = 1280.0*mm;
-  size_DC3[ThreeVector::Z] = 150.*mm;
-
-  G4double size_DC3Plane[3];
-  size_DC3Plane[ThreeVector::X] = 20.0*96.0*0.5*mm;
-  size_DC3Plane[ThreeVector::Y] = 20.0*64.0*0.5*mm;
-  size_DC3Plane[ThreeVector::Z] = 0.0001*mm;
-
-  //--------------DC3
-  G4Box* DC3_box = new G4Box( "DC3_box",
-			      size_DC3[ThreeVector::X]/2,
-			      size_DC3[ThreeVector::Y]/2,
-			      size_DC3[ThreeVector::Z]/2 );
-  G4LogicalVolume* DC3_log = new G4LogicalVolume( DC3_box, m_material_map["Argon"],
-						  "DC3_log", 0, 0, 0 );
-  DC3_log->SetVisAttributes( G4Colour::Green() );
-  new G4PVPlacement( m_rotation_matrix,
-		     G4ThreeVector( sdc3_pos[ThreeVector::X],
-				    sdc3_pos[ThreeVector::Y],
-				    sdc3_pos[ThreeVector::Z] ).rotateY( m_rotation_angle ),
-		     DC3_log,
-		     "DC3_phys",
-		     m_world_lv,
-		     false,
-		     0 );
-
-  //---------DC3 Planes
-  G4Box* DC3Plane_box = new G4Box("DC3Plane_box",
-				  size_DC3Plane[ThreeVector::X],size_DC3Plane[ThreeVector::Y],size_DC3Plane[ThreeVector::Z]);
-  //  G4LogicalVolume* DC3Plane_log[4];
-  G4double pos_DC3Plane[3]={0.};
-  G4String name1, name2;
-  for (int i=0; i<4; i++) {
+			   ( gGeom.GetGlobalPosition("SDC3-X1") +
+			     gGeom.GetGlobalPosition("SDC3-Y2") ) * 0.5 );
+  const auto& frame_size = gSize.GetSize( "Sdc3Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Sdc3Drift" ) * 0.5 * mm;
+  auto sdc3_solid = new G4Box( "Sdc3Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto sdc3_lv = new G4LogicalVolume( sdc3_solid, m_material_map["Argon"],
+				      "Sdc3LV", 0, 0, 0 );
+  sdc3_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, sdc3_pos,
+		     sdc3_lv, "Sdc3PV", m_world_lv, false, 0 );
+  auto sdc3pl_solid = new G4Box( "Sdc3PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Sdc3X1", "Sdc3X2", "Sdc3Y1", "Sdc3Y2" };
+  for( G4int i=0; i<NumOfLayersSDC3; ++i ){
+    G4ThreeVector pos;
     switch (i) {
     case 0:
-      name1 = "DC3X_log";
-      name2 = "DC3X_phys";
-      pos_DC3Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Z] = -46.5*mm;
+      pos.setZ( -16.0*mm );
       break;
     case 1:
-      name1 = "DC3Xp_log";
-      name2 = "DC3Xp_phys";
-      pos_DC3Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Z] = -14.5*mm;
+      pos.setZ( -8.206*mm );
       break;
     case 2:
-      name1 = "DC3Y_log";
-      name2 = "DC3Y_phys";
-      pos_DC3Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Z] = 16.5*mm;
+      pos.setZ( 8.206*mm );
       break;
     case 3:
-      name1 = "DC3Yp_log";
-      name2 = "DC3Yp_phys";
-      pos_DC3Plane[ThreeVector::X] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Y] = 0.0*mm;
-      pos_DC3Plane[ThreeVector::Z] = 46.5*mm;
+      pos.setZ( 16.0*mm );
       break;
     }
-    DC3Plane_log[i] = new G4LogicalVolume(DC3Plane_box, m_material_map["Argon"], name1,0,0,0);
-    new G4PVPlacement( 0,
-		       G4ThreeVector( pos_DC3Plane[ThreeVector::X],
-				      pos_DC3Plane[ThreeVector::Y],
-				      pos_DC3Plane[ThreeVector::Z] ),
-		       DC3Plane_log[i],
-		       name2,
-		       DC3_log,
-		       false,
-		       131+i );
+    auto sdc3pl_lv = new G4LogicalVolume( sdc3pl_solid,
+					  m_material_map["Argon"],
+					  plane_name[i] + "LV", 0, 0, 0 );
+    sdc3pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, sdc3pl_lv, plane_name[i] + "PV",
+		       sdc3_lv, false, 121+i );
   }
-  for( G4int i = 0; i<4; ++i ){
-    DC3Plane_log[i]->SetSensitiveDetector( m_sdc_sd );
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructSDC4( void )
+{
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
+  }
+
+  const auto& sdc4_pos = ( gGeom.GetGlobalPosition("KURAMA") +
+			   ( gGeom.GetGlobalPosition("SDC4-Y1") +
+			     gGeom.GetGlobalPosition("SDC4-X2") ) * 0.5 );
+  const auto& frame_size = gSize.GetSize( "Sdc4Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Sdc4Drift" ) * 0.5 * mm;
+  auto sdc4_solid = new G4Box( "Sdc4Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto sdc4_lv = new G4LogicalVolume( sdc4_solid, m_material_map["Argon"],
+				      "Sdc4LV", 0, 0, 0 );
+  sdc4_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, sdc4_pos,
+		     sdc4_lv, "Sdc4PV", m_world_lv, false, 0 );
+  auto sdc4pl_solid = new G4Box( "Sdc4PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Sdc4Y1", "Sdc4Y2", "Sdc4X1", "Sdc4X2" };
+  for( G4int i=0; i<NumOfLayersSDC4; ++i ){
+    G4ThreeVector pos;
+    switch (i) {
+    case 0:
+      pos.setZ( -34.868*mm );
+      break;
+    case 1:
+      pos.setZ( -17.547*mm );
+      break;
+    case 2:
+      pos.setZ( 17.547*mm );
+      break;
+    case 3:
+      pos.setZ( 34.868*mm );
+      break;
+    }
+    auto sdc4pl_lv = new G4LogicalVolume( sdc4pl_solid,
+					  m_material_map["Argon"],
+					  plane_name[i] + "LV", 0, 0, 0 );
+    sdc4pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, sdc4pl_lv, plane_name[i] + "PV",
+		       sdc4_lv, false, 121+i );
   }
 }
 

@@ -51,6 +51,7 @@ private:
   void ConstructSDC1( void );
   void ConstructSDC2( void );
   void ConstructSDC3( void );
+  void ConstructSDC4( void );
   void ConstructShsMagnet( void );
   void ConstructTarget( void );
   void ConstructWC( void );

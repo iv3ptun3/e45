@@ -14,19 +14,23 @@
 #
 World		4000	3000	8000
 Target		30.0	10.0	15.0
-#
-### BH2
+
+### Counters
 Bh2Seg		9.0	100.0	5.0
-### SCH
 SchSeg		11.5	400.0	2.0
-### FTOF
 FtofSeg		80.0	1800.0	30.0
-### LAC
 LacFrame	2200.0	1260.0	700.0
 LacRadiator	2080.0	1200.0	113.0
-### WC
 WcSeg		240.0	1840.0	190.0
-#
+
+### Chambers
+Sdc1Frame	578.0	430.0	146.0
+Sdc1Drift	384.0	264.0	0.001
+Sdc3Frame	1330.0	1330.0	90.0
+Sdc3Drift	1152.0	1152.0	0.001
+Sdc4Frame	2200.0	1560.0	272.0
+Sdc4Drift	1920.0	1280.0	0.001
+
 ### KURAMA
 KuramaField	1000.0	800.0	800.0
 ### HypTPC
