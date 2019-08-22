@@ -111,6 +111,8 @@ TPCDetectorConstruction::Construct( void )
   if( gConf.Get<G4int>("Generator") == 10 )
     ConstructK18BeamlineSpectrometer();
 
+  ConstructAreaTent();
+
 #if 1
   ConstructBH2();
 #endif
@@ -329,6 +331,23 @@ TPCDetectorConstruction::ConstructMaterials( void )
     std::string e(FUNC_NAME + " No target material : " + target_material );
     throw std::invalid_argument( e );
   }
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructAreaTent( void )
+{
+  const G4ThreeVector size( 5.0*m/2, 5.0*m/2, 6.0*m/2 );
+  const G4ThreeVector pos( 0., 0., -143.-1200.-170.*mm+size.z() );
+  auto tent_solid = new G4Box( "AreaTentSolid",
+			       size.x(), size.y(), size.z() );
+  auto tent_lv = new G4LogicalVolume( tent_solid,
+				      m_material_map["Air"],
+				      "AreaTentLV" );
+  tent_lv->SetVisAttributes( G4Color::Blue() );
+  // tent_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  new G4PVPlacement( nullptr, pos, tent_lv,
+		     "AreaTentPV", m_world_lv, false, 0 );
 }
 
 //_____________________________________________________________________________
