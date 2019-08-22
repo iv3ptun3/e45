@@ -2,6 +2,7 @@
 *~
 \#*\#
 *.dev
+*.log
 *.pcm
 *.pdf
 *.pyc
