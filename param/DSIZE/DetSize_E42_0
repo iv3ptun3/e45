@@ -13,7 +13,7 @@
 # Name			Value
 #
 World		4000	3000	8000
-Target		30.0	10.0	15.0
+Target		40.0	40.0	20.0
 
 ### Counters
 Bh2Seg		9.0	100.0	5.0
@@ -24,6 +24,10 @@ LacRadiator	2080.0	1200.0	113.0
 WcSeg		240.0	1840.0	190.0
 
 ### Chambers
+Bc3Frame	362.0	294.0	86.0
+Bc3Drift	192.0	100.0	0.001
+Bc4Frame	362.0	294.0	86.0
+Bc4Drift	192.0	100.0	0.001
 Sdc1Frame	578.0	430.0	146.0
 Sdc1Drift	384.0	264.0	0.001
 Sdc3Frame	1330.0	1330.0	90.0

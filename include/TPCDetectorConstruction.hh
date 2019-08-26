@@ -39,6 +39,8 @@ private:
   void ConstructMaterials( void );
   // Detectors
   void ConstructAreaTent( void );
+  void ConstructBC3( void );
+  void ConstructBC4( void );
   void ConstructBH2( void );
   void ConstructFTOF( void );
   void ConstructHTOF( void );

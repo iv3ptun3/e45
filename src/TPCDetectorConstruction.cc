@@ -111,15 +111,19 @@ TPCDetectorConstruction::Construct( void )
   if( gConf.Get<G4int>("Generator") == 10 )
     ConstructK18BeamlineSpectrometer();
 
+#if 1
   ConstructAreaTent();
-
+#endif
+#if 1
+  ConstructBC3();
+  ConstructBC4();
+#endif
 #if 1
   ConstructBH2();
 #endif
 
 #if 1
   ConstructShsMagnet();
-  ConstructTarget();
   ConstructHypTPC();
   ConstructHTOF();
 #endif
@@ -356,6 +360,94 @@ TPCDetectorConstruction::ConstructAreaTent( void )
 
 //_____________________________________________________________________________
 void
+TPCDetectorConstruction::ConstructBC3( void )
+{
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
+  }
+
+  const auto& bc3_pos = ( gGeom.GetGlobalPosition("KURAMA") +
+			  ( gGeom.GetGlobalPosition("BC3-X1") +
+			    gGeom.GetGlobalPosition("BC3-U2") ) * 0.5 );
+  const auto& frame_size = gSize.GetSize( "Bc3Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Bc3Drift" ) * 0.5 * mm;
+  auto bc3_solid = new G4Box( "Bc3Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto bc3_lv = new G4LogicalVolume( bc3_solid, m_material_map["Argon"],
+				      "Bc3LV", 0, 0, 0 );
+  bc3_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, bc3_pos,
+		     bc3_lv, "Bc3PV", m_world_lv, false, 0 );
+  auto bc3pl_solid = new G4Box( "Bc3PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Bc3X1", "Bc3X2", "Bc3V1",
+			    "Bc3V2", "Bc3U1", "Bc3U2" };
+  for( G4int i=0; i<NumOfLayersBcOut/2; ++i ){
+    G4ThreeVector pos;
+    switch (i) {
+    case 0: pos.setZ( -22.*mm ); break;
+    case 1: pos.setZ( -18.*mm ); break;
+    case 2: pos.setZ(  -2.*mm ); break;
+    case 3: pos.setZ(   2.*mm ); break;
+    case 4: pos.setZ(  18.*mm ); break;
+    case 5: pos.setZ(  22.*mm ); break;
+    }
+    auto bc3pl_lv = new G4LogicalVolume( bc3pl_solid,
+					 m_material_map["Argon"],
+					 plane_name[i] + "LV", 0, 0, 0 );
+    bc3pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, bc3pl_lv, plane_name[i] + "PV",
+		       bc3_lv, false, 1001+i );
+  }
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructBC4( void )
+{
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
+  }
+
+  const auto& bc4_pos = ( gGeom.GetGlobalPosition("KURAMA") +
+			  ( gGeom.GetGlobalPosition("BC4-U1") +
+			    gGeom.GetGlobalPosition("BC4-X2") ) * 0.5 );
+  const auto& frame_size = gSize.GetSize( "Bc4Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Bc4Drift" ) * 0.5 * mm;
+  auto bc4_solid = new G4Box( "Bc4Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto bc4_lv = new G4LogicalVolume( bc4_solid, m_material_map["Argon"],
+				     "Bc4LV", 0, 0, 0 );
+  bc4_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, bc4_pos,
+		     bc4_lv, "Bc4PV", m_world_lv, false, 0 );
+  auto bc4pl_solid = new G4Box( "Bc4PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Bc4U1", "Bc4U2", "Bc4V1",
+			    "Bc4V2", "Bc4X1", "Bc4X2" };
+  for( G4int i=0; i<NumOfLayersBcOut/2; ++i ){
+    G4ThreeVector pos;
+    switch (i) {
+    case 0: pos.setZ( -22.*mm ); break;
+    case 1: pos.setZ( -18.*mm ); break;
+    case 2: pos.setZ(  -2.*mm ); break;
+    case 3: pos.setZ(   2.*mm ); break;
+    case 4: pos.setZ(  18.*mm ); break;
+    case 5: pos.setZ(  22.*mm ); break;
+    }
+    auto bc4pl_lv = new G4LogicalVolume( bc4pl_solid,
+					 m_material_map["Argon"],
+					 plane_name[i] + "LV", 0, 0, 0 );
+    bc4pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, bc4pl_lv, plane_name[i] + "PV",
+		       bc4_lv, false, 2001+i );
+  }
+}
+
+//_____________________________________________________________________________
+void
 TPCDetectorConstruction::ConstructBH2( void )
 {
   const auto& ra2 = gGeom.GetRotAngle2("BH2") * deg;
@@ -537,6 +629,53 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   auto tpc_sd = new TPCPadSD("/TPC");
   G4SDManager::GetSDMpointer()->AddNewDetector( tpc_sd );
   const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
+  // Target
+  auto target_sd = new TPCTargetSD( "/TGT" );
+  G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
+  const auto target_pos = gGeom.GetGlobalPosition( "SHSTarget" ) * mm;
+  const auto target_size = gSize.GetSize( "Target" ) * 0.5 * mm;
+  const auto holder_size = gSize.GetSize( "TargetHolder" ) * mm;
+  G4ThreeVector holder_pos;
+  G4VSolid* target_solid = nullptr;
+  G4VSolid* holder_solid = nullptr;
+  switch( m_experiment ){
+  case 42: {
+    target_solid = new G4Box( "Target", target_size.x(),
+			      target_size.y(), target_size.z() );
+    holder_solid = new G4Tubs( "TargetHolderSolid", holder_size.x() /* Rin */,
+			       holder_size.y() /* Rout */,
+			       holder_size.z()/2 /* DZ */, 0., 360.*deg );
+    holder_pos = target_pos;
+  }
+    break;
+  case 45: case 27: {
+    //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm);
+    G4double Target_r = gSize.Get( "Target", ThreeVector::X );
+    // G4double Target_y = gSize.Get( "Target", ThreeVector::Y );
+    G4double Target_z = gSize.Get( "Target", ThreeVector::Z );
+    target_solid = new G4Tubs( "TargetSolid", 0.*mm,
+			       Target_r*mm,Target_z*mm, 0., 360*deg );
+    //  G4Box* TargetSolid = new G4Box("target", 1.*cm,0.25*cm,1.*cm);
+    holder_solid = new G4Tubs( "TargetHolderSolid", (Target_r + 15.)*mm,
+			       (Target_r + 15.2)*mm, 200.*mm, 0., 360*deg );
+    // holder_pos.set( 0*mm, 100.*mm, target_pos.z() );
+  }
+    break;
+  default:
+    return;
+  }
+  auto target_lv = new G4LogicalVolume( target_solid, m_material_map["Target"],
+					"TargetLV" );
+  target_lv->SetSensitiveDetector( target_sd );
+  target_lv->SetVisAttributes( G4Colour::Red() );
+  new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
+  		     m_world_lv, true, 0 );
+  auto holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
+					"TargetHolderLV");
+  holder_lv->SetVisAttributes( G4Colour::Blue() );
+  // new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
+  // 		     m_world_lv, true, 0 );
+  // HypTPC
   {
     const G4double Rin  = gSize.Get( "TpcRin" )*mm/2;
     const G4double Rout = gSize.Get( "TpcRout" )*mm/2;
@@ -547,14 +686,19 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     const G4double rInner[NumOfZPlane] = { 0.5*std::sqrt(3.)*Rin,
 					   0.5*std::sqrt(3.)*Rin };
     const G4double rOuter[NumOfZPlane] = { Rout, Rout };
-    auto tpc_solid = new G4Polyhedra( "TpcSolid",
-				      22.5*deg, ( 360. + 22.5 )*deg,
-				      NumOfSide, NumOfZPlane,
-				      zPlane, rInner, rOuter );
-    m_tpc_lv = new G4LogicalVolume( tpc_solid, m_material_map["P10"],
-				    "TpcLV" );
+    auto tpc_out_solid = new G4Polyhedra( "TpcOutSolid",
+					  22.5*deg, ( 360. + 22.5 )*deg,
+					  NumOfSide, NumOfZPlane,
+					  zPlane, rInner, rOuter );
+    auto pos = target_pos;
+    pos.rotateX( 90.*deg );
+    auto tpc_solid = new G4SubtractionSolid( "TpcSolid",
+					     tpc_out_solid, target_solid,
+					     nullptr, pos );
     auto rot = new G4RotationMatrix;
     rot->rotateX( 90.*deg );
+    m_tpc_lv = new G4LogicalVolume( tpc_solid, m_material_map["P10"],
+				    "TpcLV" );
     new G4PVPlacement( rot, tpc_pos, m_tpc_lv, "TpcPV",
 		       m_world_lv, false, 0 );
     m_tpc_lv->SetVisAttributes( G4Colour::White() );
@@ -2014,7 +2158,7 @@ TPCDetectorConstruction::ConstructSDC3( void )
 					  plane_name[i] + "LV", 0, 0, 0 );
     sdc3pl_lv->SetSensitiveDetector( m_sdc_sd );
     new G4PVPlacement( nullptr, pos, sdc3pl_lv, plane_name[i] + "PV",
-		       sdc3_lv, false, 121+i );
+		       sdc3_lv, false, 301+i );
   }
 }
 
@@ -2063,7 +2207,7 @@ TPCDetectorConstruction::ConstructSDC4( void )
 					  plane_name[i] + "LV", 0, 0, 0 );
     sdc4pl_lv->SetSensitiveDetector( m_sdc_sd );
     new G4PVPlacement( nullptr, pos, sdc4pl_lv, plane_name[i] + "PV",
-		       sdc4_lv, false, 121+i );
+		       sdc4_lv, false, 401+i );
   }
 }
 
@@ -2225,59 +2369,6 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
 		     logicDetectorCoil, "CoilDwPV", m_world_lv, false, 0 );
 #endif
   myField->SetStatusShsField( true );
-}
-
-//_____________________________________________________________________________
-void
-TPCDetectorConstruction::ConstructTarget( void )
-{
-  const auto target_pos = gGeom.GetGlobalPosition( "SHSTarget" ) * mm;
-  const auto target_size = gSize.GetSize( "Target" ) * 0.5 * mm;
-  const auto holder_size = gSize.GetSize( "TargetHolder" ) * mm;
-  G4ThreeVector holder_pos;
-  G4VSolid* target_solid = nullptr;
-  G4VSolid* holder_solid = nullptr;
-  G4LogicalVolume* target_lv = nullptr;
-  G4LogicalVolume* holder_lv = nullptr;
-  switch( m_experiment ){
-  case 42: {
-    target_solid = new G4Box( "Target", target_size.x(),
-			      target_size.y(), target_size.z() );
-    holder_solid = new G4Tubs( "TargetHolderSolid", holder_size.x() /* Rin */,
-			       holder_size.y() /* Rout */,
-			       holder_size.z()/2 /* DZ */, 0., 360.*deg );
-    holder_pos = target_pos;
-  }
-    break;
-  case 45: case 27: {
-    //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm);
-    G4double Target_r = gSize.Get( "Target", ThreeVector::X );
-    // G4double Target_y = gSize.Get( "Target", ThreeVector::Y );
-    G4double Target_z = gSize.Get( "Target", ThreeVector::Z );
-    target_solid = new G4Tubs( "TargetSolid", 0.*mm,
-			       Target_r*mm,Target_z*mm, 0., 360*deg );
-    //  G4Box* TargetSolid = new G4Box("target", 1.*cm,0.25*cm,1.*cm);
-    holder_solid = new G4Tubs( "TargetHolderSolid", (Target_r + 15.)*mm,
-			       (Target_r + 15.2)*mm, 200.*mm, 0., 360*deg );
-    // holder_pos.set( 0*mm, 100.*mm, target_pos.z() );
-  }
-    break;
-  default:
-    return;
-  }
-  target_lv = new G4LogicalVolume( target_solid, m_material_map["Target"],
-				   "TargetLV" );
-  target_lv->SetVisAttributes( G4Colour::Red() );
-  new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
-		     m_world_lv, true, 0 );
-  holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
-  				   "TargetHolderLV");
-  holder_lv->SetVisAttributes( G4Colour::Blue() );
-  new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
-  		     m_tpc_lv, true, 0 );
-  auto target_sd = new TPCTargetSD( "/TGT" );
-  G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
-  target_lv->SetSensitiveDetector( target_sd );
 }
 
 //_____________________________________________________________________________

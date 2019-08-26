@@ -60,9 +60,8 @@ TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   // if( particleName != "pi+" && particleName != "pi-" &&
   //     particleName != "proton" )
   //   return false;
-
-  if( particleType == "lepton" )
-    return false;
+  // if( particleType == "lepton" )
+  //   return false;
 
   m_hits_collection->insert( new TPCTargetHit( SensitiveDetectorName, aStep ) );
 
