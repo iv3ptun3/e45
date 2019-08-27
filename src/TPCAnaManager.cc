@@ -377,13 +377,6 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 
   env_on_off_helm = gConf.Get<G4int>("ShsFieldMap");
 
-  if( env_on_off_helm == 0 ){
-    env_helm_field = gConf.Get<G4int>("ShsField");
-  }else{
-    G4cout << "Env of the Helmholt_fieldmap is wrong" << G4endl;
-    exit(-1);
-  }
-
   for(G4int i=0.;i<40;i++){
     angle[i]=0;
     seg_angle[i]=0;
@@ -929,8 +922,8 @@ TPCAnaManager::EndOfEventAction( void )
     for( G4int kk=0; kk<tpctrNum; kk++){
       if(c[kk]>3.){
 	//	G4cout<<"start circle fit"<<G4endl;
-	test[kk]=circleFit(x[kk],z[kk],y[kk],c[kk],&cx[kk],&cz[kk],&rad[kk],&Pz[kk],
-			   &a_fory[kk], &b_fory[kk], &theta0_fory[kk]);
+	// test[kk]=circleFit(x[kk],z[kk],y[kk],c[kk],&cx[kk],&cz[kk],&rad[kk],&Pz[kk],
+	// 		   &a_fory[kk], &b_fory[kk], &theta0_fory[kk]);
 	if(test[kk]!=-1.){
 	  cir_r[kk]=rad[kk];
 	  cir_x[kk]=cx[kk];
@@ -962,8 +955,8 @@ TPCAnaManager::EndOfEventAction( void )
 
       mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
 
-      vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
-      vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+      // vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+      // vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
 
       vtx_flag[i]=1;
     }
@@ -1112,10 +1105,10 @@ TPCAnaManager::EndOfEventAction( void )
 	      //getchar();
 
 
-	      vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
-	      vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
-	      vtxpxfit[j]=cos(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
-	      vtxpzfit[j]=sin(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
+	      // vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+	      // vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+	      // vtxpxfit[j]=cos(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
+	      // vtxpzfit[j]=sin(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
 	      //	    G4cout<<"bfield:"<<env_helm_field<<G4endl;
 
 
@@ -1243,10 +1236,10 @@ TPCAnaManager::EndOfEventAction( void )
 	      mom_theta[i]=atan2(vtxzfit[i]-cz[i],vtxxfit[i]-cx[i])-acos(-1.)/2;
 	      mom_theta[j]=atan2(vtxzfit[j]-cz[j],vtxxfit[j]-cx[j])-acos(-1.)/2;
 
-	      vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
-	      vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
-	      vtxpxfit[j]=cos(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
-	      vtxpzfit[j]=sin(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
+	      // vtxpxfit[i]=cos(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+	      // vtxpzfit[i]=sin(mom_theta[i])*(cir_r[i])*(-0.299792458)*(env_helm_field)*(tpcData[i].tpcqq);
+	      // vtxpxfit[j]=cos(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
+	      // vtxpzfit[j]=sin(mom_theta[j])*(cir_r[j])*(-0.299792458)*(env_helm_field)*(tpcData[j].tpcqq);
 	      //	    G4cout<<"env_helm_field:"<<env_helm_field<<G4endl;
 	    }
 	  }

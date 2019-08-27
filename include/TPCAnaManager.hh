@@ -471,7 +471,6 @@ private:
   G4double truncated_mean_cut;
   G4int trigger_env;
   G4int env_on_off_helm;
-  G4double env_helm_field;
   G4int env_pad_config;
   G4int env_Experiment_num;
 
@@ -637,137 +636,137 @@ public:
   }
 
 
-  double circleFit(const double *mX,const double *mY,const double *mZ,
-		   const int npoints, double* mXCenter, double* mYCenter,
-		   double* mRadius, double* Pz_, double* a_forz,
-		   double* b_forz, double* theta0_fory)
-  {
-    double xx, yy, xx2, yy2;
-    double f, g, h, p, q, t, g0, g02, a, b, c, d;
-    double xroot, ff, fp, xd, yd, g1;
-    double dx, dy, dradius2, xnom;
+  // double circleFit(const double *mX,const double *mY,const double *mZ,
+  // 		   const int npoints, double* mXCenter, double* mYCenter,
+  // 		   double* mRadius, double* Pz_, double* a_forz,
+  // 		   double* b_forz, double* theta0_fory)
+  // {
+  //   double xx, yy, xx2, yy2;
+  //   double f, g, h, p, q, t, g0, g02, a, b, c, d;
+  //   double xroot, ff, fp, xd, yd, g1;
+  //   double dx, dy, dradius2, xnom;
 
-    double xgravity = 0.0;
-    double ygravity = 0.0;
-    double x2 = 0.0;
-    double y2 = 0.0;
-    double xy = 0.0;
-    double xx2y2 = 0.0;
-    double yx2y2 = 0.0;
-    double x2y22 = 0.0;
-    double radius2 = 0.0;
+  //   double xgravity = 0.0;
+  //   double ygravity = 0.0;
+  //   double x2 = 0.0;
+  //   double y2 = 0.0;
+  //   double xy = 0.0;
+  //   double xx2y2 = 0.0;
+  //   double yx2y2 = 0.0;
+  //   double x2y22 = 0.0;
+  //   double radius2 = 0.0;
 
-    double mVariance = 0.0;
+  //   double mVariance = 0.0;
 
-    if (npoints <= 3){
-      fprintf(stderr,"circleFit: npoints %d <= 3\n",npoints);
-      return -1;
-    }else  if (npoints > 499){
-      fprintf(stderr,"circleFit: npoints %d > 499\n",npoints);
-      return -1;
-    }
+  //   if (npoints <= 3){
+  //     fprintf(stderr,"circleFit: npoints %d <= 3\n",npoints);
+  //     return -1;
+  //   }else  if (npoints > 499){
+  //     fprintf(stderr,"circleFit: npoints %d > 499\n",npoints);
+  //     return -1;
+  //   }
 
-    for (int i=0; i<npoints; i++) {
-      xgravity += mX[i];
-      ygravity += mY[i];
-    }
-    xgravity /= npoints;
-    ygravity /= npoints;
+  //   for (int i=0; i<npoints; i++) {
+  //     xgravity += mX[i];
+  //     ygravity += mY[i];
+  //   }
+  //   xgravity /= npoints;
+  //   ygravity /= npoints;
 
-    for (int i=0; i<npoints; i++) {
-      xx  = mX[i]-xgravity;
-      yy  = mY[i]-ygravity;
-      xx2 = xx*xx;
-      yy2 = yy*yy;
-      x2  += xx2;
-      y2  += yy2;
-      xy  += xx*yy;
-      xx2y2 += xx*(xx2+yy2);
-      yx2y2 += yy*(xx2+yy2);
-      x2y22 += (xx2+yy2)*(xx2+yy2);
-    }
-    if (xy == 0.){
-      fprintf(stderr,"circleFit: xy = %f,    grav=%f, %f\n",xy,xgravity,ygravity);
-      return -1;
-    }
+  //   for (int i=0; i<npoints; i++) {
+  //     xx  = mX[i]-xgravity;
+  //     yy  = mY[i]-ygravity;
+  //     xx2 = xx*xx;
+  //     yy2 = yy*yy;
+  //     x2  += xx2;
+  //     y2  += yy2;
+  //     xy  += xx*yy;
+  //     xx2y2 += xx*(xx2+yy2);
+  //     yx2y2 += yy*(xx2+yy2);
+  //     x2y22 += (xx2+yy2)*(xx2+yy2);
+  //   }
+  //   if (xy == 0.){
+  //     fprintf(stderr,"circleFit: xy = %f,    grav=%f, %f\n",xy,xgravity,ygravity);
+  //     return -1;
+  //   }
 
-    f = (3.*x2+y2)/npoints;
-    g = (x2+3.*y2)/npoints;
-    h = 2*xy/npoints;
-    p = xx2y2/npoints;
-    q = yx2y2/npoints;
-    t = x2y22/npoints;
-    g0 = (x2+y2)/npoints;
-    g02 = g0*g0;
-    a = -4.0;
-    b = (f*g-t-h*h)/g02;
-    c = (t*(f+g)-2.*(p*p+q*q))/(g02*g0);
-    d = (t*(h*h-f*g)+2.*(p*p*g+q*q*f)-4.*p*q*h)/(g02*g02);
-    xroot = 1.0;
-    for (int i=0; i<5; i++) {
-      ff = (((xroot+a)*xroot+b)*xroot+c)*xroot+d;
-      fp = ((4.*xroot+3.*a)*xroot+2.*b)*xroot+c;
-      xroot -= ff/fp;
-    }
-    g1 = xroot*g0;
-    xnom = (g-g1)*(f-g1)-h*h;
-    if (xnom == 0.){
-      fprintf(stderr,"circleFit: xnom1 = %f\n",xnom);
-      return -1;
-    }
-
-
-    yd = (q*(f-g1)-h*p)/xnom;
-    xnom = f-g1;
-    if (xnom == 0.){
-      fprintf(stderr,"circleFit: xnom2 = %f\n",xnom);
-      return -1;
-    }
-
-    xd = (p-h*yd )/xnom;
-
-    radius2 = xd*xd+yd*yd+g1;
-    *mXCenter = xd+xgravity;
-    *mYCenter = yd+ygravity;
-    for (int i=0; i<npoints; i++) {
-      dx = mX[i]-(*mXCenter);
-      dy = mY[i]-(*mYCenter);
-      dradius2 = dx*dx+dy*dy;
-      mVariance += dradius2+radius2-2.*sqrt(dradius2*radius2);
-    }
-
-    *mRadius  = (double) sqrt(radius2);
-    double RadiusMes=(double) sqrt(radius2);
-
-    /////linear fit for Pz
-    double rr[500],zer[500];
-    //Linear fit but exact
-    //  rr[0]=0;
-
-    rr[0]=0;
-    zer[0]=1.;
-
-    for(int i=1; i<npoints; i++){
-      G4double aa = (sqrt((pow(mX[i-1]-(*mXCenter),2)+pow(mY[i-1]-(*mYCenter),2))*(pow(mX[i]-(*mXCenter),2)+pow(mY[i]-(*mYCenter),2))));
-      G4double diff=acos(((mX[i-1]-(*mXCenter))*(mX[i]-(*mXCenter))+(mY[i-1]-(*mYCenter))*(mY[i]-(*mYCenter)))/aa);
-      rr[i]=rr[i-1]+RadiusMes*diff;
-
-      zer[i]=1.0;//must be corrected
-    }
-
-    double aa,bb;
-    linearFitter(npoints,rr,mZ,zer,&aa,&bb);
-
-    //  *Pz=aa*Pt
-    *Pz_=aa*(RadiusMes*(0.299792458)*fabs(env_helm_field));
-    *a_forz=aa;
-    *b_forz=bb;
-    *theta0_fory = atan2(mY[0]-(*mYCenter),mX[0]-(*mXCenter));
+  //   f = (3.*x2+y2)/npoints;
+  //   g = (x2+3.*y2)/npoints;
+  //   h = 2*xy/npoints;
+  //   p = xx2y2/npoints;
+  //   q = yx2y2/npoints;
+  //   t = x2y22/npoints;
+  //   g0 = (x2+y2)/npoints;
+  //   g02 = g0*g0;
+  //   a = -4.0;
+  //   b = (f*g-t-h*h)/g02;
+  //   c = (t*(f+g)-2.*(p*p+q*q))/(g02*g0);
+  //   d = (t*(h*h-f*g)+2.*(p*p*g+q*q*f)-4.*p*q*h)/(g02*g02);
+  //   xroot = 1.0;
+  //   for (int i=0; i<5; i++) {
+  //     ff = (((xroot+a)*xroot+b)*xroot+c)*xroot+d;
+  //     fp = ((4.*xroot+3.*a)*xroot+2.*b)*xroot+c;
+  //     xroot -= ff/fp;
+  //   }
+  //   g1 = xroot*g0;
+  //   xnom = (g-g1)*(f-g1)-h*h;
+  //   if (xnom == 0.){
+  //     fprintf(stderr,"circleFit: xnom1 = %f\n",xnom);
+  //     return -1;
+  //   }
 
 
-    //  *Pz=aa*(RadiusMes*0.299792458);
-    return  mVariance;
-  }
+  //   yd = (q*(f-g1)-h*p)/xnom;
+  //   xnom = f-g1;
+  //   if (xnom == 0.){
+  //     fprintf(stderr,"circleFit: xnom2 = %f\n",xnom);
+  //     return -1;
+  //   }
+
+  //   xd = (p-h*yd )/xnom;
+
+  //   radius2 = xd*xd+yd*yd+g1;
+  //   *mXCenter = xd+xgravity;
+  //   *mYCenter = yd+ygravity;
+  //   for (int i=0; i<npoints; i++) {
+  //     dx = mX[i]-(*mXCenter);
+  //     dy = mY[i]-(*mYCenter);
+  //     dradius2 = dx*dx+dy*dy;
+  //     mVariance += dradius2+radius2-2.*sqrt(dradius2*radius2);
+  //   }
+
+  //   *mRadius  = (double) sqrt(radius2);
+  //   double RadiusMes=(double) sqrt(radius2);
+
+  //   /////linear fit for Pz
+  //   double rr[500],zer[500];
+  //   //Linear fit but exact
+  //   //  rr[0]=0;
+
+  //   rr[0]=0;
+  //   zer[0]=1.;
+
+  //   for(int i=1; i<npoints; i++){
+  //     G4double aa = (sqrt((pow(mX[i-1]-(*mXCenter),2)+pow(mY[i-1]-(*mYCenter),2))*(pow(mX[i]-(*mXCenter),2)+pow(mY[i]-(*mYCenter),2))));
+  //     G4double diff=acos(((mX[i-1]-(*mXCenter))*(mX[i]-(*mXCenter))+(mY[i-1]-(*mYCenter))*(mY[i]-(*mYCenter)))/aa);
+  //     rr[i]=rr[i-1]+RadiusMes*diff;
+
+  //     zer[i]=1.0;//must be corrected
+  //   }
+
+  //   double aa,bb;
+  //   linearFitter(npoints,rr,mZ,zer,&aa,&bb);
+
+  //   //  *Pz=aa*Pt
+  //   *Pz_=aa*(RadiusMes*(0.299792458)*fabs(env_helm_field));
+  //   *a_forz=aa;
+  //   *b_forz=bb;
+  //   *theta0_fory = atan2(mY[0]-(*mYCenter),mX[0]-(*mXCenter));
+
+
+  //   //  *Pz=aa*(RadiusMes*0.299792458);
+  //   return  mVariance;
+  // }
 
 };
 

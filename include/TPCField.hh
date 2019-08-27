@@ -8,19 +8,7 @@
 #include <G4String.hh>
 #include <G4ThreeVector.hh>
 
-// const double solenoidOffset = 1617.0;
-
-const G4int MAX_DIM_X_OPERA3D = 121;
-const G4int MAX_DIM_Y_OPERA3D = 121;
-const G4int MAX_DIM_Z_OPERA3D = 121;
-
-const G4int MAX_KURAMA_X_OPERA3D = 121;
-const G4int MAX_KURAMA_Y_OPERA3D = 121;
-const G4int MAX_KURAMA_Z_OPERA3D = 121;
-
-#define BFIELD_GRID_X 0.5
-#define BFIELD_GRID_Y 0.5
-#define BFIELD_GRID_Z 0.5
+class FieldMap;
 
 //_____________________________________________________________________________
 class MagnetInfo
@@ -49,7 +37,7 @@ public:
   G4double a0; // aperture
 
 public:
-  G4bool CalcField( const G4ThreeVector& point, G4double* bfield ) const;
+  G4bool CalcK18Field( const G4ThreeVector& point, G4double* bfield ) const;
 };
 
 //_____________________________________________________________________________
@@ -73,22 +61,14 @@ private:
   TPCField& operator =( const TPCField& );
 
 private:
-  G4bool   m_k18_status;
-  G4bool   m_kurama_status;
-  G4bool   m_shs_status;
-  G4String m_kurama_field_map;
-  G4String m_shs_field_map;
-  std::map<G4String, MagnetInfo> m_magnet_map;
-
-  G4double xOPERA3D[MAX_DIM_X_OPERA3D];
-  G4double yOPERA3D[MAX_DIM_Y_OPERA3D];
-  G4double zOPERA3D[MAX_DIM_Z_OPERA3D];
-  G4double bOPERA3D[3][MAX_DIM_X_OPERA3D][MAX_DIM_Y_OPERA3D][MAX_DIM_Z_OPERA3D];
-
-  G4double xKuOPERA3D[MAX_KURAMA_X_OPERA3D];
-  G4double yKuOPERA3D[MAX_KURAMA_Y_OPERA3D];
-  G4double zKuOPERA3D[MAX_KURAMA_Z_OPERA3D];
-  G4double bKuOPERA3D[3][MAX_KURAMA_X_OPERA3D][MAX_KURAMA_Y_OPERA3D][MAX_KURAMA_Z_OPERA3D];
+  typedef std::map<G4String, MagnetInfo> MagnetMap;
+  typedef std::vector< std::vector< std::vector<G4ThreeVector> > > Field;
+  G4bool    m_k18_status;
+  G4bool    m_kurama_status;
+  G4bool    m_shs_status;
+  FieldMap* m_kurama_field_map;
+  FieldMap* m_shs_field_map;
+  MagnetMap m_magnet_map;
 
 public:
   virtual void GetFieldValue( const G4double Point[4], G4double* Bfield ) const;
@@ -99,8 +79,8 @@ public:
   G4bool GetStatusKuramaField( void ) const { return m_kurama_status; }
   G4bool GetStatusShsField( void ) const { return m_shs_status; }
   G4bool Initialize( void );
-  void   SetKuramaFieldMap( G4String map ){ m_kurama_field_map = map; }
-  void   SetShsFieldMap( G4String map ){ m_shs_field_map = map; }
+  void   SetKuramaFieldMap( G4String map );
+  void   SetShsFieldMap( G4String map );
   void   SetStatusK18Field( G4bool flag=true ){ m_k18_status = flag; }
   void   SetStatusKuramaField( G4bool flag=true ){ m_kurama_status = flag; }
   void   SetStatusShsField( G4bool flag=true ){ m_shs_status = flag; }

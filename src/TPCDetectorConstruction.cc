@@ -101,7 +101,6 @@ TPCDetectorConstruction::Construct( void )
 				     "WorldPV", nullptr, false, 0 );
 
   myField = new TPCField;
-  myField->Initialize();
   auto transMan = G4TransportationManager::GetTransportationManager();
   auto fieldMan = transMan->GetFieldManager();
   fieldMan->SetDetectorField( myField );
@@ -144,6 +143,8 @@ TPCDetectorConstruction::Construct( void )
     ConstructWC();
   }
 #endif
+
+  myField->Initialize();
 
   return world_pv;
 }
@@ -1833,6 +1834,7 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 		       Form( "VP%dPV", i+1 ), m_world_lv, false, i );
   }
   myField->SetStatusKuramaField( true );
+  myField->SetKuramaFieldMap( gConf.Get<G4String>( "KURAMAFLDMAP" ) );
 }
 
 //_____________________________________________________________________________
@@ -2369,6 +2371,7 @@ TPCDetectorConstruction::ConstructShsMagnet( void )
 		     logicDetectorCoil, "CoilDwPV", m_world_lv, false, 0 );
 #endif
   myField->SetStatusShsField( true );
+  myField->SetShsFieldMap( gConf.Get<G4String>( "SHSFLDMAP" ) );
 }
 
 //_____________________________________________________________________________

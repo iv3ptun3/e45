@@ -12,6 +12,7 @@
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
+#include "FieldMap.hh"
 #include "FuncName.hh"
 #include "MathTools.hh"
 #include "PrintHelper.hh"
@@ -19,6 +20,7 @@
 namespace
 {
   using CLHEP::deg;
+  using CLHEP::cm;
   using CLHEP::mm;
   using CLHEP::tesla;
   const auto& gConf = ConfMan::GetInstance();
@@ -28,7 +30,7 @@ namespace
 
 //_____________________________________________________________________________
 G4bool
-MagnetInfo::CalcField( const G4ThreeVector& point, G4double* bfield ) const
+MagnetInfo::CalcK18Field( const G4ThreeVector& point, G4double* bfield ) const
 {
   PrintHelper helper( 4, std::ios::scientific, G4cout );
   G4ThreeVector dist = point - pos;
@@ -97,40 +99,20 @@ G4bool
 TPCField::Initialize( void )
 {
   G4cout << FUNC_NAME << G4endl;
-  if( gConf.Get<G4int>( "ShsFieldMap" ) == 1 ){
-    std::ifstream ifs( m_shs_field_map );
-    G4cout << "   Reading " << m_shs_field_map << G4endl;
-    for(int ix= 0; ix<MAX_DIM_X_OPERA3D; ix++){
-      for(int iy= 0; iy<MAX_DIM_Y_OPERA3D; iy++){
-	for(int iz= 0; iz<MAX_DIM_Z_OPERA3D; iz++){
-	  ifs >> xOPERA3D[ix] >> yOPERA3D[iy] >> zOPERA3D[iz] >>
-	    bOPERA3D[0][ix][iy][iz] >> bOPERA3D[1][ix][iy][iz] >> bOPERA3D[2][ix][iy][iz];
-	  bOPERA3D[0][ix][iy][iz] *=tesla;
-	  bOPERA3D[1][ix][iy][iz] *=tesla;
-	  bOPERA3D[2][ix][iy][iz] *=tesla;
-	}
-      }
-    }
-    G4cout << "   Finish reading OPERA3D file" << G4endl;
+
+  if( m_shs_status &&
+      gConf.Get<G4int>( "ShsFieldMap" ) == 1 ){
+    m_shs_field_map->SetValueCalc( gConf.Get<G4double>( "SHSFLDCALC" ) );
+    m_shs_field_map->SetValueNMR( gConf.Get<G4double>( "SHSFLDNMR" ) );
+    m_shs_field_map->Initialize();
   }
-  if( gConf.Get<G4int>( "KuramaFieldMap" ) == 1 ){
-    std::ifstream ifs( m_kurama_field_map );
-    G4cout << "   Reading " << m_kurama_field_map << G4endl;
-    for(int ix= 0; ix<MAX_KURAMA_X_OPERA3D; ix++){
-      for(int iy= 0; iy<MAX_KURAMA_Y_OPERA3D; iy++){
-	for(int iz= 0; iz<MAX_KURAMA_Z_OPERA3D; iz++){
-	  ifs >> xOPERA3D[ix] >> yOPERA3D[iy] >> zOPERA3D[iz] >>
-	    bOPERA3D[0][ix][iy][iz] >> bOPERA3D[1][ix][iy][iz] >> bOPERA3D[2][ix][iy][iz];
-	  bOPERA3D[0][ix][iy][iz] *=tesla;
-	  bOPERA3D[1][ix][iy][iz] *=tesla;
-	  bOPERA3D[2][ix][iy][iz] *=tesla;
-	}
-      }
-    }
-    G4cout << "   Finish reading OPERA3D file" << G4endl;
+  if( m_kurama_status &&
+      gConf.Get<G4int>( "KuramaFieldMap" ) == 1 ){
+    m_kurama_field_map->SetValueCalc( gConf.Get<G4double>( "KURAMAFLDCALC" ) );
+    m_kurama_field_map->SetValueNMR( gConf.Get<G4double>( "KURAMAFLDNMR" ) );
+    m_kurama_field_map->Initialize();
   }
 
-  G4cout << "   Initialized" << G4endl;
   return true;
 }
 
@@ -145,99 +127,62 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   static const G4double h_field = gConf.Get<G4double>( "ShsField" ) * tesla;
   static const G4double k_field = gConf.Get<G4double>( "KuramaField" ) * tesla;
   static const auto kurama_pos = gGeom.GetGlobalPosition( "KURAMA" ) * mm;
-  static const auto kurama_size = gSize.GetSize( "KuramaField" ) * mm;
+  static const auto kurama_size = gSize.GetSize( "KuramaField" ) * 0.5 * mm;
   const G4double xp = Point[0];
   const G4double yp = Point[1];
   const G4double zp = Point[2];
   const G4double rot_xp = zp*std::sin(-angle) + xp*std::cos(-angle);
   const G4double rot_zp = zp*std::cos(-angle) - xp*std::sin(-angle);
   const G4ThreeVector pos( rot_xp, yp, rot_zp );
+  const G4ThreeVector kurama_coord = pos - kurama_pos;
 
-  if( shs_fieldmap == 0 ){
-    if( zp > -310.*mm && zp < 310.*mm && xp > -310.*mm && xp < 310.*mm
-	&& std::abs(yp) < 300.*mm){
+  Bfield[0] = 0.*tesla;
+  Bfield[1] = 0.*tesla;
+  Bfield[2] = 0.*tesla;
+
+  if( zp > -310.*mm && zp < 310.*mm && xp > -310.*mm && xp < 310.*mm
+      && std::abs(yp) < 300.*mm){
+    if( shs_fieldmap == 0 ){
       Bfield[0] = 0.*tesla;
       Bfield[1] = h_field;
       Bfield[2] = 0.*tesla;
-    }
-    else {
-      Bfield[0] = 0.*tesla;
-      Bfield[1] = 0.*tesla;
-      Bfield[2] = 0.*tesla;
+      return;
+    } else {
+      G4double shs_point[3] =
+	{ pos.x()/cm, pos.y()/cm, pos.z()/cm };
+      m_shs_field_map->GetFieldValue( shs_point, Bfield );
+      return;
     }
   }
-  if( construct_kurama == 1 && kurama_fieldmap == 0 &&
-      std::abs( pos.x() - kurama_pos.x() ) <= kurama_size.x()/2 &&
-      std::abs( pos.y() - kurama_pos.y() ) <= kurama_size.y()/2 &&
-      std::abs( pos.z() - kurama_pos.z() ) <= kurama_size.z()/2 ){
-    Bfield[0] = 0.*tesla;
-    Bfield[1] = k_field;
-    Bfield[2] = 0.*tesla;
+  if( construct_kurama == 1 ){
+    if( std::abs( kurama_coord.x() ) <= kurama_size.x() &&
+	std::abs( kurama_coord.y() ) <= kurama_size.y() &&
+	std::abs( kurama_coord.z() ) <= kurama_size.z() ){
+      if( kurama_fieldmap == 0 ){
+	Bfield[0] = 0.*tesla;
+	Bfield[1] = k_field;
+	Bfield[2] = 0.*tesla;
+	return;
+      } else {
+	G4double kurama_point[3] =
+	  { kurama_coord.x()/cm, kurama_coord.y()/cm, kurama_coord.z()/cm };
+	m_kurama_field_map->GetFieldValue( kurama_point, Bfield );
+	return;
+      }
+    }
   }
-  // } else { /// by using field map from OPERA-3D
-  //   const G4double xmax = 250.0*mm;
-  //   const G4double ymax = 250.0*mm;
-  //   const G4double zmax = 250.0*mm;
-  //   //    const G4double zmin = -300.0*mm;
-  //   G4int iX,iY,iZ;
-  //   //    Bfield[0] = 0.;
-  //   //    Bfield[1] = 0.;
-  //   //    Bfield[2] = 1.0*tesla;
-  //   //    return;
-  //   iX = (int) ((Point[0]-xOPERA3D[0])/BFIELD_GRID_X);
-  //   iY = (int) ((Point[1]-yOPERA3D[0])/BFIELD_GRID_Y);
-  //   iZ = (int) ((Point[2]-zOPERA3D[0])/BFIELD_GRID_Z);
-  //   G4cout<<"iX,iY,iZ"<<iX<<","<<iY<<","<<iZ<<G4endl;
-  //   if( std::abs(Point[2])<zmax && std::abs(Point[1])<ymax &&
-  // 	std::abs(Point[0])<xmax ){
-  //     G4double s,t,u;
-  //     G4double sp, tp, up;
-  //     /*
-  //      *    bOPERA3D[0] : BX
-  //      *    bOPERA3D[1] : BY
-  //      *    bOPERA3D[2] : BZ
-  //      *    bOut[0]   : Bx (at interior point)
-  //      *    bOut[1]   : By (at interior point)
-  //      *    bOut[2]   : Bz (at interior point)
-  //      */
-  //     s = (Point[0] - xOPERA3D[iX]) / BFIELD_GRID_X;
-  //     t = (Point[1] - yOPERA3D[iY]) / BFIELD_GRID_Y;
-  //     u = (Point[2] - zOPERA3D[iZ]) / BFIELD_GRID_Z;
-  //     sp = 1.0-s; tp = 1.0-t;  up = 1.0-u;
-  //     for( G4int i=0; i<3; ++i ){
-  // 	G4double b[8]= { bOPERA3D[i][iX][iY][iZ],
-  // 			 bOPERA3D[i][iX+1][iY][iZ],
-  // 			 bOPERA3D[i][iX+1][iY][iZ+1],
-  // 			 bOPERA3D[i][iX][iY][iZ+1],
-  // 			 bOPERA3D[i][iX][iY+1][iZ],
-  // 			 bOPERA3D[i][iX+1][iY+1][iZ],
-  // 			 bOPERA3D[i][iX+1][iY+1][iZ+1],
-  // 			 bOPERA3D[i][iX][iY+1][iZ+1] };
-  // 	G4double bTmp  = up*b[0] + u*b[3]; /* up*(iX,  iY,  iZ) + u*(iX,  iY,  iZ+1) */
-  // 	G4double bTmp1 = up*b[1] + u*b[2]; /* up*(iX+1,iY,  iZ) + u*(iX+1,iY,  iZ+1) */
-  // 	G4double bTmp2 = up*b[4] + u*b[7]; /* up*(iX,  iY+1,iZ) + u*(iX,  iY+1,iZ+1) */
-  // 	G4double bTmp3 = up*b[5] + u*b[6]; /* up*(iX+1,iY+1,iZ) + u*(iX+1,iY+1,iZ+1) */
-  // 	Bfield[i] = sp * (tp * bTmp + t * bTmp2) + s * (tp * bTmp1 + t * bTmp3) ;
-  // 	G4cout<<Bfield[i]<<G4endl;
-  //     }
-  //   } else {  //othere case
-  //     Bfield[0] = 0.;
-  //     Bfield[1] = 0.;
-  //     Bfield[2] = 0.;
-  //   }
-  // }
 
   // K18Beamline
   if( m_k18_status ){
     for( auto& m : m_magnet_map ){
-      if( m.second.CalcField( G4ThreeVector( xp, yp, zp ), Bfield ) )
+      if( m.second.CalcK18Field( G4ThreeVector( xp, yp, zp ), Bfield ) )
 	return;
     }
   }
 
 #if 0
   G4ThreeVector b( Bfield[0], Bfield[1], Bfield[2] );
-  if( b.mag() > 0.01*tesla
+  if( b.mag() > 0.001*tesla
       // || true
       ){
     PrintHelper helper( 4, std::ios::fixed, G4cout );
@@ -253,4 +198,22 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 #endif
 
   return;
+}
+
+//_____________________________________________________________________________
+void
+TPCField::SetKuramaFieldMap( G4String map )
+{
+  if( m_kurama_field_map )
+    delete m_kurama_field_map;
+  m_kurama_field_map = new FieldMap( map );
+}
+
+//_____________________________________________________________________________
+void
+TPCField::SetShsFieldMap( G4String map )
+{
+  if( m_shs_field_map )
+    delete m_shs_field_map;
+  m_shs_field_map = new FieldMap( map );
 }
