@@ -38,14 +38,14 @@ TPCTargetSD::Initialize( G4HCofThisEvent* HCTE )
 G4bool
 TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
-  // const auto preStepPoint = aStep->GetPreStepPoint();
+  const auto preStepPoint = aStep->GetPreStepPoint();
   const auto aTrack = aStep->GetTrack();
   const auto Definition = aTrack->GetDefinition();
   const G4String particleName = Definition->GetParticleName();
   const G4String particleType = Definition->GetParticleType();
 
-  // if( preStepPoint->GetStepStatus() != fGeomBoundary )
-  //   return false;
+  if( preStepPoint->GetStepStatus() != fGeomBoundary )
+    return false;
   if( Definition->GetPDGCharge() == 0. )
     return false;
 

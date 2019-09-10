@@ -128,6 +128,8 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   static const G4double k_field = gConf.Get<G4double>( "KuramaField" ) * tesla;
   static const auto kurama_pos = gGeom.GetGlobalPosition( "KURAMA" ) * mm;
   static const auto kurama_size = gSize.GetSize( "KuramaField" ) * 0.5 * mm;
+  static const auto shs_pos = gGeom.GetGlobalPosition( "HypTPC" ) * mm;
+  static const auto shs_size = gSize.GetSize( "ShsField" ) * 0.5 * mm;
   const G4double xp = Point[0];
   const G4double yp = Point[1];
   const G4double zp = Point[2];
@@ -140,34 +142,34 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   Bfield[1] = 0.*tesla;
   Bfield[2] = 0.*tesla;
 
-  if( zp > -310.*mm && zp < 310.*mm && xp > -310.*mm && xp < 310.*mm
-      && std::abs(yp) < 300.*mm){
-    if( shs_fieldmap == 0 ){
-      Bfield[0] = 0.*tesla;
-      Bfield[1] = h_field;
-      Bfield[2] = 0.*tesla;
-      return;
-    } else {
-      G4double shs_point[3] =
-	{ pos.x()/cm, pos.y()/cm, pos.z()/cm };
+  if( shs_fieldmap == 0 ){
+    if( std::abs( pos.x() ) < shs_size.x() &&
+	std::abs( pos.y() ) < shs_size.y() &&
+	std::abs( pos.z() ) < shs_size.z() ){
+      Bfield[0] += 0.*tesla;
+      Bfield[1] += h_field;
+      Bfield[2] += 0.*tesla;
+    }
+  } else {
+    G4double shs_point[3] = { pos.x()/cm, pos.y()/cm, pos.z()/cm };
+    if( m_shs_field_map->IsInsideField( shs_point ) ){
       m_shs_field_map->GetFieldValue( shs_point, Bfield );
-      return;
     }
   }
   if( construct_kurama == 1 ){
-    if( std::abs( kurama_coord.x() ) <= kurama_size.x() &&
-	std::abs( kurama_coord.y() ) <= kurama_size.y() &&
-	std::abs( kurama_coord.z() ) <= kurama_size.z() ){
-      if( kurama_fieldmap == 0 ){
-	Bfield[0] = 0.*tesla;
-	Bfield[1] = k_field;
-	Bfield[2] = 0.*tesla;
-	return;
-      } else {
-	G4double kurama_point[3] =
-	  { kurama_coord.x()/cm, kurama_coord.y()/cm, kurama_coord.z()/cm };
+    if( kurama_fieldmap == 0 ){
+      if( std::abs( kurama_coord.x() ) < kurama_size.x() &&
+	  std::abs( kurama_coord.y() ) < kurama_size.y() &&
+	  std::abs( kurama_coord.z() ) < kurama_size.z() ){
+	Bfield[0] += 0.*tesla;
+	Bfield[1] += k_field;
+	Bfield[2] += 0.*tesla;
+      }
+    } else {
+      G4double kurama_point[3] =
+	{ kurama_coord.x()/cm, kurama_coord.y()/cm, kurama_coord.z()/cm };
+      if( m_kurama_field_map->IsInsideField( kurama_coord ) ){
 	m_kurama_field_map->GetFieldValue( kurama_point, Bfield );
-	return;
       }
     }
   }

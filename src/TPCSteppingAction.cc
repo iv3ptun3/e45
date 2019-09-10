@@ -76,17 +76,8 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
     }
   }
 
-  // if( prePVName.contains( "Coil" ) ){
+  // if( prePVName.contains( "Coil" ) || prePVName.contains( "Guard" ) ){
   //   theTrack->SetTrackStatus( fStopAndKill );
   //   return;
   // }
-
-  // if( prePVName.contains( "Target" ) )
-  //   G4cout<<"end stepping action = "<<prePVName<<G4endl;
-  //  G4StepPoint * thePostPoint = theStep->GetPostStepPoint();
-  //  G4VPhysicalVolume * thePostPV = thePostPoint->GetPhysicalVolume();
-  //  G4String thePostPVname = thePostPV->GetName();
-  //  if(thePostPVname(0,4)!="calo") { return; }
-  // then suspend the track
-  //  theTrack->SetTrackStatus(fSuspend);
 }

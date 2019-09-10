@@ -24,7 +24,7 @@ private:
   ConfMan& operator=( const ConfMan& );
 
 private:
-  typedef std::map<G4String, G4String>  StrList;
+  typedef std::map<G4String, G4String> StrList;
   typedef std::map<G4String, G4double> DoubleList;
   typedef std::map<G4String, G4int>    IntList;
   typedef std::map<G4String, G4bool>   BoolList;

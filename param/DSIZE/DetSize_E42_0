@@ -53,7 +53,7 @@ TargetHolder		16.0	16.2	290.0
 ### HTOF
 HtofSeg		68.0	800.0	10.0
 ### SHS
-ShsField	1550.0	950.0	1200.0
+ShsField	800.0	800.0	2000.0
 ### K18Beamline
 D4Rho			4000.0
 D4BendAngle		64.0	# [deg]

@@ -1513,7 +1513,7 @@ TPCAnaManager::EndOfEventAction( void )
 void
 TPCAnaManager::SetBH2Data( const VHitInfo* hit )
 {
-  if( event.nhBh2 > MaxHits ){
+  if( event.nhBh2 >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhBh2 << G4endl;
   } else {
     Int_t i = event.nhBh2;
@@ -1755,7 +1755,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 void
 TPCAnaManager::SetFTOFData( const VHitInfo* hit )
 {
-  if( event.nhFtof > MaxHits ){
+  if( event.nhFtof >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhFtof << G4endl;
   } else {
     Int_t i = event.nhFtof;
@@ -1776,7 +1776,7 @@ TPCAnaManager::SetFTOFData( const VHitInfo* hit )
 void
 TPCAnaManager::SetHTOFData( const VHitInfo* hit )
 {
-  if( event.nhHtof > MaxHits ){
+  if( event.nhHtof >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhHtof << G4endl;
   } else {
     Int_t i = event.nhHtof;
@@ -1797,7 +1797,7 @@ TPCAnaManager::SetHTOFData( const VHitInfo* hit )
 void
 TPCAnaManager::SetLACData( const VHitInfo* hit )
 {
-  if( event.nhLac > MaxHits ){
+  if( event.nhLac >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhLac << G4endl;
   } else {
     Int_t i = event.nhLac;
@@ -1818,7 +1818,7 @@ TPCAnaManager::SetLACData( const VHitInfo* hit )
 void
 TPCAnaManager::SetSCHData( const VHitInfo* hit )
 {
-  if( event.nhSch > MaxHits ){
+  if( event.nhSch >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhSch << G4endl;
   } else {
     Int_t i = event.nhSch;
@@ -1839,7 +1839,7 @@ TPCAnaManager::SetSCHData( const VHitInfo* hit )
 void
 TPCAnaManager::SetSDCData( const VHitInfo* hit )
 {
-  if( event.nhSdc > MaxHits ){
+  if( event.nhSdc >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhSdc << G4endl;
   } else {
     Int_t i = event.nhSdc;
@@ -1860,7 +1860,7 @@ TPCAnaManager::SetSDCData( const VHitInfo* hit )
 void
 TPCAnaManager::SetVPData( const VHitInfo* hit )
 {
-  if( event.nhVp > MaxHits ){
+  if( event.nhVp >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhVp << G4endl;
   } else {
     Int_t i = event.nhVp;
@@ -1881,7 +1881,7 @@ TPCAnaManager::SetVPData( const VHitInfo* hit )
 void
 TPCAnaManager::SetWCData( const VHitInfo* hit )
 {
-  if( event.nhWc > MaxHits ){
+  if( event.nhWc >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhWc << G4endl;
   } else {
     Int_t i = event.nhWc;
@@ -2077,7 +2077,7 @@ TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
 void
 TPCAnaManager::SetTargetData( const VHitInfo* hit )
 {
-  if( event.nhTgt > MaxHits ){
+  if( event.nhTgt >= MaxHits ){
     G4cerr << FUNC_NAME << " too much nhit " << event.nhTgt << G4endl;
   } else {
     Int_t i = event.nhTgt;
