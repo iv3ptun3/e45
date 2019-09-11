@@ -6,6 +6,7 @@
 #include <G4ThreeVector.hh>
 #include <Randomize.hh>
 
+#include <TFile.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TString.h>
@@ -1492,7 +1493,7 @@ TPCAnaManager::EndOfEventAction( void )
 
   tree->Fill();
 
-  event.pb->SetMag( 0. );
+  event.pb->SetXYZ( 0., 0., 0. );
   event.nhPrm = 0;
   for( Int_t i=0; i<MaxPrimaryParticle; ++i ){
     event.pidPrm[i] = -9999;

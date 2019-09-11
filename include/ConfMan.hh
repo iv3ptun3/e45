@@ -38,17 +38,14 @@ private:
   BoolList     m_bool;
 
 public:
+  // G4bool    Finalize( void );
+  // G4bool    FinalizeProcess( void );
   template <typename T>
   static const T& Get( const G4String& key );
   G4bool    Initialize( void );
   G4bool    Initialize( const G4String& file_name );
   G4bool    InitializeHistograms( void );
   G4bool    InitializeParameterFiles( void );
-  G4bool    IsReady( void ) const { return m_is_ready; }
-  // G4bool    Finalize( void );
-  // G4bool    FinalizeProcess( void );
-
-  // Initialize Parameter
   template <typename T>
   G4bool    InitializeParameter( void );
   template <typename T>
@@ -56,6 +53,7 @@ public:
   template <typename T>
   G4bool    InitializeParameter( const G4String& key1,
 				 const G4String& key2 );
+  G4bool    IsReady( void ) const { return m_is_ready; }
 
 private:
   G4String FilePath( const G4String& src ) const;

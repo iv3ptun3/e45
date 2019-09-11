@@ -62,6 +62,9 @@ BeamMan::Initialize( void )
   const auto& gGeom = DCGeomMan::GetInstance();
   const G4double p0 = gConf.Get<G4double>( "BeamMom" );
 
+  if( m_file_name.isNull() )
+    return true;
+
   m_file = new TFile( m_file_name );
   TTree* tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
 

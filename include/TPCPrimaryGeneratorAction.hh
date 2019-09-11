@@ -8,8 +8,10 @@
 #include <G4Types.hh>
 
 class G4ParticleGun;
+class TFile;
 
 struct BeamInfo;
+struct JamInfo;
 
 //_____________________________________________________________________________
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
@@ -20,11 +22,13 @@ public:
   ~TPCPrimaryGeneratorAction( void );
 
 private:
+  G4int          m_generator;
   G4ParticleGun* m_particle_gun;
   G4ThreeVector  m_target_pos;
   G4ThreeVector  m_target_size;
   BeamInfo*      m_beam;
   G4double       m_beam_p0;
+  JamInfo*       m_jam;
   G4double env_target_pos_z;
   G4double env_Beam_width;
   G4double env_Beam_x0;
@@ -56,6 +60,7 @@ public:
   void Generate_Kp_Kn(G4Event* anEvent);
   void GenerateBeamVI( G4Event* anEvent );
   void GenerateBeamVO( G4Event* anEvent );
+  void GenerateJamInput( G4Event* anEvent );
   void Generate_hdibaryon_non_reso(G4Event* anEvent);
   void Generate_test(G4Event* anEvent);
   void Generate_test2(G4Event* anEvent);

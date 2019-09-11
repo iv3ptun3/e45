@@ -38,7 +38,7 @@ main( int argc, char** argv )
     return EXIT_FAILURE;
   }
 
-  auto output = new TFile( argv[kOutputName], "RECREATE" );
+  new TFile( argv[kOutputName], "RECREATE" );
 
   auto runManager = new G4RunManager;
   runManager->SetUserInitialization( new TPCDetectorConstruction );
@@ -87,8 +87,8 @@ main( int argc, char** argv )
     uiManager->ApplyCommand( command + fileName );
   }
 
-  output->Write();
-  output->Close();
+  gFile->Write();
+  gFile->Close();
 
 #ifdef G4VIS_USE
   delete visManager;

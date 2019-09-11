@@ -11,19 +11,12 @@
 #include <G4IonConstructor.hh>
 #include <Randomize.hh>
 
-#include <TH1.h>
-#include <TH2.h>
-#include <TCanvas.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <TF1.h>
-#include <TMath.h>
-
 #include "BeamMan.hh"
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
 #include "FuncName.hh"
+#include "JamMan.hh"
 #include "Kinema3Resonance.hh"
 #include "E27Reaction.hh"
 #include "KKppReaction.hh"
@@ -46,17 +39,23 @@ namespace
   const auto& gConf = ConfMan::GetInstance();
   const auto& gGeom = DCGeomMan::GetInstance();
   const auto& gSize = DetSizeMan::GetInstance();
+  const auto& gJam  = JamMan::GetInstance();
 }
 
 //_____________________________________________________________________________
 TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
   : G4VUserPrimaryGeneratorAction(),
+    m_generator( gConf.Get<G4int>( "Generator" ) ),
     m_particle_gun( new G4ParticleGun ),
     m_target_pos( gGeom.GetGlobalPosition( "SHSTarget" )*mm ),
     m_target_size( gSize.GetSize( "Target" )*mm ),
     m_beam( new BeamInfo ),
-    m_beam_p0( gConf.Get<G4double>( "BeamMom" ) /* 1.80*GeV */ )
+    m_beam_p0( gConf.Get<G4double>( "BeamMom" ) /* 1.80*GeV */ ),
+    m_jam( new JamInfo )
 {
+  G4cout << FUNC_NAME << G4endl
+	 << "   Generator# = " << m_generator << G4endl;
+  gAnaMan.SetGeneratorID( m_generator );
 }
 
 //_____________________________________________________________________________
@@ -71,31 +70,21 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   E27Reaction E27Generator(this);
   KKppReaction KKppGenerator(this);
 
-  const G4int generator = gConf.Get<G4int>( "Generator" );
-
-  static G4bool first = true;
-  if( first ){
-    G4cout << FUNC_NAME << G4endl
-	   << "   Generator# = " << generator << G4endl;
-    first = false;
-  }
-
-  TTree *t1 = nullptr;
-  if( generator == 3101 ||
-      generator == 3103 ||
-      generator == 3104 ){
-    TFile *fin = new TFile( gConf.Get<G4String>("Input_JAM_File_Name"), "READ");
-    t1 = (TTree*)fin->Get("tree");
-  }
-
-  gAnaMan.SetGeneratorID( generator );
-
-  *m_beam = gBeam.Get();
+  if( gBeam.IsReady() ){
+    *m_beam = gBeam.Get();
 #ifdef DEBUG
-   m_beam->Print();
+    m_beam->Print();
 #endif
+  }
 
-  switch( generator  ){
+  if( gJam.IsReady() ){
+    *m_jam = gJam.Get();
+#ifdef DEBUG
+    m_jam->Print();
+#endif
+  }
+
+  switch( m_generator ){
   case 0:
     // no generation
     break;
@@ -167,6 +156,9 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     // 12C_amu = 12u --> 12*931.494061 MeV
     // 10C_amu = 10.012938u --> 10.012938*931.494061 MeV
    break;
+  case 31:
+    GenerateJamInput( anEvent );
+    break;
   case 99:
     Generate_dedx_single(anEvent); // study on dedx. only single particle will be generated
     break;
@@ -264,20 +256,20 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 3004:
     KKppGenerator.KKpp_LSpPim(anEvent);
     break;
-  case 3101:
-    KKppGenerator.JAMInput(anEvent,t1);
-    break;
-  case 3102:
-    KKppGenerator.KKpp_BeamThrough1(anEvent);
-    break;
-  case 3103:
-    KKppGenerator.JAMInput_K0(anEvent,t1);
-    break;
-  case 3104:
-    KKppGenerator.JAMInput_K0bar(anEvent,t1);
-    break;
+  // case 3101:
+  //   KKppGenerator.JAMInput(anEvent,t1);
+  //   break;
+  // case 3102:
+  //   KKppGenerator.KKpp_BeamThrough1(anEvent);
+  //   break;
+  // case 3103:
+  //   KKppGenerator.JAMInput_K0(anEvent,t1);
+  //   break;
+  // case 3104:
+  //   KKppGenerator.JAMInput_K0bar(anEvent,t1);
+  //   break;
   default:
-    G4cout << "Generator number error :" << generator << G4endl;
+    G4cout << "Generator number error :" << m_generator << G4endl;
     break;
   }
 }
@@ -1448,6 +1440,30 @@ TPCPrimaryGeneratorAction::GenerateBeamVO( G4Event* anEvent )
 }
 
 //_____________________________________________________________________________
+// Generator# 31
+void
+TPCPrimaryGeneratorAction::GenerateJamInput( G4Event* anEvent )
+{
+  static const auto particleTable = G4ParticleTable::GetParticleTable();
+  gAnaMan.SetNumberOfPrimaryParticle( m_jam->np );
+  // gAnaMan.SetPrimaryInfo( 0., 0., 0., 0., 0. );
+  for( G4int i=0; i<m_jam->np; ++i ){
+    auto particle = particleTable->FindParticle( m_jam->pid[i] );
+    G4ThreeVector x( 0., 0., gGeom.GetGlobalPosition( "Target" ).z() );
+    G4ThreeVector p( m_jam->px[i]*GeV, m_jam->py[i]*GeV, m_jam->pz[i]*GeV );
+    m_particle_gun->SetParticleDefinition( particle );
+    m_particle_gun->SetParticleMomentumDirection( p );
+    G4double m = particle->GetPDGMass()/GeV;
+    G4double ke = std::sqrt( m*m + p.mag2() ) - m;
+    m_particle_gun->SetParticleEnergy( ke );
+    m_particle_gun->SetParticlePosition( x );
+    m_particle_gun->GeneratePrimaryVertex( anEvent );
+    gAnaMan.SetPrimaryParticle( i, p, m, m_jam->pid[i] );
+    gAnaMan.SetPrimaryVertex( i, x );
+  }
+}
+
+//_____________________________________________________________________________
 void
 TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
 {
@@ -1540,7 +1556,7 @@ TPCPrimaryGeneratorAction::Generate_hdibaryon_non_reso( G4Event* anEvent )
   G4double vtx = 0.*mm;
   G4double vty = 0.*mm;
   G4double vtz = G4RandFlat::shoot( env_target_pos_z - m_target_size.z()/2,
-					 env_target_pos_z + m_target_size.z()/2 )*mm;
+				    env_target_pos_z + m_target_size.z()/2 )*mm;
 
   //Kaon +
   m_particle_gun->SetParticleDefinition(kaonPlus);
