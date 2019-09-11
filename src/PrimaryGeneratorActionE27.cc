@@ -1,10 +1,6 @@
 // -*- C++ -*-
 
-/**
- * for the EventGeneration for the E27 experiment
- */
-
-#include "E27Reaction.hh"
+#include "TPCPrimaryGeneratorAction.hh"
 
 #include <G4Event.hh>
 #include <G4IonConstructor.hh>
@@ -20,7 +16,7 @@
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
 #include "DetSizeMan.hh"
-#include "TPCPrimaryGeneratorAction.hh"
+#include "FuncName.hh"
 #include "Kinema3Resonance.hh"
 #include "KinemaHResonance.hh"
 #include "Kinema3Body.hh"
@@ -48,7 +44,7 @@ namespace
 //_____________________________________________________________________________
 // reactio No #2701 pi+ beam through
 void
-E27Reaction::E27_beamthrough(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27BeamThrough( G4Event* anEvent )
 {
   //  G4double  momk[3], mom[3],momkn[3];
   //  G4double rmk=0.493677;
@@ -80,15 +76,15 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
   G4double vtx = CLHEP::RandGauss::shoot(0,10.)*mm;
   G4double vty = CLHEP::RandFlat::shoot(0.,3.2)*mm;
   G4double vtz = gSize.Get("Target", ThreeVector::Z );
-  //G4double vtz= CLHEP::RandFlat::shoot(pGen->Get_env_target_pos_z()-gSize.Get( "Target", ThreeVector::Z )/2,pGen->Get_env_target_pos_z()+gSize.Get( "Target", ThreeVector::Z )/2)*mm-250.*mm;
+  //G4double vtz= CLHEP::RandFlat::shoot(m_particle_gun->Get_env_target_pos_z()-gSize.Get( "Target", ThreeVector::Z )/2,m_particle_gun->Get_env_target_pos_z()+gSize.Get( "Target", ThreeVector::Z )/2)*mm-250.*mm;
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   //getchar();
   //beam pi+
-  pGen->GetParticleGun()->SetParticleDefinition(pionPlus);
-  pGen->GetParticleGun()->SetParticleMomentumDirection(G4ThreeVector(mom_pip_x,mom_pip_y,mom_pip_z));
-  pGen->GetParticleGun()->SetParticleEnergy((Energy_pip - pionPlus->GetPDGMass()/GeV)*GeV);
-  pGen->GetParticleGun()->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(pionPlus);
+  m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_pip_x,mom_pip_y,mom_pip_z));
+  m_particle_gun->SetParticleEnergy((Energy_pip - pionPlus->GetPDGMass()/GeV)*GeV);
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   //  gAnaMan->SetNumberOfPrimaryParticle(1);
   //  gAnaMan->SetPrimaryParticle(0,mom_pip_x,mom_pip_y,mom_pip_z,pionPlus->GetPDGMass()/GeV);
@@ -98,7 +94,7 @@ E27Reaction::E27_beamthrough(G4Event* anEvent)
 //_____________________________________________________________________________
 //reactio No #2702 K+ gun for test
 void
-E27Reaction::E27_Kptest(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27Kptest( G4Event* anEvent )
 {
   //  G4double  momk[3], mom[3],momkn[3];
   //  G4double rmk=0.493677;
@@ -136,11 +132,11 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   // getchar();
   //scat K+
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticleMomentumDirection(G4ThreeVector(mom_Kp_x,mom_Kp_y,mom_Kp_z));
-  pGen->GetParticleGun()->SetParticleEnergy((Energy_Kp - KaonPlus->GetPDGMass()/GeV)*GeV);
-  pGen->GetParticleGun()->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_Kp_x,mom_Kp_y,mom_Kp_z));
+  m_particle_gun->SetParticleEnergy((Energy_Kp - KaonPlus->GetPDGMass()/GeV)*GeV);
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   //  gAnaMan->SetNumberOfPrimaryParticle(1);
   //  gAnaMan->SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,pionPlus->GetPDGMass()/GeV);
@@ -150,7 +146,7 @@ E27Reaction::E27_Kptest(G4Event* anEvent)
 //_____________________________________________________________________________
 //reactio No #2703 pi+ d -> K+ K-pp, K-pp -> Lambda p reaction
 void
-E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27KppFLambdaP( G4Event* anEvent )
 {
   G4double Mi1=G4PionPlus::Definition()->GetPDGMass();
   G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
@@ -199,10 +195,10 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -254,24 +250,24 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Lambda;
   Lambda= particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Proton;
   Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(3);
 
@@ -288,7 +284,7 @@ E27Reaction::E27_Kpp_F_LambdaP(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2704 pi+ d -> K+ K-pp, K-pp -> SigmaZ p reaction
 void
-E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27KppFSigmaZP(G4Event* anEvent)
 {
   G4double Mi1=G4PionPlus::Definition()->GetPDGMass();
   G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
@@ -337,10 +333,10 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -388,24 +384,24 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* SigmaZ;
   SigmaZ= particleTable->FindParticle("sigma0");
-  pGen->GetParticleGun()->SetParticleDefinition(SigmaZ);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(SigmaZ);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Proton;
   Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(3);
 
@@ -422,7 +418,7 @@ E27Reaction::E27_Kpp_F_SigmaZP(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2705 pi+ d -> K+ K-pp, K-pp -> Lambda piz p reaction
 void
-E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27KppFLambdaPizP( G4Event* anEvent )
 {
   G4double Mi1=G4PionPlus::Definition()->GetPDGMass();
   G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
@@ -472,10 +468,10 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -523,31 +519,31 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Lambda;
   Lambda= particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Proton;
   Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* PiZero;
   PiZero= particleTable->FindParticle("pi0");
-  pGen->GetParticleGun()->SetParticleDefinition(PiZero);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf4);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PiZero);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf4);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(4);
 
@@ -565,7 +561,7 @@ E27Reaction::E27_Kpp_F_LambdaPizP(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2706 pi+ d -> K+ K-pp, K-pp -> SigmaZ piz p reaction
 void
-E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27KppFSigmaZPizP( G4Event* anEvent )
 {
   G4double Mi1=G4PionPlus::Definition()->GetPDGMass();
   G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
@@ -615,10 +611,10 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -666,31 +662,31 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* SigmaZero;
   SigmaZero= particleTable->FindParticle("sigma0");
-  pGen->GetParticleGun()->SetParticleDefinition(SigmaZero);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(SigmaZero);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Proton;
   Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* PiZero;
   PiZero= particleTable->FindParticle("pi0");
-  pGen->GetParticleGun()->SetParticleDefinition(PiZero);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf4);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PiZero);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf4);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(4);
 
@@ -708,7 +704,7 @@ E27Reaction::E27_Kpp_F_SigmaZPizP(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2707 pi+ d -> K+ K-pp, K-pp -> SigmaP pim p reaction
 void
-E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27KppFSigmaPPimP( G4Event* anEvent )
 {
   G4double Mi1=G4PionPlus::Definition()->GetPDGMass();
   G4double Mi2=G4Deuteron::Definition()->GetPDGMass();
@@ -758,10 +754,10 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -809,31 +805,31 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonPlus;
   KaonPlus = particleTable->FindParticle("kaon+");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* SigmaPlus;
   SigmaPlus= particleTable->FindParticle("sigma+");
-  pGen->GetParticleGun()->SetParticleDefinition(SigmaPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(SigmaPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Proton;
   Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* PiMinus;
   PiMinus= particleTable->FindParticle("pi-");
-  pGen->GetParticleGun()->SetParticleDefinition(PiMinus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf4);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PiMinus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf4);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(4);
 
@@ -851,7 +847,7 @@ E27Reaction::E27_Kpp_F_SigmaPPimP(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2708 K- 12C -> p 11KB, 11KB -> Lambda 10Be reaction
 void
-E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27K11BLambda10Be( G4Event* anEvent )
 {
   G4double Mi1=G4KaonPlus::Definition()->GetPDGMass();
   G4double Mi2=12.*AtomicMassUnit*GeV;//12C
@@ -903,10 +899,10 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("E27Reaction::E27_Kpp_F_LambdaP",
-		  "Production under threshold",
-		  RunMustBeAborted,
-		  "E27Reaction::Production under Threshold!!");
+      G4Exception( FUNC_NAME,
+		   "Production under threshold",
+		   RunMustBeAborted,
+		   "Production under Threshold!!" );
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, Mf1, Mm1,
@@ -963,17 +959,17 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Proton;
   Proton = particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   G4ParticleDefinition* Lambda;
   Lambda= particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
 
   G4IonTable* ionTable = G4IonTable::GetIonTable();
@@ -987,10 +983,10 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
   }
   // G4ParticleDefinition* ;
   // Proton= particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Be10);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Be10);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(3);
 
@@ -1007,7 +1003,7 @@ E27Reaction::E27_K11B_Lambda10Be(G4Event* anEvent)
 //_____________________________________________________________________________
 // reactio No #2709 K+ gun for test
 void
-E27Reaction::E27_Kptest2(G4Event* anEvent)
+TPCPrimaryGeneratorAction::GenerateE27Kptest2( G4Event* anEvent )
 {
   int nev = anEvent->GetEventID();
   G4double pbeam;
@@ -1061,11 +1057,11 @@ E27Reaction::E27_Kptest2(G4Event* anEvent)
   std::cout<<"pbeam = "<<pbeam<<std::endl;
   // getchar();
   //scat K+
-  pGen->GetParticleGun()->SetParticleDefinition(KaonPlus);
-  pGen->GetParticleGun()->SetParticleMomentumDirection(G4ThreeVector(mom_Kp_x,mom_Kp_y,mom_Kp_z));
-  pGen->GetParticleGun()->SetParticleEnergy((Energy_Kp - KaonPlus->GetPDGMass()/GeV)*GeV);
-  pGen->GetParticleGun()->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonPlus);
+  m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_Kp_x,mom_Kp_y,mom_Kp_z));
+  m_particle_gun->SetParticleEnergy((Energy_Kp - KaonPlus->GetPDGMass()/GeV)*GeV);
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex(anEvent);
 
   gAnaMan.SetNumberOfPrimaryParticle(1);
   gAnaMan.SetPrimaryParticle(0,mom_Kp_x,mom_Kp_y,mom_Kp_z,KaonPlus->GetPDGMass()/GeV);

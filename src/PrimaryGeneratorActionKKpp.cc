@@ -1,10 +1,6 @@
 // -*- C++ -*-
 
-/**
- * for the EventGeneration for the KKpp reaction
- */
-
-#include "KKppReaction.hh"
+#include "TPCPrimaryGeneratorAction.hh"
 
 #include <G4Event.hh>
 #include <G4IonConstructor.hh>
@@ -32,7 +28,6 @@
 #include "KinemaHybrid.hh"
 #include "KinemaKstar.hh"
 #include "TPCAnaManager.hh"
-#include "TPCPrimaryGeneratorAction.hh"
 
 namespace
 {
@@ -45,20 +40,9 @@ namespace
 }
 
 //_____________________________________________________________________________
-KKppReaction::KKppReaction( TPCPrimaryGeneratorAction * PGAction )
-  : pGen( PGAction )
-{
-}
-
-//_____________________________________________________________________________
-KKppReaction::~KKppReaction( void )
-{
-}
-
-//_____________________________________________________________________________
 // reaction #3001 K- d -> K0 K-K-pp, K-K-pp -> LL -> p pi p pi reaction
 void
-KKppReaction::KKpp_LL1( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateKKppLL1( G4Event* anEvent )
 {
   G4double Mp   = G4Proton::Definition()->GetPDGMass();
   G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
@@ -90,9 +74,9 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
     dpb = G4RandGauss::shoot(0., gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
-  double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
-  double KKpp_G0 = 0.1; //assumption
-  G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+  double KKppM0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
+  double KKppG0 = 0.1; //assumption
+  G4double Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
 
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL1, LPL2, LPf1, LPf2, LPf3, LPf4, LPf5, LPf6;
@@ -114,10 +98,10 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("KKppReaction::KKpp_LL1",
+      G4Exception("TPCPrimaryGeneratorAction::GenerateKKppLL1",
 		  "Production under threshold",
 		  RunMustBeAborted,
-		  "KKppReaction::Production under Threshold!!");
+		  "TPCPrimaryGeneratorAction::GenerateProduction under Threshold!!");
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
@@ -150,7 +134,7 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
      if(gConf.Get<G4double>( "BeamMom" )!=0.)
        dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
-     Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+     Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
   }
 
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
@@ -186,40 +170,40 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
   G4ParticleDefinition* PionPlus;
   PionPlus = particleTable->FindParticle("pi+");
 
-  pGen->GetParticleGun()->SetParticleDefinition(PionPlus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PionPlus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf1);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
   G4ParticleDefinition* PionMinus;
   PionMinus = particleTable->FindParticle("pi-");
-  pGen->GetParticleGun()->SetParticleDefinition(PionMinus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PionMinus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf2);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   G4ParticleDefinition* Proton;
   Proton = particleTable->FindParticle("proton");
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf3);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf3);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
-  pGen->GetParticleGun()->SetParticleDefinition(PionMinus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf4);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PionMinus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf4);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
-  pGen->GetParticleGun()->SetParticleDefinition(Proton);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf5);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Proton);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf5);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
-  pGen->GetParticleGun()->SetParticleDefinition(PionMinus);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPf6);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(PionMinus);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPf6);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
 
@@ -251,7 +235,7 @@ KKppReaction::KKpp_LL1( G4Event* anEvent )
 // reaction #3002 K- d -> K0 K-K-pp, K-K-pp -> LL reaction
 //  K0S and Lambda is directory gunned
 void
-KKppReaction::KKpp_LL2( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateKKppLL2( G4Event* anEvent )
 {
   G4double Mp   = G4Proton::Definition()->GetPDGMass();
   // G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
@@ -283,9 +267,9 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
     dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
-  double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
-  double KKpp_G0 = 0.1; //assumption
-  G4double Mm1= BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+  double KKppM0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
+  double KKppG0 = 0.1; //assumption
+  G4double Mm1= BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
 
 
   G4double thetaK, theta_CM;
@@ -307,10 +291,10 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("KKppReaction::KKpp_LL1",
+      G4Exception("TPCPrimaryGeneratorAction::GenerateKKppLL1",
 		  "Production under threshold",
 		  RunMustBeAborted,
-		  "KKppReaction::Production under Threshold!!");
+		  "TPCPrimaryGeneratorAction::GenerateProduction under Threshold!!");
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
@@ -345,7 +329,7 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
      if(gConf.Get<G4double>( "BeamMom" )!=0.)
        dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
-     Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+     Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
   }
 
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
@@ -380,23 +364,23 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Kaon0S;
   Kaon0S = particleTable->FindParticle("kaon0S");
-  pGen->GetParticleGun()->SetParticleDefinition(Kaon0S);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPKz);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Kaon0S);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPKz);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
   G4ParticleDefinition* Lambda;
   Lambda = particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPL1);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPL1);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPL2);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPL2);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
 
@@ -420,7 +404,7 @@ KKppReaction::KKpp_LL2( G4Event* anEvent )
 // reaction #3003 K- d -> K0 K-K-pp, K-K-pp -> LS-pi+ reaction
 //  K0S, Lambda, Sigma is directory gunned
 void
-KKppReaction::KKpp_LSmPip( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateKKppLSmPip( G4Event* anEvent )
 {
   G4double Mp   = G4Proton::Definition()->GetPDGMass();
   // G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
@@ -454,9 +438,9 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
     dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
-  double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
-  double KKpp_G0 = 0.1; //assumption
-  G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+  double KKppM0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
+  double KKppG0 = 0.1; //assumption
+  G4double Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
 
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL, LPS, LPpi;
@@ -478,10 +462,10 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("KKppReaction::KKpp_LSmPip",
+      G4Exception("TPCPrimaryGeneratorAction::GenerateKKppLSmPip",
 		  "Production under threshold",
 		  RunMustBeAborted,
-		  "KKppReaction::Production under Threshold!!");
+		  "TPCPrimaryGeneratorAction::GenerateProduction under Threshold!!");
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
@@ -517,7 +501,7 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
      if(gConf.Get<G4double>( "BeamMom" )!=0.)
        dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
-     Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+     Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
   }
 
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
@@ -552,32 +536,32 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Kaon0S;
   Kaon0S = particleTable->FindParticle("kaon0S");
-  pGen->GetParticleGun()->SetParticleDefinition(Kaon0S);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPKz);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Kaon0S);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPKz);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
   G4ParticleDefinition* Lambda;
   Lambda = particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPL);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPL);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   G4ParticleDefinition* Sigma;
   Sigma = particleTable->FindParticle("sigma-");
-  pGen->GetParticleGun()->SetParticleDefinition(Sigma);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPS);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Sigma);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPS);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   G4ParticleDefinition* Pi;
   Pi = particleTable->FindParticle("pi+");
-  pGen->GetParticleGun()->SetParticleDefinition(Pi);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPpi);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Pi);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPpi);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
 
@@ -603,7 +587,7 @@ KKppReaction::KKpp_LSmPip( G4Event* anEvent )
 // reaction #3004 K- d -> K0 K-K-pp, K-K-pp -> LS+pi- reaction
 // K0S, Lambda, Sigma is directory gunned
 void
-KKppReaction::KKpp_LSpPim( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateKKppLSpPim( G4Event* anEvent )
 {
   G4double Mp   = G4Proton::Definition()->GetPDGMass();
   G4double Mpim = G4PionMinus::Definition()->GetPDGMass();
@@ -637,9 +621,9 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
     dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
   pb += dpb;
 
-  double KKpp_M0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
-  double KKpp_G0 = 0.1; //assumption
-  G4double Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+  double KKppM0 = 1.405 + 1.405; //assuming L(1405)+L(1405)
+  double KKppG0 = 0.1; //assumption
+  G4double Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
 
   G4double thetaK, theta_CM;
   G4ThreeVector LPKz, LPm1, LPL, LPS, LPpi;
@@ -660,10 +644,10 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
   G4int n=0;
   while(1){
     if(++n>MaxTry){
-      G4Exception("KKppReaction::KKpp_LSpPim",
+      G4Exception("TPCPrimaryGeneratorAction::GenerateKKppLSpPim",
 		  "Production under threshold",
 		  RunMustBeAborted,
-		  "KKppReaction::Production under Threshold!!");
+		  "TPCPrimaryGeneratorAction::GenerateProduction under Threshold!!");
      }
 
     status=Scattering2Body_theta( Mi1, Mi2, MKz, Mm1,
@@ -698,7 +682,7 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
      if(gConf.Get<G4double>( "BeamMom" )!=0.)
        dpb = G4RandGauss::shoot(0.,gConf.Get<G4double>( "BeamWidth" ))*GeV;
      pb += dpb;
-     Mm1 = BreitWigner(KKpp_M0, KKpp_G0)*GeV; //KKpp
+     Mm1 = BreitWigner(KKppM0, KKppG0)*GeV; //KKpp
   }
 
   double BE_KKpp = Mm1 - 2.*Mi1 - 2.*Mp;
@@ -733,32 +717,32 @@ KKppReaction::KKpp_LSpPim( G4Event* anEvent )
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* Kaon0S;
   Kaon0S = particleTable->FindParticle("kaon0S");
-  pGen->GetParticleGun()->SetParticleDefinition(Kaon0S);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPKz);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Kaon0S);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPKz);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
   G4ParticleDefinition* Lambda;
   Lambda = particleTable->FindParticle("lambda");
-  pGen->GetParticleGun()->SetParticleDefinition(Lambda);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPL);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Lambda);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPL);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   G4ParticleDefinition* Sigma;
   Sigma = particleTable->FindParticle("sigma+");
-  pGen->GetParticleGun()->SetParticleDefinition(Sigma);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPS);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Sigma);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPS);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   G4ParticleDefinition* Pi;
   Pi = particleTable->FindParticle("pi-");
-  pGen->GetParticleGun()->SetParticleDefinition(Pi);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(LPpi);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(Pi);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(LPpi);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
 
@@ -785,7 +769,7 @@ int Nbeam_JAM=0;
 //_____________________________________________________________________________
 // reaction #3101 JAM input
 void
-KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
+TPCPrimaryGeneratorAction::GenerateJAMInput( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
@@ -864,10 +848,10 @@ KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
     //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
     G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 
-    pGen->GetParticleGun()->SetParticleDefinition(ptmp);
-    pGen->GetParticleGun()->SetParticlePosition(LPos);
-    pGen->GetParticleGun()->SetParticleMomentum(LP);
-    pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+    m_particle_gun->SetParticleDefinition(ptmp);
+    m_particle_gun->SetParticlePosition(LPos);
+    m_particle_gun->SetParticleMomentum(LP);
+    m_particle_gun->GeneratePrimaryVertex( anEvent );
 
     //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
     if(pid_JAM==-311)
@@ -889,7 +873,7 @@ KKppReaction::JAMInput( G4Event* anEvent, TTree*t1 )
 //_____________________________________________________________________________
 //reactio No #3102 K- beam through gaus without correlation
 void
-KKppReaction::KKpp_BeamThrough1( G4Event* anEvent )
+TPCPrimaryGeneratorAction::GenerateKKppBeamThrough1( G4Event* anEvent )
 {
   // G4double Mp=G4Proton::Definition()->GetPDGMass();
   // G4double Mpim=G4PionMinus::Definition()->GetPDGMass();
@@ -928,10 +912,10 @@ KKppReaction::KKpp_BeamThrough1( G4Event* anEvent )
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* KaonM;
   KaonM = particleTable->FindParticle("kaon-");
-  pGen->GetParticleGun()->SetParticleDefinition(KaonM);
-  pGen->GetParticleGun()->SetParticlePosition(LPos);
-  pGen->GetParticleGun()->SetParticleMomentum(beam_mom);
-  pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+  m_particle_gun->SetParticleDefinition(KaonM);
+  m_particle_gun->SetParticlePosition(LPos);
+  m_particle_gun->SetParticleMomentum(beam_mom);
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 
 
@@ -946,7 +930,7 @@ KKppReaction::KKpp_BeamThrough1( G4Event* anEvent )
 //_____________________________________________________________________________
 //reaction No #3103 JAM input K0
 void
-KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
+TPCPrimaryGeneratorAction::GenerateJAMInputK0( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
@@ -1030,10 +1014,10 @@ KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
       //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
       G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 
-      pGen->GetParticleGun()->SetParticleDefinition(ptmp);
-      pGen->GetParticleGun()->SetParticlePosition(LPos);
-      pGen->GetParticleGun()->SetParticleMomentum(LP);
-      pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+      m_particle_gun->SetParticleDefinition(ptmp);
+      m_particle_gun->SetParticlePosition(LPos);
+      m_particle_gun->SetParticleMomentum(LP);
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
 
       //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
       if(pid_JAM==-311)
@@ -1054,7 +1038,8 @@ KKppReaction::JAMInput_K0( G4Event* anEvent, TTree*t1 )
 
 //_____________________________________________________________________________
 //reactio No #3104 JAM input K0bar
-void KKppReaction::JAMInput_K0bar( G4Event* anEvent, TTree*t1 )
+void
+TPCPrimaryGeneratorAction::GenerateJAMInputK0bar( G4Event* anEvent, TTree*t1 )
 {
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   // G4ParticleDefinition* kaonMinus = particleTable->FindParticle("kaon-");
@@ -1138,10 +1123,10 @@ void KKppReaction::JAMInput_K0bar( G4Event* anEvent, TTree*t1 )
       //G4ThreeVector LP = GetP_JAM(Nbeam_JAMInput, inp);
       G4ThreeVector LP = G4ThreeVector(px[inp]*GeV, py[inp]*GeV, pz[inp]*GeV);
 
-      pGen->GetParticleGun()->SetParticleDefinition(ptmp);
-      pGen->GetParticleGun()->SetParticlePosition(LPos);
-      pGen->GetParticleGun()->SetParticleMomentum(LP);
-      pGen->GetParticleGun()->GeneratePrimaryVertex(anEvent);
+      m_particle_gun->SetParticleDefinition(ptmp);
+      m_particle_gun->SetParticlePosition(LPos);
+      m_particle_gun->SetParticleMomentum(LP);
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
 
       //    std::cout<<"encording="<<ptmp->GetPDGEncoding()<<std::endl;
       if(pid_JAM==-311)
