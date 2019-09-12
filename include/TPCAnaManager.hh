@@ -443,6 +443,10 @@ private:
   TPCAnaManager& operator=( const TPCAnaManager& );
 
 private:
+  G4int m_on_off_helm;
+  G4int m_pad_config;
+  G4int m_experiment;
+
   CounterData counterData[MaxTrack];
   TPCData tpcData[MAXtpctrNum];
 
@@ -469,10 +473,6 @@ private:
   G4double pad_in_num;
   G4double pad_out_num;
   G4double truncated_mean_cut;
-  G4int trigger_env;
-  G4int env_on_off_helm;
-  G4int env_pad_config;
-  G4int env_Experiment_num;
 
   G4double angle[40];
   G4double seg_angle[40];

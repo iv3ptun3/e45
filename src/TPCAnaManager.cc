@@ -363,20 +363,20 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 
   G4double target_pos_z=-143.;
   truncated_mean_cut = gConf.Get<G4double>("TruncatedMeanCut");
-  env_Experiment_num = gConf.Get<G4int>("Experiment");
+  m_experiment = gConf.Get<G4int>("Experiment");
   //out side less 100 mm. 10+5*x < 100 mm is pad_in_num
   pad_length_in = gConf.Get<G4double>("PadLengthIn");
   pad_length_out = gConf.Get<G4double>("PadLengthOut");
   pad_gap = gConf.Get<G4double>("PadGap");
 
   ////pad configure
-  env_pad_config = gConf.Get<G4int>("PadConfigure");
+  m_pad_config = gConf.Get<G4int>("PadConfigure");
   pad_in_num = gConf.Get<G4int>("PadNumIn");
   pad_out_num = gConf.Get<G4int>("PadNumOut");
   pad_in_width = gConf.Get<G4double>("PadWidthOut");
   pad_out_width = gConf.Get<G4double>("PadWidthOut");
 
-  env_on_off_helm = gConf.Get<G4int>("ShsFieldMap");
+  m_on_off_helm = gConf.Get<G4int>("ShsFieldMap");
 
   for(G4int i=0.;i<40;i++){
     angle[i]=0;
@@ -390,7 +390,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
   tpc_rad=250;
   G4double cen_diff=fabs(target_pos_z);
 
-  if( env_pad_config ==1 ){
+  if( m_pad_config ==1 ){
     for(G4int i=0;i<pad_in_num+pad_out_num;i++){
       if(i<pad_in_num){
 	pad_in[i]=10.+(pad_length_in+pad_gap)*i;
@@ -406,7 +406,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     }
 
 
-  }else if( env_pad_config ==2 ){
+  }else if( m_pad_config ==2 ){
     for(G4int i=0;i<pad_in_num+pad_out_num;i++){
       if(i<pad_in_num){
 	pad_in[i]=10.+(pad_length_in+pad_gap)*i;
@@ -841,7 +841,7 @@ TPCAnaManager::EndOfEventAction( void )
   event.evnum++;
 
   //Fill Primary Infomation for E27
-  if( env_Experiment_num ==27 || env_Experiment_num ==45 ){
+  if( m_experiment == 27 || m_experiment == 45 ){
     event.mm_d = primaryInfo.mm_d;
     event.mm_p = primaryInfo.mm_p;
     event.theta = primaryInfo.theta;
@@ -1603,7 +1603,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 
     // G4double delta_x=0.;
 
-    // if( env_pad_config ==1 ){
+    // if( m_pad_config ==1 ){
     //   if(iLay<pad_in_num){   // const G4int pad_in_num=10;
     // 	delta_x=arc_sh-ith_pad_in*pad_in_width;
     // 	if(delta_x<0){
@@ -1615,7 +1615,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
     // 	  delta_x=delta_x+pad_out_width;
     // 	}
     //   }
-    // }else if( env_pad_config ==2 ){
+    // }else if( m_pad_config ==2 ){
     //   if(iLay<pad_in_num){   //
 
     // 	ith_pad_in=arc_sh/seg_width[iLay];
@@ -1656,7 +1656,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 
     // G4double dydz_track=0;
 
-    // if( env_pad_config ==1){
+    // if( m_pad_config ==1){
     //   if(iLay<pad_in_num){
     // 	ResHypTPC reshyptpc(pad_in_width, pad_length_in, 0.1,0.18, 0);
     // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
@@ -1668,7 +1668,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
     //   }
 
 
-    // }else if( env_pad_config ==2){
+    // }else if( m_pad_config ==2){
     //   if(iLay<pad_in_num){
     // 	ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_in, 0.1,0.18, 0);
     // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
@@ -1708,7 +1708,7 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
     counterData[hitnum].iLay = iLay;
     G4int iPad=0.;
 
-    if( env_pad_config ==2 ){
+    if( m_pad_config == 2 ){
       //    G4bool pass_check=false;
       G4bool pass_check=true;
       G4double cur_angle= (acos(-1.)-atan2(sh_x,sh_z))*180./acos(-1.);
