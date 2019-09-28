@@ -43,9 +43,10 @@ TPCAnaManager::TPCAnaManager( void )
   tree->Branch( "pxPrm", event.pxPrm, "pxPrm[nhPrm]/D" );
   tree->Branch( "pyPrm", event.pyPrm, "pyPrm[nhPrm]/D" );
   tree->Branch( "pzPrm", event.pzPrm, "pzPrm[nhPrm]/D" );
-  tree->Branch( "ptPrm", event.ptPrm, "ptPrm[nhPrm]/D" );
+  tree->Branch( "ppPrm", event.ppPrm, "ppPrm[nhPrm]/D" );
   tree->Branch( "mPrm", event.mPrm, "mPrm[nhPrm]/D" );
   tree->Branch( "thetaPrm", event.thetaPrm, "thetaPrm[nhPrm]/D" );
+  tree->Branch( "phiPrm", event.phiPrm, "phiPrm[nhPrm]/D" );
 
   tree->Branch("mm_d",&event.mm_d,"mm_d/D");
   // tree->Branch("mm_p",&event.mm_p,"mm_p/D");
@@ -511,6 +512,9 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
       hmap[key] = new TH1D( key, key, 400, 0.0, 2.0 );
     else
       hmap[key] = new TH1D( key, key, 400, -2.0, 2. );
+    key = Form( "Fermi%d", i );
+    hmap[key] = new TH1D( key, key, 500, -1.0*CLHEP::GeV, 1.0*CLHEP::GeV );
+    hmap[key]->GetXaxis()->SetTitle( "[MeV/c]" );
   }
 }
 
@@ -1503,9 +1507,10 @@ TPCAnaManager::EndOfEventAction( void )
     event.pxPrm[i] = -9999.;
     event.pyPrm[i] = -9999.;
     event.pzPrm[i] = -9999.;
-    event.ptPrm[i] = -9999.;
-    event.thetaPrm[i] = -9999.;
+    event.ppPrm[i] = -9999.;
     event.mPrm[i] = -9999.;
+    event.thetaPrm[i] = -9999.;
+    event.phiPrm[i] = -9999.;
   }
   return 0;
 }
@@ -1522,11 +1527,15 @@ TPCAnaManager::SetBH2Data( const VHitInfo* hit )
     event.pidBh2[i] = hit->GetParticleID();
     event.didBh2[i] = hit->GetDetectorID();
     event.prtBh2[i] = hit->GetParentID();
-    event.deBh2[i] = hit->GetEnergyDeposit();
-    event.tBh2[i] = hit->GetTime();
     event.xBh2[i] = hit->GetPosition().x();
     event.yBh2[i] = hit->GetPosition().y();
     event.zBh2[i] = hit->GetPosition().z();
+    event.pxBh2[i] = hit->GetMomentum().x();
+    event.pyBh2[i] = hit->GetMomentum().y();
+    event.pzBh2[i] = hit->GetMomentum().z();
+    event.ppBh2[i] = hit->GetMomentum().mag();
+    event.deBh2[i] = hit->GetEnergyDeposit();
+    event.tBh2[i] = hit->GetTime();
     event.nhBh2++;
   }
 }
@@ -1754,6 +1763,16 @@ TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
 
 //_____________________________________________________________________________
 void
+TPCAnaManager::SetFermiMomentum( const G4ThreeVector& p )
+{
+  for( G4int i=0; i<G4ThreeVector::SIZE; ++i ){
+    TString key = Form( "Fermi%d", i );
+    hmap[key]->Fill( p[i]*CLHEP::GeV );
+  }
+}
+
+//_____________________________________________________________________________
+void
 TPCAnaManager::SetFTOFData( const VHitInfo* hit )
 {
   if( event.nhFtof >= MaxHits ){
@@ -1764,11 +1783,15 @@ TPCAnaManager::SetFTOFData( const VHitInfo* hit )
     event.pidFtof[i] = hit->GetParticleID();
     event.didFtof[i] = hit->GetDetectorID();
     event.prtFtof[i] = hit->GetParentID();
-    event.deFtof[i] = hit->GetEnergyDeposit();
-    event.tFtof[i] = hit->GetTime();
     event.xFtof[i] = hit->GetPosition().x();
     event.yFtof[i] = hit->GetPosition().y();
     event.zFtof[i] = hit->GetPosition().z();
+    event.pxFtof[i] = hit->GetMomentum().x();
+    event.pyFtof[i] = hit->GetMomentum().y();
+    event.pzFtof[i] = hit->GetMomentum().z();
+    event.ppFtof[i] = hit->GetMomentum().mag();
+    event.deFtof[i] = hit->GetEnergyDeposit();
+    event.tFtof[i] = hit->GetTime();
     event.nhFtof++;
   }
 }
@@ -1785,11 +1808,15 @@ TPCAnaManager::SetHTOFData( const VHitInfo* hit )
     event.pidHtof[i] = hit->GetParticleID();
     event.didHtof[i] = hit->GetDetectorID();
     event.prtHtof[i] = hit->GetParentID();
-    event.deHtof[i] = hit->GetEnergyDeposit();
-    event.tHtof[i] = hit->GetTime();
     event.xHtof[i] = hit->GetPosition().x();
     event.yHtof[i] = hit->GetPosition().y();
     event.zHtof[i] = hit->GetPosition().z();
+    event.pxHtof[i] = hit->GetMomentum().x();
+    event.pyHtof[i] = hit->GetMomentum().y();
+    event.pzHtof[i] = hit->GetMomentum().z();
+    event.ppHtof[i] = hit->GetMomentum().mag();
+    event.deHtof[i] = hit->GetEnergyDeposit();
+    event.tHtof[i] = hit->GetTime();
     event.nhHtof++;
   }
 }
@@ -1806,11 +1833,15 @@ TPCAnaManager::SetLACData( const VHitInfo* hit )
     event.pidLac[i] = hit->GetParticleID();
     event.didLac[i] = hit->GetDetectorID();
     event.prtLac[i] = hit->GetParentID();
-    event.deLac[i] = hit->GetEnergyDeposit();
-    event.tLac[i] = hit->GetTime();
     event.xLac[i] = hit->GetPosition().x();
     event.yLac[i] = hit->GetPosition().y();
     event.zLac[i] = hit->GetPosition().z();
+    event.pxLac[i] = hit->GetMomentum().x();
+    event.pyLac[i] = hit->GetMomentum().y();
+    event.pzLac[i] = hit->GetMomentum().z();
+    event.ppLac[i] = hit->GetMomentum().mag();
+    event.deLac[i] = hit->GetEnergyDeposit();
+    event.tLac[i] = hit->GetTime();
     event.nhLac++;
   }
 }
@@ -1827,11 +1858,15 @@ TPCAnaManager::SetSCHData( const VHitInfo* hit )
     event.pidSch[i] = hit->GetParticleID();
     event.didSch[i] = hit->GetDetectorID();
     event.prtSch[i] = hit->GetParentID();
-    event.deSch[i] = hit->GetEnergyDeposit();
-    event.tSch[i] = hit->GetTime();
     event.xSch[i] = hit->GetPosition().x();
     event.ySch[i] = hit->GetPosition().y();
     event.zSch[i] = hit->GetPosition().z();
+    event.pxSch[i] = hit->GetMomentum().x();
+    event.pySch[i] = hit->GetMomentum().y();
+    event.pzSch[i] = hit->GetMomentum().z();
+    event.ppSch[i] = hit->GetMomentum().mag();
+    event.deSch[i] = hit->GetEnergyDeposit();
+    event.tSch[i] = hit->GetTime();
     event.nhSch++;
   }
 }
@@ -1848,11 +1883,15 @@ TPCAnaManager::SetSDCData( const VHitInfo* hit )
     event.pidSdc[i] = hit->GetParticleID();
     event.didSdc[i] = hit->GetDetectorID();
     event.prtSdc[i] = hit->GetParentID();
-    event.deSdc[i] = hit->GetEnergyDeposit();
-    event.tSdc[i] = hit->GetTime();
     event.xSdc[i] = hit->GetPosition().x();
     event.ySdc[i] = hit->GetPosition().y();
     event.zSdc[i] = hit->GetPosition().z();
+    event.pxSdc[i] = hit->GetMomentum().x();
+    event.pySdc[i] = hit->GetMomentum().y();
+    event.pzSdc[i] = hit->GetMomentum().z();
+    event.ppSdc[i] = hit->GetMomentum().mag();
+    event.deSdc[i] = hit->GetEnergyDeposit();
+    event.tSdc[i] = hit->GetTime();
     event.nhSdc++;
   }
 }
@@ -1869,11 +1908,15 @@ TPCAnaManager::SetVPData( const VHitInfo* hit )
     event.pidVp[i] = hit->GetParticleID();
     event.didVp[i] = hit->GetDetectorID();
     event.prtVp[i] = hit->GetParentID();
-    event.deVp[i] = hit->GetEnergyDeposit();
-    event.tVp[i] = hit->GetTime();
     event.xVp[i] = hit->GetPosition().x();
     event.yVp[i] = hit->GetPosition().y();
     event.zVp[i] = hit->GetPosition().z();
+    event.pxVp[i] = hit->GetMomentum().x();
+    event.pyVp[i] = hit->GetMomentum().y();
+    event.pzVp[i] = hit->GetMomentum().z();
+    event.ppVp[i] = hit->GetMomentum().mag();
+    event.deVp[i] = hit->GetEnergyDeposit();
+    event.tVp[i] = hit->GetTime();
     event.nhVp++;
   }
 }
@@ -1890,11 +1933,15 @@ TPCAnaManager::SetWCData( const VHitInfo* hit )
     event.pidWc[i] = hit->GetParticleID();
     event.didWc[i] = hit->GetDetectorID();
     event.prtWc[i] = hit->GetParentID();
-    event.deWc[i] = hit->GetEnergyDeposit();
-    event.tWc[i] = hit->GetTime();
     event.xWc[i] = hit->GetPosition().x();
     event.yWc[i] = hit->GetPosition().y();
     event.zWc[i] = hit->GetPosition().z();
+    event.pxWc[i] = hit->GetMomentum().x();
+    event.pyWc[i] = hit->GetMomentum().y();
+    event.pzWc[i] = hit->GetMomentum().z();
+    event.ppWc[i] = hit->GetMomentum().mag();
+    event.deWc[i] = hit->GetEnergyDeposit();
+    event.tWc[i] = hit->GetTime();
     event.nhWc++;
   }
 }
@@ -2013,7 +2060,10 @@ TPCAnaManager::SetPrimaryParticle( G4int id, const G4ThreeVector& p,
     event.pxPrm[id] = p.x();
     event.pyPrm[id] = p.y();
     event.pzPrm[id] = p.z();
+    event.ppPrm[id] = p.mag();
     event.mPrm[id] = mass;
+    event.thetaPrm[id] = p.theta();
+    event.phiPrm[id] = p.phi();
     event.pidPrm[id] = pid;
   }
 }
@@ -2023,15 +2073,7 @@ void
 TPCAnaManager::SetPrimaryParticle( G4int id, G4double px, G4double py,
 				   G4double pz, G4double mass, G4int pid )
 {
-  if( id >= event.nhPrm ){
-    G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
-  } else {
-    event.pxPrm[id] = px;
-    event.pyPrm[id] = py;
-    event.pzPrm[id] = pz;
-    event.mPrm[id] = mass;
-    event.pidPrm[id] = pid;
-  }
+  SetPrimaryParticle( id, G4ThreeVector( px, py, pz ), mass, pid );
 }
 
 //_____________________________________________________________________________

@@ -127,9 +127,10 @@ struct Event
   Double_t pxPrm[MaxPrimaryParticle];
   Double_t pyPrm[MaxPrimaryParticle];
   Double_t pzPrm[MaxPrimaryParticle];
-  Double_t ptPrm[MaxPrimaryParticle];
+  Double_t ppPrm[MaxPrimaryParticle];
   Double_t mPrm[MaxPrimaryParticle];
   Double_t thetaPrm[MaxPrimaryParticle];
+  Double_t phiPrm[MaxPrimaryParticle];
 
   // BH2
   Int_t nhBh2;
@@ -499,6 +500,7 @@ public:
 		       G4ThreeVector mom, G4int track, G4int particle,
 		       G4int iLay, G4int iRow, G4double beta, G4double edep,
 		       G4int parentid, G4double tlength, G4double slength );
+  void SetFermiMomentum( const G4ThreeVector& p );
   void SetHTOFData( const VHitInfo* hit );
   void SetFTOFData( const VHitInfo* hit );
   void SetLACData( const VHitInfo* hit );

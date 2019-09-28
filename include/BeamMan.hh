@@ -17,14 +17,16 @@ class TFile;
 //_____________________________________________________________________________
 struct BeamInfo
 {
-  Double_t x; // [mm]
-  Double_t y; // [mm]
-  Double_t u; // [mrad]
-  Double_t v; // [mrad]
-  Double_t dp; // [%]
+  G4double      x; // [mm]
+  G4double      y; // [mm]
+  G4double      u; // [mrad]
+  G4double      v; // [mrad]
+  G4double      dp; // [%]
   G4ThreeVector p; // [GeV/c]
-  Double_t z; // [mm]
-  void Print( void ) const;
+  G4double      z; // [mm]
+  G4double GetX( G4double offset=0. ) const;
+  G4double GetY( G4double offset=0. ) const;
+  void     Print( void ) const;
 };
 
 //_____________________________________________________________________________

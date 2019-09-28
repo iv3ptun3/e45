@@ -25,6 +25,7 @@
 #include "KinemaHweak.hh"
 #include "KinemaFermi.hh"
 #include "KinemaKstar.hh"
+#include "Kinematics.hh"
 #include "TPCAnaManager.hh"
 
 namespace
@@ -986,45 +987,44 @@ void
 TPCPrimaryGeneratorAction::GenerateE07StudyTakahashi( G4Event* anEvent )
 {
   G4double mom[3];
-  G4double Ebeam, pbeam;
   //  G4double rmk=0.493677;
-  G4double pbm[4];
   G4double Energy_h, mom_h_x, mom_h_y, mom_h_z;
   G4double Energy_kp, mom_kp_x, mom_kp_y, mom_kp_z;
 
-  G4double p_proton[4]={0};
-  G4int angular_mom = G4RandFlat::shoot() * 6. < 2. ? 0.:1.;
+  G4int type = G4RandFlat::shoot() * 6. < 2. ? 0.:1.;
   //  G4cout<<"test111:"<<angular_mom<<G4endl;
   //  G4cout<<G4RandFlat::shoot()<<G4endl;
-  HarmonicFermiMomentum( angular_mom, p_proton);
-  G4double p_fermi = sqrt(pow(p_proton[0],2)+pow(p_proton[1],2)+pow(p_proton[2],2));
-  p_proton[3] = sqrt(p_fermi * p_fermi + m_Proton->GetPDGMass()/GeV * m_Proton->GetPDGMass()/GeV);
-  G4cout<<p_proton[3]<<G4endl;
-  G4double Al[13]={1., -1.22, 1.55, -1.08, 0.37, -0.15, 0.16, -0.38, -0.18, 0.09, 0.05, -0.01, 0.20}; //from Dauber, et al., PR 179 5 1968 at K- beam energy 1.7 GeV/c
+  auto p_proton = Kinematics::HarmonicFermiMomentum( type );
+  G4double p_fermi = sqrt(pow(p_proton[0],2)+pow(p_proton[1],2)+
+			  pow(p_proton[2],2));
+  G4double ke = sqrt(p_fermi * p_fermi +
+		     m_Proton->GetPDGMass()/GeV * m_Proton->GetPDGMass()/GeV);
+  G4cout << ke << G4endl;
+  G4double Al[13] = { 1., -1.22, 1.55, -1.08, 0.37,
+		      -0.15, 0.16, -0.38, -0.18, 0.09,
+		      0.05, -0.01, 0.20 };
+  // from Dauber, et al., PR 179 5 1968 at K- beam energy 1.7 GeV/c
 
   G4double cross_section=0.;
 
   G4cout<<"p_proton:"<<p_proton[0]<<":"<<p_proton[1]<<":"<<p_proton[2]<<G4endl;
   //  G4double pimom=0.635+G4RandFlat::shoot()*(2.000-0.635);
   ////FWHM 3.3 x 10^-4, FWHM ~ 2.3548 sigma
-    pbeam=G4RandGauss::shoot(m_beam_p0,m_beam_p0*3.3*0.0001/2.3548);
+  G4double pbeam=G4RandGauss::shoot(m_beam_p0,m_beam_p0*3.3*0.0001/2.3548);
   //  pbeam=G4RandGauss::shoot(1.7,1.7*3.3*0.0001/2.3548);
   //  G4cout<<pbeam<<G4endl;
 
   gAnaMan.SetPrimaryBeam(0,0,pbeam);
-  Ebeam = sqrt(pbeam*pbeam+m_KaonMinus->GetPDGMass()/GeV*m_KaonMinus->GetPDGMass()/GeV);
-  pbm[0]=0;
-  pbm[1]=0;
-  pbm[2]=pbeam;
-  pbm[3]=Ebeam;
+  // G4double Ebeam = sqrt(pbeam*pbeam+
+  // 	m_KaonMinus->GetPDGMass()/GeV*m_KaonMinus->GetPDGMass()/GeV);
+  G4ThreeVector pbm( 0., 0., pbeam );
   // up:
   G4double cosx=G4RandFlat::shoot(-1.,1.);
   KinemaFermi Hkinema(m_KaonMinus->GetPDGMass()/GeV,
-			p_proton[3],
-			m_XiMinus->GetPDGMass()/GeV,
-			m_KaonPlus->GetPDGMass()/GeV,
-			pbm, p_proton,cosx);
-
+		      ke,
+		      m_XiMinus->GetPDGMass()/GeV,
+		      m_KaonPlus->GetPDGMass()/GeV,
+		      pbm, p_proton,cosx);
   for(G4int le=0;le<13;le++){
     cross_section=cross_section+Al[le];
   }

@@ -22,6 +22,20 @@
 #include "PrintHelper.hh"
 
 //_____________________________________________________________________________
+G4double
+BeamInfo::GetX( G4double offset ) const
+{
+  return x + std::tan( -1.*u*CLHEP::mrad )*offset;
+}
+
+//_____________________________________________________________________________
+G4double
+BeamInfo::GetY( G4double offset ) const
+{
+  return y + std::tan( -1.*v*CLHEP::mrad )*offset;
+}
+
+//_____________________________________________________________________________
 void
 BeamInfo::Print( void ) const
 {

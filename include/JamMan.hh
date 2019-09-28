@@ -15,6 +15,7 @@
 #include "TPCAnaManager.hh"
 
 class TFile;
+class TTree;
 
 //_____________________________________________________________________________
 struct JamInfo
@@ -41,19 +42,20 @@ private:
   JamMan& operator =( const JamMan& );
 
 private:
-  typedef std::vector<JamInfo> ParamArray;
   G4bool     m_is_ready;
   G4String   m_file_name;
   TFile*     m_file;
-  ParamArray m_param_array;
-  G4int      m_n_param;
+  TTree*     m_tree;
+  JamInfo*   m_event;
+  G4int      m_n_event;
 
 public:
-  const JamInfo& Get( void ) const;
-  G4bool         Initialize( void );
-  G4bool         Initialize( const G4String& filename );
-  G4bool         IsReady( void ) const { return m_is_ready; }
-  void           Print( void ) const;
+  JamInfo* Get( void ) const;
+  JamInfo* Get( Int_t i ) const;
+  G4bool   Initialize( void );
+  G4bool   Initialize( const G4String& filename );
+  G4bool   IsReady( void ) const { return m_is_ready; }
+  void     Print( void ) const;
 };
 
 //_____________________________________________________________________________

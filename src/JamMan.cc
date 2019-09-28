@@ -31,7 +31,7 @@ JamInfo::Print( void ) const
   const G4int w = 8;
   G4cout << "   np=" << np << G4endl;
   for( G4int i=0; i<np; ++i ){
-    G4cout << "   " << i << " "
+    G4cout << "   - " << i << " "
 	   << "pid=" << std::setw(w) << pid[i] << " "
 	   << "px=" << std::setw(w) << px[i] << " "
 	   << "py=" << std::setw(w) << py[i] << " "
@@ -44,14 +44,17 @@ JamMan::JamMan( void )
   : m_is_ready( false ),
     m_file_name(),
     m_file(),
-    m_param_array(),
-    m_n_param()
+    m_tree(),
+    m_event( new JamInfo ),
+    m_n_event()
 {
 }
 
 //_____________________________________________________________________________
 JamMan::~JamMan( void )
 {
+  if( m_file && m_file->IsOpen() )
+    m_file->Close();
 }
 
 //_____________________________________________________________________________
@@ -62,30 +65,26 @@ JamMan::Initialize( void )
     return true;
 
   m_file = new TFile( m_file_name );
-  TTree* tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+  m_tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
 
-  if( !m_file->IsOpen() || !tree )
+  if( !m_file->IsOpen() || !m_tree )
     return false;
 
-  m_param_array.clear();
-  JamInfo jam;
-  tree->SetBranchAddress( "np", &jam.np );
-  tree->SetBranchAddress( "pid", jam.pid );
-  tree->SetBranchAddress( "px", jam.px );
-  tree->SetBranchAddress( "py", jam.py );
-  tree->SetBranchAddress( "pz", jam.pz );
-
-  for( Long64_t i=0, n=tree->GetEntries(); i<n; ++i ){
-    tree->GetEntry( i );
-#if SKIP_NP0
-    if( jam.np == 0 )
-      continue;
-#endif
-    m_param_array.push_back( jam );
-  }
-
-  m_file->Close();
-  m_n_param = m_param_array.size();
+  m_event = new JamInfo;
+  m_file = new TFile( m_file_name );
+  m_tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+  m_tree->SetBranchAddress( "np", &m_event->np );
+  m_tree->SetBranchAddress( "pid", m_event->pid );
+  m_tree->SetBranchAddress( "px", m_event->px );
+  m_tree->SetBranchAddress( "py", m_event->py );
+  m_tree->SetBranchAddress( "pz", m_event->pz );
+  m_tree->SetBranchStatus( "*", false );
+  m_tree->SetBranchStatus( "np", true );
+  m_tree->SetBranchStatus( "pid", true );
+  m_tree->SetBranchStatus( "px", true );
+  m_tree->SetBranchStatus( "py", true );
+  m_tree->SetBranchStatus( "pz", true );
+  m_n_event = m_tree->GetEntries();
   m_is_ready = true;
   return true;
 }
@@ -99,10 +98,22 @@ JamMan::Initialize( const G4String& filename )
 }
 
 //_____________________________________________________________________________
-const JamInfo&
+JamInfo*
 JamMan::Get( void ) const
 {
-  return m_param_array.at( G4RandFlat::shootInt( m_n_param ) );
+  return Get( G4RandFlat::shootInt( m_n_event ) );
+}
+
+//_____________________________________________________________________________
+JamInfo*
+JamMan::Get( Int_t i ) const
+{
+  auto curr_file = gFile;
+  m_file->cd();
+  m_tree->GetEntry( i );
+  if( curr_file )
+    curr_file->cd();
+  return m_event;
 }
 
 //_____________________________________________________________________________
@@ -112,8 +123,7 @@ JamMan::Print( void ) const
   PrintHelper helper( 4, std::ios::fixed, G4cout );
 
   G4cout << FUNC_NAME << G4endl;
-  for( const auto& j : m_param_array ){
-    j.Print();
-  }
-  G4cout << "   nparam = " << m_param_array.size() << G4endl;
+  if( m_event )
+    m_event->Print();
+  G4cout << "   n_event = " << m_n_event << G4endl;
 }

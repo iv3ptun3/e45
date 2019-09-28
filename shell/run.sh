@@ -8,7 +8,7 @@ mkdir -p log
 
 case $HOSTNAME in
     *.cc.kek.jp)
-	bsub -q s -o $log hyptpc1 $conf $root $macro
+	bsub -q l -o $log hyptpc1 $conf $root $macro
 	;;
     *)
 	echo "hyptpc1 $conf $root $macro >$log 2>&1" | batch

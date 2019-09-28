@@ -3,5 +3,5 @@
 /tracking/verbose 0
 /vis/verbose 0
 /event/verbose 0
-/run/beamOn 1000000
+/run/beamOn 100000
 exit

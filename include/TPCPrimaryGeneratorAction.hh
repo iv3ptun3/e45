@@ -55,13 +55,13 @@ private:
   G4ParticleDefinition* m_HdibaryonLL;
   G4ParticleDefinition* m_LLphase;
   G4ParticleDefinition* m_HybridBaryon;
-
   G4double env_target_pos_z;
 
 public:
   virtual void GeneratePrimaries( G4Event* anEvent );
 
 public:
+  void     GenerateKpXi2Body( G4Event* anEvent );
   void     GenerateHanul( G4Event* anEvent );
   void     GeneratePhaseSpace( G4Event* anEvent );
   void     GenerateHdibaryon1( G4Event* anEvent );
@@ -133,7 +133,6 @@ public:
   void     GenerateE45ElasticPionPlus( G4Event* anEvent ); //#4501
   void     GenerateE45ElasticPionMinus( G4Event* anEvent ); //#4502
   // Other methods
-  G4int    HarmonicFermiMomentum(G4int Angular_mom, G4double *Kf);
   double   RandSin(void);
 };
 
