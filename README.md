@@ -9,7 +9,7 @@ K1.8 geant4 simulation tool.
 
 This tool is developed on the platform of KEKCC, Scientific Linux 6.10.
 - g++ (GCC) 4.8.5
-- ROOT 6.14.06
+- ROOT 6.16.00
 - Geant4 10.5.0-mt
 
 
@@ -50,5 +50,17 @@ G4Macro is an optional argument.
 hyptpc1 [ConfFile] [OutputName] (G4Macro)
 hyptpc1 param/conf/default.conf hoge.root
 hyptpc1 param/conf/default.conf hoge.root g4macro/run.mac
+```
+
+
+
+## Parameters
+
+Some parameter files that are out of the git control should be linked.
+
+```shell
+ln -s /group/had/sks/E42/software/param/BEAM/* param/BEAM/
+ln -s /group/had/sks/E42/software/param/JAM/* param/JAM/
+ln -s /group/had/sks/E42/software/fieldmap .
 ```
 
