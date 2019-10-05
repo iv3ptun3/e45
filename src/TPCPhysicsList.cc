@@ -130,7 +130,7 @@ TPCPhysicsList::ConstructProcess( void )
   AddTransportation();
   if( gConf.Get<G4bool>( "EM" ) )
     ConstructEM();
-  // ConstructGeneral(); // for test
+  ConstructGeneral(); // for test
   if( gConf.Get<G4bool>( "Hadron" ) )
     ConstructHadron();
 }
@@ -242,6 +242,33 @@ TPCPhysicsList::ConstructGeneral( void )
       mode1 = new G4PhaseSpaceDecayChannel("kaon0S",1.0000,2,"pi+","pi-");
       Table1->Insert(mode1);
       particle->SetDecayTable(Table1);
+    }
+    // H-dibaryon
+    {
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+      particle=particleTable->FindParticle("hdibaryonLL");
+      mode = new G4PhaseSpaceDecayChannel("hdibaryonLL",1.0000,2,"lambda","lambda");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+    }
+    {
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+      particle=particleTable->FindParticle("hdibaryon");
+      mode = new G4PhaseSpaceDecayChannel( "hdibaryon", 1.0, 3, "lambda",
+	  "proton", "pi-" );
+      Table->Insert( mode );
+      particle->SetDecayTable( Table );
+    }
+    {
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+      particle=particleTable->FindParticle("hdibaryonS");
+       mode = new G4PhaseSpaceDecayChannel( "hdibaryonS", 1.0, 2,
+				       "sigma-", "proton" );
+      Table->Insert( mode );
+      particle->SetDecayTable( Table );
     }
     /*
   ////Decay mode control of lambda 1405. L1405 --> Lambda + gamma
@@ -378,36 +405,21 @@ TPCPhysicsList::ConstructStableHyperons( void )
   // decayTable->Insert( mode );
   // particle->SetDecayTable( decayTable );
 
-  G4double h_lifetime = gConf.Get<G4double>("HdibaryonLifetime");
+  G4double h_lifetime = gConf.Get<G4double>("HdibaryonLifetime")* ns;
   G4double h_mass = gConf.Get<G4double>("HdibaryonMass") * GeV;
-  G4double h_width = gConf.Get<G4double>("HdibaryonWidth") * GeV;
+  G4double h_width = gConf.Get<G4double>("HdibaryonWidth") * keV;
   particle = new G4ParticleDefinition( "hdibaryon", h_mass, h_width,
 				       0, 0, +0, 0, 0, +0, 0,
 				       "baryon", 0, +2, 9223,
 				       false, h_lifetime, nullptr );
-  decayTable =  new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryon", 1.0, 3, "lambda",
-				       "proton", "pi-" );
-  decayTable->Insert( mode );
-  particle->SetDecayTable( decayTable );
   particle = new G4ParticleDefinition( "hdibaryonS", h_mass, h_width,
 				       0, 0, +0, 0, 0, +0, 0,
 				       "baryon", 0, +2, 9224,
 				       false, h_lifetime, nullptr );
-  decayTable = new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryonS", 1.0, 2,
-				       "sigma-", "proton" );
-  decayTable->Insert( mode );
-  particle->SetDecayTable( decayTable );
   particle = new G4ParticleDefinition( "hdibaryonLL", h_mass, h_width,
 				       0, 0, +0, 0, 0, +0, 0,
 				       "baryon", 0, +2, 9225,
-				       false, h_lifetime, nullptr );
-  decayTable = new G4DecayTable;
-  mode = new G4PhaseSpaceDecayChannel( "hdibaryonLL", 1.0, 2,
-				       "lambda", "lambda" );
-  decayTable->Insert( mode );
-  particle->SetDecayTable( decayTable );
+				       false, 0.000000001*ns, nullptr );
 }
 
 //_____________________________________________________________________________
