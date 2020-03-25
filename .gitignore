@@ -15,6 +15,5 @@ bin/
 fieldmap
 lib/
 rootfiles/
-rootfiles
 tmp/
 !.gitkeep

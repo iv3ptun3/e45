@@ -342,9 +342,9 @@ TPCDetectorConstruction::ConstructMaterials( void )
 void
 TPCDetectorConstruction::ConstructAreaTent( void )
 {
-  //  const G4ThreeVector size( 5.0*m/2, 5.0*m/2, 6.0*m/2 );
+  //const G4ThreeVector size( 5.0*m/2, 5.0*m/2, 6.0*m/2 );
   const G4ThreeVector size( 4.8*m/2, 4.8*m/2, 6.3*m/2 );
-  //  const G4ThreeVector pos( 0., 0., -143.-1200.-170.*mm+size.z() );
+  //const G4ThreeVector pos( 0., 0., -143.-1200.-170.*mm+size.z() );
   const G4ThreeVector pos( 0., 0., -1270.-119.*mm+size.z() );
   auto tent_out_solid = new G4Box( "AreaTentOutSolid",
 				   size.x(), size.y(), size.z() );
