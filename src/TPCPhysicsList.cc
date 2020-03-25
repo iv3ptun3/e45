@@ -130,7 +130,8 @@ TPCPhysicsList::ConstructProcess( void )
   AddTransportation();
   if( gConf.Get<G4bool>( "EM" ) )
     ConstructEM();
-  ConstructGeneral(); // for test
+  if( gConf.Get<G4bool>( "Decay" ) )
+    ConstructGeneral(); // for test
   if( gConf.Get<G4bool>( "Hadron" ) )
     ConstructHadron();
 }

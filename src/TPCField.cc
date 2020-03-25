@@ -168,12 +168,13 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
     } else {
       G4double kurama_point[3] =
 	{ kurama_coord.x()/cm, kurama_coord.y()/cm, kurama_coord.z()/cm };
-      if( m_kurama_field_map->IsInsideField( kurama_coord ) ){
+      //      if( m_kurama_field_map->IsInsideField( kurama_coord ) ){
+      if( m_kurama_field_map->IsInsideField( kurama_point ) ){
 	m_kurama_field_map->GetFieldValue( kurama_point, Bfield );
-      }
+      }   
     }
   }
-
+  
   // K18Beamline
   if( m_k18_status ){
     for( auto& m : m_magnet_map ){
@@ -181,7 +182,7 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 	return;
     }
   }
-
+  
 #if 0
   G4ThreeVector b( Bfield[0], Bfield[1], Bfield[2] );
   if( b.mag() > 0.001*tesla
@@ -198,6 +199,8 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
 	   << std::setw(10) << Bfield[2]/tesla << " )" << G4endl;
   }
 #endif
+
+
 
   return;
 }
