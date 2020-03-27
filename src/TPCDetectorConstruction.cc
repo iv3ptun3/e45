@@ -319,6 +319,15 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name] = new G4Material( name, density=2.64 *g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Silicon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
+  // Acrylic for WC
+  name = "Acrylic";
+  m_material_map[name] = new G4Material( name, density=1.18 *g/cm3, nel=3 );
+  m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=5 );
+  m_material_map[name]->AddElement( m_element_map["Hydrogen"],  natoms=8 );
+  m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
+
+
+  
 
   G4String target_material = gConf.Get<G4String>("TargetMaterial");
   G4cout << "   Target material : " << target_material << G4endl;
@@ -2381,16 +2390,21 @@ void
 TPCDetectorConstruction::ConstructWC( void )
 {
   const auto& ra2 = gGeom.GetRotAngle2("WC") * deg;
-  const auto& half_size = gSize.GetSize("WcSeg") * 0.5 * mm;
+  const auto& half_size_In = gSize.GetSize("WcSegIn") * 0.5 * mm;
+  const auto& half_size_Out = gSize.GetSize("WcSegOut") * 0.5 * mm;
   const G4double pitch = gGeom.GetWirePitch("WC");
   auto wcSD = new TPCWCSD("/WC");
   wcSD->SetRefractiveIndex( 1.33 );
   G4SDManager::GetSDMpointer()->AddNewDetector( wcSD );
   // Mother
   auto mother_solid = new G4Box( "WcMotherSolid",
-				 half_size.x()*NumOfSegWC + 50.*mm,
-				 half_size.y() + 50.*mm,
-				 half_size.z()*2 + 50.*mm );
+				 half_size_Out.x()*NumOfSegWC + 200.*mm,
+				 half_size_Out.y() + 200.*mm,
+				 half_size_Out.z()*2 + 200.*mm );
+				 // half_size_Out.x()*NumOfSegWC + 50.*mm,
+				 // half_size_Out.y() + 50.*mm,
+				 // half_size_Out.z()*2 + 50.*mm );
+
   auto mother_lv = new G4LogicalVolume( mother_solid,
 					m_material_map["Air"],
 					"WcMotherLV" );
@@ -2403,18 +2417,49 @@ TPCDetectorConstruction::ConstructWC( void )
 		     "WcMotherPV", m_world_lv, false, 0 );
   mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
   // Segment
-  auto segment_solid = new G4Box( "WcSegmentSolid", half_size.x(),
-				  half_size.y(), half_size.z() );
+  auto segment_solid = new G4Box( "WcSegmentSolid", half_size_In.x(),
+				  half_size_In.y(), half_size_In.z() );
   auto segment_lv = new G4LogicalVolume( segment_solid,
 					 m_material_map["Water"],
 					 "WcSegmentLV" );
+
+  auto WCContainer     = new G4Box("WCContainer",
+				   half_size_Out.x(),
+				   half_size_Out.y(),
+				   half_size_Out.z());
+  auto WCContainer_gap = new G4Box("WCContainer_gap",
+				   half_size_In.x(),
+				   half_size_In.y(),
+				   half_size_In.z());
+  //G4RotationMatrix* rot_wccontainer_gap;
+  auto rot_wccontainer_gap = new G4RotationMatrix;
+  G4ThreeVector pos_wccontainer_gap(0.0, 0.0 ,0.0);
+  auto solid_WCContainer
+    = new G4SubtractionSolid("solid_WCContainer",
+   			     WCContainer, WCContainer_gap,
+   			     rot_wccontainer_gap, 
+			     pos_wccontainer_gap);
+  
+  auto logWCContainer = new G4LogicalVolume(solid_WCContainer,
+					    m_material_map["Acrylic"],
+					    "logWCContainer");
+  
   for( G4int i=0; i<NumOfSegWC; ++i ){
-    segment_lv->SetVisAttributes( G4Colour::Cyan() );
-    segment_lv->SetSensitiveDetector( wcSD );
+
+
     pos = G4ThreeVector( ( -NumOfSegWC/2 + i )*pitch,
 			 0.0,
-			 2.*( - i%2 + 0.5 )*half_size.z() );
+			 2.*( - i%2 + 0.5 )*half_size_Out.z() );
+    //for Vessel
+    //    logWCContainer->SetVisAttributes( G4Colour::White() );
+    logWCContainer->SetVisAttributes( G4Colour::Cyan() );
+    new G4PVPlacement( nullptr, pos, logWCContainer,
+		       "WcSegmentContainerPV", mother_lv, false, i );
+    //for Water
+    segment_lv->SetVisAttributes( G4Colour::Cyan() );
+    segment_lv->SetSensitiveDetector( wcSD );
     new G4PVPlacement( nullptr, pos, segment_lv,
 		       "WcSegmentPV", mother_lv, false, i );
+
   }
 }
