@@ -2443,7 +2443,7 @@ TPCDetectorConstruction::ConstructWC( void )
   auto logWCContainer = new G4LogicalVolume(solid_WCContainer,
 					    m_material_map["Acrylic"],
 					    "logWCContainer");
-  
+
   for( G4int i=0; i<NumOfSegWC; ++i ){
 
 
@@ -2462,4 +2462,64 @@ TPCDetectorConstruction::ConstructWC( void )
 		       "WcSegmentPV", mother_lv, false, i );
 
   }
+  
+  //Temporary!!!!!!
+  //WC frame (test)
+  //double Alcut_z =0.*mm;
+  double Alcut_z =(1000.-(250.+403.))*mm;
+
+  auto Alframe1     = new G4Box("Alframe1",
+				80.*mm/2., 
+				80.*mm/2., 
+				2000.*mm/2. - Alcut_z/2.);
+
+  auto Alframe2     = new G4Box("Alframe2",
+				80.*mm/2., 
+				80.*mm/2., 
+				750.*mm/2.);
+
+ 
+  
+  auto Alframe1_lv = new G4LogicalVolume( Alframe1,
+					  m_material_map["Aluminum"],
+					  "Alframe1_LV" );
+  auto Alframe2_lv = new G4LogicalVolume( Alframe2,
+					  m_material_map["Aluminum"],
+					  "Alframe2_LV" );
+
+  auto pos_frame1_1 = G4ThreeVector( -pitch/2.-3000.*mm/2.,
+				     -2000.*mm,
+				     -1.*Alcut_z/2.);
+
+  auto pos_frame1_2 = G4ThreeVector( -pitch/2.+3000.*mm/2.,
+				     -2000.*mm,
+				     -1.*Alcut_z/2.);
+
+  Alframe1_lv->SetVisAttributes( G4Colour::White() );
+  new G4PVPlacement( nullptr, pos_frame1_1, Alframe1_lv,
+		     "WcFramePV", mother_lv, false, 0 );
+  
+  new G4PVPlacement( nullptr, pos_frame1_2, Alframe1_lv,
+		     "WcFramePV", mother_lv, false, 1 );
+
+
+  auto pos_frame2_1 = G4ThreeVector( -pitch/2.-3000.*mm/2.,
+				     -1000.*mm,
+				     750/2.);
+
+  auto pos_frame2_2 = G4ThreeVector( -pitch/2.+3000.*mm/2.,
+				     -1000.*mm,
+				     750/2.);
+  
+  Alframe2_lv->SetVisAttributes( G4Colour::Red() );
+  new G4PVPlacement( nullptr, pos_frame2_1, Alframe2_lv,
+		     "WcFramePV", mother_lv, false, 3 );
+  
+  new G4PVPlacement( nullptr, pos_frame2_2, Alframe2_lv,
+		     "WcFramePV", mother_lv, false, 4 );
+
+  //Temporary!!!!!!
+
+
+
 }

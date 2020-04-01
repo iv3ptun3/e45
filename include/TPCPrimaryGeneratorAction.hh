@@ -72,6 +72,8 @@ public:
   void     GenerateKpKn( G4Event* anEvent );
   void     GenerateBeamVI( G4Event* anEvent );
   void     GenerateBeamVO( G4Event* anEvent );
+  void     GenerateUniformProton( G4Event* anEvent );
+  void     GenerateUniformPim( G4Event* anEvent );
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
   void     GenerateTest( G4Event* anEvent );
