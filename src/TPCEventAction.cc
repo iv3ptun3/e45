@@ -124,7 +124,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       //      G4double mass = (*padHC)[i]-> GetPDGMass(); //mass(GeV)
       G4int parentid = (*padHC)[i]-> GetParentID();
       G4double tlength = (*padHC)[i]-> GettLength();
-      G4int irow=0.;
+      G4int irow=(*padHC)[i]-> GetPadRow();
       G4double beta = (*padHC)[i]-> GetBeta();
       G4double edep = (*padHC)[i]-> GetEdep();
       G4double slength = (*padHC)[i]-> GetsLength();

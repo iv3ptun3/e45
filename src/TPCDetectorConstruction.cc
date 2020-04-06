@@ -42,6 +42,7 @@
 #include "TPCTargetSD.hh"
 #include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
+#include "padHelper.hh"
 
 namespace
 {
@@ -714,7 +715,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     new G4PVPlacement( rot, tpc_pos, m_tpc_lv, "TpcPV",
 		       m_world_lv, false, 0 );
     m_tpc_lv->SetVisAttributes( G4Colour::White() );
-    m_tpc_lv->SetSensitiveDetector( tpc_sd );
+    //m_tpc_lv->SetSensitiveDetector( tpc_sd );
   }
   // Field Cage
   {
@@ -803,29 +804,27 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     angle[29] = 180. - 29.;
     angle[30] = 180. - 23.23;
     angle[31] = 180. - 18.69;
-    // numpads[10]=208.;
-    // numpads[11]=218.;
-    // numpads[12]=230.;
-    // numpads[13]=214.;
-    // numpads[14]=212.;
-    // numpads[15]=214.;
-    // numpads[16]=220.;
-    // numpads[17]=224.;
-    // numpads[18]=232.;
-    // numpads[19]=238.;
-    // numpads[20]=244.;
-    // numpads[21]=232.;
-    // numpads[22]=218.;
-    // numpads[23]=210.;
-    // numpads[24]=206.;
-    // numpads[25]=202.;
-    // numpads[26]=200.;
-    // numpads[27]=196.;
-    // numpads[28]=178.;
-    // numpads[29]=130.;
-    // numpads[30]=108.;
-    // numpads[31]=90.;
     break;
+
+   
+  case 3:
+    //for tracking analysis
+    //If you need the dE/dx information, it should be modified. 
+    //Thin sensitive detector is introduced.
+    for( G4int i=0; i<NumOfPadTPC; ++i ){
+      double pad_radius = padHelper::getRadius(i);
+      pad_in[i] = pad_radius;
+      pad_out[i] = pad_radius + 0.1;
+      if( i<NumOfPadTPCIn ){
+	angle[i]   = 360.;
+      }
+      else{
+	angle[i] = padHelper::getsTheta(i);
+      }
+    }
+    break;
+
+
   default:
     break;
   }

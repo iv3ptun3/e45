@@ -213,6 +213,17 @@ struct Event
   Double_t ytpc[MaxTrack];     // coordinates
   Double_t ztpc[MaxTrack];     // coordinates
 
+  Double_t xtpc_pad[MaxTrack];     // coordinates
+  Double_t ytpc_pad[MaxTrack];     // coordinates
+  Double_t ztpc_pad[MaxTrack];     // coordinates
+
+  Double_t dxtpc_pad[MaxTrack];     // coordinates
+  Double_t dytpc_pad[MaxTrack];     // coordinates
+  Double_t dztpc_pad[MaxTrack];     // coordinates
+  
+
+
+
   Double_t x0tpc[MaxTrack];    // coordinates
   Double_t y0tpc[MaxTrack];    // coordinates
   Double_t z0tpc[MaxTrack];    // coordinates
@@ -230,6 +241,7 @@ struct Event
   Double_t dedxtpc[MaxTrack];    // Energy deposit/dx
   Double_t slengthtpc[MaxTrack];    // Energy deposit/dx
 
+  Int_t iPadtpc[MaxTrack];      // number of pad 
   Int_t laytpc[MaxTrack];      // number of pad layer
   Int_t rowtpc[MaxTrack];      // number of pad raw
   Double_t toftpc[MaxTrack];   // tof

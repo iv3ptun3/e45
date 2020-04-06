@@ -19,6 +19,7 @@
 #include "ConfMan.hh"
 #include "FuncName.hh"
 #include "TPCPadHit.hh"
+#include "padHelper.hh"
 
 namespace
 {
@@ -375,9 +376,46 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   //  G4cout<<"copyNo :"<<copyNo<<G4endl;
   //  G4cout<<"tlength"<<tlength<<G4endl;
 
-  G4int iLay=copyNo;
-  G4int iRow=0;
+  G4int iLay_copyNo=copyNo;
+  G4int iPad = padHelper::findPadID(hitz, hitx);
+  G4int iLay= padHelper::getLayerID(iPad);
+  G4int iRow= padHelper::getRowID(iPad);
+  
+#ifdef DEBUG
+  
+  //for test 
+  G4double radius = sqrt( hitx*hitx + (hitz+143.)*(hitz+143.));
+  TVector3 Point = padHelper::getPoint(iPad);
+  G4int iPad_re = padHelper::findPadID(Point.z(), Point.x());
+  G4cout<<"hitx = "<< hitx
+   	<<", pointx "<< Point.x()
+   	<<", hitz =" << hitz
+  	<<", pointz "<< Point.z()
+   	<<", radius = "<< radius
+   	<<", iPad ="<<iPad
+	<<", iPad_re ="<<iPad_re
+   	<<", iLay_copyNo = " <<iLay_copyNo
+   	<< ", iLay = "<<iLay<<G4endl;
+
+  G4cout<<"dx ="<<hitx-Point.x()
+	<<", dz ="<<hitz-Point.z()<<std::endl;
+#endif
+  
+  
+
+
+
+  // if(iLay_copyNo!=iLay)
+  //   G4cerr << FUNC_NAME 
+  // 	   << " iLay_copyNo = " <<iLay_copyNo
+  // 	   << ", iLay = "<<iLay<<G4endl;
+  
+
   G4String name = physVol->GetName();
+
+  
+
+
 
   if(name=="TPC_PV"){
     name="PadPV-1";
@@ -387,7 +425,8 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   //    name="PadPV-1";
   //  }
 
-  sscanf(name,"PadPV%d",&iLay);
+  //  sscanf(name,"PadPV%d",&iLay);
+  sscanf(name,"PadPV%d",&iLay_copyNo);
   TPCPadHit* ahit= new TPCPadHit(pos, mom, tof, tid, pid, iLay, iRow, beta, edep,parentID,tlength, mass, charge, VertexPosition, VertexMomentum, VertexEnergy,slength, parentID_pid );
 
   hitsCollection-> insert(ahit);
