@@ -1459,55 +1459,59 @@ TPCAnaManager::EndOfEventAction( void )
       }
       //      }
     }
-    for( G4int i=0; i<HitNum; i++){
-      event.ntrk[event.nttpc] = counterData[i].ntrk;
-      hmap["Time"]->Fill( counterData[i].time );
-      for( G4int j=0; j<G4ThreeVector::SIZE; ++j ){
-	hmap[Form( "Pos%d", j )]->Fill( counterData[i].pos[j]/CLHEP::mm );
-	hmap[Form( "Mom%d", j )]->Fill( counterData[i].mom[j]/CLHEP::GeV );
-      }
-      event.xtpc[event.nttpc] = counterData[i].pos[0]/CLHEP::mm;
-      event.ytpc[event.nttpc] = counterData[i].pos[1]/CLHEP::mm;
-      event.ztpc[event.nttpc] = counterData[i].pos[2]/CLHEP::mm;
+    if( HitNum >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit (TPC) " << HitNum << G4endl;
+    } else {
 
-      event.x0tpc[event.nttpc] = counterData[i].pos0[0]/CLHEP::mm;
-      event.y0tpc[event.nttpc] = counterData[i].pos0[1]/CLHEP::mm;
-      event.z0tpc[event.nttpc] = counterData[i].pos0[2]/CLHEP::mm;
+      for( G4int i=0; i<HitNum; i++){
+	event.ntrk[event.nttpc] = counterData[i].ntrk;
+	hmap["Time"]->Fill( counterData[i].time );
+	for( G4int j=0; j<G4ThreeVector::SIZE; ++j ){
+	  hmap[Form( "Pos%d", j )]->Fill( counterData[i].pos[j]/CLHEP::mm );
+	  hmap[Form( "Mom%d", j )]->Fill( counterData[i].mom[j]/CLHEP::GeV );
+	}
+	event.xtpc[event.nttpc] = counterData[i].pos[0]/CLHEP::mm;
+	event.ytpc[event.nttpc] = counterData[i].pos[1]/CLHEP::mm;
+	event.ztpc[event.nttpc] = counterData[i].pos[2]/CLHEP::mm;
 
-      event.resoX[event.nttpc] = counterData[i].resoX;
-      event.pxtpc[event.nttpc] = counterData[i].mom[0]/CLHEP::GeV;
-      event.pytpc[event.nttpc] = counterData[i].mom[1]/CLHEP::GeV;
-      event.pztpc[event.nttpc] = counterData[i].mom[2]/CLHEP::GeV;
-      event.pptpc[event.nttpc] = sqrt(pow(counterData[i].mom[0], 2) +
-				      pow(counterData[i].mom[1], 2) +
-				      pow(counterData[i].mom[2], 2))/CLHEP::GeV;
-      event.ititpc[event.nttpc] = counterData[i].trackID;
-      event.idtpc[event.nttpc] = counterData[i].particleID;
-      event.laytpc[event.nttpc] = counterData[i].iLay;
+	event.x0tpc[event.nttpc] = counterData[i].pos0[0]/CLHEP::mm;
+	event.y0tpc[event.nttpc] = counterData[i].pos0[1]/CLHEP::mm;
+	event.z0tpc[event.nttpc] = counterData[i].pos0[2]/CLHEP::mm;
 
-      event.rowtpc[event.nttpc] = counterData[i].iRow;
-      event.iPadtpc[event.nttpc] = padHelper::getPadID(event.laytpc[event.nttpc], event.rowtpc[event.nttpc]);
-      TVector3 Point = padHelper::getPoint(event.iPadtpc[event.nttpc]);
-      event.xtpc_pad[event.nttpc] = Point.x();
-      event.ytpc_pad[event.nttpc] = event.ytpc[event.nttpc];
-      event.ztpc_pad[event.nttpc] = Point.z();
+	event.resoX[event.nttpc] = counterData[i].resoX;
+	event.pxtpc[event.nttpc] = counterData[i].mom[0]/CLHEP::GeV;
+	event.pytpc[event.nttpc] = counterData[i].mom[1]/CLHEP::GeV;
+	event.pztpc[event.nttpc] = counterData[i].mom[2]/CLHEP::GeV;
+	event.pptpc[event.nttpc] = sqrt(pow(counterData[i].mom[0], 2) +
+					pow(counterData[i].mom[1], 2) +
+					pow(counterData[i].mom[2], 2))/CLHEP::GeV;
+	event.ititpc[event.nttpc] = counterData[i].trackID;
+	event.idtpc[event.nttpc] = counterData[i].particleID;
+	event.laytpc[event.nttpc] = counterData[i].iLay;
 
-      event.dxtpc_pad[event.nttpc] = event.x0tpc[event.nttpc] - event.xtpc_pad[event.nttpc];
-      event.dytpc_pad[event.nttpc] = event.y0tpc[event.nttpc] - event.ytpc_pad[event.nttpc];
-      event.dztpc_pad[event.nttpc] = event.z0tpc[event.nttpc] - event.ztpc_pad[event.nttpc];
+	event.rowtpc[event.nttpc] = counterData[i].iRow;
+	event.iPadtpc[event.nttpc] = padHelper::getPadID(event.laytpc[event.nttpc], event.rowtpc[event.nttpc]);
+	TVector3 Point = padHelper::getPoint(event.iPadtpc[event.nttpc]);
+	event.xtpc_pad[event.nttpc] = Point.x();
+	event.ytpc_pad[event.nttpc] = event.ytpc[event.nttpc];
+	event.ztpc_pad[event.nttpc] = Point.z();
+
+	event.dxtpc_pad[event.nttpc] = event.x0tpc[event.nttpc] - event.xtpc_pad[event.nttpc];
+	event.dytpc_pad[event.nttpc] = event.y0tpc[event.nttpc] - event.ytpc_pad[event.nttpc];
+	event.dztpc_pad[event.nttpc] = event.z0tpc[event.nttpc] - event.ztpc_pad[event.nttpc];
       
 
-      event.betatpc[event.nttpc] = counterData[i].beta;
-      event.edeptpc[event.nttpc] = counterData[i].edep;
-      event.dedxtpc[event.nttpc] = counterData[i].dedx;
-      event.slengthtpc[event.nttpc] = counterData[i].slength;
-      event.nthlay[event.nttpc] = counterData[i].iLay;
-      event.nthpad[event.nttpc] = counterData[i].iPad;
-      event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]
-	= event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]+1.;
-      event.nttpc += 1;
+	event.betatpc[event.nttpc] = counterData[i].beta;
+	event.edeptpc[event.nttpc] = counterData[i].edep;
+	event.dedxtpc[event.nttpc] = counterData[i].dedx;
+	event.slengthtpc[event.nttpc] = counterData[i].slength;
+	event.nthlay[event.nttpc] = counterData[i].iLay;
+	event.nthpad[event.nttpc] = counterData[i].iPad;
+	event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]
+	  = event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]+1.;
+	event.nttpc += 1;
+      }
     }
-
     //
     // TPC
     //
@@ -1552,790 +1556,790 @@ TPCAnaManager::EndOfEventAction( void )
   return 0;
 }
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetBH2Data( const VHitInfo* hit )
-{
-  if( event.nhBh2 >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhBh2 << G4endl;
-  } else {
-    Int_t i = event.nhBh2;
-    event.tidBh2[i] = hit->GetTrackID();
-    event.pidBh2[i] = hit->GetParticleID();
-    event.didBh2[i] = hit->GetDetectorID();
-    event.prtBh2[i] = hit->GetParentID();
-    event.xBh2[i] = hit->GetPosition().x();
-    event.yBh2[i] = hit->GetPosition().y();
-    event.zBh2[i] = hit->GetPosition().z();
-    event.pxBh2[i] = hit->GetMomentum().x();
-    event.pyBh2[i] = hit->GetMomentum().y();
-    event.pzBh2[i] = hit->GetMomentum().z();
-    event.ppBh2[i] = hit->GetMomentum().mag();
-    event.deBh2[i] = hit->GetEnergyDeposit();
-    event.tBh2[i] = hit->GetTime();
-    event.nhBh2++;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetBH2Data( const VHitInfo* hit )
+  {
+    if( event.nhBh2 >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhBh2 << G4endl;
+    } else {
+      Int_t i = event.nhBh2;
+      event.tidBh2[i] = hit->GetTrackID();
+      event.pidBh2[i] = hit->GetParticleID();
+      event.didBh2[i] = hit->GetDetectorID();
+      event.prtBh2[i] = hit->GetParentID();
+      event.xBh2[i] = hit->GetPosition().x();
+      event.yBh2[i] = hit->GetPosition().y();
+      event.zBh2[i] = hit->GetPosition().z();
+      event.pxBh2[i] = hit->GetMomentum().x();
+      event.pyBh2[i] = hit->GetMomentum().y();
+      event.pzBh2[i] = hit->GetMomentum().z();
+      event.ppBh2[i] = hit->GetMomentum().mag();
+      event.deBh2[i] = hit->GetEnergyDeposit();
+      event.tBh2[i] = hit->GetTime();
+      event.nhBh2++;
+    }
   }
-}
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
-			       G4ThreeVector mom,
-			       G4int track, G4int particle,
-			       G4int iLay,  G4int iRow, G4double beta,
-			       G4double edep, G4int parentid,
-			       G4double /* tlength */, G4double slength )
-{
-  G4int hitnum = HitNum;
-  G4bool flag=true;
-  if (hitnum >= MaxTrack) {
-    fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
-	    hitnum);
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
+				   G4ThreeVector mom,
+				   G4int track, G4int particle,
+				   G4int iLay,  G4int iRow, G4double beta,
+				   G4double edep, G4int parentid,
+				   G4double /* tlength */, G4double slength )
+  {
+    G4int hitnum = HitNum;
+    G4bool flag=true;
+    if (hitnum >= MaxTrack) {
+      fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
+	      hitnum);
+      return;
+    }
+
+    //  G4ThreeVector tar_pos(0.,0.*CLHEP::mm,-150.*CLHEP::mm);
+
+    G4ThreeVector tar_pos(0.,0., -143);
+    G4ThreeVector sh_pos(0.,0.,0.);
+    sh_pos=pos-tar_pos;
+
+    G4double sh_r = sh_pos.r();
+    G4double sh_theta = sh_pos.theta();
+    G4double sh_phi = sh_pos.phi();
+
+    G4double sh_x = sh_r*sin(sh_theta)*cos(sh_phi);
+    G4double sh_y = sh_r*sin(sh_theta)*sin(sh_phi);
+    G4double sh_z = sh_r*cos(sh_theta);
+
+    counterData[hitnum].particleID = particle;
+    ////shhwang check, check a multiplicity of layers
+    for(G4int i=0;i<hitnum;i++){
+      if((counterData[i].iLay == iLay &&
+	  counterData[i].ntrk == ntrk)){
+	flag = false;
+      }
+    }
+    flag=true;
+    if(flag == true){
+      counterData[hitnum].ntrk = ntrk;
+      counterData[hitnum].time = time;
+      counterData[hitnum].beta = beta;
+      counterData[hitnum].dedx = edep/slength;
+      counterData[hitnum].edep = edep;
+      counterData[hitnum].slength = slength;
+
+      //////shhwang position smearing////
+
+
+      G4double sh_alpha =  atan2(sh_x,sh_z);
+      G4double sh_rho =  sqrt(pow(sh_z,2)+pow(sh_x,2));
+      //    G4double sh_dalpha = 0.300*CLHEP::mm/sh_rho; // rho * theta = arc --> sigma=300 um
+      //    G4double sh_smear_alpha = CLHEP::RandGauss::shoot(sh_alpha, sh_dalpha);
+      G4double sh_sigmaY = 0.500*CLHEP::mm; //--> smearing : 400 um
+
+      G4double ang_sh=atan2(sh_pos.getY(),sh_pos.getX());
+      // G4double ang_check=0;
+      if(ang_sh>acos(-1.)){
+	ang_sh=ang_sh-2*acos(-1.);
+	// ang_check=-1;
+      }else{
+	// ang_check=1.;
+      }
+      // G4double arc_sh=pad_in[iLay]*ang_sh;
+      // G4int ith_pad_in=arc_sh/pad_in_width;
+      // G4int ith_pad_out=arc_sh/pad_out_width;
+
+
+      // G4double delta_x=0.;
+
+      // if( m_pad_config ==1 ){
+      //   if(iLay<pad_in_num){   // const G4int pad_in_num=10;
+      // 	delta_x=arc_sh-ith_pad_in*pad_in_width;
+      // 	if(delta_x<0){
+      // 	  delta_x=delta_x+pad_in_width;
+      // 	}
+      //   }else if(iLay>=pad_in_num){
+      // 	delta_x=arc_sh-ith_pad_out*pad_out_width;
+      // 	if(delta_x<0){
+      // 	  delta_x=delta_x+pad_out_width;
+      // 	}
+      //   }
+      // }else if( m_pad_config ==2 ){
+      //   if(iLay<pad_in_num){   //
+
+      // 	ith_pad_in=arc_sh/seg_width[iLay];
+      // 	delta_x=arc_sh-ith_pad_in*seg_width[iLay];
+      // 	if(delta_x<0){
+      // 	  delta_x=delta_x+seg_width[iLay];
+      // 	}
+
+      //   }else if(iLay>=pad_in_num){
+      // 	ith_pad_out=arc_sh/seg_width[iLay];
+      // 	delta_x=arc_sh-ith_pad_out*seg_width[iLay];
+      // 	if(delta_x<0){
+      // 	  delta_x=delta_x+seg_width[iLay];
+      // 	}
+
+      //   }
+      // }
+
+
+      ///include saho-san's code
+
+      // G4double compy=0.;
+      G4double compx=0.;
+
+      // G4int n_electron=0; //output
+      // G4int n_pad=0;//output
+      // G4double x_rms=0;//output
+      // G4double x_track = delta_x;// pad edge
+      // G4double y_track = double(250.+50.+pos.getY());// 50 is office set
+      // if(y_track<0 || y_track>600) G4cout<<"Y_track estimation is wrong(y_track:y_pos)"<<y_track<<":"<<pos.getY()<<G4endl;
+
+
+      // G4double dxdz_track=tan(acos((sh_pos.getX()*mom.getX()+sh_pos.getZ()*mom.getZ())/(sqrt(sh_pos.getX()*sh_pos.getX()+sh_pos.getZ()*sh_pos.getZ())*sqrt(mom.getX()*mom.getX()+mom.getZ()*mom.getZ()))));
+
+
+      // //pad and particle angle
+
+
+      // G4double dydz_track=0;
+
+      // if( m_pad_config ==1){
+      //   if(iLay<pad_in_num){
+      // 	ResHypTPC reshyptpc(pad_in_width, pad_length_in, 0.1,0.18, 0);
+      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
+      // 	compy = reshyptpc.getYDeviation(pos.getY());
+      //   }else if(iLay>=pad_in_num){
+      // 	ResHypTPC reshyptpc(pad_out_width, pad_length_out, 0.1,0.18, 0);
+      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
+      // 	compy = reshyptpc.getYDeviation(pos.getY());
+      //   }
+
+
+      // }else if( m_pad_config ==2){
+      //   if(iLay<pad_in_num){
+      // 	ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_in, 0.1,0.18, 0);
+      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
+      // 	compy = reshyptpc.getYDeviation(pos.getY());
+      //   }else if(iLay>=pad_in_num){
+      //ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_out, 0.1,0.18, 0);
+      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
+      // 	compy = reshyptpc.getYDeviation(pos.getY());
+      //   }
+      // }
+      compx = GetTransverseRes(sh_y);
+      double s_compx = CLHEP::RandGauss::shoot(0.,compx);
+
+      // std::cout<<"compx="<<compx<<", sh_sigmaY"<<sh_sigmaY<<std::endl;
+      // getchar();
+      //G4double sh_dalpha = compx/sh_rho; // rho * theta = arc --> from sako-san's code
+      G4double sh_dalpha = s_compx/sh_rho; // rho * theta = arc --> from sako-san's code
+      G4double sh_smear_alpha = sh_alpha+sh_dalpha;
+      //    G4cout<<compx<<":"<<sh_dalpha<<G4endl;
+
+      counterData[hitnum].resoX = compx;
+
+      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
+      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
+      counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
+
+      counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();
+      counterData[hitnum].pos0[G4ThreeVector::Y] = pos.getY();
+      counterData[hitnum].pos0[G4ThreeVector::Z] = pos.getZ();
+
+      counterData[hitnum].mom[G4ThreeVector::X] = mom.getX();
+      counterData[hitnum].mom[G4ThreeVector::Y] = mom.getY();
+      counterData[hitnum].mom[G4ThreeVector::Z] = mom.getZ();
+
+      counterData[hitnum].trackID = track;
+      counterData[hitnum].particleID = particle;
+      counterData[hitnum].iLay = iLay;
+      G4int iPad=0.;
+
+      if( m_pad_config == 2 ){
+	//    G4bool pass_check=false;
+	G4bool pass_check=true;
+	G4double cur_angle= (acos(-1.)-atan2(sh_x,sh_z))*180./acos(-1.);
+	//    G4cout<<"--------------------"<<G4endl;
+	//    G4cout<<"currrent angle:"<<cur_angle<<G4endl;
+	//    G4cout<<"layer angle:"<<angle[iLay]<<G4endl;
+	//    G4cout<<"seg angle:"<<seg_angle[iLay]<<G4endl;
+	if(iLay<pad_in_num){
+	  G4double check_num_pads=(cur_angle)/seg_angle[iLay];
+	  //      G4cout<<check_num_pads<<G4endl;
+	  iPad=int(check_num_pads);
+	}else if(iLay>=pad_in_num){
+	  G4double check_num_pads=(cur_angle-angle[iLay])/seg_angle[iLay];
+	  //      G4cout<<check_num_pads<<G4endl;
+	  iPad=int(check_num_pads);
+	}
+	if(iPad>numpads[iLay]){
+	  G4cout<<"this code has a error(iPad:numpads)-->"<<iPad<<":"<<numpads[iLay]<<G4endl;
+	}
+	if(pass_check){
+	  //    G4cout<<"iLay:"<<iLay<<G4endl;
+	  //        G4cout<<"iLay:"<<iLay<<G4endl;
+	  //        G4cout<<"iPad:"<<iPad<<G4endl;
+	  counterData[hitnum].iPad = iPad;
+	}else{
+	  G4cout<<"wrong:"<<iLay<<G4endl;
+	}
+      }
+    
+      counterData[hitnum].iRow = iRow;
+      counterData[hitnum].parentID = parentid;
+      HitNum++;
+
+      if(particle==321)
+	HitNum_K++;
+
+      if(particle==2212)
+	HitNum_p++;
+    }
+
     return;
   }
 
-  //  G4ThreeVector tar_pos(0.,0.*CLHEP::mm,-150.*CLHEP::mm);
-
-  G4ThreeVector tar_pos(0.,0., -143);
-  G4ThreeVector sh_pos(0.,0.,0.);
-  sh_pos=pos-tar_pos;
-
-  G4double sh_r = sh_pos.r();
-  G4double sh_theta = sh_pos.theta();
-  G4double sh_phi = sh_pos.phi();
-
-  G4double sh_x = sh_r*sin(sh_theta)*cos(sh_phi);
-  G4double sh_y = sh_r*sin(sh_theta)*sin(sh_phi);
-  G4double sh_z = sh_r*cos(sh_theta);
-
-  counterData[hitnum].particleID = particle;
-  ////shhwang check, check a multiplicity of layers
-  for(G4int i=0;i<hitnum;i++){
-    if((counterData[i].iLay == iLay &&
-  	counterData[i].ntrk == ntrk)){
-      flag = false;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetFermiMomentum( const G4ThreeVector& p )
+  {
+    for( G4int i=0; i<G4ThreeVector::SIZE; ++i ){
+      TString key = Form( "Fermi%d", i );
+      hmap[key]->Fill( p[i]*CLHEP::GeV );
     }
   }
-  flag=true;
-  if(flag == true){
-    counterData[hitnum].ntrk = ntrk;
-    counterData[hitnum].time = time;
-    counterData[hitnum].beta = beta;
-    counterData[hitnum].dedx = edep/slength;
-    counterData[hitnum].edep = edep;
-    counterData[hitnum].slength = slength;
 
-    //////shhwang position smearing////
-
-
-    G4double sh_alpha =  atan2(sh_x,sh_z);
-    G4double sh_rho =  sqrt(pow(sh_z,2)+pow(sh_x,2));
-    //    G4double sh_dalpha = 0.300*CLHEP::mm/sh_rho; // rho * theta = arc --> sigma=300 um
-    //    G4double sh_smear_alpha = CLHEP::RandGauss::shoot(sh_alpha, sh_dalpha);
-    G4double sh_sigmaY = 0.500*CLHEP::mm; //--> smearing : 400 um
-
-    G4double ang_sh=atan2(sh_pos.getY(),sh_pos.getX());
-    // G4double ang_check=0;
-    if(ang_sh>acos(-1.)){
-      ang_sh=ang_sh-2*acos(-1.);
-      // ang_check=-1;
-    }else{
-      // ang_check=1.;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetFTOFData( const VHitInfo* hit )
+  {
+    if( event.nhFtof >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhFtof << G4endl;
+    } else {
+      Int_t i = event.nhFtof;
+      event.tidFtof[i] = hit->GetTrackID();
+      event.pidFtof[i] = hit->GetParticleID();
+      event.didFtof[i] = hit->GetDetectorID();
+      event.prtFtof[i] = hit->GetParentID();
+      event.xFtof[i] = hit->GetPosition().x();
+      event.yFtof[i] = hit->GetPosition().y();
+      event.zFtof[i] = hit->GetPosition().z();
+      event.pxFtof[i] = hit->GetMomentum().x();
+      event.pyFtof[i] = hit->GetMomentum().y();
+      event.pzFtof[i] = hit->GetMomentum().z();
+      event.ppFtof[i] = hit->GetMomentum().mag();
+      event.deFtof[i] = hit->GetEnergyDeposit();
+      event.tFtof[i] = hit->GetTime();
+      event.nhFtof++;
     }
-    // G4double arc_sh=pad_in[iLay]*ang_sh;
-    // G4int ith_pad_in=arc_sh/pad_in_width;
-    // G4int ith_pad_out=arc_sh/pad_out_width;
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetHTOFData( const VHitInfo* hit )
+  {
+    if( event.nhHtof >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhHtof << G4endl;
+    } else {
+      Int_t i = event.nhHtof;
+      event.tidHtof[i] = hit->GetTrackID();
+      event.pidHtof[i] = hit->GetParticleID();
+      event.didHtof[i] = hit->GetDetectorID();
+      event.prtHtof[i] = hit->GetParentID();
+      event.xHtof[i] = hit->GetPosition().x();
+      event.yHtof[i] = hit->GetPosition().y();
+      event.zHtof[i] = hit->GetPosition().z();
+      event.pxHtof[i] = hit->GetMomentum().x();
+      event.pyHtof[i] = hit->GetMomentum().y();
+      event.pzHtof[i] = hit->GetMomentum().z();
+      event.ppHtof[i] = hit->GetMomentum().mag();
+      event.deHtof[i] = hit->GetEnergyDeposit();
+      event.tHtof[i] = hit->GetTime();
+      event.nhHtof++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetLACData( const VHitInfo* hit )
+  {
+    if( event.nhLac >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhLac << G4endl;
+    } else {
+      Int_t i = event.nhLac;
+      event.tidLac[i] = hit->GetTrackID();
+      event.pidLac[i] = hit->GetParticleID();
+      event.didLac[i] = hit->GetDetectorID();
+      event.prtLac[i] = hit->GetParentID();
+      event.xLac[i] = hit->GetPosition().x();
+      event.yLac[i] = hit->GetPosition().y();
+      event.zLac[i] = hit->GetPosition().z();
+      event.pxLac[i] = hit->GetMomentum().x();
+      event.pyLac[i] = hit->GetMomentum().y();
+      event.pzLac[i] = hit->GetMomentum().z();
+      event.ppLac[i] = hit->GetMomentum().mag();
+      event.deLac[i] = hit->GetEnergyDeposit();
+      event.tLac[i] = hit->GetTime();
+      event.nhLac++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetSCHData( const VHitInfo* hit )
+  {
+    if( event.nhSch >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhSch << G4endl;
+    } else {
+      Int_t i = event.nhSch;
+      event.tidSch[i] = hit->GetTrackID();
+      event.pidSch[i] = hit->GetParticleID();
+      event.didSch[i] = hit->GetDetectorID();
+      event.prtSch[i] = hit->GetParentID();
+      event.xSch[i] = hit->GetPosition().x();
+      event.ySch[i] = hit->GetPosition().y();
+      event.zSch[i] = hit->GetPosition().z();
+      event.pxSch[i] = hit->GetMomentum().x();
+      event.pySch[i] = hit->GetMomentum().y();
+      event.pzSch[i] = hit->GetMomentum().z();
+      event.ppSch[i] = hit->GetMomentum().mag();
+      event.deSch[i] = hit->GetEnergyDeposit();
+      event.tSch[i] = hit->GetTime();
+      event.nhSch++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetSDCData( const VHitInfo* hit )
+  {
+    if( event.nhSdc >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhSdc << G4endl;
+    } else {
+      Int_t i = event.nhSdc;
+      event.tidSdc[i] = hit->GetTrackID();
+      event.pidSdc[i] = hit->GetParticleID();
+      event.didSdc[i] = hit->GetDetectorID();
+      event.prtSdc[i] = hit->GetParentID();
+      event.xSdc[i] = hit->GetPosition().x();
+      event.ySdc[i] = hit->GetPosition().y();
+      event.zSdc[i] = hit->GetPosition().z();
+      event.pxSdc[i] = hit->GetMomentum().x();
+      event.pySdc[i] = hit->GetMomentum().y();
+      event.pzSdc[i] = hit->GetMomentum().z();
+      event.ppSdc[i] = hit->GetMomentum().mag();
+      event.deSdc[i] = hit->GetEnergyDeposit();
+      event.tSdc[i] = hit->GetTime();
+      event.nhSdc++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetVPData( const VHitInfo* hit )
+  {
+    if( event.nhVp >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhVp << G4endl;
+    } else {
+      Int_t i = event.nhVp;
+      event.tidVp[i] = hit->GetTrackID();
+      event.pidVp[i] = hit->GetParticleID();
+      event.didVp[i] = hit->GetDetectorID();
+      event.prtVp[i] = hit->GetParentID();
+      event.xVp[i] = hit->GetPosition().x();
+      event.yVp[i] = hit->GetPosition().y();
+      event.zVp[i] = hit->GetPosition().z();
+      event.pxVp[i] = hit->GetMomentum().x();
+      event.pyVp[i] = hit->GetMomentum().y();
+      event.pzVp[i] = hit->GetMomentum().z();
+      event.ppVp[i] = hit->GetMomentum().mag();
+      event.deVp[i] = hit->GetEnergyDeposit();
+      event.tVp[i] = hit->GetTime();
+      event.nhVp++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetWCData( const VHitInfo* hit )
+  {
+    if( event.nhWc >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhWc << G4endl;
+    } else {
+      Int_t i = event.nhWc;
+      event.tidWc[i] = hit->GetTrackID();
+      event.pidWc[i] = hit->GetParticleID();
+      event.didWc[i] = hit->GetDetectorID();
+      event.prtWc[i] = hit->GetParentID();
+      event.xWc[i] = hit->GetPosition().x();
+      event.yWc[i] = hit->GetPosition().y();
+      event.zWc[i] = hit->GetPosition().z();
+      event.pxWc[i] = hit->GetMomentum().x();
+      event.pyWc[i] = hit->GetMomentum().y();
+      event.pzWc[i] = hit->GetMomentum().z();
+      event.ppWc[i] = hit->GetMomentum().mag();
+      event.deWc[i] = hit->GetEnergyDeposit();
+      event.tWc[i] = hit->GetTime();
+      event.nhWc++;
+    }
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetTPCData( G4int tpctr2, G4int tpcpid2, G4int tpcparentid2,
+			       G4int tpcparentid_pid2, G4double tpcpx2,
+			       G4double tpcpy2, G4double tpcpz2,
+			       G4double /* tpcpp2 */,
+			       G4int tpcqq2, G4double tpcpm2, G4double tpcde2,
+			       G4double tpclen2, G4int tpclay2,
+			       G4double vtxpxtpc2, G4double vtxpytpc2,
+			       G4double vtxpztpc2,
+			       G4double vtxxtpc2, G4double vtxytpc2,
+			       G4double vtxztpc2, G4double vtxene2 )
+  {
+    G4int hitnum = tpctr2;
+
+    // G4double theta=acos(tpcpz2/tpcpp2);
+
+    tpcData[hitnum].tpctr = tpctr2;
+    tpcData[hitnum].tpcpid = tpcpid2;
+    tpcData[hitnum].tpcparentid = tpcparentid2;
+    tpcData[hitnum].tpcparentid_pid = tpcparentid_pid2;
+
+    //// w/o smearing
+    tpcData[hitnum].tpcpx = tpcpx2;
+    tpcData[hitnum].tpcpy = tpcpy2;
+    tpcData[hitnum].tpcpz = tpcpz2;
+    //// with smearing
+    //    tpcData[hitnum].tpcpx = px;
+    //    tpcData[hitnum].tpcpz = pz;
+    //    tpcData[hitnum].tpcpy = py;
 
 
-    // G4double delta_x=0.;
+    //kine E = sqrt(p^2+m^2)-m
+    //p=sqrt((E+m)^2-m^2)
+    G4double totalmom=sqrt(pow(vtxene2+tpcpm2,2)-pow(tpcpm2,2));
+    tpcData[hitnum].tpcvtxpx = totalmom*vtxpxtpc2;
+    tpcData[hitnum].tpcvtxpy = totalmom*vtxpytpc2;
+    tpcData[hitnum].tpcvtxpz = totalmom*vtxpztpc2;
 
-    // if( m_pad_config ==1 ){
-    //   if(iLay<pad_in_num){   // const G4int pad_in_num=10;
-    // 	delta_x=arc_sh-ith_pad_in*pad_in_width;
-    // 	if(delta_x<0){
-    // 	  delta_x=delta_x+pad_in_width;
-    // 	}
-    //   }else if(iLay>=pad_in_num){
-    // 	delta_x=arc_sh-ith_pad_out*pad_out_width;
-    // 	if(delta_x<0){
-    // 	  delta_x=delta_x+pad_out_width;
-    // 	}
-    //   }
-    // }else if( m_pad_config ==2 ){
-    //   if(iLay<pad_in_num){   //
+    tpcData[hitnum].tpcvtxx = vtxxtpc2;
+    tpcData[hitnum].tpcvtxy = vtxytpc2;
+    tpcData[hitnum].tpcvtxz = vtxztpc2;
 
-    // 	ith_pad_in=arc_sh/seg_width[iLay];
-    // 	delta_x=arc_sh-ith_pad_in*seg_width[iLay];
-    // 	if(delta_x<0){
-    // 	  delta_x=delta_x+seg_width[iLay];
-    // 	}
+    //// with smearing
+    //  tpcData[hitnum].tpcpp = sqrt(pow(px,2)+pow(py,2)+pow(pz,2));
 
-    //   }else if(iLay>=pad_in_num){
-    // 	ith_pad_out=arc_sh/seg_width[iLay];
-    // 	delta_x=arc_sh-ith_pad_out*seg_width[iLay];
-    // 	if(delta_x<0){
-    // 	  delta_x=delta_x+seg_width[iLay];
-    // 	}
+    //// w/o smearing
+    tpcData[hitnum].tpcpp = sqrt(pow(tpcpx2,2)+pow(tpcpy2,2)+pow(tpcpz2,2));
+    //  tpcData[hitnum].tpcppfit = sqrt(pow(,2)+pow(tpcpy2,2));
 
-    //   }
-    // }
+    tpcData[hitnum].tpcqq = tpcqq2;
+    tpcData[hitnum].tpcpm = tpcpm2;
+    tpcData[hitnum].tpclen = tpclen2;
+    tpcData[hitnum].tpcdedx = tpcde2;
+    tpcData[hitnum].tpclay = tpclay2;
+    tpctrNum++;
+    return;
+  }
 
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryInfo( G4double mm_d, G4double mm_p,
+				   G4double theta, G4double theta_scat,
+				   G4double theta_CM )
+  {
+    primaryInfo.mm_d = mm_d;
+    primaryInfo.mm_p = mm_p;
+    primaryInfo.theta = theta;
+    primaryInfo.theta_scat = theta_scat;
+    primaryInfo.theta_CM = theta_CM;
+  }
 
-    ///include saho-san's code
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetNumberOfPrimaryParticle( G4int n )
+  {
+    event.nhPrm = n;
+  }
 
-    // G4double compy=0.;
-    G4double compx=0.;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryParticle( G4double px, G4double py, G4double pz )
+  {
+    Int_t id = 0;
+    event.pxPrm[id] = px;
+    event.pyPrm[id] = py;
+    event.pzPrm[id] = pz;
+  }
 
-    // G4int n_electron=0; //output
-    // G4int n_pad=0;//output
-    // G4double x_rms=0;//output
-    // G4double x_track = delta_x;// pad edge
-    // G4double y_track = double(250.+50.+pos.getY());// 50 is office set
-    // if(y_track<0 || y_track>600) G4cout<<"Y_track estimation is wrong(y_track:y_pos)"<<y_track<<":"<<pos.getY()<<G4endl;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetGeneratorID( G4int gen )
+  {
+    event.gen = gen;
+  }
 
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetModeID( G4int mode )
+  {
+    event.mode = mode;
+  }
 
-    // G4double dxdz_track=tan(acos((sh_pos.getX()*mom.getX()+sh_pos.getZ()*mom.getZ())/(sqrt(sh_pos.getX()*sh_pos.getX()+sh_pos.getZ()*sh_pos.getZ())*sqrt(mom.getX()*mom.getX()+mom.getZ()*mom.getZ()))));
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryParticle( G4int id, const G4ThreeVector& p,
+				       G4double mass, G4int pid )
+  {
+    if( id >= event.nhPrm ){
+      G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
+    } else {
+      event.pxPrm[id] = p.x();
+      event.pyPrm[id] = p.y();
+      event.pzPrm[id] = p.z();
+      event.ppPrm[id] = p.mag();
+      event.mPrm[id] = mass;
+      event.thetaPrm[id] = p.theta();
+      event.phiPrm[id] = p.phi();
+      event.pidPrm[id] = pid;
+    }
+  }
 
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryParticle( G4int id, G4double px, G4double py,
+				       G4double pz, G4double mass, G4int pid )
+  {
+    SetPrimaryParticle( id, G4ThreeVector( px, py, pz ), mass, pid );
+  }
 
-    // //pad and particle angle
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryVertex( G4int id, G4double x, G4double y, G4double z )
+  {
+    if( id >= event.nhPrm ){
+      G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
+    } else {
+      event.xPrm[id] = x;
+      event.yPrm[id] = y;
+      event.zPrm[id] = z;
+    }
+  }
 
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryVertex( G4int id, const G4ThreeVector& x )
+  {
+    if( id >= event.nhPrm ){
+      G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
+    } else {
+      event.xPrm[id] = x.x();
+      event.yPrm[id] = x.y();
+      event.zPrm[id] = x.z();
+    }
+  }
 
-    // G4double dydz_track=0;
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryBeam( const G4ThreeVector& p )
+  {
+    event.pb->SetXYZ( p.x(), p.y(), p.z() );
+  }
 
-    // if( m_pad_config ==1){
-    //   if(iLay<pad_in_num){
-    // 	ResHypTPC reshyptpc(pad_in_width, pad_length_in, 0.1,0.18, 0);
-    // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-    // 	compy = reshyptpc.getYDeviation(pos.getY());
-    //   }else if(iLay>=pad_in_num){
-    // 	ResHypTPC reshyptpc(pad_out_width, pad_length_out, 0.1,0.18, 0);
-    // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-    // 	compy = reshyptpc.getYDeviation(pos.getY());
-    //   }
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
+  {
+    event.pb->SetXYZ( px, py, pz );
+  }
 
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetTargetData( const VHitInfo* hit )
+  {
+    if( event.nhTgt >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhTgt << G4endl;
+    } else {
+      Int_t i = event.nhTgt;
+      event.tidTgt[i] = hit->GetTrackID();
+      event.pidTgt[i] = hit->GetParticleID();
+      event.prtTgt[i] = hit->GetParentID();
+      event.xTgt[i] = hit->GetPosition().x();
+      event.yTgt[i] = hit->GetPosition().y();
+      event.zTgt[i] = hit->GetPosition().z();
+      event.vtxTgt[i] = hit->GetVertexPosition().x();
+      event.vtyTgt[i] = hit->GetVertexPosition().y();
+      event.vtzTgt[i] = hit->GetVertexPosition().z();
+      event.nhTgt++;
+    }
+  }
 
-    // }else if( m_pad_config ==2){
-    //   if(iLay<pad_in_num){
-    // 	ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_in, 0.1,0.18, 0);
-    // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-    // 	compy = reshyptpc.getYDeviation(pos.getY());
-    //   }else if(iLay>=pad_in_num){
-    //ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_out, 0.1,0.18, 0);
-    // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-    // 	compy = reshyptpc.getYDeviation(pos.getY());
-    //   }
-    // }
-    compx = GetTransverseRes(sh_y);
-    double s_compx = CLHEP::RandGauss::shoot(0.,compx);
-
-    // std::cout<<"compx="<<compx<<", sh_sigmaY"<<sh_sigmaY<<std::endl;
-    // getchar();
-    //G4double sh_dalpha = compx/sh_rho; // rho * theta = arc --> from sako-san's code
-    G4double sh_dalpha = s_compx/sh_rho; // rho * theta = arc --> from sako-san's code
-    G4double sh_smear_alpha = sh_alpha+sh_dalpha;
-    //    G4cout<<compx<<":"<<sh_dalpha<<G4endl;
-
-    counterData[hitnum].resoX = compx;
-
-    counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
-    counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
-    counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
-
-    counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();
-    counterData[hitnum].pos0[G4ThreeVector::Y] = pos.getY();
-    counterData[hitnum].pos0[G4ThreeVector::Z] = pos.getZ();
-
-    counterData[hitnum].mom[G4ThreeVector::X] = mom.getX();
-    counterData[hitnum].mom[G4ThreeVector::Y] = mom.getY();
-    counterData[hitnum].mom[G4ThreeVector::Z] = mom.getZ();
-
-    counterData[hitnum].trackID = track;
-    counterData[hitnum].particleID = particle;
-    counterData[hitnum].iLay = iLay;
-    G4int iPad=0.;
-
-    if( m_pad_config == 2 ){
-      //    G4bool pass_check=false;
-      G4bool pass_check=true;
-      G4double cur_angle= (acos(-1.)-atan2(sh_x,sh_z))*180./acos(-1.);
-      //    G4cout<<"--------------------"<<G4endl;
-      //    G4cout<<"currrent angle:"<<cur_angle<<G4endl;
-      //    G4cout<<"layer angle:"<<angle[iLay]<<G4endl;
-      //    G4cout<<"seg angle:"<<seg_angle[iLay]<<G4endl;
-      if(iLay<pad_in_num){
-	G4double check_num_pads=(cur_angle)/seg_angle[iLay];
-	//      G4cout<<check_num_pads<<G4endl;
-	iPad=int(check_num_pads);
-      }else if(iLay>=pad_in_num){
-	G4double check_num_pads=(cur_angle-angle[iLay])/seg_angle[iLay];
-	//      G4cout<<check_num_pads<<G4endl;
-	iPad=int(check_num_pads);
+  /*************************************
+   *************************************/
+  void initTrack(Track* tracks){
+    static const std::string funcname = "[InitTrack]";
+    int i,j;
+    //  G4cout<<"init track"<<G4endl;
+    for( i = 0; i < MAX_TRACK; i++){
+      tracks[i].nout   =  0;
+      tracks[i].ngood  =  0;
+      tracks[i].igroup = -1;
+      tracks[i].trkQual = -1;
+      tracks[i].numHits = 0;
+      ////    tracks[i].numSectors = 0;
+      tracks[i].numLayers = 0;
+      tracks[i].charge = 1000;
+      tracks[i].totalLength = 0.0;
+      tracks[i].totalLengthTOF = 0.0; /*NTPC TOF*/
+      tracks[i].meanAdc = -1.0;
+      tracks[i].chi2Pad = -1.0;
+      tracks[i].chi2Z       = -1.0;
+      tracks[i].chi2Prob = -1.0;
+      tracks[i].chi2 = -1.0;
+      tracks[i].radius = 0.0;
+      tracks[i].center[0] = tracks[i].center[1] = 1000;
+      tracks[i].rKNumIter = -1;
+      tracks[i].CrossOuter = -1;
+      tracks[i].mom[0] = tracks[i].mom[1] =
+	tracks[i].mom[2] = 10000.0;
+      tracks[i].mom[3] = -1.0;
+      tracks[i].resVirtual[0] = tracks[i].resVirtual[1]
+	=tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
+      tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
+	= tracks[i].xOnTrack[2] = 1000.0;
+      tracks[i].RKPFinal[0] =
+	tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
+      //    for( j=0 ; j<NUM_SECTOR ; j++ ){
+      //      tracks[i].numLayersinSec[j] = 0;
+      //    }
+      for(j=0; j < MAX_ITERATION; j++){
+	tracks[i].rKChi2[j] = 1000.;
       }
-      if(iPad>numpads[iLay]){
-	G4cout<<"this code has a error(iPad:numpads)-->"<<iPad<<":"<<numpads[iLay]<<G4endl;
+
+      for(j=0; j < NUM_PARA_RK; j++){
+	tracks[i].rKInitPara[j] =
+	  tracks[i].rKFinalPara[j] = -1000.;
       }
-      if(pass_check){
-	//    G4cout<<"iLay:"<<iLay<<G4endl;
-	//        G4cout<<"iLay:"<<iLay<<G4endl;
-	//        G4cout<<"iPad:"<<iPad<<G4endl;
-	counterData[hitnum].iPad = iPad;
-      }else{
-	G4cout<<"wrong:"<<iLay<<G4endl;
+
+      /*  tracks[i].hitPattern = 0;*/
+      for( j = 0; j < MAX_HIT_IN_TRACK; j++){
+	tracks[i].ibad[j]  = 10;
+	tracks[i].zbad[j]  = 10;
+	//      tracks[i].hit[j]    = NULL;
+	tracks[i].resPad[j] = 1000;
+	tracks[i].resPady[j] = 1000; /*NTPC*/
+	tracks[i].resZ[j]   = 1000;
+	tracks[i].sector[j] = 100;
+	tracks[i].lay[j] = 100;
+	tracks[i].x[j][0] = 1000.;/*originally 100.*/
+	tracks[i].x[j][1] = 1000.;/*originally 100.*/
+	tracks[i].x[j][2] = -10000.;
+	tracks[i].err[j][0] = tracks[i].err[j][1]
+	  = tracks[i].err[j][2] = 1000.;
+	tracks[i].arcLen[j] = -1.0;
+	tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
+	  tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
+	  tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
+	  tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
+	  tracks[i].initRes[j][2] = tracks[i].phi_local[j]
+	  = -10000.;
+
       }
     }
-    
-    counterData[hitnum].iRow = iRow;
-    counterData[hitnum].parentID = parentid;
-    HitNum++;
-
-    if(particle==321)
-      HitNum_K++;
-
-    if(particle==2212)
-      HitNum_p++;
   }
 
-  return;
-}
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetFermiMomentum( const G4ThreeVector& p )
-{
-  for( G4int i=0; i<G4ThreeVector::SIZE; ++i ){
-    TString key = Form( "Fermi%d", i );
-    hmap[key]->Fill( p[i]*CLHEP::GeV );
-  }
-}
+  void initTrack_ku(Track* tracks){
+    static const std::string funcname = "[InitTrack]";
+    int i,j;
+    //  G4cout<<"init track"<<G4endl;
+    for( i = 0; i < MAX_TRACK; i++){
+      tracks[i].nout   =  0;
+      tracks[i].ngood  =  0;
+      tracks[i].igroup = -1;
+      tracks[i].trkQual = -1;
+      tracks[i].numHits = 0;
+      ////    tracks[i].numSectors = 0;
+      tracks[i].numLayers = 0;
+      tracks[i].charge = 1000;
+      tracks[i].totalLength = 0.0;
+      tracks[i].totalLengthTOF = 0.0; /*NTPC TOF*/
+      tracks[i].meanAdc = -1.0;
+      tracks[i].chi2Pad = -1.0;
+      tracks[i].chi2Z       = -1.0;
+      tracks[i].chi2Prob = -1.0;
+      tracks[i].chi2 = -1.0;
+      tracks[i].radius = 0.0;
+      tracks[i].center[0] = tracks[i].center[1] = 1000;
+      tracks[i].rKNumIter = -1;
+      tracks[i].CrossOuter = -1;
+      tracks[i].mom[0] = tracks[i].mom[1] =
+	tracks[i].mom[2] = 10000.0;
+      tracks[i].mom[3] = -1.0;
+      tracks[i].resVirtual[0] = tracks[i].resVirtual[1]
+	=tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
+      tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
+	= tracks[i].xOnTrack[2] = 1000.0;
+      tracks[i].RKPFinal[0] =
+	tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
+      //    for( j=0 ; j<NUM_SECTOR ; j++ ){
+      //      tracks[i].numLayersinSec[j] = 0;
+      //    }
+      for(j=0; j < MAX_ITERATION; j++){
+	tracks[i].rKChi2[j] = 1000.;
+      }
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetFTOFData( const VHitInfo* hit )
-{
-  if( event.nhFtof >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhFtof << G4endl;
-  } else {
-    Int_t i = event.nhFtof;
-    event.tidFtof[i] = hit->GetTrackID();
-    event.pidFtof[i] = hit->GetParticleID();
-    event.didFtof[i] = hit->GetDetectorID();
-    event.prtFtof[i] = hit->GetParentID();
-    event.xFtof[i] = hit->GetPosition().x();
-    event.yFtof[i] = hit->GetPosition().y();
-    event.zFtof[i] = hit->GetPosition().z();
-    event.pxFtof[i] = hit->GetMomentum().x();
-    event.pyFtof[i] = hit->GetMomentum().y();
-    event.pzFtof[i] = hit->GetMomentum().z();
-    event.ppFtof[i] = hit->GetMomentum().mag();
-    event.deFtof[i] = hit->GetEnergyDeposit();
-    event.tFtof[i] = hit->GetTime();
-    event.nhFtof++;
-  }
-}
+      for(j=0; j < NUM_PARA_RK; j++){
+	tracks[i].rKInitPara[j] =
+	  tracks[i].rKFinalPara[j] = -1000.;
+      }
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetHTOFData( const VHitInfo* hit )
-{
-  if( event.nhHtof >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhHtof << G4endl;
-  } else {
-    Int_t i = event.nhHtof;
-    event.tidHtof[i] = hit->GetTrackID();
-    event.pidHtof[i] = hit->GetParticleID();
-    event.didHtof[i] = hit->GetDetectorID();
-    event.prtHtof[i] = hit->GetParentID();
-    event.xHtof[i] = hit->GetPosition().x();
-    event.yHtof[i] = hit->GetPosition().y();
-    event.zHtof[i] = hit->GetPosition().z();
-    event.pxHtof[i] = hit->GetMomentum().x();
-    event.pyHtof[i] = hit->GetMomentum().y();
-    event.pzHtof[i] = hit->GetMomentum().z();
-    event.ppHtof[i] = hit->GetMomentum().mag();
-    event.deHtof[i] = hit->GetEnergyDeposit();
-    event.tHtof[i] = hit->GetTime();
-    event.nhHtof++;
-  }
-}
+      /*  tracks[i].hitPattern = 0;*/
+      for( j = 0; j < MAX_HIT_IN_TRACK; j++){
+	tracks[i].ibad[j]  = 10;
+	tracks[i].zbad[j]  = 10;
+	//      tracks[i].hit[j]    = NULL;
+	tracks[i].resPad[j] = 1000;
+	tracks[i].resPady[j] = 1000; /*NTPC*/
+	tracks[i].resZ[j]   = 1000;
+	tracks[i].sector[j] = 100;
+	tracks[i].lay[j] = 100;
+	tracks[i].x[j][0] = 1000.;/*originally 100.*/
+	tracks[i].x[j][1] = 1000.;/*originally 100.*/
+	tracks[i].x[j][2] = -10000.;
+	tracks[i].res[j] = 0.;
+	tracks[i].err[j][0] = tracks[i].err[j][1]
+	  = tracks[i].err[j][2] = 1000.;
+	tracks[i].arcLen[j] = -1.0;
+	tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
+	  tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
+	  tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
+	  tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
+	  tracks[i].initRes[j][2] = tracks[i].phi_local[j]
+	  = -10000.;
 
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetLACData( const VHitInfo* hit )
-{
-  if( event.nhLac >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhLac << G4endl;
-  } else {
-    Int_t i = event.nhLac;
-    event.tidLac[i] = hit->GetTrackID();
-    event.pidLac[i] = hit->GetParticleID();
-    event.didLac[i] = hit->GetDetectorID();
-    event.prtLac[i] = hit->GetParentID();
-    event.xLac[i] = hit->GetPosition().x();
-    event.yLac[i] = hit->GetPosition().y();
-    event.zLac[i] = hit->GetPosition().z();
-    event.pxLac[i] = hit->GetMomentum().x();
-    event.pyLac[i] = hit->GetMomentum().y();
-    event.pzLac[i] = hit->GetMomentum().z();
-    event.ppLac[i] = hit->GetMomentum().mag();
-    event.deLac[i] = hit->GetEnergyDeposit();
-    event.tLac[i] = hit->GetTime();
-    event.nhLac++;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetSCHData( const VHitInfo* hit )
-{
-  if( event.nhSch >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhSch << G4endl;
-  } else {
-    Int_t i = event.nhSch;
-    event.tidSch[i] = hit->GetTrackID();
-    event.pidSch[i] = hit->GetParticleID();
-    event.didSch[i] = hit->GetDetectorID();
-    event.prtSch[i] = hit->GetParentID();
-    event.xSch[i] = hit->GetPosition().x();
-    event.ySch[i] = hit->GetPosition().y();
-    event.zSch[i] = hit->GetPosition().z();
-    event.pxSch[i] = hit->GetMomentum().x();
-    event.pySch[i] = hit->GetMomentum().y();
-    event.pzSch[i] = hit->GetMomentum().z();
-    event.ppSch[i] = hit->GetMomentum().mag();
-    event.deSch[i] = hit->GetEnergyDeposit();
-    event.tSch[i] = hit->GetTime();
-    event.nhSch++;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetSDCData( const VHitInfo* hit )
-{
-  if( event.nhSdc >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhSdc << G4endl;
-  } else {
-    Int_t i = event.nhSdc;
-    event.tidSdc[i] = hit->GetTrackID();
-    event.pidSdc[i] = hit->GetParticleID();
-    event.didSdc[i] = hit->GetDetectorID();
-    event.prtSdc[i] = hit->GetParentID();
-    event.xSdc[i] = hit->GetPosition().x();
-    event.ySdc[i] = hit->GetPosition().y();
-    event.zSdc[i] = hit->GetPosition().z();
-    event.pxSdc[i] = hit->GetMomentum().x();
-    event.pySdc[i] = hit->GetMomentum().y();
-    event.pzSdc[i] = hit->GetMomentum().z();
-    event.ppSdc[i] = hit->GetMomentum().mag();
-    event.deSdc[i] = hit->GetEnergyDeposit();
-    event.tSdc[i] = hit->GetTime();
-    event.nhSdc++;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetVPData( const VHitInfo* hit )
-{
-  if( event.nhVp >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhVp << G4endl;
-  } else {
-    Int_t i = event.nhVp;
-    event.tidVp[i] = hit->GetTrackID();
-    event.pidVp[i] = hit->GetParticleID();
-    event.didVp[i] = hit->GetDetectorID();
-    event.prtVp[i] = hit->GetParentID();
-    event.xVp[i] = hit->GetPosition().x();
-    event.yVp[i] = hit->GetPosition().y();
-    event.zVp[i] = hit->GetPosition().z();
-    event.pxVp[i] = hit->GetMomentum().x();
-    event.pyVp[i] = hit->GetMomentum().y();
-    event.pzVp[i] = hit->GetMomentum().z();
-    event.ppVp[i] = hit->GetMomentum().mag();
-    event.deVp[i] = hit->GetEnergyDeposit();
-    event.tVp[i] = hit->GetTime();
-    event.nhVp++;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetWCData( const VHitInfo* hit )
-{
-  if( event.nhWc >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhWc << G4endl;
-  } else {
-    Int_t i = event.nhWc;
-    event.tidWc[i] = hit->GetTrackID();
-    event.pidWc[i] = hit->GetParticleID();
-    event.didWc[i] = hit->GetDetectorID();
-    event.prtWc[i] = hit->GetParentID();
-    event.xWc[i] = hit->GetPosition().x();
-    event.yWc[i] = hit->GetPosition().y();
-    event.zWc[i] = hit->GetPosition().z();
-    event.pxWc[i] = hit->GetMomentum().x();
-    event.pyWc[i] = hit->GetMomentum().y();
-    event.pzWc[i] = hit->GetMomentum().z();
-    event.ppWc[i] = hit->GetMomentum().mag();
-    event.deWc[i] = hit->GetEnergyDeposit();
-    event.tWc[i] = hit->GetTime();
-    event.nhWc++;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetTPCData( G4int tpctr2, G4int tpcpid2, G4int tpcparentid2,
-			   G4int tpcparentid_pid2, G4double tpcpx2,
-			   G4double tpcpy2, G4double tpcpz2,
-			   G4double /* tpcpp2 */,
-			   G4int tpcqq2, G4double tpcpm2, G4double tpcde2,
-			   G4double tpclen2, G4int tpclay2,
-			   G4double vtxpxtpc2, G4double vtxpytpc2,
-			   G4double vtxpztpc2,
-			   G4double vtxxtpc2, G4double vtxytpc2,
-			   G4double vtxztpc2, G4double vtxene2 )
-{
-  G4int hitnum = tpctr2;
-
-  // G4double theta=acos(tpcpz2/tpcpp2);
-
-  tpcData[hitnum].tpctr = tpctr2;
-  tpcData[hitnum].tpcpid = tpcpid2;
-  tpcData[hitnum].tpcparentid = tpcparentid2;
-  tpcData[hitnum].tpcparentid_pid = tpcparentid_pid2;
-
-  //// w/o smearing
-  tpcData[hitnum].tpcpx = tpcpx2;
-  tpcData[hitnum].tpcpy = tpcpy2;
-  tpcData[hitnum].tpcpz = tpcpz2;
-  //// with smearing
-  //    tpcData[hitnum].tpcpx = px;
-  //    tpcData[hitnum].tpcpz = pz;
-  //    tpcData[hitnum].tpcpy = py;
-
-
-  //kine E = sqrt(p^2+m^2)-m
-  //p=sqrt((E+m)^2-m^2)
-  G4double totalmom=sqrt(pow(vtxene2+tpcpm2,2)-pow(tpcpm2,2));
-  tpcData[hitnum].tpcvtxpx = totalmom*vtxpxtpc2;
-  tpcData[hitnum].tpcvtxpy = totalmom*vtxpytpc2;
-  tpcData[hitnum].tpcvtxpz = totalmom*vtxpztpc2;
-
-  tpcData[hitnum].tpcvtxx = vtxxtpc2;
-  tpcData[hitnum].tpcvtxy = vtxytpc2;
-  tpcData[hitnum].tpcvtxz = vtxztpc2;
-
-  //// with smearing
-  //  tpcData[hitnum].tpcpp = sqrt(pow(px,2)+pow(py,2)+pow(pz,2));
-
-  //// w/o smearing
-  tpcData[hitnum].tpcpp = sqrt(pow(tpcpx2,2)+pow(tpcpy2,2)+pow(tpcpz2,2));
-  //  tpcData[hitnum].tpcppfit = sqrt(pow(,2)+pow(tpcpy2,2));
-
-  tpcData[hitnum].tpcqq = tpcqq2;
-  tpcData[hitnum].tpcpm = tpcpm2;
-  tpcData[hitnum].tpclen = tpclen2;
-  tpcData[hitnum].tpcdedx = tpcde2;
-  tpcData[hitnum].tpclay = tpclay2;
-  tpctrNum++;
-  return;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryInfo( G4double mm_d, G4double mm_p,
-			       G4double theta, G4double theta_scat,
-			       G4double theta_CM )
-{
-  primaryInfo.mm_d = mm_d;
-  primaryInfo.mm_p = mm_p;
-  primaryInfo.theta = theta;
-  primaryInfo.theta_scat = theta_scat;
-  primaryInfo.theta_CM = theta_CM;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetNumberOfPrimaryParticle( G4int n )
-{
-  event.nhPrm = n;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryParticle( G4double px, G4double py, G4double pz )
-{
-  Int_t id = 0;
-  event.pxPrm[id] = px;
-  event.pyPrm[id] = py;
-  event.pzPrm[id] = pz;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetGeneratorID( G4int gen )
-{
-  event.gen = gen;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetModeID( G4int mode )
-{
-  event.mode = mode;
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryParticle( G4int id, const G4ThreeVector& p,
-				   G4double mass, G4int pid )
-{
-  if( id >= event.nhPrm ){
-    G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
-  } else {
-    event.pxPrm[id] = p.x();
-    event.pyPrm[id] = p.y();
-    event.pzPrm[id] = p.z();
-    event.ppPrm[id] = p.mag();
-    event.mPrm[id] = mass;
-    event.thetaPrm[id] = p.theta();
-    event.phiPrm[id] = p.phi();
-    event.pidPrm[id] = pid;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryParticle( G4int id, G4double px, G4double py,
-				   G4double pz, G4double mass, G4int pid )
-{
-  SetPrimaryParticle( id, G4ThreeVector( px, py, pz ), mass, pid );
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryVertex( G4int id, G4double x, G4double y, G4double z )
-{
-  if( id >= event.nhPrm ){
-    G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
-  } else {
-    event.xPrm[id] = x;
-    event.yPrm[id] = y;
-    event.zPrm[id] = z;
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryVertex( G4int id, const G4ThreeVector& x )
-{
-  if( id >= event.nhPrm ){
-    G4cerr << FUNC_NAME << " Invalid Primary particle ID" << G4endl;
-  } else {
-    event.xPrm[id] = x.x();
-    event.yPrm[id] = x.y();
-    event.zPrm[id] = x.z();
-  }
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryBeam( const G4ThreeVector& p )
-{
-  event.pb->SetXYZ( p.x(), p.y(), p.z() );
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
-{
-  event.pb->SetXYZ( px, py, pz );
-}
-
-//_____________________________________________________________________________
-void
-TPCAnaManager::SetTargetData( const VHitInfo* hit )
-{
-  if( event.nhTgt >= MaxHits ){
-    G4cerr << FUNC_NAME << " too much nhit " << event.nhTgt << G4endl;
-  } else {
-    Int_t i = event.nhTgt;
-    event.tidTgt[i] = hit->GetTrackID();
-    event.pidTgt[i] = hit->GetParticleID();
-    event.prtTgt[i] = hit->GetParentID();
-    event.xTgt[i] = hit->GetPosition().x();
-    event.yTgt[i] = hit->GetPosition().y();
-    event.zTgt[i] = hit->GetPosition().z();
-    event.vtxTgt[i] = hit->GetVertexPosition().x();
-    event.vtyTgt[i] = hit->GetVertexPosition().y();
-    event.vtzTgt[i] = hit->GetVertexPosition().z();
-    event.nhTgt++;
-  }
-}
-
-/*************************************
- *************************************/
-void initTrack(Track* tracks){
-  static const std::string funcname = "[InitTrack]";
-  int i,j;
-  //  G4cout<<"init track"<<G4endl;
-  for( i = 0; i < MAX_TRACK; i++){
-    tracks[i].nout   =  0;
-    tracks[i].ngood  =  0;
-    tracks[i].igroup = -1;
-    tracks[i].trkQual = -1;
-    tracks[i].numHits = 0;
-    ////    tracks[i].numSectors = 0;
-    tracks[i].numLayers = 0;
-    tracks[i].charge = 1000;
-    tracks[i].totalLength = 0.0;
-    tracks[i].totalLengthTOF = 0.0; /*NTPC TOF*/
-    tracks[i].meanAdc = -1.0;
-    tracks[i].chi2Pad = -1.0;
-    tracks[i].chi2Z       = -1.0;
-    tracks[i].chi2Prob = -1.0;
-    tracks[i].chi2 = -1.0;
-    tracks[i].radius = 0.0;
-    tracks[i].center[0] = tracks[i].center[1] = 1000;
-    tracks[i].rKNumIter = -1;
-    tracks[i].CrossOuter = -1;
-    tracks[i].mom[0] = tracks[i].mom[1] =
-      tracks[i].mom[2] = 10000.0;
-    tracks[i].mom[3] = -1.0;
-    tracks[i].resVirtual[0] = tracks[i].resVirtual[1]
-      =tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
-    tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
-      = tracks[i].xOnTrack[2] = 1000.0;
-    tracks[i].RKPFinal[0] =
-      tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
-    //    for( j=0 ; j<NUM_SECTOR ; j++ ){
-    //      tracks[i].numLayersinSec[j] = 0;
-    //    }
-    for(j=0; j < MAX_ITERATION; j++){
-      tracks[i].rKChi2[j] = 1000.;
-    }
-
-    for(j=0; j < NUM_PARA_RK; j++){
-      tracks[i].rKInitPara[j] =
-        tracks[i].rKFinalPara[j] = -1000.;
-    }
-
-    /*  tracks[i].hitPattern = 0;*/
-    for( j = 0; j < MAX_HIT_IN_TRACK; j++){
-      tracks[i].ibad[j]  = 10;
-      tracks[i].zbad[j]  = 10;
-      //      tracks[i].hit[j]    = NULL;
-      tracks[i].resPad[j] = 1000;
-      tracks[i].resPady[j] = 1000; /*NTPC*/
-      tracks[i].resZ[j]   = 1000;
-      tracks[i].sector[j] = 100;
-      tracks[i].lay[j] = 100;
-      tracks[i].x[j][0] = 1000.;/*originally 100.*/
-      tracks[i].x[j][1] = 1000.;/*originally 100.*/
-      tracks[i].x[j][2] = -10000.;
-      tracks[i].err[j][0] = tracks[i].err[j][1]
-        = tracks[i].err[j][2] = 1000.;
-      tracks[i].arcLen[j] = -1.0;
-      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
-        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
-        tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
-        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
-        tracks[i].initRes[j][2] = tracks[i].phi_local[j]
-        = -10000.;
-
+      }
     }
   }
-}
 
-
-void initTrack_ku(Track* tracks){
-  static const std::string funcname = "[InitTrack]";
-  int i,j;
-  //  G4cout<<"init track"<<G4endl;
-  for( i = 0; i < MAX_TRACK; i++){
-    tracks[i].nout   =  0;
-    tracks[i].ngood  =  0;
-    tracks[i].igroup = -1;
-    tracks[i].trkQual = -1;
-    tracks[i].numHits = 0;
-    ////    tracks[i].numSectors = 0;
-    tracks[i].numLayers = 0;
-    tracks[i].charge = 1000;
-    tracks[i].totalLength = 0.0;
-    tracks[i].totalLengthTOF = 0.0; /*NTPC TOF*/
-    tracks[i].meanAdc = -1.0;
-    tracks[i].chi2Pad = -1.0;
-    tracks[i].chi2Z       = -1.0;
-    tracks[i].chi2Prob = -1.0;
-    tracks[i].chi2 = -1.0;
-    tracks[i].radius = 0.0;
-    tracks[i].center[0] = tracks[i].center[1] = 1000;
-    tracks[i].rKNumIter = -1;
-    tracks[i].CrossOuter = -1;
-    tracks[i].mom[0] = tracks[i].mom[1] =
-      tracks[i].mom[2] = 10000.0;
-    tracks[i].mom[3] = -1.0;
-    tracks[i].resVirtual[0] = tracks[i].resVirtual[1]
-      =tracks[i].resVirtual[2] = tracks[i].resVirtual[3] = -100;
-    tracks[i].xOnTrack[0] = tracks[i].xOnTrack[1]
-      = tracks[i].xOnTrack[2] = 1000.0;
-    tracks[i].RKPFinal[0] =
-      tracks[i].RKPFinal[1] = tracks[i].RKPFinal[2]  = -1000;
-    //    for( j=0 ; j<NUM_SECTOR ; j++ ){
-    //      tracks[i].numLayersinSec[j] = 0;
-    //    }
-    for(j=0; j < MAX_ITERATION; j++){
-      tracks[i].rKChi2[j] = 1000.;
+  /*************************************
+   *************************************/
+  /*void setTrack(Track* tracks,int ntrk, double* x, double* y, double* z, double* ede, double* nhit){
+    static const std::string funcname = "[SetTrack]";
+    int i,j;
+    for( i = 0; i < ntrk; i++){
+    for( j = 0; j < nhit[i]; j++){
+    tracks[i].lay[j] = 100;
+    tracks[i].x[j][0] = x[j];
+    tracks[i].x[j][1] = y[j];
+    tracks[i].x[j][2] = z[j];
     }
-
-    for(j=0; j < NUM_PARA_RK; j++){
-      tracks[i].rKInitPara[j] =
-        tracks[i].rKFinalPara[j] = -1000.;
     }
-
-    /*  tracks[i].hitPattern = 0;*/
-    for( j = 0; j < MAX_HIT_IN_TRACK; j++){
-      tracks[i].ibad[j]  = 10;
-      tracks[i].zbad[j]  = 10;
-      //      tracks[i].hit[j]    = NULL;
-      tracks[i].resPad[j] = 1000;
-      tracks[i].resPady[j] = 1000; /*NTPC*/
-      tracks[i].resZ[j]   = 1000;
-      tracks[i].sector[j] = 100;
-      tracks[i].lay[j] = 100;
-      tracks[i].x[j][0] = 1000.;/*originally 100.*/
-      tracks[i].x[j][1] = 1000.;/*originally 100.*/
-      tracks[i].x[j][2] = -10000.;
-      tracks[i].res[j] = 0.;
-      tracks[i].err[j][0] = tracks[i].err[j][1]
-        = tracks[i].err[j][2] = 1000.;
-      tracks[i].arcLen[j] = -1.0;
-      tracks[i].resPad[j] = tracks[i].resPady[j] = tracks[i].resZ[j] =
-        tracks[i].rKresXYZ[j][0] = tracks[i].rKresXYZ[j][1] =
-        tracks[i].rKresXYZ[j][2] = tracks[i].rKresXYZ[j][3] =
-        tracks[i].initRes[j][0] = tracks[i].initRes[j][1] =
-        tracks[i].initRes[j][2] = tracks[i].phi_local[j]
-        = -10000.;
-
     }
-  }
-}
-
-/*************************************
- *************************************/
-/*void setTrack(Track* tracks,int ntrk, double* x, double* y, double* z, double* ede, double* nhit){
-  static const std::string funcname = "[SetTrack]";
-  int i,j;
-  for( i = 0; i < ntrk; i++){
-  for( j = 0; j < nhit[i]; j++){
-  tracks[i].lay[j] = 100;
-  tracks[i].x[j][0] = x[j];
-  tracks[i].x[j][1] = y[j];
-  tracks[i].x[j][2] = z[j];
-  }
-  }
-  }
-*/
-/*************************************
- *************************************/
+  */
+  /*************************************
+   *************************************/
