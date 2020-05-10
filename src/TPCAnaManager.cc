@@ -61,6 +61,7 @@ TPCAnaManager::TPCAnaManager( void )
   //generator mode
   TPC_g->Branch("gen",&event.gen,"gen/I");
   TPC_g->Branch("mode",&event.mode,"mode/I");
+  TPC_g->Branch("inc",&event.inc,"inc/I");
   // BH2
   TPC_g->Branch( "nhBh2", &event.nhBh2, "nhBh2/I" );
   TPC_g->Branch( "tidBh2", event.tidBh2, "tidBh2[nhBh2]/I" );
@@ -2088,6 +2089,13 @@ TPCAnaManager::EndOfEventAction( void )
     TPCAnaManager::SetModeID( G4int mode )
   {
     event.mode = mode;
+  }
+
+  //_____________________________________________________________________________
+  void
+    TPCAnaManager::SetIncID( G4int inc )
+  {
+    event.inc = inc;
   }
 
   //_____________________________________________________________________________

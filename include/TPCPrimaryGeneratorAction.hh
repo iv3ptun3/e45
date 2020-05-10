@@ -14,6 +14,7 @@ class TTree;
 
 struct BeamInfo;
 struct JamInfo;
+struct IncInfo;
 
 //_____________________________________________________________________________
 class TPCPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
@@ -28,9 +29,11 @@ private:
   G4ParticleGun*        m_particle_gun;
   G4ThreeVector         m_target_pos;
   G4ThreeVector         m_target_size;
+  G4ThreeVector         m_e45target_size;
   BeamInfo*             m_beam;
   G4double              m_beam_p0;
   JamInfo*              m_jam;
+  IncInfo*              m_inc;
   G4ParticleDefinition* m_Neutron;
   G4ParticleDefinition* m_Proton;
   G4ParticleDefinition* m_Lambda;
@@ -75,6 +78,7 @@ public:
   void     GenerateUniformProton( G4Event* anEvent );
   void     GenerateUniformPim( G4Event* anEvent );
   void     GenerateJamInput( G4Event* anEvent );
+  void     GenerateIncInput( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
   void     GenerateTest( G4Event* anEvent );
   void     GenerateTest2( G4Event* anEvent );

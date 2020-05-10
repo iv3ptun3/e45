@@ -105,6 +105,7 @@ struct Event
   TVector3* pb; // momentum of inncident beam
   Int_t gen;        // generator number
   Int_t mode;        // mode number
+  Int_t inc;        // INC id number
 
   Double_t mm_d; //missing-mass of d(pi,K) reaction
   Double_t mm_p;  //missing-mass for proton target kinematic
@@ -522,6 +523,7 @@ public:
   void SetWCData( const VHitInfo* hit );
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);
+  void SetIncID(G4int inc);
   void SetNumberOfPrimaryParticle( G4int n );
   void SetTargetData( const VHitInfo* hit );
   void SetPrimaryBeam( const G4ThreeVector& p );

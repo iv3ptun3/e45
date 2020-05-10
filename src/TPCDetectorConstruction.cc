@@ -2461,7 +2461,7 @@ TPCDetectorConstruction::ConstructWC( void )
 		       "WcSegmentPV", mother_lv, false, i );
 
   }
-  
+ /* 
   //Temporary!!!!!!
   //WC frame (test)
   //double Alcut_z =0.*mm;
@@ -2518,7 +2518,7 @@ TPCDetectorConstruction::ConstructWC( void )
 		     "WcFramePV", mother_lv, false, 4 );
 
   //Temporary!!!!!!
-
+*/
 
 
 }

@@ -18,6 +18,7 @@
 #include "DetSizeMan.hh"
 #include "FuncName.hh"
 #include "JamMan.hh"
+#include "IncMan.hh"
 #include "Kinema3Resonance.hh"
 #include "KinemaHResonance.hh"
 #include "Kinema3Body.hh"
@@ -41,6 +42,7 @@ namespace
   const auto& gGeom = DCGeomMan::GetInstance();
   const auto& gSize = DetSizeMan::GetInstance();
   const auto& gJam  = JamMan::GetInstance();
+  const auto& gInc  = IncMan::GetInstance();
   const auto particleTable = G4ParticleTable::GetParticleTable();
 }
 
@@ -51,9 +53,11 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_particle_gun( new G4ParticleGun ),
     m_target_pos( gGeom.GetGlobalPosition( "SHSTarget" )*mm ),
     m_target_size( gSize.GetSize( "Target" )*mm ),
+    m_e45target_size( gSize.GetSize( "E45Target" )*mm ),
     m_beam( new BeamInfo ),
     m_beam_p0( gConf.Get<G4double>( "BeamMom" ) /* 1.80*GeV */ ),
     m_jam(),
+    m_inc(),
     m_Neutron( particleTable->FindParticle( "neutron" ) ),
     m_Proton( particleTable->FindParticle( "proton" ) ),
     m_Lambda( particleTable->FindParticle( "lambda" ) ),
@@ -112,6 +116,13 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 #endif
   }
 
+  if( gInc.IsReady() ){
+    m_inc = gInc.Get();
+#ifdef DEBUG
+    m_inc->Print();
+#endif
+  }
+
   switch( m_generator ){
   case  0: break; // no generation
   case  1: GenerateHanul( anEvent ); break; // shhwang
@@ -141,6 +152,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
        12C_amu = 12u --> 12*931.494061 MeV
        10C_amu = 10.012938u --> 10.012938*931.494061 MeV */
   case 31: GenerateJamInput( anEvent ); break;
+  case 32: GenerateIncInput( anEvent ); break;
   case 60: GenerateLambda1405Rad1( anEvent ); break; // normal decay
   case 61: GenerateLambda1405Rad2( anEvent ); break; // radioactive decay
   case 62: GenerateSigma1385( anEvent ); break; // Sigma 1385 normal dcay
@@ -324,16 +336,16 @@ TPCPrimaryGeneratorAction::GenerateUniformProton( G4Event* anEvent )
   G4double vtx=0;  G4double vty=0;   G4double vtz=0;
   if( gConf.Get<G4int>("Experiment") == 45. ){
     while(1){
-      rn_vtx = G4RandFlat::shoot(-m_target_size.x(),m_target_size.x());
-      rn_vtz = G4RandFlat::shoot(-m_target_size.x(),m_target_size.x());
-      if( (rn_vtx*rn_vtx+rn_vtz*rn_vtz) < m_target_size.x()*m_target_size.x()) break;
+      rn_vtx = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      rn_vtz = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      if( (rn_vtx*rn_vtx+rn_vtz*rn_vtz) < m_e45target_size.x()*m_e45target_size.x()) break;
     }
-    vty = G4RandFlat::shoot(-m_target_size.z(),m_target_size.z());
+    vty = G4RandFlat::shoot(-m_e45target_size.z(),m_e45target_size.z());
     vtx=rn_vtx;
     vtz=rn_vtz+m_target_pos.z();
   }else if( gConf.Get<G4int>("Experiment") == 42. ){
-    vtx = G4RandFlat::shoot(-15.,15.)*mm;
-    vty = G4RandFlat::shoot(-5.,5.)*mm;
+    vtx = G4RandFlat::shoot(-m_target_size.x()/2.,m_target_size.x()/2.)*mm;
+    vty = G4RandFlat::shoot(-m_target_size.y()/2.,m_target_size.y()/2.)*mm;
     vtz = G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2,m_target_pos.z()+m_target_size.z()/2)*mm;
   }
 
@@ -1450,6 +1462,32 @@ TPCPrimaryGeneratorAction::GenerateJamInput( G4Event* anEvent )
     m_particle_gun->SetParticlePosition( x );
     m_particle_gun->GeneratePrimaryVertex( anEvent );
     gAnaMan.SetPrimaryParticle( i, p, m, m_jam->pid[i] );
+    gAnaMan.SetPrimaryVertex( i, x );
+  }
+}
+
+//_____________________________________________________________________________
+void
+TPCPrimaryGeneratorAction::GenerateIncInput( G4Event* anEvent )
+{
+  static const auto particleTable = G4ParticleTable::GetParticleTable();
+  if( !m_inc )
+    return;
+  gAnaMan.SetIncID( m_inc->ich );
+  gAnaMan.SetPrimaryBeam( m_inc->bpx, m_inc->bpy, m_inc->bpz );
+  gAnaMan.SetNumberOfPrimaryParticle( m_inc->np );
+  for( G4int i=0; i<m_inc->np; ++i ){
+    auto particle = particleTable->FindParticle( m_inc->pid[i] );
+    G4ThreeVector x( m_target_pos.x(), m_target_pos.y(), m_target_pos.z() );
+    G4ThreeVector p( m_inc->px[i]*GeV, m_inc->py[i]*GeV, m_inc->pz[i]*GeV );
+    m_particle_gun->SetParticleDefinition( particle );
+    m_particle_gun->SetParticleMomentumDirection( p );
+    G4double m = particle->GetPDGMass()/GeV;
+    G4double ke = std::sqrt( m*m + p.mag2() ) - m;
+    m_particle_gun->SetParticleEnergy( ke );
+    m_particle_gun->SetParticlePosition( x );
+    m_particle_gun->GeneratePrimaryVertex( anEvent );
+    gAnaMan.SetPrimaryParticle( i, p, m, m_inc->pid[i] );
     gAnaMan.SetPrimaryVertex( i, x );
   }
 }

@@ -17,6 +17,7 @@
 #include "DetSizeMan.hh"
 #include "FuncName.hh"
 #include "JamMan.hh"
+#include "IncMan.hh"
 
 //_____________________________________________________________________________
 ConfMan::ConfMan( void )
@@ -108,7 +109,8 @@ ConfMan::InitializeParameterFiles( void )
   return ( InitializeParameter<DCGeomMan>("DCGEO") &&
 	   InitializeParameter<BeamMan>("BEAM") &&
 	   InitializeParameter<DetSizeMan>("DSIZE") &&
-	   InitializeParameter<JamMan>("JAM") );
+	   InitializeParameter<JamMan>("JAM") &&
+	   InitializeParameter<IncMan>("INC") );
 }
 
 //_____________________________________________________________________________
