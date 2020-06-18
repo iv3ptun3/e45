@@ -79,6 +79,7 @@ public:
   void     GenerateUniformPim( G4Event* anEvent );
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateIncInput( G4Event* anEvent );
+  void     GenerateJamInput_Randphi( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
   void     GenerateTest( G4Event* anEvent );
   void     GenerateTest2( G4Event* anEvent );

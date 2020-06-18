@@ -153,6 +153,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
        10C_amu = 10.012938u --> 10.012938*931.494061 MeV */
   case 31: GenerateJamInput( anEvent ); break;
   case 32: GenerateIncInput( anEvent ); break;
+  case 33: GenerateJamInput_Randphi( anEvent ); break;
   case 60: GenerateLambda1405Rad1( anEvent ); break; // normal decay
   case 61: GenerateLambda1405Rad2( anEvent ); break; // radioactive decay
   case 62: GenerateSigma1385( anEvent ); break; // Sigma 1385 normal dcay
@@ -1486,6 +1487,58 @@ TPCPrimaryGeneratorAction::GenerateJamInput( G4Event* anEvent )
     gAnaMan.SetPrimaryVertex( i, x );
   }
 }
+
+// Generator# 31
+void
+TPCPrimaryGeneratorAction::GenerateJamInput_Randphi( G4Event* anEvent )
+{
+  static const auto particleTable = G4ParticleTable::GetParticleTable();
+  if( !m_jam )
+    return;
+  gAnaMan.SetNumberOfPrimaryParticle( m_jam->np );
+  for( G4int i=0; i<m_jam->np; ++i ){
+    auto particle = particleTable->FindParticle( m_jam->pid[i] );
+    //G4ThreeVector x( 0., 0., gGeom.GetGlobalPosition( "Target" ).z() );
+    G4ThreeVector x( m_beam->GetX( -m_beam->z ),
+		     m_beam->GetY( -m_beam->z ),
+		     G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2, m_target_pos.z()+m_target_size.z()/2)*mm);
+    G4ThreeVector p( m_jam->px[i]*GeV, m_jam->py[i]*GeV, m_jam->pz[i]*GeV );
+    double theta = p.theta()*180./acos(-1.);
+    if(theta>30.)
+      continue;
+    double phi_rand = p.phi()+G4RandFlat::shoot(0., 2.*acos(-1.));
+    double p_x_rand = p.mag()*sin(p.theta())*cos(phi_rand);
+    double p_y_rand = p.mag()*sin(p.theta())*sin(phi_rand);
+    
+    double p_u = p_x_rand/p.z();
+    double p_v = p_y_rand/p.z();
+    double beam_u = m_beam->p.x()/m_beam->p.z();
+    double beam_v = m_beam->p.y()/m_beam->p.z();
+    double p_u_cor = p_u + beam_u;
+    double p_v_cor = p_v + beam_v;
+    double p_z_cor = p.mag()/std::sqrt( p_u_cor*p_u_cor + p_v_cor*p_v_cor + 1. );
+    G4ThreeVector p_cor( p_z_cor*p_u_cor, p_z_cor*p_v_cor, p_z_cor);
+    // std::cout<<"u="<<p_u<<", v="<<p_v
+    // 	     <<", b_u="<<beam_u<<", b_v="<<beam_v
+    // 	     <<", p="<<p.mag()<<std::endl;
+    
+    
+
+
+    m_particle_gun->SetParticleDefinition( particle );
+    //    m_particle_gun->SetParticleMomentumDirection( p );
+    m_particle_gun->SetParticleMomentumDirection( p_cor );
+    G4double m = particle->GetPDGMass()/GeV;
+    //    G4double ke = std::sqrt( m*m + p.mag2() ) - m;    
+    G4double ke = std::sqrt( m*m + p_cor.mag2() ) - m;
+    m_particle_gun->SetParticleEnergy( ke );
+    m_particle_gun->SetParticlePosition( x );
+    m_particle_gun->GeneratePrimaryVertex( anEvent );
+    gAnaMan.SetPrimaryParticle( i, p_cor, m, m_jam->pid[i] );
+    gAnaMan.SetPrimaryVertex( i, x );
+  }
+}
+
 
 //_____________________________________________________________________________
 void
