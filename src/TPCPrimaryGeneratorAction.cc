@@ -1488,7 +1488,7 @@ TPCPrimaryGeneratorAction::GenerateJamInput( G4Event* anEvent )
   }
 }
 
-// Generator# 31
+// Generator# 33
 void
 TPCPrimaryGeneratorAction::GenerateJamInput_Randphi( G4Event* anEvent )
 {

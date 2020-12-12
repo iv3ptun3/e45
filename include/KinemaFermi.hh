@@ -3,6 +3,7 @@
 #ifndef KINEMA_FERMI_HH
 #define KINEMA_FERMI_HH
 
+#include <vector>
 #include <G4LorentzVector.hh>
 #include <G4ThreeVector.hh>
 

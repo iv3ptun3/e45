@@ -18,9 +18,9 @@
 /vis/drawVolume 
 /vis/viewer/set/autoRefresh
 #
-/vis/viewer/set/viewpointThetaPhi   90.00 90.00
+#/vis/viewer/set/viewpointThetaPhi   90.00 90.00
 #/vis/viewer/set/viewpointThetaPhi   89.99 270.00
-#/vis/viewer/set/viewpointThetaPhi 60.00 270.00
+/vis/viewer/set/viewpointThetaPhi 60.00 270.00
 #/vis/viewer/zoom 1.15
 /tracking/storeTrajectory 1
 #/run/beamOn 1

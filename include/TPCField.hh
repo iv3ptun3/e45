@@ -3,6 +3,8 @@
 #ifndef TPC_FIELD_HH
 #define TPC_FIELD_HH
 
+#include <vector>
+#include <map>
 #include <globals.hh>
 #include <G4MagneticField.hh>
 #include <G4String.hh>

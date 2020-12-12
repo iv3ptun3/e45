@@ -11,9 +11,10 @@ G4EXLIB		:= true
 PHONY: all
 all: lib bin
 
-ifndef G4WORKDIR
+#ifndef G4WORKDIR
+#  G4WORKDIR	= ./
+#endif
   G4WORKDIR	= ./
-endif
 
 include $(G4INSTALL)/config/binmake.gmk
 

@@ -90,6 +90,7 @@ TPCAnaManager::TPCAnaManager( void )
 
   ///////shhwang tpc hit step
 
+  // comment out for trigger study
   TPC_g->Branch("nttpc",&event.nttpc,"nttpc/I");
   TPC_g->Branch("ntrk",event.ntrk,"ntrk[nttpc]/I");
   TPC_g->Branch("ititpc",event.ititpc,"ititpc[nttpc]/I");

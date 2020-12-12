@@ -3,15 +3,15 @@
 work_dir=$(dirname $(readlink -f $0))/..
 
 #conf=$work_dir/param/conf/default.conf
-conf=$work_dir/param/conf/kpxi.conf
+#conf=$work_dir/param/conf/kpxi.conf
 #conf=$work_dir/param/conf/e42_beam.conf
-#conf=$work_dir/param/conf/jam_0.conf
-#conf=$work_dir/param/conf/jam_1.conf
+#conf=$work_dir/param/conf/e42_jam_kp.conf
+conf=$work_dir/param/conf/e42_jam_proton.conf
 g4macro_dir=$work_dir/g4macro
-root_dir=$work_dir/root/all
-log_dir=$work_dir/log
+root_dir=$work_dir/rootfiles/root/all
+log_dir=$work_dir/rootfiles/log
 
-n_run=1000
+n_run=100
 
 cd $work_dir
 mkdir -p $root_dir
