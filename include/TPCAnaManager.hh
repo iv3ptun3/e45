@@ -205,7 +205,7 @@ struct Event
 
 
   ///////////////
-  Int_t nttpc;                 // Number of Hit in Pads
+  Int_t nhittpc;                 // Number of Hit in Pads
   Int_t ntrk[MaxTrack];        // Number of Track
 
   Int_t ititpc[MaxTrack];      // Track ID
