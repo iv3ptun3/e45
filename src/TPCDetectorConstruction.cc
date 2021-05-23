@@ -21,6 +21,8 @@
 #include <G4UnionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
+#include <G4TwoVector.hh>
+#include <G4GenericTrap.hh>
 
 #include "BeamMan.hh"
 #include "ConfMan.hh"
@@ -54,6 +56,7 @@ namespace
   using CLHEP::m;
   using CLHEP::mg;
   using CLHEP::mm;
+  using CLHEP::ns;
   using CLHEP::mole;
   using CLHEP::STP_Temperature;
   using CLHEP::universe_mean_density;
@@ -78,7 +81,8 @@ TPCDetectorConstruction::TPCDetectorConstruction( void )
     m_tpc_lv(),
     m_rotation_angle( gConf.Get<Double_t>("SpectrometerAngle")*deg ),
     m_rotation_matrix( new G4RotationMatrix ),
-    m_sdc_sd()
+    m_sdc_sd(),
+    fStepLimit(nullptr)
 {
   m_rotation_matrix->rotateY( - m_rotation_angle );
 }
@@ -128,8 +132,8 @@ TPCDetectorConstruction::Construct( void )
   ConstructHTOF();
 #endif
 #if 0
-  ConstructPVAC2();
-  ConstructNBAR();
+  //ConstructPVAC2();
+  //ConstructNBAR();
 #endif
 #if 1
   if( gConf.Get<G4int>("ConstructKurama") ){
@@ -175,9 +179,30 @@ TPCDetectorConstruction::ConstructElements( void )
   name = "Silicon";
   m_element_map[name] = new G4Element( name, symbol="Si", Z=14.,
 				       A=28.0855 *g/mole );
+  name = "Phoshorus";
+  m_element_map[name] = new G4Element( name, symbol="P", Z=15.,
+				       A=30.973762 *g/mole );
+  name = "Sulfur";
+  m_element_map[name] = new G4Element( name, symbol="S", Z=16.,
+				       A=32.066 *g/mole );
   name = "Argon";
   m_element_map[name] = new G4Element( name, symbol="Ar", Z=18.,
 				       A=39.948 *g/mole );
+  name = "Chrominum";
+  m_element_map[name] = new G4Element( name, symbol="Cr", Z=24.,
+				       A=51.9961 *g/mole );
+  name = "Manganese";
+  m_element_map[name] = new G4Element( name, symbol="Mn", Z=25.,
+				       A=54.93805 *g/mole );
+  name = "Iron";
+  m_element_map[name] = new G4Element( name, symbol="Fe", Z=26.,
+				       A=55.847 *g/mole );
+  name = "Nickel";
+  m_element_map[name] = new G4Element( name, symbol="Ni", Z=28.,
+				       A=58.69 *g/mole );
+  name = "Molybdenum";
+  m_element_map[name] = new G4Element( name, symbol="Mo", Z=42.,
+				       A=95.94 *g/mole );
   name = "Iodine";
   m_element_map[name] = new G4Element( name, symbol="I",  Z=53.,
 				       A=126.90447 *g/mole );
@@ -326,9 +351,41 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=5 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"],  natoms=8 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
+  // SUS for frames
+  name = "SUS";
+  m_material_map[name] = new G4Material( name, density=7.5*g/cm3, nel=10 );
+  G4double fracFe = 66.337;
+  G4double fracC = 0.028;
+  fracO = 0.50;
+  G4double fracNi = 12.50;
+  G4double fracCr = 17.00;
+  G4double fracMo = 2.43;
+  G4double fracP = 0.018;
+  G4double fracS = 0.007;
+  G4double fracSi = 0.69;
+  G4double fracMn = 0.49;
+  denominator = fracFe + fracC + fracO + fracNi + fracCr + fracMo + fracP + fracS + fracSi + fracMn;
 
-
-  
+  m_material_map[name]->AddElement( m_element_map["Iron"],
+				    massfraction=fracFe/denominator );
+  m_material_map[name]->AddElement( m_element_map["Carbon"],
+				    massfraction=fracC/denominator );
+  m_material_map[name]->AddElement( m_element_map["Oxygen"],
+				    massfraction=fracO/denominator );
+  m_material_map[name]->AddElement( m_element_map["Nickel"],
+				    massfraction=fracNi/denominator );
+  m_material_map[name]->AddElement( m_element_map["Chrominum"],
+				    massfraction=fracCr/denominator );
+  m_material_map[name]->AddElement( m_element_map["Molybdenum"],
+				    massfraction=fracMo/denominator );
+  m_material_map[name]->AddElement( m_element_map["Phoshorus"],
+				    massfraction=fracP/denominator );
+  m_material_map[name]->AddElement( m_element_map["Sulfur"],
+				    massfraction=fracS/denominator );
+  m_material_map[name]->AddElement( m_element_map["Silicon"],
+				    massfraction=fracSi/denominator );
+  m_material_map[name]->AddElement( m_element_map["Manganese"],
+				    massfraction=fracMn/denominator );
 
   G4String target_material = gConf.Get<G4String>("TargetMaterial");
   G4cout << "   Target material : " << target_material << G4endl;
@@ -342,6 +399,8 @@ TPCDetectorConstruction::ConstructMaterials( void )
     m_material_map["Target"] = m_material_map["LH2"];
   } else if( target_material == "LD2" ){
     m_material_map["Target"] = m_material_map["LD2"];
+  } else if( target_material == "Empty" ){
+    m_material_map["Target"] = m_material_map["P10"];
   } else {
     std::string e(FUNC_NAME + " No target material : " + target_material );
     throw std::invalid_argument( e );
@@ -490,15 +549,39 @@ TPCDetectorConstruction::ConstructBH2( void )
   auto segment_lv = new G4LogicalVolume( segment_solid,
 					 m_material_map["Scintillator"],
 					 "Bh2SegmentLV" );
+  G4double edge=17.0 *mm;
+  auto edge_segment_solid = new G4Box( "EdgeBh2SegmentSolid", edge/2.,
+				       half_size.y(), half_size.z() );
+  auto edge_segment_lv = new G4LogicalVolume( edge_segment_solid,
+					      m_material_map["Scintillator"],
+					      "EdgeBh2SegmentLV" );
   for( G4int i=0; i<NumOfSegBH2; ++i ){
-    segment_lv->SetVisAttributes( G4Colour::Cyan() );
-    segment_lv->SetSensitiveDetector( bh2SD );
-    pos = G4ThreeVector( ( -NumOfSegBH2/2 + i )*pitch,
-			 0.*mm,
-			 0.*mm );
-    new G4PVPlacement( nullptr, pos, segment_lv,
-		       "Bh2SegmentPV", mother_lv, false, i );
+    if(i==0){ //left edge
+      pos = G4ThreeVector( ( -NumOfSegBH2/2 + i + 0.5 )*pitch - 1.5*mm,
+			   0.*mm,
+			   0.*mm );
+      new G4PVPlacement( nullptr, pos, edge_segment_lv,
+			 "Bh2SegmentPV", mother_lv, false, i );
+    }
+    else if(i==NumOfSegBH2-1){ //right edge
+      pos = G4ThreeVector( ( -NumOfSegBH2/2 + i + 0.5 )*pitch + 1.5*mm,
+			   0.*mm,
+			   0.*mm );
+      new G4PVPlacement( nullptr, pos, edge_segment_lv,
+			 "Bh2SegmentPV", mother_lv, false, i );
+    }
+    else{ //center segments
+      pos = G4ThreeVector( ( -NumOfSegBH2/2 + i + 0.5 )*pitch,
+			   0.*mm,
+			   0.*mm );
+      new G4PVPlacement( nullptr, pos, segment_lv,
+			 "Bh2SegmentPV", mother_lv, false, i );
+    }
   }
+  segment_lv->SetVisAttributes( G4Colour::Cyan() );
+  segment_lv->SetSensitiveDetector( bh2SD );
+  edge_segment_lv->SetVisAttributes( G4Colour::Cyan() );
+  edge_segment_lv->SetSensitiveDetector( bh2SD );
 }
 
 //_____________________________________________________________________________
@@ -553,10 +636,71 @@ TPCDetectorConstruction::ConstructHTOF( void )
   const auto& half_size = gSize.GetSize( "HtofSeg" ) * 0.5 * mm;
   const G4double L = gGeom.GetLocalZ( "HTOF" );
   const G4double dXdW = gGeom.GetWirePitch( "HTOF" );
-  auto htof_solid = new G4Box( "HtofSolid", half_size.x(),
-			       half_size.y(), half_size.z() );
+
+  // Segment
+  // Sintillator
+  auto htof_scintilltor = new G4Box( "HtofScint", half_size.x(),
+				     half_size.y(), half_size.z() );
+  // Light-guides
+  const auto& lg_size = gSize.GetSize( "HtofLG_edge" ) * 0.5 * mm;
+  // Upper one
+  std::vector<G4TwoVector> upper_lg_vertices;
+  upper_lg_vertices.push_back( G4TwoVector( -half_size.x() , -half_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( -half_size.x() , half_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( half_size.x() , half_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( half_size.x() , -half_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( -lg_size.x() , -half_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( -lg_size.x() , -half_size.z() + lg_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( lg_size.x() , -half_size.z() + lg_size.z() ) );
+  upper_lg_vertices.push_back( G4TwoVector( lg_size.x() , -half_size.z() ) );
+  auto htof_upper_lg = new G4GenericTrap("HtofLG_upper", lg_size.y(), upper_lg_vertices );
+  auto rotM_upper_lg = new G4RotationMatrix;
+  rotM_upper_lg->rotateX( 90.0 *deg );
+  rotM_upper_lg->rotateZ( - 180.0 *deg );
+  G4ThreeVector trans_upper_lg(0.*mm , half_size.y() + lg_size.y(),  0.*mm );
+
+  // Lower one
+  std::vector<G4TwoVector> lower_lg_vertices;
+  lower_lg_vertices.push_back( G4TwoVector( -half_size.x() , -half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( -half_size.x() , half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( half_size.x() , half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( half_size.x() , -half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( -lg_size.x() , half_size.z() - lg_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( -lg_size.x() , half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( lg_size.x() , half_size.z() ) );
+  lower_lg_vertices.push_back( G4TwoVector( lg_size.x() , half_size.z() - lg_size.z() ) );
+  auto htof_lower_lg = new G4GenericTrap("HtofLG_lower", lg_size.y(), lower_lg_vertices );
+  auto rotM_lower_lg = new G4RotationMatrix;
+  rotM_lower_lg->rotateX( - 90.0 *deg );
+  rotM_lower_lg->rotateZ( - 180.0 *deg );
+  G4ThreeVector trans_lower_lg(0.*mm , -half_size.y() - lg_size.y() , 0.*mm );
+  auto solid_dummy = new G4UnionSolid( "dummysolid", htof_scintilltor, htof_upper_lg,
+				       rotM_upper_lg, trans_upper_lg );
+
+  auto htof_solid = new G4UnionSolid( "HtofSolid", solid_dummy,
+				      htof_lower_lg, rotM_lower_lg,
+				      trans_lower_lg );
+  //Common slats
   auto htof_lv = new G4LogicalVolume( htof_solid, m_material_map["Scintillator"],
 				      "HtofLV" );
+
+  //HTOF beam-through part
+  G4double HTOF_window=110.*mm;
+  auto window_dummy = new G4Box( "window_dummy", half_size.x(), half_size.y()/2. - HTOF_window/4., half_size.z() );
+
+  //Upper slats(Beam-through)
+  G4ThreeVector trans_upper_window(0.*mm , half_size.y()/2. - HTOF_window/4. + lg_size.y(),  0.*mm );
+  auto htof_solid_upper = new G4UnionSolid( "HtofSolid_upper", window_dummy, htof_upper_lg,
+					    rotM_upper_lg, trans_upper_window );
+  auto htof_upper_lv = new G4LogicalVolume( htof_solid_upper, m_material_map["Scintillator"],
+					    "HtofUpperLV" );
+  //Lower slats(Beam-through)
+  G4ThreeVector trans_lower_window(0.*mm , -half_size.y()/2. + HTOF_window/4. - lg_size.y(),  0.*mm );
+  auto htof_solid_lower = new G4UnionSolid( "HtofSolid_lower", window_dummy, htof_lower_lg,
+					    rotM_lower_lg, trans_lower_window );
+  auto htof_lower_lv = new G4LogicalVolume( htof_solid_lower, m_material_map["Scintillator"],
+					    "HtofLowerLV" );
+
   for( G4int i=0; i<NumOfPlaneHTOF; ++i ){
     for( G4int j=0; j<NumOfSegHTOFOnePlane; ++j ){
       G4int seg = i*NumOfSegHTOFOnePlane + j;
@@ -565,75 +709,225 @@ TPCDetectorConstruction::ConstructHTOF( void )
 			     0.*mm,
 			     -L );
       auto rotMOutP = new G4RotationMatrix;
-      rotMOutP->rotateY( - i * 360./NumOfPlaneHTOF*deg );
-      seg_pos.rotateY( i * 360./NumOfPlaneHTOF*deg );
+      rotMOutP->rotateY( i * 360./NumOfPlaneHTOF*deg );
+      seg_pos.rotateY( - i * 360./NumOfPlaneHTOF*deg );
       seg_pos += htof_pos;
-      G4int copy_no = seg + 6;
-      if( copy_no > 31 )
-	copy_no -= 32;
-      new G4PVPlacement( rotMOutP, seg_pos, htof_lv, Form("HtofPV%d", seg),
-			 m_world_lv, false, copy_no );
+      G4int copy_no = seg+2;
+
+      G4ThreeVector window_pos( 0.*mm, half_size.y()/2. + HTOF_window/4., 0.*mm);
+      //common slats
+      if(i!=0 )	new G4PVPlacement( rotMOutP, seg_pos, htof_lv, Form("HtofPV%d", copy_no), m_world_lv, false, copy_no );
+      else if(j==0) new G4PVPlacement( rotMOutP, seg_pos, htof_lv, Form("HtofPV%d", 0), m_world_lv, false, 0 );
+      else if(j==3) new G4PVPlacement( rotMOutP, seg_pos, htof_lv, Form("HtofPV%d", 5), m_world_lv, false, 5 );
+      //Beam-through slats
+      else if(j==1){
+	new G4PVPlacement( rotMOutP, seg_pos + window_pos, htof_upper_lv, Form("HtofPV%d", 1), m_world_lv, false, 1 );
+	new G4PVPlacement( rotMOutP, seg_pos - window_pos, htof_lower_lv, Form("HtofPV%d", 2), m_world_lv, false, 2 );
+      }
+      else if(j==2){
+	new G4PVPlacement( rotMOutP, seg_pos + window_pos, htof_upper_lv, Form("HtofPV%d", seg), m_world_lv, false, 3 );
+	new G4PVPlacement( rotMOutP, seg_pos - window_pos, htof_lower_lv, Form("HtofPV%d", seg+31), m_world_lv, false, 4 );
+      }
     }
   }
+  //time of flight limit
+  if(false){
+  //if(true){
+    G4double maxtime = 500*ns;
+    fStepLimit = new G4UserLimits(DBL_MAX,DBL_MAX,maxtime);
+    htof_lv -> SetUserLimits(fStepLimit);
+  }
+
   htof_lv->SetSensitiveDetector( htof_sd );
+  htof_upper_lv->SetSensitiveDetector( htof_sd );
+  htof_lower_lv->SetSensitiveDetector( htof_sd );
   htof_lv->SetVisAttributes( G4Colour::Cyan() );
+  htof_upper_lv->SetVisAttributes( G4Colour::Green() );
+  htof_lower_lv->SetVisAttributes( G4Colour::Green() );
 
-  // ==============================================================
-  // light guide for Scintillators
-  // ==============================================================
-  /*
-    const G4int NTOF_LG = 16;
-    G4LogicalVolume* TOFLGLV;
-    G4VPhysicalVolume* TOFLGPV[NTOF_LG];
-    G4VisAttributes* TOFLGVisAtt;
+  // Supporting frame parts
+  // Dummy for subtraction
+  auto RingHoleOut = new G4Box( "RingHoleOut", 127.5*mm, 6.0*mm, 5.*mm );
+  auto RingHoleIn = new G4Box( "RingHoleIn", 10.*mm, 6.*mm, 5.*mm );
+  auto RingHole = new G4SubtractionSolid( "RingHole" , RingHoleOut, RingHoleIn );
 
-    // ==============================================================
-    // Side TOFLGillators (Outer)
-    // ==============================================================
-    //thickness 5mm
-    //  const G4double R_TOFLG =  ROUT_TPC*0.5*sqrt(3.0)+2.5*1.0;
-    const G4double Angle_TOFLG = 15.0*deg;
-    const G4double DX_TOFLG1 = cos(15.*deg)*5.*mm;
-    const G4double DZ_TOFLG1 = (320.-DX_TOFLG1)*tan(22.5*deg)/2*mm;
-    const G4double DY_TOFLG1 = 100.0*mm;
+  // Top Ring
+  const G4double RingIn_zPlane[2] = { -5.*mm, 5.*mm };
+  const G4double RingIn_rInner[2] = { 0.*mm, 0.*mm };
+  const G4double RingIn_rOuter[2] =  { 334.13*mm, 334.13*mm } ;
+  auto TopRingOutSolid = new G4Tubs( "TopRingOutSolid", 0.*mm, 391.97*mm,
+				     5.*mm, 0.*deg, 360.*deg );
+  auto TopRingInSolid = new G4Polyhedra( "TopRingInSolid", 22.5*deg, ( 360. + 22.5 )*deg,
+					 8, 2,
+					 RingIn_zPlane, RingIn_rInner, RingIn_rOuter );
 
-    G4Trd* TOFLGSolid1= new G4Trd("SIDE TOFLG1", DX_TOFLG1, 30.*mm,
-    DY_TOFLG1, DY_TOFLG1, DZ_TOFLG1);
-    TOFLGLV = new G4LogicalVolume(htof_solid, Scinti, name1);
-    // 16 side TOFLG.
+  G4SubtractionSolid* TopRingSubSolid[8];
+  for( G4int i=0; i<8; i++){
+    auto rotMHole = new G4RotationMatrix;
+    rotMHole->rotateZ( i * 45.0 * deg );
+    G4ThreeVector trans_hole(0*mm, 348.13*mm, 0.*mm );
+    trans_hole.rotateZ( - i * 45.0 * deg );
+    if( i==0 ) TopRingSubSolid[0] = new G4SubtractionSolid( "TopRingSubSolid_0", TopRingOutSolid, RingHole, rotMHole, trans_hole );
+    else TopRingSubSolid[i] = new G4SubtractionSolid( Form("TopRingSubSolid_%d", i ), TopRingSubSolid[i-1], RingHole, rotMHole, trans_hole );
+  }
 
-    const G4double dangleTOFLG = 22.5*2*deg;
-    G4ThreeVector posTOFLG1(520.*mm,0.*mm,(-DZ_TOFLG1)); //x,z,y??
-    G4ThreeVector posTOFLG2(520.*mm,0.*mm,(+DZ_TOFLG1)); //x,z,y??
-    G4RotationMatrix* rotTOFLGP = new G4RotationMatrix;
-    rotTOFLGP->rotateY(dangleTOFLG*0.5-22.5*deg);
-    posTOFLG1.rotateY(dangleTOFLG*0.5-22.5*deg);
-    posTOFLG2.rotateY(dangleTOFLG*0.5-22.5*deg);
+  auto TopRingSolid = new G4SubtractionSolid( "TopRingSoild" , TopRingSubSolid[7], TopRingInSolid );
+  auto TopRing_lv = new G4LogicalVolume( TopRingSolid, m_material_map["SUS"], "TopRingLV" );
+  TopRing_lv->SetVisAttributes( ORANGE );
 
-    //  for(G4int k=0;k<NPHI_TOFLG; k++){
-    for(G4int k=0;k<8; k++){
-    G4Transform3D transformMP1(*rotTOFLGP, posTOFLG1);
-    TOFLGPV[k*2] = new G4PVPlacement(transformMP1,"TOFLGPV", TOFLGLV, m_world_pv, FALSE, 0);
-    G4Transform3D transformMP2(*rotTOFLGP, posTOFLG2);
-    TOFLGPV[k*2+1] = new G4PVPlacement(transformMP2,"TOFLGPV", TOFLGLV, m_world_pv, FALSE, 0);
-    rotTOFLGP->rotateY(dangleTOFLG);
-    posTOFLG1.rotateY(dangleTOFLG);
-    posTOFLG2.rotateY(dangleTOFLG);
+  // Bottom Ring
+  const G4double RingOut_zPlane[2] = { -5.*mm, 5.*mm };
+  const G4double RingOut_rInner[2] = { 334.13*mm, 334.13*mm };
+  const G4double RingOut_rOuter[2] = { 362.13*mm, 362.13*mm };
+  auto BotRingOutSolid = new G4Polyhedra( "BotRingOutSolid", 22.5*deg, ( 360. + 22.5 )*deg,
+					  8, 2,
+					  RingOut_zPlane, RingOut_rInner, RingOut_rOuter );
+
+  G4SubtractionSolid* BotRingSubSolid[8];
+  for( G4int i=0; i<8; i++){
+    auto rotMHole = new G4RotationMatrix;
+    rotMHole->rotateZ( i * 45.0 * deg );
+    G4ThreeVector trans_hole(0.*mm, 348.13*mm, 0.*mm );
+    trans_hole.rotateZ( - i * 45.0 * deg );
+    if( i==0 ) BotRingSubSolid[i] = new G4SubtractionSolid( Form("BotRingSubSolid_%d", i ) , BotRingOutSolid, RingHole, rotMHole, trans_hole );
+    else BotRingSubSolid[i] = new G4SubtractionSolid( Form("BotRingSubSolid_%d", i ) , BotRingSubSolid[i-1], RingHole, rotMHole, trans_hole );
+  }
+  auto BotRing_lv = new G4LogicalVolume( BotRingSubSolid[7], m_material_map["SUS"],"BotRingLV");
+  BotRing_lv->SetVisAttributes( G4Colour::Blue() );
+
+  // Bracket
+  auto BraInSolid = new G4Box( "BraInSolid", 137.5*mm, 75.*mm, 2.5*mm );
+  auto BraInHole = new G4Box( "BraInHole", 127.5*mm, 30.*mm, 2.5*mm );
+  G4ThreeVector brain_trans_hole(0.*mm, 25.*mm, 0.*mm );
+  auto BraInSubSolid = new G4SubtractionSolid( "BraInSubSolid", BraInSolid, BraInHole,
+					       0, brain_trans_hole );
+
+  auto BraOutSolid = new G4Box( "BraOutSolid", 137.5*mm, 2.5*mm, 16.5*mm );
+  G4ThreeVector braout_trans_hole(0.*mm, 0.*mm, 3.5*mm );
+  auto BraOutSubSolid = new G4SubtractionSolid( "BraOutSubSolid", BraOutSolid, RingHole,
+						0, braout_trans_hole );
+
+  G4ThreeVector trans_braket(0.*mm, 72.5*mm, 14.*mm );
+  auto BraSolid = new G4UnionSolid( "BraSolid", BraInSubSolid, BraOutSubSolid,
+				    0, trans_braket );
+  auto Bra_lv = new G4LogicalVolume( BraSolid, m_material_map["SUS"],
+				     "BraLV" );
+  Bra_lv->SetVisAttributes( G4Colour::Green() );
+
+  // Preamp Support Frame
+  const G4double PreFrameIn_zPlane[2] = { -37.*mm, 37.*mm };
+  const G4double PreFrameIn_rInner[2] = { 334.13*mm, 334.13*mm };
+  const G4double PreFrameIn_rOuter[2] = { 339.13*mm, 339.13*mm } ;
+  auto PreFrameInSolid = new G4Polyhedra( "PreFrameInSolid", 22.5*deg, ( 360. + 22.5 )*deg,
+					  8, 2,
+					  PreFrameIn_zPlane,  PreFrameIn_rInner,  PreFrameIn_rOuter);
+
+  const G4double PreFrameOut_zPlane[2] = { -32.5*mm, 32.5*mm };
+  const G4double PreFrameOut_rInner[2] = { 354.13*mm, 354.13*mm };
+  const G4double PreFrameOut_rOuter[2] = { 362.13*mm, 362.13*mm } ;
+  auto PreFrameOutSolid = new G4Polyhedra( "PreFrameOutSolid", 22.5*deg, ( 360. + 22.5 )*deg,
+					   8, 2,
+					   PreFrameOut_zPlane,  PreFrameOut_rInner,  PreFrameOut_rOuter);
+  auto PreFrameHole = new G4Box( "PreFrameHole", 3.5*mm, 4.0*mm, 32.5*mm );
+
+  G4SubtractionSolid* PreFrameOutSubSolid[8];
+  for( G4int i=0; i<8; i++){
+    auto rotMHole = new G4RotationMatrix;
+    rotMHole->rotateZ( i * 45.0 * deg );
+    G4ThreeVector trans_hole(0.*mm, 348.13*mm, 0.*mm );
+    trans_hole.rotateZ( - i * 45.0 * deg );
+    if( i==0 ) PreFrameOutSubSolid[0] = new G4SubtractionSolid( "PreFrameOutSubSolid_0",
+								PreFrameOutSolid, PreFrameHole );
+    else PreFrameOutSubSolid[i] = new G4SubtractionSolid( Form( "PreFrameOutSubSolid_%d", i ),
+							  PreFrameOutSubSolid[i-1], PreFrameHole,
+							  rotMHole, trans_hole );
+  }
+  G4ThreeVector trans_preframe( 0.*mm, 0.*mm, -9.0*mm );
+  auto PreFrameSolid = new G4UnionSolid( "PreFrameSolid", PreFrameInSolid, PreFrameOutSubSolid[7],
+					 0, trans_preframe );
+  auto PreFrame_lv = new G4LogicalVolume( PreFrameSolid, m_material_map["Aluminum"],
+					 "PreFrameLV" );
+  PreFrame_lv->SetVisAttributes( G4Colour::Red() );
+
+  // Bar
+  auto BarMainSolid = new G4Box( "BarMainSolid", 45.*mm, 618.25*mm, 5.*mm );
+  auto BarSideSolid = new G4Box( "BarSideSolid", 5.*mm, 618.25*mm, 5.*mm );
+  G4ThreeVector trans_bar_side( -40.*mm, 0.*mm, -10.*mm );
+  auto BarUniSolid = new G4UnionSolid( "BarUniSolid", BarMainSolid, BarSideSolid,
+				       0, trans_bar_side );
+
+  auto BarBotSolid = new G4Box( "BarSideSolid", 45.*mm, 5.*mm, 5.*mm );
+  G4ThreeVector trans_bar_bot( 0.*mm, -613.25*mm, -10.*mm );
+
+  auto BarSolid = new G4UnionSolid( "BarSolid", BarUniSolid, BarBotSolid,
+				    0, trans_bar_bot );
+  auto Bar_lv = new G4LogicalVolume( BarSolid, m_material_map["SUS"],
+				     "BarLV" );
+  Bar_lv->SetVisAttributes( G4Colour::Blue() );
+
+  //if(true){   // Htof Frame Placement
+  if(false){   // Htof Frame Placement
+
+    auto rotMOutRing = new G4RotationMatrix;
+    rotMOutRing->rotateX( - 90. *deg );
+
+    // Top Ring
+    G4ThreeVector TopRing_pos( 0.*mm, 586.72*mm, 0.*mm );
+    TopRing_pos += htof_pos;
+    new G4PVPlacement( rotMOutRing, TopRing_pos, TopRing_lv, "TopRingPV", m_world_lv, false, 0 );
+
+    // Bottom Ring
+    G4ThreeVector BotRing_pos( 0.*mm, -586.72*mm, 0.*mm );
+    BotRing_pos += htof_pos;
+    new G4PVPlacement( rotMOutRing, BotRing_pos, BotRing_lv, "BotRingPV",
+		       m_world_lv, false, 0 );
+
+    // Preamp Support Frame
+    for( G4int i=0; i<2; ++i ){
+      auto rotMOutP_PreFrame = new G4RotationMatrix;
+      rotMOutP_PreFrame->rotateX( ( 1 - 2 * i ) * 90.*deg );
+      rotMOutP_PreFrame->rotateZ( i * 180.*deg );
+
+      G4ThreeVector PreFrame_pos( 0.*mm, 453.22*mm, 0.*mm );
+      PreFrame_pos.rotateZ( - i * 180.*deg );
+      PreFrame_pos += htof_pos;
+      new G4PVPlacement( rotMOutP_PreFrame, PreFrame_pos, PreFrame_lv,
+			 Form("PreFramePV%d", i),
+			 m_world_lv, false, i );
     }
 
-
-    TOFLGVisAtt= new G4VisAttributes(true, G4Colour(0.,0.8,0.));
-    TOFLGLV->SetVisAttributes(TOFLGVisAtt);
-    //    TOFLGVisAtt[k*2+1]= new G4VisAttributes(true, G4Colour::Cyan() );
-    TOFLGVisAtt= new G4VisAttributes(true, G4Colour(0.,0.8,0.));
-    TOFLGLV->SetVisAttributes(TOFLGVisAtt);
-
-    // ==============================================================
-    // end light guide
-    // ==============================================================
-    */
-
+    G4int Bar_seg=0;
+    for( G4int i=0; i<NumOfPlaneHTOF; ++i ){
+      //Bar
+      auto rotMOutP_bar = new G4RotationMatrix;
+      rotMOutP_bar->rotateY( - i * 45.*deg );
+      G4ThreeVector Bar_pos( 0.*mm, - 36.53*mm, - 372.13*mm );
+      Bar_pos.rotateY( i * 45.*deg );
+      Bar_pos += htof_pos;
+      if(i!=0 && i!=4){ //Beam through
+	new G4PVPlacement( rotMOutP_bar, Bar_pos, Bar_lv,
+			   Form("BarPV%d", Bar_seg),
+			   m_world_lv, false, Bar_seg );
+	Bar_seg++;
+      }
+      //Bracket
+      for( G4int j=0; j<2; ++j ){
+	auto rotMOutP_bra = new G4RotationMatrix;
+	rotMOutP_bra->rotateY(  - ( 1 - 2 * j ) * i * 45.*deg );
+	rotMOutP_bra->rotateZ(  - j * 180.*deg );
+	G4ThreeVector Bra_pos( 0.*mm, 506.72*mm, - 364.63*mm );
+	Bra_pos.rotateY( i * 45.*deg );
+	Bra_pos.rotateZ( j * 180.*deg );
+	Bra_pos += htof_pos;
+	G4int Bra_seg = 2 * i + j;
+	new G4PVPlacement( rotMOutP_bra, Bra_pos, Bra_lv,
+			   Form("BraPV%d", Bra_seg),
+			   m_world_lv, false, Bra_seg );
+      }
+    }
+  }
 }
+
 
 //_____________________________________________________________________________
 void
@@ -806,10 +1100,10 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     angle[31] = 180. - 18.69;
     break;
 
-   
+
   case 3:
     //for tracking analysis
-    //If you need the dE/dx information, it should be modified. 
+    //If you need the dE/dx information, it should be modified.
     //Thin sensitive detector is introduced.
     for( G4int i=0; i<NumOfPadTPC; ++i ){
       double pad_radius = padHelper::getRadius(i);
@@ -2436,9 +2730,9 @@ TPCDetectorConstruction::ConstructWC( void )
   auto solid_WCContainer
     = new G4SubtractionSolid("solid_WCContainer",
    			     WCContainer, WCContainer_gap,
-   			     rot_wccontainer_gap, 
+   			     rot_wccontainer_gap,
 			     pos_wccontainer_gap);
-  
+
   auto logWCContainer = new G4LogicalVolume(solid_WCContainer,
 					    m_material_map["Acrylic"],
 					    "logWCContainer");
@@ -2461,24 +2755,24 @@ TPCDetectorConstruction::ConstructWC( void )
 		       "WcSegmentPV", mother_lv, false, i );
 
   }
- /* 
+ /*
   //Temporary!!!!!!
   //WC frame (test)
   //double Alcut_z =0.*mm;
   double Alcut_z =(1000.-(250.+403.))*mm;
 
   auto Alframe1     = new G4Box("Alframe1",
-				80.*mm/2., 
-				80.*mm/2., 
+				80.*mm/2.,
+				80.*mm/2.,
 				2000.*mm/2. - Alcut_z/2.);
 
   auto Alframe2     = new G4Box("Alframe2",
-				80.*mm/2., 
-				80.*mm/2., 
+				80.*mm/2.,
+				80.*mm/2.,
 				750.*mm/2.);
 
- 
-  
+
+
   auto Alframe1_lv = new G4LogicalVolume( Alframe1,
 					  m_material_map["Aluminum"],
 					  "Alframe1_LV" );
@@ -2497,7 +2791,7 @@ TPCDetectorConstruction::ConstructWC( void )
   Alframe1_lv->SetVisAttributes( G4Colour::White() );
   new G4PVPlacement( nullptr, pos_frame1_1, Alframe1_lv,
 		     "WcFramePV", mother_lv, false, 0 );
-  
+
   new G4PVPlacement( nullptr, pos_frame1_2, Alframe1_lv,
 		     "WcFramePV", mother_lv, false, 1 );
 
@@ -2509,11 +2803,11 @@ TPCDetectorConstruction::ConstructWC( void )
   auto pos_frame2_2 = G4ThreeVector( -pitch/2.+3000.*mm/2.,
 				     -1000.*mm,
 				     750/2.);
-  
+
   Alframe2_lv->SetVisAttributes( G4Colour::Red() );
   new G4PVPlacement( nullptr, pos_frame2_1, Alframe2_lv,
 		     "WcFramePV", mother_lv, false, 3 );
-  
+
   new G4PVPlacement( nullptr, pos_frame2_2, Alframe2_lv,
 		     "WcFramePV", mother_lv, false, 4 );
 
