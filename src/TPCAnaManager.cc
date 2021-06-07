@@ -90,46 +90,51 @@ TPCAnaManager::TPCAnaManager( void )
 
   ///////shhwang tpc hit step
 
-  // comment out for trigger study
-  TPC_g->Branch("nhittpc",&event.nhittpc,"nhittpc/I");
-  TPC_g->Branch("ntrk",event.ntrk,"ntrk[nhittpc]/I");
-  TPC_g->Branch("ititpc",event.ititpc,"ititpc[nhittpc]/I");
-  TPC_g->Branch("idtpc",event.idtpc,"idtpc[nhittpc]/I");
-  TPC_g->Branch("xtpc",event.xtpc,"xtpc[nhittpc]/D");//after smeared by resolution
-  TPC_g->Branch("ytpc",event.ytpc,"ytpc[nhittpc]/D");//after smeared by resolution
-  TPC_g->Branch("ztpc",event.ztpc,"ztpc[nhittpc]/D");//after smeared by resolution
-  TPC_g->Branch("x0tpc",event.x0tpc,"x0tpc[nhittpc]/D");
-  TPC_g->Branch("y0tpc",event.y0tpc,"y0tpc[nhittpc]/D");
-  TPC_g->Branch("z0tpc",event.z0tpc,"z0tpc[nhittpc]/D");
-  TPC_g->Branch("resoX",event.resoX,"resoX[nhittpc]/D");
-  TPC_g->Branch("pxtpc",event.pxtpc,"pxtpc[nhittpc]/D");
-  TPC_g->Branch("pytpc",event.pytpc,"pytpc[nhittpc]/D");
-  TPC_g->Branch("pztpc",event.pztpc,"pztpc[nhittpc]/D");
-  TPC_g->Branch("pptpc",event.pptpc,"pptpc[nhittpc]/D");   // total mometum
-  TPC_g->Branch("masstpc",event.masstpc,"masstpc[nhittpc]/D");   // mass TPC
-  TPC_g->Branch("betatpc",event.betatpc,"betatpc[nhittpc]/D");
-  TPC_g->Branch("edeptpc",event.edeptpc,"edeptpc[nhittpc]/D");
-  TPC_g->Branch("dedxtpc",event.dedxtpc,"dedxtpc[nhittpc]/D");
-  TPC_g->Branch("slengthtpc",event.slengthtpc,"slengthtpc[nhittpc]/D");
-  TPC_g->Branch("iPadtpc",event.iPadtpc,"iPadtpc[nhittpc]/I");
-  TPC_g->Branch("laytpc",event.laytpc,"laytpc[nhittpc]/I");
-  TPC_g->Branch("rowtpc",event.rowtpc,"rowtpc[nhittpc]/I");
-  TPC_g->Branch("parentID",event.parentID,"parentID[nhittpc]/I");
-  TPC_g->Branch("xtpc_pad",event.xtpc_pad,"xtpc_pad[nhittpc]/D");//pad center position
-  TPC_g->Branch("ytpc_pad",event.ytpc_pad,"ytpc_pad[nhittpc]/D");//pad center position (dummy = ytpc)
-  TPC_g->Branch("ztpc_pad",event.ztpc_pad,"ztpc_pad[nhittpc]/D");//pad center position
-  TPC_g->Branch("dxtpc_pad",event.dxtpc_pad,"dxtpc_pad[nhittpc]/D");//x0tpc - xtpc_pad
-  TPC_g->Branch("dytpc_pad",event.dytpc_pad,"dytpc_pad[nhittpc]/D");//y0tpc - ytpc_pad (dummy = 0)
-  TPC_g->Branch("dztpc_pad",event.dztpc_pad,"dztpc_pad[nhittpc]/D");//z0tpc - ztpc_pad
+  TPC_g->Branch("nttpc",&event.nttpc,"nttpc/I");
+  TPC_g->Branch("ntrk",event.ntrk,"ntrk[nttpc]/I");
+  TPC_g->Branch("ititpc",event.ititpc,"ititpc[nttpc]/I");
+  TPC_g->Branch("idtpc",event.idtpc,"idtpc[nttpc]/I");
+  TPC_g->Branch("xtpc",event.xtpc,"xtpc[nttpc]/D");//after smeared by resolution
+  TPC_g->Branch("ytpc",event.ytpc,"ytpc[nttpc]/D");//after smeared by resolution
+  TPC_g->Branch("ztpc",event.ztpc,"ztpc[nttpc]/D");//after smeared by resolution
+  TPC_g->Branch("x0tpc",event.x0tpc,"x0tpc[nttpc]/D");
+  TPC_g->Branch("y0tpc",event.y0tpc,"y0tpc[nttpc]/D");
+  TPC_g->Branch("z0tpc",event.z0tpc,"z0tpc[nttpc]/D");
 
-  
+  TPC_g->Branch("vtxxtpc",event.vtxxtpc,"vtxxtpc[nttpc]/D");
+  TPC_g->Branch("vtxytpc",event.vtxytpc,"vtxytpc[nttpc]/D");
+  TPC_g->Branch("vtxztpc",event.vtxztpc,"vtxztpc[nttpc]/D");
+  TPC_g->Branch("vtxpxtpc",event.vtxpxtpc,"vtxpxtpc[nttpc]/D");
+  TPC_g->Branch("vtxpytpc",event.vtxpytpc,"vtxpytpc[nttpc]/D");
+  TPC_g->Branch("vtxpztpc",event.vtxpztpc,"vtxpztpc[nttpc]/D");
+  TPC_g->Branch("vtxenetpc",event.vtxenetpc,"vtxenetpc[nttpc]/D");
 
-
+  TPC_g->Branch("resoX",event.resoX,"resoX[nttpc]/D");
+  TPC_g->Branch("pxtpc",event.pxtpc,"pxtpc[nttpc]/D");
+  TPC_g->Branch("pytpc",event.pytpc,"pytpc[nttpc]/D");
+  TPC_g->Branch("pztpc",event.pztpc,"pztpc[nttpc]/D");
+  TPC_g->Branch("pptpc",event.pptpc,"pptpc[nttpc]/D");   // total mometum
+  TPC_g->Branch("masstpc",event.masstpc,"masstpc[nttpc]/D");   // mass TPC
+  TPC_g->Branch("betatpc",event.betatpc,"betatpc[nttpc]/D");
+  TPC_g->Branch("timetpc",event.timetpc,"time[nttpc]/D");
+  TPC_g->Branch("edeptpc",event.edeptpc,"edeptpc[nttpc]/D");
+  TPC_g->Branch("dedxtpc",event.dedxtpc,"dedxtpc[nttpc]/D");
+  TPC_g->Branch("slengthtpc",event.slengthtpc,"slengthtpc[nttpc]/D");
+  TPC_g->Branch("iPadtpc",event.iPadtpc,"iPadtpc[nttpc]/I");
+  TPC_g->Branch("laytpc",event.laytpc,"laytpc[nttpc]/I");
+  TPC_g->Branch("rowtpc",event.rowtpc,"rowtpc[nttpc]/I");
+  TPC_g->Branch("parentID",event.parentID,"parentID[nttpc]/I");
+  TPC_g->Branch("xtpc_pad",event.xtpc_pad,"xtpc_pad[nttpc]/D");//pad center position
+  TPC_g->Branch("ytpc_pad",event.ytpc_pad,"ytpc_pad[nttpc]/D");//pad center position (dummy = ytpc)
+  TPC_g->Branch("ztpc_pad",event.ztpc_pad,"ztpc_pad[nttpc]/D");//pad center position
+  TPC_g->Branch("dxtpc_pad",event.dxtpc_pad,"dxtpc_pad[nttpc]/D");//x0tpc - xtpc_pad
+  TPC_g->Branch("dytpc_pad",event.dytpc_pad,"dytpc_pad[nttpc]/D");//y0tpc - ytpc_pad (dummy = 0)
+  TPC_g->Branch("dztpc_pad",event.dztpc_pad,"dztpc_pad[nttpc]/D");//z0tpc - ztpc_pad
 
   //// Study on multiplicity
-  // TPC_g->Branch("nthlay",event.nthlay,"nthlay[nhittpc]/I");
-  // TPC_g->Branch("nthpad",event.nthpad,"nthpad[nhittpc]/I");
-  // TPC_g->Branch("laypad",event.laypad,"laytpadpc[nhittpc][40][250]/I");
+  // TPC_g->Branch("nthlay",event.nthlay,"nthlay[nttpc]/I");
+  // TPC_g->Branch("nthpad",event.nthpad,"nthpad[nttpc]/I");
+  // TPC_g->Branch("laypad",event.laypad,"laytpadpc[nttpc][40][250]/I");
 
 
   //shhwang ntrtpc --> number of trak in tpc
@@ -152,10 +157,10 @@ TPCAnaManager::TPCAnaManager( void )
   // TPC_g->Branch("trpptpcfit",event.trpptpcfit,"trpptpcfit[ntrtpc]/D");
   // TPC_g->Branch("trpttpcfit",event.trpttpcfit,"trpttpcfit[ntrtpc]/D");
 
-  // TPC_g->Branch("vtpxtpc",event.vtpxtpc,"vtpxtpc[ntrtpc]/D");
-  // TPC_g->Branch("vtpytpc",event.vtpytpc,"vtpytpc[ntrtpc]/D");
-  // TPC_g->Branch("vtpztpc",event.vtpztpc,"vtpztpc[ntrtpc]/D");
-  // TPC_g->Branch("vtpptpc",event.vtpptpc,"vtpptpc[ntrtpc]/D");
+  //TPC_g->Branch("vtpxtpc",event.vtpxtpc,"vtpxtpc[ntrtpc]/D");
+  //TPC_g->Branch("vtpytpc",event.vtpytpc,"vtpytpc[ntrtpc]/D");
+  //TPC_g->Branch("vtpztpc",event.vtpztpc,"vtpztpc[ntrtpc]/D");
+   //TPC_g->Branch("vtpptpc",event.vtpptpc,"vtpptpc[ntrtpc]/D");
 
   // TPC_g->Branch("vtxtpc",event.vtxtpc,"vtxtpc[ntrtpc]/D");
   // TPC_g->Branch("vtytpc",event.vtytpc,"vtytpc[ntrtpc]/D");
@@ -213,6 +218,7 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "vtxHtof", event.vtxHtof, "vtxHtof[nhHtof]/D" );
   TPC_g->Branch( "vtyHtof", event.vtyHtof, "vtyHtof[nhHtof]/D" );
   TPC_g->Branch( "vtzHtof", event.vtzHtof, "vtzHtof[nhHtof]/D" );
+  TPC_g->Branch( "vteHtof", event.vteHtof, "vteHtof[nhHtof]/D" );
   TPC_g->Branch( "lengthHtof", event.lengthHtof, "lengthHtof[nhHtof]/D" );
   // SDC
   TPC_g->Branch( "nhSdc", &event.nhSdc, "nhSdc/I" );
@@ -589,6 +595,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxBh2[i] = -9999.;
     event.vtyBh2[i] = -9999.;
     event.vtzBh2[i] = -9999.;
+    event.lengthBh2[i] = -9999.;
     // TARGET
     event.pidTgt[i] = -9999;
     event.tidTgt[i] = -9999;
@@ -612,6 +619,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.pxHtof[i] = -9999.;
     event.pyHtof[i] = -9999.;
     event.pzHtof[i] = -9999.;
+    event.ppHtof[i] = -9999.;
     event.tHtof[i] = -9999.;
     event.vtppHtof[i] = -9999.;
     event.vtpxHtof[i] = -9999.;
@@ -620,6 +628,8 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxHtof[i] = -9999.;
     event.vtyHtof[i] = -9999.;
     event.vtzHtof[i] = -9999.;
+    event.vteHtof[i] = -9999.;
+    event.lengthHtof[i] = -9999.;
     // SDC
     event.tidSdc[i] = -9999;
     event.pidSdc[i] = -9999;
@@ -683,6 +693,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxFtof[i] = -9999.;
     event.vtyFtof[i] = -9999.;
     event.vtzFtof[i] = -9999.;
+    event.lengthFtof[i] = -9999.;
     // LAC
     event.tidLac[i] = -9999;
     event.pidLac[i] = -9999;
@@ -748,7 +759,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtzVp[i] = -9999.;
   }
 
-  event.nhittpc = 0;
+  event.nttpc = 0;
   event.ntrtpc = 0;
 
   event.HitNum_K=-1;
@@ -777,14 +788,13 @@ TPCAnaManager::BeginOfEventAction( void )
     event.trpytpc[i]  = -9999.9999;
     event.trpztpc[i]  = -9999.9999;
 
-    event.vtpxtpc[i]  = -9999.9999;
-    event.vtpytpc[i]  = -9999.9999;
-    event.vtpztpc[i]  = -9999.9999;
+    event.vtxpxtpc[i]  = -9999.9999;
+    event.vtxpytpc[i]  = -9999.9999;
+    event.vtxpztpc[i]  = -9999.9999;
 
     event.vtxtpc[i]  = -9999.9999;
     event.vtytpc[i]  = -9999.9999;
     event.vtztpc[i]  = -9999.9999;
-
     event.trpttpcfit[i]  = -9999.9999;
 
     event.trpptpcfit[i]  = -9999.9999;
@@ -837,6 +847,13 @@ TPCAnaManager::BeginOfEventAction( void )
     event.dztpc_pad[i] = -9999.9;
 
 
+    event.vtxxtpc[i] = -9999.9;
+    event.vtxytpc[i] = -9999.9;
+    event.vtxztpc[i] = -9999.9;
+    event.vtxpxtpc[i] = -9999.9;
+    event.vtxpytpc[i] = -9999.9;
+    event.vtxpztpc[i] = -9999.9;
+    event.vtxenetpc[i] = -9999.9;
 
     event.x0tpc[i] = -9999.9;
     event.y0tpc[i] = -9999.9;
@@ -849,7 +866,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.pptpc[i] = -9999.9;
 
     event.masstpc[i] = -9999.9;
-
+    event.timetpc[i] = -9999.9;
     event.betatpc[i] = -9999.9;
 
     event.edeptpc[i] = -9999.9;
@@ -1466,52 +1483,62 @@ TPCAnaManager::EndOfEventAction( void )
     } else {
 
       for( G4int i=0; i<HitNum; i++){
-	event.ntrk[event.nhittpc] = counterData[i].ntrk;
+	event.ntrk[event.nttpc] = counterData[i].ntrk;
 	hmap["Time"]->Fill( counterData[i].time );
 	for( G4int j=0; j<G4ThreeVector::SIZE; ++j ){
 	  hmap[Form( "Pos%d", j )]->Fill( counterData[i].pos[j]/CLHEP::mm );
 	  hmap[Form( "Mom%d", j )]->Fill( counterData[i].mom[j]/CLHEP::GeV );
 	}
-	event.xtpc[event.nhittpc] = counterData[i].pos[0]/CLHEP::mm;
-	event.ytpc[event.nhittpc] = counterData[i].pos[1]/CLHEP::mm;
-	event.ztpc[event.nhittpc] = counterData[i].pos[2]/CLHEP::mm;
+	event.xtpc[event.nttpc] = counterData[i].pos[0]/CLHEP::mm;
+	event.ytpc[event.nttpc] = counterData[i].pos[1]/CLHEP::mm;
+	event.ztpc[event.nttpc] = counterData[i].pos[2]/CLHEP::mm;
 
-	event.x0tpc[event.nhittpc] = counterData[i].pos0[0]/CLHEP::mm;
-	event.y0tpc[event.nhittpc] = counterData[i].pos0[1]/CLHEP::mm;
-	event.z0tpc[event.nhittpc] = counterData[i].pos0[2]/CLHEP::mm;
+	event.x0tpc[event.nttpc] = counterData[i].pos0[0]/CLHEP::mm;
+	event.y0tpc[event.nttpc] = counterData[i].pos0[1]/CLHEP::mm;
+	event.z0tpc[event.nttpc] = counterData[i].pos0[2]/CLHEP::mm;
 
-	event.resoX[event.nhittpc] = counterData[i].resoX;
-	event.pxtpc[event.nhittpc] = counterData[i].mom[0]/CLHEP::GeV;
-	event.pytpc[event.nhittpc] = counterData[i].mom[1]/CLHEP::GeV;
-	event.pztpc[event.nhittpc] = counterData[i].mom[2]/CLHEP::GeV;
-	event.pptpc[event.nhittpc] = sqrt(pow(counterData[i].mom[0], 2) +
+	event.resoX[event.nttpc] = counterData[i].resoX;
+	event.masstpc[event.nttpc] = counterData[i].mass;
+
+	event.vtxxtpc[event.nttpc] = counterData[i].vtxpos[0]/CLHEP::mm;
+	event.vtxytpc[event.nttpc] = counterData[i].vtxpos[1]/CLHEP::mm;
+	event.vtxztpc[event.nttpc] = counterData[i].vtxpos[2]/CLHEP::mm;
+	event.vtxpxtpc[event.nttpc] = counterData[i].vtxmom[0];
+	event.vtxpytpc[event.nttpc] = counterData[i].vtxmom[1];
+	event.vtxpztpc[event.nttpc] = counterData[i].vtxmom[2];
+	event.vtxenetpc[event.nttpc] = counterData[i].vtxene/CLHEP::GeV;
+
+	event.pxtpc[event.nttpc] = counterData[i].mom[0]/CLHEP::GeV;
+	event.pytpc[event.nttpc] = counterData[i].mom[1]/CLHEP::GeV;
+	event.pztpc[event.nttpc] = counterData[i].mom[2]/CLHEP::GeV;
+	event.pptpc[event.nttpc] = sqrt(pow(counterData[i].mom[0], 2) +
 					pow(counterData[i].mom[1], 2) +
 					pow(counterData[i].mom[2], 2))/CLHEP::GeV;
-	event.ititpc[event.nhittpc] = counterData[i].trackID;
-	event.idtpc[event.nhittpc] = counterData[i].particleID;
-	event.laytpc[event.nhittpc] = counterData[i].iLay;
+	event.ititpc[event.nttpc] = counterData[i].trackID;
+	event.idtpc[event.nttpc] = counterData[i].particleID;
+	event.laytpc[event.nttpc] = counterData[i].iLay;
 
-	event.rowtpc[event.nhittpc] = counterData[i].iRow;
-	event.iPadtpc[event.nhittpc] = padHelper::getPadID(event.laytpc[event.nhittpc], event.rowtpc[event.nhittpc]);
-	TVector3 Point = padHelper::getPoint(event.iPadtpc[event.nhittpc]);
-	event.xtpc_pad[event.nhittpc] = Point.x();
-	event.ytpc_pad[event.nhittpc] = event.ytpc[event.nhittpc];
-	event.ztpc_pad[event.nhittpc] = Point.z();
+	event.parentID[event.nttpc] = counterData[i].parentID;
+	event.rowtpc[event.nttpc] = counterData[i].iRow;
+	event.iPadtpc[event.nttpc] = padHelper::getPadID(event.laytpc[event.nttpc], event.rowtpc[event.nttpc]);
+	TVector3 Point = padHelper::getPoint(event.iPadtpc[event.nttpc]);
+	event.xtpc_pad[event.nttpc] = Point.x();
+	event.ytpc_pad[event.nttpc] = event.ytpc[event.nttpc];
+	event.ztpc_pad[event.nttpc] = Point.z();
 
-	event.dxtpc_pad[event.nhittpc] = event.x0tpc[event.nhittpc] - event.xtpc_pad[event.nhittpc];
-	event.dytpc_pad[event.nhittpc] = event.y0tpc[event.nhittpc] - event.ytpc_pad[event.nhittpc];
-	event.dztpc_pad[event.nhittpc] = event.z0tpc[event.nhittpc] - event.ztpc_pad[event.nhittpc];
-      
-
-	event.betatpc[event.nhittpc] = counterData[i].beta;
-	event.edeptpc[event.nhittpc] = counterData[i].edep;
-	event.dedxtpc[event.nhittpc] = counterData[i].dedx;
-	event.slengthtpc[event.nhittpc] = counterData[i].slength;
-	event.nthlay[event.nhittpc] = counterData[i].iLay;
-	event.nthpad[event.nhittpc] = counterData[i].iPad;
-	event.laypad[event.nhittpc][event.nthlay[event.nhittpc]][event.nthpad[event.nhittpc]]
-	  = event.laypad[event.nhittpc][event.nthlay[event.nhittpc]][event.nthpad[event.nhittpc]]+1.;
-	event.nhittpc += 1;
+	event.dxtpc_pad[event.nttpc] = event.x0tpc[event.nttpc] - event.xtpc_pad[event.nttpc];
+	event.dytpc_pad[event.nttpc] = event.y0tpc[event.nttpc] - event.ytpc_pad[event.nttpc];
+	event.dztpc_pad[event.nttpc] = event.z0tpc[event.nttpc] - event.ztpc_pad[event.nttpc];
+	event.timetpc[event.nttpc] = counterData[i].time;
+	event.betatpc[event.nttpc] = counterData[i].beta;
+	event.edeptpc[event.nttpc] = counterData[i].edep;
+	event.dedxtpc[event.nttpc] = counterData[i].dedx;
+	event.slengthtpc[event.nttpc] = counterData[i].slength;
+	event.nthlay[event.nttpc] = counterData[i].iLay;
+	event.nthpad[event.nttpc] = counterData[i].iPad;
+	event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]
+	  = event.laypad[event.nttpc][event.nthlay[event.nttpc]][event.nthpad[event.nttpc]]+1.;
+	event.nttpc += 1;
       }
     }
     //
@@ -1579,17 +1606,21 @@ TPCAnaManager::EndOfEventAction( void )
       event.ppBh2[i] = hit->GetMomentum().mag();
       event.deBh2[i] = hit->GetEnergyDeposit();
       event.tBh2[i] = hit->GetTime();
+      event.lengthBh2[i] = hit->GetTrackLength();
       event.nhBh2++;
     }
   }
 
   //_____________________________________________________________________________
   void
-    TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
-				   G4ThreeVector mom,
+    TPCAnaManager::SetCounterData( G4int ntrk,G4double time,
+				   G4ThreeVector vtxpos,
+				   G4ThreeVector vtxmom,
+				   G4double vtxene,
+				   G4ThreeVector pos, G4ThreeVector mom,
 				   G4int track, G4int particle,
 				   G4int iLay,  G4int iRow, G4double beta,
-				   G4double edep, G4int parentid,
+				   G4double edep, G4double mass, G4int parentid,
 				   G4double /* tlength */, G4double slength )
   {
     G4int hitnum = HitNum;
@@ -1740,30 +1771,34 @@ TPCAnaManager::EndOfEventAction( void )
       G4double sh_dalpha = s_compx/sh_rho; // rho * theta = arc --> from sako-san's code
       G4double sh_smear_alpha = sh_alpha+sh_dalpha;
       //    G4cout<<compx<<":"<<sh_dalpha<<G4endl;
-      G4double randx = sh_rho*(sin(sh_smear_alpha)-sin(sh_alpha));
-      G4double randz = sh_rho*(cos(sh_smear_alpha)-cos(sh_alpha));
-      G4double s0 = 0.204;// mm HIMAC result
-      G4double randx_com = CLHEP::RandGauss::shoot(0.,s0);
-      G4double randz_com = CLHEP::RandGauss::shoot(0.,s0);
-      G4double smear_x = sqrt(randx*randx + randx_com*randx_com )*(randx_com/fabs(randx_com));
-      G4double smear_z = sqrt(randz*randz + randz_com*randz_com )*(randz_com/fabs(randz_com));
 
       counterData[hitnum].resoX = compx;
 
-      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
-      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_alpha)+smear_x;
+      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
+      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
       counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
 
       counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();
       counterData[hitnum].pos0[G4ThreeVector::Y] = pos.getY();
       counterData[hitnum].pos0[G4ThreeVector::Z] = pos.getZ();
 
+      counterData[hitnum].vtxpos[G4ThreeVector::X] = vtxpos.getX();
+      counterData[hitnum].vtxpos[G4ThreeVector::Y] = vtxpos.getY();
+      counterData[hitnum].vtxpos[G4ThreeVector::Z] = vtxpos.getZ();
+
       counterData[hitnum].mom[G4ThreeVector::X] = mom.getX();
       counterData[hitnum].mom[G4ThreeVector::Y] = mom.getY();
       counterData[hitnum].mom[G4ThreeVector::Z] = mom.getZ();
 
+      counterData[hitnum].vtxmom[G4ThreeVector::X] = vtxmom.getX();
+      counterData[hitnum].vtxmom[G4ThreeVector::Y] = vtxmom.getY();
+      counterData[hitnum].vtxmom[G4ThreeVector::Z] = vtxmom.getZ();
+
+      counterData[hitnum].vtxene = vtxene;
+
       counterData[hitnum].trackID = track;
       counterData[hitnum].particleID = particle;
+      counterData[hitnum].mass = mass;
       counterData[hitnum].iLay = iLay;
       G4int iPad=0.;
 
@@ -1796,7 +1831,7 @@ TPCAnaManager::EndOfEventAction( void )
 	  G4cout<<"wrong:"<<iLay<<G4endl;
 	}
       }
-    
+
       counterData[hitnum].iRow = iRow;
       counterData[hitnum].parentID = parentid;
       HitNum++;
@@ -1842,6 +1877,7 @@ TPCAnaManager::EndOfEventAction( void )
       event.ppFtof[i] = hit->GetMomentum().mag();
       event.deFtof[i] = hit->GetEnergyDeposit();
       event.tFtof[i] = hit->GetTime();
+      event.lengthFtof[i] = hit->GetTrackLength();
       event.nhFtof++;
     }
   }
@@ -1858,6 +1894,8 @@ TPCAnaManager::EndOfEventAction( void )
       event.pidHtof[i] = hit->GetParticleID();
       event.didHtof[i] = hit->GetDetectorID();
       event.prtHtof[i] = hit->GetParentID();
+      event.qHtof[i] = hit->GetCharge();
+      event.massHtof[i] = hit->GetMass();
       event.xHtof[i] = hit->GetPosition().x();
       event.yHtof[i] = hit->GetPosition().y();
       event.zHtof[i] = hit->GetPosition().z();
@@ -1867,6 +1905,15 @@ TPCAnaManager::EndOfEventAction( void )
       event.ppHtof[i] = hit->GetMomentum().mag();
       event.deHtof[i] = hit->GetEnergyDeposit();
       event.tHtof[i] = hit->GetTime();
+      event.vtppHtof[i] = hit->GetVertexMomentum().mag();
+      event.vtpxHtof[i] = hit->GetVertexMomentum().x();
+      event.vtpyHtof[i] = hit->GetVertexMomentum().y();
+      event.vtpzHtof[i] = hit->GetVertexMomentum().z();
+      event.vtxHtof[i] = hit->GetVertexPosition().x();
+      event.vtyHtof[i] = hit->GetVertexPosition().y();
+      event.vtzHtof[i] = hit->GetVertexPosition().z();
+      event.vteHtof[i] = hit->GetVertexKineticEnergy();
+      event.lengthHtof[i] = hit->GetTrackLength();
       event.nhHtof++;
     }
   }
