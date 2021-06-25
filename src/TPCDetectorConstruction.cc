@@ -705,12 +705,12 @@ TPCDetectorConstruction::ConstructHTOF( void )
     for( G4int j=0; j<NumOfSegHTOFOnePlane; ++j ){
       G4int seg = i*NumOfSegHTOFOnePlane + j;
       // ( lateral, height, radial )
-      G4ThreeVector seg_pos( dXdW * ( j - ( NumOfSegHTOFOnePlane - 1 )/2. ),
+      G4ThreeVector seg_pos( -dXdW * ( j - ( NumOfSegHTOFOnePlane - 1 )/2. ),
 			     0.*mm,
 			     -L );
       auto rotMOutP = new G4RotationMatrix;
-      rotMOutP->rotateY( i * 360./NumOfPlaneHTOF*deg );
-      seg_pos.rotateY( - i * 360./NumOfPlaneHTOF*deg );
+      rotMOutP->rotateY( - i * 360./NumOfPlaneHTOF*deg );
+      seg_pos.rotateY( i * 360./NumOfPlaneHTOF*deg );
       seg_pos += htof_pos;
       G4int copy_no = seg+2;
 
