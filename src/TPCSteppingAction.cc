@@ -70,7 +70,7 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
 
   if( KillStepInIron ){
     auto preMaterial = prePoint->GetMaterial();
-    if( preMaterial->GetName() == "Iron" || preMaterial->GetName() == "SUS" ){
+    if( preMaterial->GetName() == "Iron" ){
       theTrack->SetTrackStatus( fStopAndKill );
       return;
     }

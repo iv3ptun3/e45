@@ -14,7 +14,6 @@ class G4Material;
 class G4LogicalVolume;
 class G4PVPlacement;
 class TPCSDCSD;
-class G4UserLimits;
 
 //_____________________________________________________________________________
 class TPCDetectorConstruction : public G4VUserDetectorConstruction
@@ -33,7 +32,6 @@ private:
   G4double                        m_rotation_angle;
   G4RotationMatrix*               m_rotation_matrix;
   TPCSDCSD*                       m_sdc_sd;
-  G4UserLimits*                   fStepLimit;
 
 private:
   // Materials
