@@ -11,3 +11,6 @@
 /vis/viewer/update viewer-0
 /tracking/storeTrajectory 1
 /vis/scene/endOfEventAction accumulate
+/run/beamOn 10
+/vis/scene/notifyHandlers scene-0
+/control/execute prerun1.mac
