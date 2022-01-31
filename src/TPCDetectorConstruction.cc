@@ -342,7 +342,10 @@ TPCDetectorConstruction::ConstructMaterials( void )
     m_material_map["Target"] = m_material_map["LH2"];
   } else if( target_material == "LD2" ){
     m_material_map["Target"] = m_material_map["LD2"];
-  } else {
+  } else if( target_material == "Vacuum" ){
+    m_material_map["Target"] = m_material_map["Vacuum"];
+  }
+  else {
     std::string e(FUNC_NAME + " No target material : " + target_material );
     throw std::invalid_argument( e );
   }
