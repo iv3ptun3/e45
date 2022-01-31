@@ -182,8 +182,8 @@ GetTransverseRes( G4double y_pos )
   double N_eff = 42.8;
   double A = 0.0582*0.01;//m-1 -> cm-1
   double e_ALD = exp(-1.*A*L_D);
-  //  double sT2 = s0*s0 + (Dt*Dt*L_D/(N_eff*e_ALD));
-  double sT2 = (Dt*Dt*L_D/(N_eff*e_ALD));
+  double sT2 = s0*s0 + (Dt*Dt*L_D/(N_eff*e_ALD));
+  //double sT2 = (Dt*Dt*L_D/(N_eff*e_ALD));
   double sT = sqrt(sT2);
   return sT;
 }
