@@ -144,6 +144,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 16: GenerateUniformProton( anEvent ); break;
   case 17: GenerateUniformPim( anEvent ); break;
   case 18: GenerateBeamProton( anEvent ); break;
+  case 19: GenerateUniformProton_P( anEvent ); break;
   case 21: GenerateHybrid3bodyMode1( anEvent ); break;
   case 22: GenerateHybrid3bodyMode2( anEvent ); break;
   case 23: GenerateHybrid3bodyMode3( anEvent ); break;
@@ -439,6 +440,64 @@ TPCPrimaryGeneratorAction::GenerateBeamProton( G4Event* anEvent )
   G4double mom_p=m_beam_p0;
   //G4double theta=acos(G4RandFlat::shoot(0.,1.));
   G4double theta=G4RandFlat::shoot(0.,3.)*acos(-1.)/180.;// 0-3 degree flat
+  //  G4cout<<theta*180/3.141592<<G4endl;
+  mom_p_x = mom_p*sin(theta)*cos(phi);
+  mom_p_y = mom_p*sin(theta)*sin(phi);
+  mom_p_z = mom_p*cos(theta);
+  Energy_p=sqrt(pow(mom_p,2)+pow(m_Proton->GetPDGMass()/GeV,2))*GeV;
+
+  G4double rn_vtx=-1;  G4double rn_vtz=-1;
+  G4double vtx=0;  G4double vty=0;   G4double vtz=0;
+  if( gConf.Get<G4int>("Experiment") == 45. ){
+    while(1){
+      rn_vtx = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      rn_vtz = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      if( (rn_vtx*rn_vtx+rn_vtz*rn_vtz) < m_e45target_size.x()*m_e45target_size.x()) break;
+    }
+    vty = G4RandFlat::shoot(-m_e45target_size.z(),m_e45target_size.z());
+    vtx=rn_vtx;
+    vtz=rn_vtz+m_target_pos.z();
+  }else if( gConf.Get<G4int>("Experiment") == 42. ){
+    vtx = G4RandFlat::shoot(-m_target_size.x()/2.,m_target_size.x()/2.)*mm;
+    vty = G4RandFlat::shoot(-m_target_size.y()/2.,m_target_size.y()/2.)*mm;
+    vtz = G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2,m_target_pos.z()+m_target_size.z()/2)*mm;
+  }
+
+  //  G4double ratio=G4RandFlat::shoot(0.,1.);
+  //  ratio = 0.1;
+  // proton//
+  Energy_p=sqrt(pow(mom_p,2)+pow(m_Proton->GetPDGMass()/GeV,2));
+  m_particle_gun->SetParticleDefinition(m_Proton);
+  m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_p_x,mom_p_y,mom_p_z));
+  m_particle_gun->SetParticleEnergy((Energy_p - m_Proton->GetPDGMass()/GeV)*GeV);
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetModeID(1);
+  gAnaMan.SetNumberOfPrimaryParticle(1);
+  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
+  
+
+
+
+}
+
+
+
+//_____________________________________________________________________________
+//case 19 based on GenerateAll
+//beam mom is fixed
+void
+TPCPrimaryGeneratorAction::GenerateUniformProton_P( G4Event* anEvent )
+{
+  G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
+
+  //angle
+  G4double phi=G4RandFlat::shoot(-1.,1.)*acos(-1.);
+  //  G4double mom_p=G4RandFlat::shoot(0.05,1.0);
+  G4double mom_p=m_beam_p0;
+  //G4double theta=acos(G4RandFlat::shoot(0.,1.));
+  G4double theta=G4RandFlat::shoot(0.,180.)*acos(-1.)/180.;// 0-180 degree flat
   //  G4cout<<theta*180/3.141592<<G4endl;
   mom_p_x = mom_p*sin(theta)*cos(phi);
   mom_p_y = mom_p*sin(theta)*sin(phi);

@@ -78,6 +78,7 @@ public:
   void     GenerateUniformProton( G4Event* anEvent );
   void     GenerateUniformPim( G4Event* anEvent );
   void     GenerateBeamProton( G4Event* anEvent );
+  void     GenerateUniformProton_P( G4Event* anEvent );
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateIncInput( G4Event* anEvent );
   void     GenerateJamInput_Randphi( G4Event* anEvent );
