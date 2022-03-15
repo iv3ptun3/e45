@@ -1742,16 +1742,19 @@ TPCAnaManager::EndOfEventAction( void )
       //    G4cout<<compx<<":"<<sh_dalpha<<G4endl;
       G4double randx = sh_rho*(sin(sh_smear_alpha)-sin(sh_alpha));
       G4double randz = sh_rho*(cos(sh_smear_alpha)-cos(sh_alpha));
-      G4double s0 = 0.204;// mm HIMAC result
+      //G4double s0 = 0.204;// mm HIMAC result
+      G4double s0 = 0.199;// mm HIMAC result
       G4double randx_com = CLHEP::RandGauss::shoot(0.,s0);
       G4double randz_com = CLHEP::RandGauss::shoot(0.,s0);
       G4double smear_x = sqrt(randx*randx + randx_com*randx_com )*(randx_com/fabs(randx_com));
       G4double smear_z = sqrt(randz*randz + randz_com*randz_com )*(randz_com/fabs(randz_com));
-
+      
       counterData[hitnum].resoX = compx;
 
-      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
-      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_alpha)+smear_x;
+      // counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
+      // counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_alpha)+smear_x;
+      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+smear_z+tar_pos.getZ();
+      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha)+smear_x;
       counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
 
       counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();

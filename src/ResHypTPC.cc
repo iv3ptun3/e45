@@ -176,11 +176,14 @@ ResHypTPC::getYDeviation( G4double /* y_track */ )
 G4double
 GetTransverseRes( G4double y_pos )
 {
-  double s0 = 0.204;// mm HIMAC result
+  //  double s0 = 0.204;// mm HIMAC result
+  double s0 = 0.199;// mm HIMAC result
   double Dt = 0.18;//mm/sqrt(cm) at 1T
   double L_D = 30.+(y_pos*0.1);//cm
-  double N_eff = 42.8;
-  double A = 0.0582*0.01;//m-1 -> cm-1
+  // double N_eff = 42.8;
+  double N_eff = 42.1;
+  //double A = 0.0582*0.01;//m-1 -> cm-1
+  double A = 0.055*0.01;//m-1 -> cm-1
   double e_ALD = exp(-1.*A*L_D);
   //  double sT2 = s0*s0 + (Dt*Dt*L_D/(N_eff*e_ALD));
   double sT2 = (Dt*Dt*L_D/(N_eff*e_ALD));
