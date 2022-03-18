@@ -1737,7 +1737,8 @@ TPCAnaManager::EndOfEventAction( void )
       // std::cout<<"compx="<<compx<<", sh_sigmaY"<<sh_sigmaY<<std::endl;
       // getchar();
       //G4double sh_dalpha = compx/sh_rho; // rho * theta = arc --> from sako-san's code
-      G4double sh_dalpha = s_compx/sh_rho; // rho * theta = arc --> from sako-san's code
+      //      G4double sh_dalpha = s_compx/sh_rho; // rho * theta = arc --> from sako-san's code
+      G4double sh_dalpha = atan2(s_compx, sh_rho); // rho * theta = arc --> from sako-san's code
       G4double sh_smear_alpha = sh_alpha+sh_dalpha;
       //    G4cout<<compx<<":"<<sh_dalpha<<G4endl;
       G4double randx = sh_rho*(sin(sh_smear_alpha)-sin(sh_alpha));
@@ -1753,8 +1754,8 @@ TPCAnaManager::EndOfEventAction( void )
 
       // counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
       // counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_alpha)+smear_x;
-      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+smear_z+tar_pos.getZ();
-      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha)+smear_x;
+      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
+      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
       counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
 
       counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();
