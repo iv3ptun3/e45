@@ -498,7 +498,8 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P( G4Event* anEvent )
   //  G4double mom_p=G4RandFlat::shoot(0.05,1.0);
   G4double mom_p=m_beam_p0;
   //G4double theta=acos(G4RandFlat::shoot(0.,1.));
-  G4double theta=G4RandFlat::shoot(0.,180.)*acos(-1.)/180.;// 0-180 degree flat
+  //  G4double theta=G4RandFlat::shoot(0.,180.)*acos(-1.)/180.;// 0-180 degree flat
+  G4double theta=acos(G4RandFlat::shoot(-1.,1.));// uniform generation in a sphere
   //  G4cout<<theta*180/3.141592<<G4endl;
   mom_p_x = mom_p*sin(theta)*cos(phi);
   mom_p_y = mom_p*sin(theta)*sin(phi);
