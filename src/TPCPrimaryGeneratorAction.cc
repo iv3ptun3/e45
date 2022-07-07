@@ -326,6 +326,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2Body( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::GenerateUniformProton( G4Event* anEvent )
 {
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
 
   //angle
@@ -366,9 +367,9 @@ TPCPrimaryGeneratorAction::GenerateUniformProton( G4Event* anEvent )
   m_particle_gun->GeneratePrimaryVertex( anEvent );
   gAnaMan.SetModeID(1);
   gAnaMan.SetNumberOfPrimaryParticle(1);
-  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
+
 
 
 
@@ -425,7 +426,7 @@ TPCPrimaryGeneratorAction::GenerateUniformPim( G4Event* anEvent )
   gAnaMan.SetNumberOfPrimaryParticle(1);
   gAnaMan.SetPrimaryParticle(0,mom_pi_x,mom_pi_y,mom_pi_z,m_PionMinus->GetPDGMass()/GeV);
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
+
 }
 
 
@@ -479,7 +480,7 @@ TPCPrimaryGeneratorAction::GenerateBeamProton( G4Event* anEvent )
   gAnaMan.SetNumberOfPrimaryParticle(1);
   gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
+
 
 
 
@@ -493,6 +494,7 @@ TPCPrimaryGeneratorAction::GenerateBeamProton( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::GenerateUniformProton_P( G4Event* anEvent )
 {
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
 
   //angle
@@ -536,9 +538,9 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P( G4Event* anEvent )
   m_particle_gun->GeneratePrimaryVertex( anEvent );
   gAnaMan.SetModeID(1);
   gAnaMan.SetNumberOfPrimaryParticle(1);
-  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
+
 
 
 
@@ -551,6 +553,7 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::GenerateUniformProton_P_fixphi( G4Event* anEvent )
 {
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
 
   //angle
@@ -594,10 +597,8 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_fixphi( G4Event* anEvent )
   m_particle_gun->GeneratePrimaryVertex( anEvent );
   gAnaMan.SetModeID(1);
   gAnaMan.SetNumberOfPrimaryParticle(1);
-  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
+  gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
   gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
-
 
 
 }
@@ -610,8 +611,9 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_fixphi( G4Event* anEvent )
 void
 TPCPrimaryGeneratorAction::GenerateUniformProton_P_Multi( G4Event* anEvent )
 {
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
-  
+
   int n_event = 5;
   for(int i=0; i<n_event; ++i){
 
@@ -657,9 +659,9 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_Multi( G4Event* anEvent )
     gAnaMan.SetModeID(1);
     //  gAnaMan.SetNumberOfPrimaryParticle(1);
     gAnaMan.SetNumberOfPrimaryParticle(i+1);
-    gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV);
+    gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
     gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
-  
+
   }
 
 
@@ -1720,7 +1722,7 @@ TPCPrimaryGeneratorAction::GenerateJamInput( G4Event* anEvent )
     //    m_particle_gun->SetParticleMomentumDirection( p );
     m_particle_gun->SetParticleMomentumDirection( p_cor );
     G4double m = particle->GetPDGMass()/GeV;
-    //    G4double ke = std::sqrt( m*m + p.mag2() ) - m;    
+    //    G4double ke = std::sqrt( m*m + p.mag2() ) - m;
     G4double ke = std::sqrt( m*m + p_cor.mag2() ) - m;
     m_particle_gun->SetParticleEnergy( ke );
     m_particle_gun->SetParticlePosition( x );
@@ -1751,7 +1753,7 @@ TPCPrimaryGeneratorAction::GenerateJamInput_Randphi( G4Event* anEvent )
     double phi_rand = p.phi()+G4RandFlat::shoot(0., 2.*acos(-1.));
     double p_x_rand = p.mag()*sin(p.theta())*cos(phi_rand);
     double p_y_rand = p.mag()*sin(p.theta())*sin(phi_rand);
-    
+
     double p_u = p_x_rand/p.z();
     double p_v = p_y_rand/p.z();
     double beam_u = m_beam->p.x()/m_beam->p.z();
@@ -1763,15 +1765,15 @@ TPCPrimaryGeneratorAction::GenerateJamInput_Randphi( G4Event* anEvent )
     // std::cout<<"u="<<p_u<<", v="<<p_v
     // 	     <<", b_u="<<beam_u<<", b_v="<<beam_v
     // 	     <<", p="<<p.mag()<<std::endl;
-    
-    
+
+
 
 
     m_particle_gun->SetParticleDefinition( particle );
     //    m_particle_gun->SetParticleMomentumDirection( p );
     m_particle_gun->SetParticleMomentumDirection( p_cor );
     G4double m = particle->GetPDGMass()/GeV;
-    //    G4double ke = std::sqrt( m*m + p.mag2() ) - m;    
+    //    G4double ke = std::sqrt( m*m + p.mag2() ) - m;
     G4double ke = std::sqrt( m*m + p_cor.mag2() ) - m;
     m_particle_gun->SetParticleEnergy( ke );
     m_particle_gun->SetParticlePosition( x );
