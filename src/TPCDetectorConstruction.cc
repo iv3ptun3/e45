@@ -328,7 +328,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
 
 
-  
+
 
   G4String target_material = gConf.Get<G4String>("TargetMaterial");
   G4cout << "   Target material : " << target_material << G4endl;
@@ -344,6 +344,8 @@ TPCDetectorConstruction::ConstructMaterials( void )
     m_material_map["Target"] = m_material_map["LD2"];
   } else if( target_material == "Vacuum" ){
     m_material_map["Target"] = m_material_map["Vacuum"];
+  } else if( target_material == "Empty" ){
+    m_material_map["Target"] = m_material_map["P10"];
   }
   else {
     std::string e(FUNC_NAME + " No target material : " + target_material );
@@ -809,10 +811,10 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     angle[31] = 180. - 18.69;
     break;
 
-   
+
   case 3:
     //for tracking analysis
-    //If you need the dE/dx information, it should be modified. 
+    //If you need the dE/dx information, it should be modified.
     //Thin sensitive detector is introduced.
     for( G4int i=0; i<NumOfPadTPC; ++i ){
       double pad_radius = padHelper::getRadius(i);
@@ -2439,9 +2441,9 @@ TPCDetectorConstruction::ConstructWC( void )
   auto solid_WCContainer
     = new G4SubtractionSolid("solid_WCContainer",
    			     WCContainer, WCContainer_gap,
-   			     rot_wccontainer_gap, 
+   			     rot_wccontainer_gap,
 			     pos_wccontainer_gap);
-  
+
   auto logWCContainer = new G4LogicalVolume(solid_WCContainer,
 					    m_material_map["Acrylic"],
 					    "logWCContainer");
@@ -2464,24 +2466,24 @@ TPCDetectorConstruction::ConstructWC( void )
 		       "WcSegmentPV", mother_lv, false, i );
 
   }
- /* 
+ /*
   //Temporary!!!!!!
   //WC frame (test)
   //double Alcut_z =0.*mm;
   double Alcut_z =(1000.-(250.+403.))*mm;
 
   auto Alframe1     = new G4Box("Alframe1",
-				80.*mm/2., 
-				80.*mm/2., 
+				80.*mm/2.,
+				80.*mm/2.,
 				2000.*mm/2. - Alcut_z/2.);
 
   auto Alframe2     = new G4Box("Alframe2",
-				80.*mm/2., 
-				80.*mm/2., 
+				80.*mm/2.,
+				80.*mm/2.,
 				750.*mm/2.);
 
- 
-  
+
+
   auto Alframe1_lv = new G4LogicalVolume( Alframe1,
 					  m_material_map["Aluminum"],
 					  "Alframe1_LV" );
@@ -2500,7 +2502,7 @@ TPCDetectorConstruction::ConstructWC( void )
   Alframe1_lv->SetVisAttributes( G4Colour::White() );
   new G4PVPlacement( nullptr, pos_frame1_1, Alframe1_lv,
 		     "WcFramePV", mother_lv, false, 0 );
-  
+
   new G4PVPlacement( nullptr, pos_frame1_2, Alframe1_lv,
 		     "WcFramePV", mother_lv, false, 1 );
 
@@ -2512,11 +2514,11 @@ TPCDetectorConstruction::ConstructWC( void )
   auto pos_frame2_2 = G4ThreeVector( -pitch/2.+3000.*mm/2.,
 				     -1000.*mm,
 				     750/2.);
-  
+
   Alframe2_lv->SetVisAttributes( G4Colour::Red() );
   new G4PVPlacement( nullptr, pos_frame2_1, Alframe2_lv,
 		     "WcFramePV", mother_lv, false, 3 );
-  
+
   new G4PVPlacement( nullptr, pos_frame2_2, Alframe2_lv,
 		     "WcFramePV", mother_lv, false, 4 );
 
