@@ -130,6 +130,7 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
   static const auto kurama_size = gSize.GetSize( "KuramaField" ) * 0.5 * mm;
   static const auto shs_pos = gGeom.GetGlobalPosition( "HypTPC" ) * mm;
   static const auto shs_size = gSize.GetSize( "ShsField" ) * 0.5 * mm;
+  static const auto shs_field_ofset = gSize.GetSize( "ShsFieldOffset" ) * mm;
   const G4double xp = Point[0];
   const G4double yp = Point[1];
   const G4double zp = Point[2];
@@ -152,6 +153,9 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
     }
   } else {
     G4double shs_point[3] = { pos.x()/cm, pos.y()/cm, pos.z()/cm };
+		for(int shsi=0;shsi<3;shsi++){
+			shs_point[shsi]+=shs_field_ofset[shsi]/cm;
+		}
     if( m_shs_field_map->IsInsideField( shs_point ) ){
       m_shs_field_map->GetFieldValue( shs_point, Bfield );
     }
