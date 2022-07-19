@@ -121,8 +121,10 @@ namespace padHelper
       }
     else
       {
-	//angle = tan(-x / z);
-	angle = TMath::Pi() - atan(-x / z);
+				if (z > 0) angle = TMath::Pi()+atan(x / z);
+				else if( z < 0&&x<0) angle = atan(x / z);
+				else angle = 2*TMath::Pi()+ atan(x / z);
+//	angle = TMath::Pi() - atan(-x / z);
       }
 
     int layer, row;
