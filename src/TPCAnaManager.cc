@@ -107,10 +107,12 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch("pztpc",event.pztpc,"pztpc[nhittpc]/D");
   TPC_g->Branch("pptpc",event.pptpc,"pptpc[nhittpc]/D");   // total mometum
   TPC_g->Branch("masstpc",event.masstpc,"masstpc[nhittpc]/D");   // mass TPC
+  TPC_g->Branch("timetpc",event.timetpc,"timetpc[nhittpc]/D");
   TPC_g->Branch("betatpc",event.betatpc,"betatpc[nhittpc]/D");
   TPC_g->Branch("edeptpc",event.edeptpc,"edeptpc[nhittpc]/D");
   TPC_g->Branch("dedxtpc",event.dedxtpc,"dedxtpc[nhittpc]/D");
   TPC_g->Branch("slengthtpc",event.slengthtpc,"slengthtpc[nhittpc]/D");
+  TPC_g->Branch("tlengthtpc",event.tlengthtpc,"tlengthtpc[nhittpc]/D");
   TPC_g->Branch("iPadtpc",event.iPadtpc,"iPadtpc[nhittpc]/I");
   TPC_g->Branch("laytpc",event.laytpc,"laytpc[nhittpc]/I");
   TPC_g->Branch("rowtpc",event.rowtpc,"rowtpc[nhittpc]/I");
@@ -122,7 +124,7 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch("dytpc_pad",event.dytpc_pad,"dytpc_pad[nhittpc]/D");//y0tpc - ytpc_pad (dummy = 0)
   TPC_g->Branch("dztpc_pad",event.dztpc_pad,"dztpc_pad[nhittpc]/D");//z0tpc - ztpc_pad
 
-  
+
 
 
 
@@ -612,6 +614,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.pxHtof[i] = -9999.;
     event.pyHtof[i] = -9999.;
     event.pzHtof[i] = -9999.;
+    event.ppHtof[i] = -9999.;
     event.tHtof[i] = -9999.;
     event.vtppHtof[i] = -9999.;
     event.vtpxHtof[i] = -9999.;
@@ -620,6 +623,7 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxHtof[i] = -9999.;
     event.vtyHtof[i] = -9999.;
     event.vtzHtof[i] = -9999.;
+    event.lengthHtof[i] = -9999.;
     // SDC
     event.tidSdc[i] = -9999;
     event.pidSdc[i] = -9999;
@@ -850,6 +854,7 @@ TPCAnaManager::BeginOfEventAction( void )
 
     event.masstpc[i] = -9999.9;
 
+    event.timetpc[i] = -9999.9;
     event.betatpc[i] = -9999.9;
 
     event.edeptpc[i] = -9999.9;
@@ -1501,12 +1506,14 @@ TPCAnaManager::EndOfEventAction( void )
 	event.dxtpc_pad[event.nhittpc] = event.x0tpc[event.nhittpc] - event.xtpc_pad[event.nhittpc];
 	event.dytpc_pad[event.nhittpc] = event.y0tpc[event.nhittpc] - event.ytpc_pad[event.nhittpc];
 	event.dztpc_pad[event.nhittpc] = event.z0tpc[event.nhittpc] - event.ztpc_pad[event.nhittpc];
-      
 
+
+	event.timetpc[event.nhittpc] = counterData[i].time/CLHEP::ns;
 	event.betatpc[event.nhittpc] = counterData[i].beta;
-	event.edeptpc[event.nhittpc] = counterData[i].edep;
+	event.edeptpc[event.nhittpc] = counterData[i].edep/(CLHEP::MeV/CLHEP::mm);
 	event.dedxtpc[event.nhittpc] = counterData[i].dedx;
-	event.slengthtpc[event.nhittpc] = counterData[i].slength;
+	event.slengthtpc[event.nhittpc] = counterData[i].slength/CLHEP::mm;
+	event.tlengthtpc[event.nhittpc] = counterData[i].tlength/CLHEP::mm;
 	event.nthlay[event.nhittpc] = counterData[i].iLay;
 	event.nthpad[event.nhittpc] = counterData[i].iPad;
 	event.laypad[event.nhittpc][event.nthlay[event.nhittpc]][event.nthpad[event.nhittpc]]
@@ -1585,12 +1592,12 @@ TPCAnaManager::EndOfEventAction( void )
 
   //_____________________________________________________________________________
   void
-    TPCAnaManager::SetCounterData( G4int ntrk,G4double time, G4ThreeVector pos,
+    TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 				   G4ThreeVector mom,
 				   G4int track, G4int particle,
 				   G4int iLay,  G4int iRow, G4double beta,
 				   G4double edep, G4int parentid,
-				   G4double /* tlength */, G4double slength )
+				   G4double tlength, G4double slength )
   {
     G4int hitnum = HitNum;
     G4bool flag=true;
@@ -1630,6 +1637,7 @@ TPCAnaManager::EndOfEventAction( void )
       counterData[hitnum].dedx = edep/slength;
       counterData[hitnum].edep = edep;
       counterData[hitnum].slength = slength;
+      counterData[hitnum].tlength = tlength;
 
       //////shhwang position smearing////
 
@@ -1749,7 +1757,7 @@ TPCAnaManager::EndOfEventAction( void )
       G4double randz_com = CLHEP::RandGauss::shoot(0.,s0);
       G4double smear_x = sqrt(randx*randx + randx_com*randx_com )*(randx_com/fabs(randx_com));
       G4double smear_z = sqrt(randz*randz + randz_com*randz_com )*(randz_com/fabs(randz_com));
-      
+
       counterData[hitnum].resoX = compx;
 
       // counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
@@ -1800,7 +1808,7 @@ TPCAnaManager::EndOfEventAction( void )
 	  G4cout<<"wrong:"<<iLay<<G4endl;
 	}
       }
-    
+
       counterData[hitnum].iRow = iRow;
       counterData[hitnum].parentID = parentid;
       HitNum++;
@@ -1862,6 +1870,8 @@ TPCAnaManager::EndOfEventAction( void )
       event.pidHtof[i] = hit->GetParticleID();
       event.didHtof[i] = hit->GetDetectorID();
       event.prtHtof[i] = hit->GetParentID();
+      event.qHtof[i] = hit->GetCharge();
+      event.massHtof[i] = hit->GetMass();
       event.xHtof[i] = hit->GetPosition().x();
       event.yHtof[i] = hit->GetPosition().y();
       event.zHtof[i] = hit->GetPosition().z();
@@ -1871,6 +1881,14 @@ TPCAnaManager::EndOfEventAction( void )
       event.ppHtof[i] = hit->GetMomentum().mag();
       event.deHtof[i] = hit->GetEnergyDeposit();
       event.tHtof[i] = hit->GetTime();
+      event.vtppHtof[i] = hit->GetVertexMomentum().mag();
+      event.vtpxHtof[i] = hit->GetVertexMomentum().x();
+      event.vtpyHtof[i] = hit->GetVertexMomentum().y();
+      event.vtpzHtof[i] = hit->GetVertexMomentum().z();
+      event.vtxHtof[i] = hit->GetVertexPosition().x();
+      event.vtyHtof[i] = hit->GetVertexPosition().y();
+      event.vtzHtof[i] = hit->GetVertexPosition().z();
+      event.lengthHtof[i] = hit->GetTrackLength();
       event.nhHtof++;
     }
   }
