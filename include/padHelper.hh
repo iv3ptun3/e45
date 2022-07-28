@@ -62,6 +62,10 @@ namespace padHelper
     return padParameter[layerID][2];
   }
 
+  inline Double_t getLength(Int_t layerID)
+  {
+    return padParameter[layerID][5];
+  }
 
   inline Int_t getPadID(Int_t layerID, Int_t rowID)
   {

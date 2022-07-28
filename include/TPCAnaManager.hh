@@ -45,6 +45,7 @@ struct CounterData
   G4double edep;
   G4double dedx;
   G4double slength;
+  G4double tlength;
   G4double mass;
   G4double pos0[3];
   G4double pos[3];
@@ -236,6 +237,17 @@ struct Event
   Double_t pptpc[MaxTrack];    // momentum
   Double_t masstpc[MaxTrack];    // mass
 
+
+  Double_t timetpc[MaxTrack];    // global time
+  Double_t tlengthtpc[MaxTrack];    // global time
+
+
+
+
+
+
+
+	
   Double_t betatpc[MaxTrack];    // beta
 
   Double_t edeptpc[MaxTrack];    // Energy deposit
