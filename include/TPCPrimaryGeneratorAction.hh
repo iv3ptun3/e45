@@ -50,6 +50,7 @@ private:
   G4ParticleDefinition* m_PionMinus;
   G4ParticleDefinition* m_PionZero;
   G4ParticleDefinition* m_KaonPlus;
+  G4ParticleDefinition* m_sKaonPlus;
   G4ParticleDefinition* m_KaonMinus;
   G4ParticleDefinition* m_KaonZeroS;
   G4ParticleDefinition* m_KaonStarZero;
@@ -84,6 +85,7 @@ public:
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateIncInput( G4Event* anEvent );
   void     GenerateJamInput_Randphi( G4Event* anEvent );
+  void     GenerateLL_fromXiP( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
   void     GenerateTest( G4Event* anEvent );
   void     GenerateTest2( G4Event* anEvent );

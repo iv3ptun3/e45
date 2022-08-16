@@ -343,6 +343,12 @@ TPCPhysicsList::ConstructStableHyperons( void )
   // G4double magneticMoment = 0.0
   // )
 
+  // skaon+ non-decay K+
+  particle = new G4ParticleDefinition( "skaon+", 0.493677*GeV, 5.315e-14*MeV,
+				       eplus, 0, -1, 0, 1, 1, 0,
+				       "meson", 0, 0, 321,
+				       true, 0, nullptr );
+
   // ssigma+ non-decay sigma+
   particle = new G4ParticleDefinition( "ssigma+", 1.18937*GeV, 8.209e-12*MeV,
 				       eplus, 1, +1, 0, 2, +2, 0,

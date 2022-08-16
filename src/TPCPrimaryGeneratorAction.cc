@@ -12,6 +12,8 @@
 #include <Randomize.hh>
 
 #include "TMath.h"
+#include "TLorentzVector.h"
+#include "TGenPhaseSpace.h"
 #include "BeamMan.hh"
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
@@ -74,6 +76,7 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_PionMinus( particleTable->FindParticle( "pi-" ) ),
     m_PionZero( particleTable->FindParticle( "pi0" ) ),
     m_KaonPlus( particleTable->FindParticle( "kaon+" ) ),
+    m_sKaonPlus( particleTable->FindParticle( "skaon+" ) ),
     m_KaonMinus( particleTable->FindParticle( "kaon-" ) ),
     m_KaonZeroS( particleTable->FindParticle( "kaon0S" ) ),
     m_KaonStarZero( particleTable->FindParticle( "k_star0" ) ),
@@ -157,7 +160,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 31: GenerateJamInput( anEvent ); break;
   case 32: GenerateIncInput( anEvent ); break;
   case 33: GenerateJamInput_Randphi( anEvent ); break;
-
+  case 34: GenerateLL_fromXiP( anEvent ); break;
   case 50: GenerateUniformProton_P_Multi( anEvent ); break;
   case 60: GenerateLambda1405Rad1( anEvent ); break; // normal decay
   case 61: GenerateLambda1405Rad2( anEvent ); break; // radioactive decay
@@ -606,7 +609,7 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_fixphi( G4Event* anEvent )
 
 
 //_____________________________________________________________________________
-//case 30 based on GenerateUniformProton_P (case 19)
+//case 50 based on GenerateUniformProton_P (case 19)
 //beam mom is fixed
 void
 TPCPrimaryGeneratorAction::GenerateUniformProton_P_Multi( G4Event* anEvent )
@@ -615,6 +618,7 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_Multi( G4Event* anEvent )
   G4double Energy_p,  mom_p_x, mom_p_y, mom_p_z;
 
   int n_event = 5;
+  gAnaMan.SetNumberOfPrimaryParticle(n_event);
   for(int i=0; i<n_event; ++i){
 
     //angle
@@ -658,14 +662,170 @@ TPCPrimaryGeneratorAction::GenerateUniformProton_P_Multi( G4Event* anEvent )
     m_particle_gun->GeneratePrimaryVertex( anEvent );
     gAnaMan.SetModeID(1);
     //  gAnaMan.SetNumberOfPrimaryParticle(1);
-    gAnaMan.SetNumberOfPrimaryParticle(i+1);
-    gAnaMan.SetPrimaryParticle(0,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
-    gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
+    gAnaMan.SetPrimaryParticle(i,mom_p_x,mom_p_y,mom_p_z,m_Proton->GetPDGMass()/GeV,ProtonID);
+    gAnaMan.SetPrimaryVertex(i,vtx,vty,vtz);
 
   }
 
 
 }
+
+
+//_____________________________________________________________________________
+//case 34 LL production from K-"N" -> Xi K+, XiN->LL  
+void
+TPCPrimaryGeneratorAction::GenerateLL_fromXiP( G4Event* anEvent )
+{
+  static const G4double KaonMinusMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4double ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+  static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double XiMinusMass = m_XiMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4double LambdaMass = m_Lambda->GetPDGMass()/CLHEP::GeV;
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int XiMinusID = m_XiMinus->GetPDGEncoding();
+  static const G4int LambdaID = m_Lambda->GetPDGEncoding();
+
+  G4double beam_p=m_beam_p0;
+  double beam_E = sqrt(KaonMinusMass*KaonMinusMass + beam_p*beam_p);
+  double masses1[2] = {KaonPlusMass, XiMinusMass};
+  double masses2[2] = {LambdaMass, LambdaMass};
+  TLorentzVector beam_L(0.0, 0.0, beam_p , beam_E );
+  double proton_Fermi_p=0.;
+  while(1){
+    proton_Fermi_p= G4RandGauss::shoot(0.145,0.052291);//Tmp Fermimom of 12C
+    if(proton_Fermi_p>0.)
+      break;
+  }
+  G4double phi=G4RandFlat::shoot(-1.,1.)*acos(-1.);
+  G4double theta=acos(G4RandFlat::shoot(-1.,1.));// uniform generation in a sphere
+  
+  G4double proton_Fermi_px = proton_Fermi_p*sin(theta)*cos(phi);
+  G4double proton_Fermi_py = proton_Fermi_p*sin(theta)*sin(phi);
+  G4double proton_Fermi_pz = proton_Fermi_p*cos(theta);
+ 
+  G4double proton_Fermi_E = sqrt(proton_Fermi_p*proton_Fermi_p + ProtonMass);
+  TLorentzVector target(proton_Fermi_px, proton_Fermi_py, 
+			proton_Fermi_pz, proton_Fermi_E);
+
+ 
+  double proton2_Fermi_p=0.;
+  while(1){
+    proton2_Fermi_p= G4RandGauss::shoot(0.145,0.052291);//Tmp Fermimom of 12C
+    if(proton2_Fermi_p>0.)
+      break;
+  }
+  G4double phi2=G4RandFlat::shoot(-1.,1.)*acos(-1.);
+  G4double theta2=acos(G4RandFlat::shoot(-1.,1.));// uniform generation in a sphere
+  
+  G4double proton2_Fermi_px = proton2_Fermi_p*sin(theta)*cos(phi);
+  G4double proton2_Fermi_py = proton2_Fermi_p*sin(theta)*sin(phi);
+  G4double proton2_Fermi_pz = proton2_Fermi_p*cos(theta);
+ 
+  G4double proton2_Fermi_E = sqrt(proton2_Fermi_p*proton2_Fermi_p + ProtonMass);
+  TLorentzVector target2(proton2_Fermi_px, proton2_Fermi_py, 
+			 proton2_Fermi_pz, proton2_Fermi_E);
+
+  TLorentzVector W1 = beam_L + target;
+  if(W1.Mag()<masses1[0]+masses1[1])
+    G4cerr << " Error (PrimaryGeneratorAction 34): W1 < masses1"<< G4endl;
+  
+
+  TGenPhaseSpace event1;
+  event1.SetDecay(W1, 2, masses1);
+
+  TLorentzVector *kp_L = new TLorentzVector();
+  TLorentzVector *XiM_L = new TLorentzVector();
+  TLorentzVector *L1_L = new TLorentzVector();
+  TLorentzVector *L2_L = new TLorentzVector();
+
+  G4double weight1 = 0.;
+  while(1){
+    weight1 = event1.Generate();
+    kp_L = event1.GetDecay(0);
+    double kp_theta = kp_L->Theta()*180./acos(-1);
+    if(kp_theta<20.)
+      break;
+  }
+  XiM_L = event1.GetDecay(1);
+  
+  TLorentzVector W2 = *XiM_L + target2;
+  if(W2.Mag()<masses2[0]+masses2[1])
+    G4cerr << " Error (PrimaryGeneratorAction 34): W2 < masses2"<< G4endl;
+  
+  TGenPhaseSpace event2;
+  event2.SetDecay(W2, 2, masses2);
+  G4double weight2 = event2.Generate();
+  L1_L = event2.GetDecay(0);
+  L2_L = event2.GetDecay(1);
+
+  
+
+  G4double rn_vtx=-1;  G4double rn_vtz=-1;
+  G4double vtx=0;  G4double vty=0;   G4double vtz=0;
+  if( gConf.Get<G4int>("Experiment") == 45. ){
+    while(1){
+      rn_vtx = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      rn_vtz = G4RandFlat::shoot(-m_e45target_size.x(),m_e45target_size.x());
+      if( (rn_vtx*rn_vtx+rn_vtz*rn_vtz) < m_e45target_size.x()*m_e45target_size.x()) break;
+    }
+    vty = G4RandFlat::shoot(-m_e45target_size.z(),m_e45target_size.z());
+    vtx=rn_vtx;
+    vtz=rn_vtz+m_target_pos.z();
+  }else if( gConf.Get<G4int>("Experiment") == 42. ){
+    vtx = G4RandFlat::shoot(-m_target_size.x()/2.,m_target_size.x()/2.)*mm;
+    vty = G4RandFlat::shoot(-m_target_size.y()/2.,m_target_size.y()/2.)*mm;
+    vtz = G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2,m_target_pos.z()+m_target_size.z()/2)*mm;
+  }
+  
+  gAnaMan.SetNumberOfPrimaryParticle(3);
+
+  //K+ gun, (skaon+ is injected)
+  m_particle_gun->SetParticleDefinition(m_sKaonPlus);
+  //  m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_p_x,mom_p_y,mom_p_z));
+  //  m_particle_gun->SetParticleEnergy((Energy_p - m_Proton->GetPDGMass()/GeV)*GeV);
+  std::cout<<"Kp Mom: "<<kp_L->P()<<std::endl;
+  m_particle_gun->SetParticleMomentum(G4ThreeVector(kp_L->Px()*GeV,
+						    kp_L->Py()*GeV,
+						    kp_L->Pz()*GeV));
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetModeID(1);
+  gAnaMan.SetPrimaryParticle(0,kp_L->Px(),kp_L->Py(),kp_L->Pz()
+			     ,m_Proton->GetPDGMass()/GeV,KaonPlusID);
+  gAnaMan.SetPrimaryVertex(0,vtx,vty,vtz);
+
+  
+  //Lambda1 gun
+  m_particle_gun->SetParticleDefinition(m_Lambda);
+  std::cout<<"L1 Mom: "<<L1_L->P()<<std::endl;
+  m_particle_gun->SetParticleMomentum(G4ThreeVector(L1_L->Px()*GeV,
+						    L1_L->Py()*GeV,
+						    L1_L->Pz()*GeV));
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetModeID(1);
+  gAnaMan.SetPrimaryParticle(1,L1_L->Px(),L1_L->Py(),L1_L->Pz()
+			     ,m_Lambda->GetPDGMass()/GeV,LambdaID);
+  gAnaMan.SetPrimaryVertex(1,vtx,vty,vtz);
+
+    
+  //Lambda2 gun
+  m_particle_gun->SetParticleDefinition(m_Lambda);
+  std::cout<<"L2 Mom: "<<L2_L->P()<<std::endl;
+  m_particle_gun->SetParticleMomentum(G4ThreeVector(L2_L->Px()*GeV,
+						    L2_L->Py()*GeV,
+						    L2_L->Pz()*GeV));
+  m_particle_gun->SetParticlePosition(G4ThreeVector(vtx,vty,vtz));
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetModeID(1);
+  gAnaMan.SetPrimaryParticle(2,L2_L->Px(),L2_L->Py(),L2_L->Pz()
+			     ,m_Lambda->GetPDGMass()/GeV,LambdaID);
+  gAnaMan.SetPrimaryVertex(2,vtx,vty,vtz);
+
+}
+
 
 
 
