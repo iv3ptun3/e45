@@ -1060,10 +1060,14 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     //Thin sensitive detector is introduced.
     for( G4int i=0; i<NumOfPadTPC; ++i ){
       double pad_radius = padHelper::getRadius(i);
+      pad_in[i] = pad_radius;
+      pad_out[i] = pad_radius + 0.1*mm;
+			/*
 			double pad_halflength = padHelper::getLength(i)/2;
       pad_in[i] = pad_radius-pad_halflength;
       pad_out[i] = pad_radius + pad_halflength;
-      if( i<NumOfPadTPCIn ){
+      */
+			if( i<NumOfPadTPCIn ){
 	angle[i]   = 360.;
       }
       else{
