@@ -122,6 +122,9 @@ struct Event
   //  int tpctrNum_p;
 
   Int_t nhPrm;
+	Int_t data_runnum;
+	Int_t data_evnum;
+	Int_t trigpat[32];
   Int_t pidPrm[MaxPrimaryParticle];
   Double_t xPrm[MaxPrimaryParticle];
   Double_t yPrm[MaxPrimaryParticle];
@@ -540,6 +543,7 @@ public:
   void SetTargetData( const VHitInfo* hit );
   void SetPrimaryBeam( const G4ThreeVector& p );
   void SetPrimaryBeam( G4double px, G4double py, G4double pz );
+	void SetRealBeamData(G4int runnum, G4int evnum, G4int* trigpat);
   void SetPrimaryParticle( G4double px, G4double py, G4double pz );
   void SetPrimaryParticle( G4int id, const G4ThreeVector& p, G4double mass,
 			   G4int pid=-9999 );

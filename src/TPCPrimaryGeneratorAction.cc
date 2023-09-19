@@ -106,7 +106,13 @@ void
 TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 {
   if( gBeam.IsReady() ){
-    *m_beam = gBeam.Get();
+		if(gBeam.IsReal()){
+    	G4int eventID = anEvent->GetEventID();
+			*m_beam = gBeam.Get(eventID);
+		}
+		else{
+    	*m_beam = gBeam.Get();
+		}
 #ifdef DEBUG
     m_beam->Print();
 #endif
@@ -144,6 +150,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 13: GeneratePionPlusKstarL( anEvent ); break; // Study on pi-p --> KsS by using LL gen
   case 14: GeneratePionPlusKstarS( anEvent ); break; // Study on pi-p --> KsS by using LL gen
   case 15: GenerateKpXi2Body( anEvent ); break;
+  case 150: GenerateKpXi2BodyUniform( anEvent ); break;
   case 16: GenerateUniformProton( anEvent ); break;
   case 17: GenerateUniformPim( anEvent ); break;
   case 18: GenerateBeamProton( anEvent ); break;
@@ -171,7 +178,13 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 99: GenerateDedxSingle( anEvent ); break;
     // Study on dedx. only single particle will be generated
   case 98: GenerateAll( anEvent ); break; // Study on dedx. All particles will be generated
-  case 700: GenerateE07Study( anEvent ); break; // Study on E07, generate beam and K+ from INC data
+	case 135: GeneratePionPlusBeamthrough( anEvent ); break;
+	case -135: GeneratePionMinusBeamthrough( anEvent ); break;
+	case 493: GenerateKaonPlusBeamthrough( anEvent ); break;
+	case -493: GenerateKaonMinusBeamthrough( anEvent ); break;
+	case 938: GenerateProtonBeamthrough( anEvent ); break;
+
+	case 700: GenerateE07Study( anEvent ); break; // Study on E07, generate beam and K+ from INC data
   case 701: GenerateE07StudyAll( anEvent ); break; // Study on E07, generate K+ pi+ from INC data
   case 702: GenerateE07StudyKnP( anEvent ); break; // Study on E07, generate K+ pi+ from INC data
   case 703: GenerateE07StudyKp( anEvent ); break; // Study on E07, generate K+ pi+ from INC data
@@ -288,7 +301,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2Body( G4Event* anEvent )
   // m_coscmk->Fill( momcmk[2]/momcmkpp );
 
   gAnaMan.SetPrimaryBeam( m_beam->p );
-  gAnaMan.SetNumberOfPrimaryParticle( 4 );
+  gAnaMan.SetNumberOfPrimaryParticle( 3 );
 
   ///// KaonMinus (produced to upstream assumed with KaonPlus).
   // m_particle_gun->SetParticleDefinition( m_KaonPlus );
@@ -296,7 +309,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2Body( G4Event* anEvent )
   // m_particle_gun->SetParticleEnergy( ( KnLV.e() - KaonMinusMass )*CLHEP::GeV );
   // m_particle_gun->SetParticlePosition( gen_pos );
   // m_particle_gun->GeneratePrimaryVertex( anEvent );
-  gAnaMan.SetPrimaryParticle( 0, KnLV.v(), KaonMinusMass, KaonMinusID );
+  gAnaMan.SetPrimaryParticle( 0, -KnLV.v(), KaonMinusMass, KaonMinusID );
   gAnaMan.SetPrimaryVertex( 0, gen_pos );
   ///// Proton
   // m_particle_gun->SetParticleDefinition( m_Proton );
@@ -304,24 +317,105 @@ TPCPrimaryGeneratorAction::GenerateKpXi2Body( G4Event* anEvent )
   // m_particle_gun->SetParticleEnergy( ( PLV.e() - ProtonMass )*CLHEP::GeV );
   // m_particle_gun->SetParticlePosition( gen_pos );
   // m_particle_gun->GeneratePrimaryVertex( anEvent );
-  gAnaMan.SetPrimaryParticle( 1, PLV.v(), ProtonMass, ProtonID );
-  gAnaMan.SetPrimaryVertex( 1, gen_pos );
+//  gAnaMan.SetPrimaryParticle( 1, PLV.v(), ProtonMass, ProtonID );
+ // gAnaMan.SetPrimaryVertex( 1, gen_pos );
   ///// KaonPlus
   m_particle_gun->SetParticleDefinition( m_KaonPlus );
   m_particle_gun->SetParticleMomentumDirection( KpLV.v() );
   m_particle_gun->SetParticleEnergy( ( KpLV.e() - KaonPlusMass )*CLHEP::GeV );
   m_particle_gun->SetParticlePosition( gen_pos );
   m_particle_gun->GeneratePrimaryVertex( anEvent );
-  gAnaMan.SetPrimaryParticle( 2, KpLV.v(), KaonPlusMass, KaonPlusID );
-  gAnaMan.SetPrimaryVertex( 2, gen_pos );
+  gAnaMan.SetPrimaryParticle( 1, KpLV.v(), KaonPlusMass, KaonPlusID );
+  gAnaMan.SetPrimaryVertex( 1, gen_pos );
   ///// XiMinus
   m_particle_gun->SetParticleDefinition( m_XiMinus );
   m_particle_gun->SetParticleMomentumDirection( XiLV.v() );
   m_particle_gun->SetParticleEnergy( ( XiLV.e() - XiMinusMass )*CLHEP::GeV );
   m_particle_gun->SetParticlePosition( gen_pos );
   m_particle_gun->GeneratePrimaryVertex( anEvent );
-  gAnaMan.SetPrimaryParticle( 3, XiLV.v(), XiMinusMass, XiMinusID );
-  gAnaMan.SetPrimaryVertex( 3, gen_pos );
+  gAnaMan.SetPrimaryParticle( 2, XiLV.v(), XiMinusMass, XiMinusID );
+  gAnaMan.SetPrimaryVertex( 2, gen_pos );
+}
+
+//_____________________________________________________________________________
+//case 150 Generate KpXi assuming uniform distribution on CM Frame
+void
+TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
+{
+  static const G4double KaonMinusMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4double ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+  static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double XiMinusMass = m_XiMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int XiMinusID = m_XiMinus->GetPDGEncoding();
+
+  G4LorentzVector KnLV, PLV, KpLV, XiLV;
+  G4ThreeVector gen_pos( m_beam->GetX( -m_beam->z ),
+			 m_beam->GetY( -m_beam->z ),
+			 m_target_pos.z() );
+	// K+ angular distribution
+	G4double cosx = -100.;
+	cosx = G4RandFlat::shoot( -1., 1. );
+	////////////// harmonic motion
+	G4int type = G4RandFlat::shoot() * 6. < 2. ? 0 : 1 ;
+	G4ThreeVector p_fermi = Kinematics::HarmonicFermiMomentum( type );
+	p_fermi*=0;
+	gAnaMan.SetFermiMomentum( p_fermi );
+	KinemaFermi kinema( KaonMinusMass, ProtonMass, KaonPlusMass, XiMinusMass,
+			m_beam->p, p_fermi, cosx );
+	// if( kinema.GetTheta( 3 )/CLHEP::deg > 60. )
+	//   theta_flag = false;
+	KnLV = kinema.GetLorentzVector( 0 );
+	PLV = kinema.GetLorentzVector( 1 );
+	KpLV = kinema.GetLorentzVector( 2 );
+	XiLV = kinema.GetLorentzVector( 3 );
+#ifdef DEBUG
+	kinema.Print();
+#endif
+
+  // G4cout << "#D " << FUNC_NAME << " k+ mom: " << mom[2] << G4endl;
+  // m_cross_section->Fill(cosx);
+  // gAnaMan.FillCrossSection(cosx);
+  //  G4double momkpp=std::sqrt(std::pow(kp_mom_x,2)+std::pow(kp_mom_y,2)+std::pow(kp_mom_z,2));
+  // G4double momcmk[4]={0};
+  //  G4double beta= pbeam/(proton->GetPDGMass()/CLHEP::GeV+Ebeam);
+  // G4double momcmkpp = std::sqrt( momcmk[0]*momcmk[0] +
+  // 				 momcmk[1]*momcmk[1] +
+  // 				 momcmk[2]*momcmk[2] );
+  // m_cmk->Fill( std::acos(momcmk[2]/momcmkpp)/CLHEP::pi*180);
+  //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
+  // m_coscmk->Fill( momcmk[2]/momcmkpp );
+
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 3 );
+
+  ///// KaonMinus (produced to upstream assumed with KaonPlus).
+  // m_particle_gun->SetParticleDefinition( m_KaonPlus );
+   m_particle_gun->SetParticleMomentumDirection( -KnLV.v() );
+   m_particle_gun->SetParticleEnergy( ( KnLV.e() - KaonMinusMass )*CLHEP::GeV );
+   m_particle_gun->SetParticlePosition( gen_pos );
+   m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 0, KnLV.v(), KaonMinusMass, KaonMinusID );
+  gAnaMan.SetPrimaryVertex( 0, gen_pos );
+  ///// Proton No Proton track
+  ///// KaonPlus
+  m_particle_gun->SetParticleDefinition( m_KaonPlus );
+  m_particle_gun->SetParticleMomentumDirection( KpLV.v() );
+  m_particle_gun->SetParticleEnergy( ( KpLV.e() - KaonPlusMass )*CLHEP::GeV );
+  m_particle_gun->SetParticlePosition( gen_pos );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 1, KpLV.v(), KaonPlusMass, KaonPlusID );
+  gAnaMan.SetPrimaryVertex( 1, gen_pos );
+  ///// XiMinus
+  m_particle_gun->SetParticleDefinition( m_XiMinus );
+  m_particle_gun->SetParticleMomentumDirection( XiLV.v() );
+  m_particle_gun->SetParticleEnergy( ( XiLV.e() - XiMinusMass )*CLHEP::GeV );
+  m_particle_gun->SetParticlePosition( gen_pos );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 2, XiLV.v(), XiMinusMass, XiMinusID );
+  gAnaMan.SetPrimaryVertex( 2, gen_pos );
 }
 
 //_____________________________________________________________________________
@@ -3365,6 +3459,135 @@ TPCPrimaryGeneratorAction::GenerateAll( G4Event* anEvent )
   }
 
   ///////kp PG
+}
+
+//Generator 135, PionPlusBeamthrough with RealData
+	void
+TPCPrimaryGeneratorAction::GeneratePionPlusBeamthrough( G4Event* anEvent )
+{
+  static const G4double PionPlusMass = m_PionPlus->GetPDGMass()/CLHEP::GeV;
+  
+  static const G4int PionPlusID = m_PionPlus->GetPDGEncoding();
+
+  G4ThreeVector gen_pos( m_beam->GetX( 0 ),
+			 m_beam->GetY( 0 ),
+			 m_beam->z );//Z = V0
+	G4ThreeVector BeamMom = m_beam->p;
+	double BeamEnergy = hypot(PionPlusMass,BeamMom.mag()) - PionPlusMass;
+	gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, BeamMom, PionPlusMass, PionPlusID );
+ 	gAnaMan.SetRealBeamData(m_beam->runnum,m_beam->evnum,m_beam->trigpat);	
+
+	m_particle_gun->SetParticleDefinition( m_PionPlus );
+	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(BeamMom );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
+	
+//Generator -135, PionMinusBeamthrough with RealData
+	void
+TPCPrimaryGeneratorAction::GeneratePionMinusBeamthrough( G4Event* anEvent )
+{
+  static const G4double PionMinusMass = m_PionMinus->GetPDGMass()/CLHEP::GeV;
+  
+  static const G4int PionMinusID = m_PionMinus->GetPDGEncoding();
+
+  G4ThreeVector gen_pos( m_beam->GetX( 0 ),
+			 m_beam->GetY( 0 ),
+			 m_beam->z );//Z = V0
+	G4ThreeVector BeamMom = m_beam->p;
+	double BeamEnergy = hypot(PionMinusMass,BeamMom.mag()) - PionMinusMass;
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, BeamMom, PionMinusMass, PionMinusID );
+ 	gAnaMan.SetRealBeamData(m_beam->runnum,m_beam->evnum,m_beam->trigpat);	
+  
+	m_particle_gun->SetParticleDefinition( m_PionMinus );
+	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(BeamMom );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
+
+//Generator 493, KaonPlusBeamthrough with RealData
+	void
+TPCPrimaryGeneratorAction::GenerateKaonPlusBeamthrough( G4Event* anEvent )
+{
+  static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+
+  G4ThreeVector gen_pos( m_beam->GetX( 0 ),
+			 m_beam->GetY( 0 ),
+			 m_beam->z );//Z = V0
+	G4ThreeVector BeamMom = m_beam->p;
+	double BeamEnergy = hypot(KaonPlusMass,BeamMom.mag()) - KaonPlusMass;
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, BeamMom, KaonPlusMass, KaonPlusID );
+ 	gAnaMan.SetRealBeamData(m_beam->runnum,m_beam->evnum,m_beam->trigpat);	
+  
+	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(BeamMom );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
+	
+//Generator -493 KaonMinusBeamthrough with RealData
+	void
+TPCPrimaryGeneratorAction::GenerateKaonMinusBeamthrough( G4Event* anEvent )
+{
+  static const G4double KaonMinusMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+  
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+
+  G4ThreeVector gen_pos( m_beam->GetX( 0 ),
+			 m_beam->GetY( 0 ),
+			 m_beam->z );//Z = V0
+	G4ThreeVector BeamMom = m_beam->p;
+	double BeamEnergy = hypot(KaonMinusMass,BeamMom.mag()) - KaonMinusMass;
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, BeamMom, KaonMinusMass, KaonMinusID );
+ 	gAnaMan.SetRealBeamData(m_beam->runnum,m_beam->evnum,m_beam->trigpat);	
+  
+	m_particle_gun->SetParticleDefinition( m_KaonMinus );
+	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(BeamMom );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
+
+//Generator 938, ProtonBeamthrough with RealData
+	void
+TPCPrimaryGeneratorAction::GenerateProtonBeamthrough( G4Event* anEvent )
+{
+  static const G4double ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+  
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
+
+  G4ThreeVector gen_pos( m_beam->GetX( 0 ),
+			 m_beam->GetY( 0 ),
+			 m_beam->z );//Z = V0
+	G4ThreeVector BeamMom = m_beam->p;
+	double BeamEnergy = hypot(ProtonMass,BeamMom.mag()) - ProtonMass;
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 1 );
+  gAnaMan.SetPrimaryParticle( 0, BeamMom, ProtonMass, ProtonID );
+  
+	m_particle_gun->SetParticleDefinition( m_Proton );
+	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(BeamMom );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
 }
 
 //_____________________________________________________________________________

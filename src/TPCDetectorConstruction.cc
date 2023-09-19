@@ -138,7 +138,7 @@ TPCDetectorConstruction::Construct( void )
     ConstructKuramaMagnet();
     ConstructSDC1();
     ConstructSCH();
-    // ConstructSDC2();
+    ConstructSDC2();
     ConstructSDC3();
     ConstructSDC4();
     ConstructFTOF();
@@ -2374,6 +2374,55 @@ TPCDetectorConstruction::ConstructSDC1( void )
     sdc1pl_lv->SetSensitiveDetector( m_sdc_sd );
     new G4PVPlacement( nullptr, pos, sdc1pl_lv, plane_name[i] + "PV",
 		       sdc1_lv, false, 101+i );
+  }
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructSDC2( void )
+{
+  if( !m_sdc_sd ){
+    m_sdc_sd = new TPCSDCSD("/SDC");
+    G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
+  }
+
+  const auto& sdc2_pos = ( gGeom.GetGlobalPosition("KURAMA") +
+			   ( gGeom.GetGlobalPosition("SDC2-X1") +
+			     gGeom.GetGlobalPosition("SDC2-Y2") ) * 0.5 );
+  const auto& frame_size = gSize.GetSize( "Sdc2Frame" ) * 0.5 * mm;
+  const auto& drift_size = gSize.GetSize( "Sdc2Drift" ) * 0.5 * mm;
+  auto sdc2_solid = new G4Box( "Sdc2Solid", frame_size.x(),
+			       frame_size.y(), frame_size.z() );
+  auto sdc2_lv = new G4LogicalVolume( sdc2_solid, m_material_map["Argon"],
+				      "Sdc2LV", 0, 0, 0 );
+  sdc2_lv->SetVisAttributes( G4Colour::Green() );
+  new G4PVPlacement( m_rotation_matrix, sdc2_pos,
+		     sdc2_lv, "Sdc2PV", m_world_lv, false, 0 );
+  auto sdc2pl_solid = new G4Box( "Sdc2PlSolid", drift_size.x(),
+				 drift_size.y(), drift_size.z() );
+  G4String plane_name[] = { "Sdc2X1", "Sdc2X2", "Sdc2Y1", "Sdc2Y2" };
+  for( G4int i=0; i<NumOfLayersSDC2; ++i ){
+    G4ThreeVector pos;
+    switch (i) {
+    case 0:
+      pos.setZ( -23.76*mm );
+      break;
+    case 1:
+      pos.setZ( -13.76*mm );
+      break;
+    case 2:
+      pos.setZ( 13.76*mm );
+      break;
+    case 3:
+      pos.setZ( 23.76*mm );
+      break;
+    }
+    auto sdc2pl_lv = new G4LogicalVolume( sdc2pl_solid,
+					  m_material_map["Argon"],
+					  plane_name[i] + "LV", 0, 0, 0 );
+    sdc2pl_lv->SetSensitiveDetector( m_sdc_sd );
+    new G4PVPlacement( nullptr, pos, sdc2pl_lv, plane_name[i] + "PV",
+		       sdc2_lv, false, 201+i );
   }
 }
 

@@ -66,6 +66,7 @@ public:
 
 public:
   void     GenerateKpXi2Body( G4Event* anEvent );
+  void     GenerateKpXi2BodyUniform( G4Event* anEvent );
   void     GenerateHanul( G4Event* anEvent );
   void     GeneratePhaseSpace( G4Event* anEvent );
   void     GenerateHdibaryon1( G4Event* anEvent );
@@ -109,6 +110,11 @@ public:
   void     GeneratePionPlusKstarL( G4Event* anEvent ); //#13
   void     GeneratePionPlusKstarS( G4Event* anEvent ); //#14
   void     GenerateAll( G4Event* anEvent ); //#98
+  void     GeneratePionPlusBeamthrough( G4Event* anEvent ); //#135
+  void     GeneratePionMinusBeamthrough( G4Event* anEvent ); //#135
+  void     GenerateKaonPlusBeamthrough( G4Event* anEvent ); //#493
+  void     GenerateKaonMinusBeamthrough( G4Event* anEvent ); //#493
+  void     GenerateProtonBeamthrough( G4Event* anEvent ); //#938
   void     GenerateDedxSingle( G4Event* anEvent ); //#99
   // E07
   void     GenerateE07Study( G4Event* anEvent ); //#700

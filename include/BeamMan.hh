@@ -19,14 +19,18 @@ struct BeamInfo
 {
   G4double      x; // [mm]
   G4double      y; // [mm]
-  G4double      u; // [mrad]
+  G4double      u; // [mrad] -> dxdz in k18-analyzer
   G4double      v; // [mrad]
   G4double      dp; // [%]
   G4ThreeVector p; // [GeV/c]
   G4double      z; // [mm]
-  G4double GetX( G4double offset=0. ) const;
+  G4int					trigpat[32];
+	G4double GetX( G4double offset=0. ) const;
   G4double GetY( G4double offset=0. ) const;
+	G4int GetTrigPat(G4int flag) const;
   void     Print( void ) const;
+	G4int evnum;
+	G4int runnum;
 };
 
 //_____________________________________________________________________________
@@ -50,16 +54,19 @@ private:
   ParamArray    m_param_array;
   G4int         m_n_param;
   G4bool        m_is_vi; // true:VI or false:VO
+  G4bool        m_is_realdata;
   G4double      m_primary_z; // from VI or VO
   G4ThreeVector m_vi_pos;
 
 public:
   const BeamInfo&      Get( void ) const;
+  const BeamInfo&      Get( G4int iev ) const;
   G4double             GetPrimaryZ( void ) const { return m_primary_z; }
   const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
   G4bool               Initialize( void );
   G4bool               Initialize( const G4String& filename );
   G4bool               IsReady( void ) const { return m_is_ready; }
+  G4bool               IsReal( void ) const { return m_is_realdata; }
   void                 Print( void ) const;
   void                 SetPrimaryZ( G4double z ){ m_primary_z = z; }
   void                 SetVIPosition( G4ThreeVector pos ){ m_vi_pos = pos; }

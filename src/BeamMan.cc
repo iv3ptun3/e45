@@ -36,6 +36,13 @@ BeamInfo::GetY( G4double offset ) const
 }
 
 //_____________________________________________________________________________
+G4int 
+BeamInfo::GetTrigPat(G4int flag) const
+{
+	return trigpat[flag];
+}
+
+//_____________________________________________________________________________
 void
 BeamInfo::Print( void ) const
 {
@@ -78,37 +85,95 @@ BeamMan::Initialize( void )
 
   if( m_file_name.isNull() )
     return true;
+  
+	m_param_array.clear();
+  G4int generator = gConf.Get<G4int>( "Generator" );
+	m_is_vi = ( gConf.Get<G4int>( "Generator" ) == 10 );
+	if( abs(generator) == 135 or abs(generator) == 493 or abs(generator) ==938 ){
+		m_is_realdata = 1;
+	}
 
-  m_file = new TFile( m_file_name );
-  TTree* tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+  m_primary_z = gGeom.GetLocalZ( "Vertex" );
+//  double bh2_z = gGeom.GetLocalZ( "BH2" );
+  if( !m_is_vi )
+    m_primary_z -= 1318.9*CLHEP::mm; // from VO
+	TTree* tree = nullptr;
+	m_file = new TFile( m_file_name );
+	if(!m_is_realdata){
+		tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+	}
+	else{
+		tree = dynamic_cast<TTree*>( m_file->Get( "k18track" ) );
+	}
+
 
   if( !m_file->IsOpen() || !tree )
     return false;
+	int ntK18,evnum,runnum;
+	double xout[5];
+	double yout[5];
+	double uout[5];
+	double vout[5];
+	double pHS[5];
+	int trigpat[32];
 
-  m_param_array.clear();
-  m_is_vi = ( gConf.Get<G4int>( "Generator" ) == 10 );
-  m_primary_z = gGeom.GetLocalZ( "Vertex" );
-  if( !m_is_vi )
-    m_primary_z -= 1200.*CLHEP::mm; // from VO
   BeamInfo beam;
-  tree->SetBranchAddress( "x", &beam.x );
-  tree->SetBranchAddress( "y", &beam.y );
-  tree->SetBranchAddress( "u", &beam.u );
-  tree->SetBranchAddress( "v", &beam.v );
-  tree->SetBranchAddress( "p", &beam.dp );
-
+	if(!m_is_realdata){
+		tree->SetBranchAddress( "x", &beam.x );
+		tree->SetBranchAddress( "y", &beam.y );
+		tree->SetBranchAddress( "u", &beam.u );
+		tree->SetBranchAddress( "v", &beam.v );
+		tree->SetBranchAddress( "p", &beam.dp );
+	}
+	else{
+		tree->SetBranchAddress( "ntK18",&ntK18);
+		tree->SetBranchAddress( "evnum",&evnum);
+		tree->SetBranchAddress( "runnum",&runnum);
+		tree->SetBranchAddress( "xout",xout);
+		tree->SetBranchAddress( "yout",yout);
+		tree->SetBranchAddress( "uout",uout);
+		tree->SetBranchAddress( "vout",vout);
+		tree->SetBranchAddress( "pHS",pHS);
+		tree->SetBranchAddress( "trigpat",trigpat);
+	}
+	std::cout<<"BeamEvents = "<<tree->GetEntries()<<std::endl;
   for( Long64_t i=0, n=tree->GetEntries(); i<n; ++i ){
     tree->GetEntry( i );
-    beam.x *= -1.*CLHEP::cm; // -cm -> mm
-    beam.y *= -1.*CLHEP::cm; // -cm -> mm
-    G4double dxdz = std::tan( -1.*beam.u*CLHEP::mrad ); // -mrad -> tan
-    G4double dydz = std::tan( -1.*beam.v*CLHEP::mrad ); // -mrad -> tan
-    G4double pp = p0 * ( 1. + beam.dp*CLHEP::perCent ); // dp/p[%] -> GeV/c
-    G4double pz = pp / std::sqrt( dxdz*dxdz + dydz*dydz + 1. );
-    beam.x += dxdz * m_primary_z;
-    beam.y += dydz * m_primary_z;
-    beam.z = m_primary_z;
-    beam.p.set( pz*dxdz, pz*dydz, pz );
+		if(!m_is_realdata){
+			beam.x *= -1.*CLHEP::cm; // -cm -> mm
+			beam.y *= -1.*CLHEP::cm; // -cm -> mm
+			G4double dxdz = std::tan( -1.*beam.u*CLHEP::mrad ); // -mrad -> tan
+			G4double dydz = std::tan( -1.*beam.v*CLHEP::mrad ); // -mrad -> tan
+			G4double pp = p0 * ( 1. + beam.dp*CLHEP::perCent ); // dp/p[%] -> GeV/c
+			G4double pz = pp / std::sqrt( dxdz*dxdz + dydz*dydz + 1. );
+			beam.x += dxdz * m_primary_z;
+			beam.y += dydz * m_primary_z;
+			beam.z = m_primary_z;
+			beam.p.set( pz*dxdz, pz*dydz, pz );
+		}
+		else{
+			beam.x=0;
+			beam.y=0;
+			beam.z=0;
+			beam.u=0;
+			beam.v=0;
+			beam.p.set(0,0,0);
+			beam.evnum = evnum;
+			beam.runnum = runnum;
+			for(int it=0;it<ntK18;++it){
+				beam.x = xout[0]  ;
+				beam.y = yout[0];
+				beam.z = m_primary_z;//VO
+				beam.u = uout[0];// u,v definition = dxdz,dydz, not mrad. 
+				beam.v = yout[0];
+				double pz = pHS[0] / sqrt(uout[0]*uout[0]+vout[0]*vout[0]+1);
+		
+				beam.p.set(pz * uout[0],pz* vout[0], pz);
+			}
+			for(int itrg=0;itrg<32;++itrg){
+				beam.trigpat[itrg] = trigpat[itrg];
+			}
+		}
     m_param_array.push_back( beam );
   }
 
@@ -131,6 +196,12 @@ const BeamInfo&
 BeamMan::Get( void ) const
 {
   return m_param_array.at( G4RandFlat::shootInt( m_n_param ) );
+}
+
+const BeamInfo&
+BeamMan::Get( G4int iev ) const
+{
+  return m_param_array.at( iev%m_n_param );
 }
 
 //_____________________________________________________________________________

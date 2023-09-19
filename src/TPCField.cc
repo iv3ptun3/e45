@@ -153,7 +153,7 @@ TPCField::GetFieldValue( const G4double Point[4], G4double* Bfield ) const
       Bfield[2] += 0.*tesla;
     }
   } else {
-    G4double shs_point[3] = { pos.x()/cm, pos.y()/cm, pos.z()/cm };
+    G4double shs_point[3] = { kurama_coord.x()/cm, kurama_coord.y()/cm, kurama_coord.z()/cm };
     
     if(shs_field_ofset_conf==1){
       for(int shsi=0;shsi<3;shsi++){

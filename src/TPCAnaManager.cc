@@ -38,6 +38,9 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "evnum", &event.evnum, "evnum/I" );
   TPC_g->Branch( "pb", "TVector3", event.pb );
   TPC_g->Branch( "nhPrm", &event.nhPrm, "nhPrm/I" );
+  TPC_g->Branch( "data_runnum", &event.data_runnum, "data_runnum/I" );
+  TPC_g->Branch( "data_evnum", &event.data_evnum, "data_evnum/I" );
+  TPC_g->Branch( "trigpat", event.trigpat, "trigpat[32]/I" );
   TPC_g->Branch( "pidPrm", event.pidPrm, "pidPrm[nhPrm]/I" );
   TPC_g->Branch( "xPrm", event.xPrm, "xPrm[nhPrm]/D" );
   TPC_g->Branch( "yPrm", event.yPrm, "yPrm[nhPrm]/D" );
@@ -2187,13 +2190,20 @@ TPCAnaManager::EndOfEventAction( void )
   {
     event.pb->SetXYZ( p.x(), p.y(), p.z() );
   }
-
   //_____________________________________________________________________________
   void
     TPCAnaManager::SetPrimaryBeam( G4double px, G4double py, G4double pz )
   {
     event.pb->SetXYZ( px, py, pz );
   }
+	void
+		TPCAnaManager::SetRealBeamData(G4int runnum, G4int evnum, G4int* trigpat){
+			event.data_runnum = runnum;
+			event.data_evnum = evnum;
+			for(int i=0;i<32;++i){
+				event.trigpat[i] = trigpat[i];
+			}
+		};
 
   //_____________________________________________________________________________
   void
