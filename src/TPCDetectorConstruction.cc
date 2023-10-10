@@ -33,6 +33,7 @@
 #include "MathTools.hh"
 #include "TPCACSD.hh"
 #include "TPCBH2SD.hh"
+#include "TPCBVHSD.hh"
 #include "TPCField.hh"
 #include "TPCFTOFSD.hh"
 #include "TPCHTOFSD.hh"
@@ -137,8 +138,9 @@ TPCDetectorConstruction::Construct( void )
   if( gConf.Get<G4int>("ConstructKurama") ){
     ConstructKuramaMagnet();
     ConstructSDC1();
-    ConstructSCH();
     ConstructSDC2();
+    ConstructSCH();
+  	ConstructBVH();
     ConstructSDC3();
     ConstructSDC4();
     ConstructFTOF();
@@ -544,6 +546,46 @@ TPCDetectorConstruction::ConstructBH2( void )
   edge_segment_lv->SetSensitiveDetector( bh2SD );
 }
 
+	void
+TPCDetectorConstruction::ConstructBVH( void )
+{
+  const auto& ra2 = gGeom.GetRotAngle2("BVH") * deg;
+  const auto& half_size = gSize.GetSize("BVHSeg") * 0.5 * mm;
+  const G4double pitch = gGeom.GetWirePitch("BVH") *mm;
+  auto bvhSD = new TPCBVHSD("/BVH");
+  G4SDManager::GetSDMpointer()->AddNewDetector( bvhSD );
+  // Mother
+  auto mother_solid = new G4Box( "BVHMotherSolid",
+				 half_size.x()*NumOfSegBVH + 50.*mm,
+				 half_size.y() + 50.*mm,
+				 half_size.z()*2 + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+					m_material_map["Air"],
+					"BVHMotherLV" );
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+	       gGeom.GetGlobalPosition("BVH") );
+  pos.rotateY( m_rotation_angle );
+  new G4PVPlacement( rot, pos, mother_lv,
+		     "BVHMotherPV", m_world_lv, false, 0 );
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  // Segment
+  auto segment_solid = new G4Box( "BVHSegmentSolid", half_size.x(),
+				  half_size.y(), half_size.z() );
+  auto segment_lv = new G4LogicalVolume( segment_solid,
+					 m_material_map["Scintillator"],
+					 "BVHSegmentLV" );
+
+  for( G4int i=0; i<NumOfSegBVH; ++i ){
+		pos = G4ThreeVector( ( -NumOfSegBVH/2 + i + 0.5 )*pitch, 0.*mm, 0.*mm );
+		new G4PVPlacement( nullptr, pos, segment_lv,
+				"BVHSegmentPV", mother_lv, false, i );
+  }
+  segment_lv->SetVisAttributes( G4Colour::Cyan() );
+  segment_lv->SetSensitiveDetector( bvhSD );
+}
+
 //_____________________________________________________________________________
 void
 TPCDetectorConstruction::ConstructFTOF( void )
@@ -886,6 +928,7 @@ TPCDetectorConstruction::ConstructHTOF( void )
 void
 TPCDetectorConstruction::ConstructHypTPC( void )
 {
+
   auto tpc_sd = new TPCPadSD("/TPC");
   G4SDManager::GetSDMpointer()->AddNewDetector( tpc_sd );
   const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
@@ -898,6 +941,8 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   G4ThreeVector holder_pos;
   G4VSolid* target_solid = nullptr;
   G4VSolid* holder_solid = nullptr;
+	G4double maxStep = 0.3*mm;//~TPCres
+	auto StepLimit = new G4UserLimits(maxStep);
   switch( m_experiment ){
   case 42: {
     target_solid = new G4Box( "Target", target_size.x(),
@@ -926,6 +971,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   }
   auto target_lv = new G4LogicalVolume( target_solid, m_material_map["Target"],
 					"TargetLV" );
+	target_lv->SetUserLimits(StepLimit);
   target_lv->SetSensitiveDetector( target_sd );
   target_lv->SetVisAttributes( G4Colour::Red() );
   new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
@@ -959,6 +1005,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     rot->rotateX( 90.*deg );
     m_tpc_lv = new G4LogicalVolume( tpc_solid, m_material_map["P10"],
 				    "TpcLV" );
+		m_tpc_lv->SetUserLimits(StepLimit);
     new G4PVPlacement( rot, tpc_pos, m_tpc_lv, "TpcPV",
 		       m_world_lv, false, 0 );
     m_tpc_lv->SetVisAttributes( G4Colour::White() );
@@ -2305,7 +2352,7 @@ TPCDetectorConstruction::ConstructSCH( void )
   for( G4int i=0; i<NumOfSegSCH; ++i ){
     sch_lv[i] = new G4LogicalVolume( sch_solid, m_material_map["Scintillator"],
 				     Form( "SchSeg%dLV", i ), 0, 0, 0 );
-    sch_lv[i]->SetVisAttributes( G4Colour::Cyan() );
+    sch_lv[i]->SetVisAttributes( G4Colour::Green() );
     G4double ipos_x = dXdW * ( i - ( NumOfSegSCH - 1 )/2. );
     G4ThreeVector pos( sch_pos.x() + ipos_x,
 		       sch_pos.y(),

@@ -13,6 +13,7 @@
 #include <TTree.h>
 
 #include "ConfMan.hh"
+#include "TPCParamMan.hh"
 #include "FuncName.hh"
 #include "ResHypTPC.hh"
 #include "RungeKuttaTracker.hh"
@@ -24,10 +25,15 @@
 namespace
 {
   const ConfMan& gConf = ConfMan::GetInstance();
+  const TPCParamMan& gTPC    = TPCParamMan::GetInstance();
   //TTree* tree;
   TTree* TPC_g;
   Event event;
   std::map<TString, TH1*> hmap;
+  const auto& ResParamInnerLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Inner layers
+  const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, true); //B=1 T, Outer layers
+  const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Inner layers
+  const auto& ResParamOuterLayerHSOff = gTPC.TPCResolutionParams(false, true); //B=0, Outer layers
 }
 
 //_____________________________________________________________________________
@@ -105,6 +111,9 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch("y0tpc",event.y0tpc,"y0tpc[nhittpc]/D");
   TPC_g->Branch("z0tpc",event.z0tpc,"z0tpc[nhittpc]/D");
   TPC_g->Branch("resoX",event.resoX,"resoX[nhittpc]/D");
+  TPC_g->Branch("resxtpc",event.resxtpc,"resxtpc[nhittpc]/D");
+  TPC_g->Branch("resytpc",event.resytpc,"resytpc[nhittpc]/D");
+  TPC_g->Branch("resztpc",event.resztpc,"resztpc[nhittpc]/D");
   TPC_g->Branch("pxtpc",event.pxtpc,"pxtpc[nhittpc]/D");
   TPC_g->Branch("pytpc",event.pytpc,"pytpc[nhittpc]/D");
   TPC_g->Branch("pztpc",event.pztpc,"pztpc[nhittpc]/D");
@@ -849,6 +858,9 @@ TPCAnaManager::BeginOfEventAction( void )
     event.y0tpc[i] = -9999.9;
     event.z0tpc[i] = -9999.9;
     event.resoX[i] = -9999.9;
+    event.resxtpc[i] = -9999.9;
+    event.resytpc[i] = -9999.9;
+    event.resztpc[i] = -9999.9;
 
     event.pxtpc[i] = -9999.9;
     event.pytpc[i] = -9999.9;
@@ -877,6 +889,9 @@ TPCAnaManager::EndOfEventAction( void )
 {
   event.evnum++;
 
+    if(tpctrNum>9){
+      G4cout<<"Error--> over the number of tracks in the TPC:"<<tpctrNum<<G4endl;
+		}
   //Fill Primary Infomation for E27
   if( m_experiment == 27 || m_experiment == 45 ){
     event.mm_d = primaryInfo.mm_d;
@@ -922,9 +937,6 @@ TPCAnaManager::EndOfEventAction( void )
     ///shhwang code
 
 
-    if(tpctrNum>9){
-      G4cout<<"Error--> over the number of tracks in the TPC:"<<tpctrNum<<G4endl;
-    }
 
     G4int sh_paID[MAX_TRACK] = {};
     for( G4int i=0; i<HitNum; i++){
@@ -1469,7 +1481,7 @@ TPCAnaManager::EndOfEventAction( void )
       }
       //      }
     }
-    if( HitNum >= MaxHits ){
+    if( HitNum > MaxHits ){
       G4cerr << FUNC_NAME << " too much nhit (TPC) " << HitNum << G4endl;
     } else {
 
@@ -1489,6 +1501,9 @@ TPCAnaManager::EndOfEventAction( void )
 	event.z0tpc[event.nhittpc] = counterData[i].pos0[2]/CLHEP::mm;
 
 	event.resoX[event.nhittpc] = counterData[i].resoX;
+	event.resxtpc[event.nhittpc] = counterData[i].resxtpc;
+	event.resytpc[event.nhittpc] = counterData[i].resytpc;
+	event.resztpc[event.nhittpc] = counterData[i].resztpc;
 	event.pxtpc[event.nhittpc] = counterData[i].mom[0]/CLHEP::GeV;
 	event.pytpc[event.nhittpc] = counterData[i].mom[1]/CLHEP::GeV;
 	event.pztpc[event.nhittpc] = counterData[i].mom[2]/CLHEP::GeV;
@@ -1604,12 +1619,12 @@ TPCAnaManager::EndOfEventAction( void )
   {
     G4int hitnum = HitNum;
     G4bool flag=true;
-    if (hitnum >= MaxTrack) {
+    if (hitnum > MaxTrack) {
       fprintf(stderr, "TPCAnaManager::SetCounterData Too Much multiplicity %d\n",
 	      hitnum);
       return;
     }
-
+		
     //  G4ThreeVector tar_pos(0.,0.*CLHEP::mm,-150.*CLHEP::mm);
 
     G4ThreeVector tar_pos(0.,0., -143);
@@ -1642,7 +1657,6 @@ TPCAnaManager::EndOfEventAction( void )
       counterData[hitnum].slength = slength;
       counterData[hitnum].tlength = tlength;
 
-      //////shhwang position smearing////
 
 
       G4double sh_alpha =  atan2(sh_x,sh_z);
@@ -1659,90 +1673,27 @@ TPCAnaManager::EndOfEventAction( void )
       }else{
 	// ang_check=1.;
       }
-      // G4double arc_sh=pad_in[iLay]*ang_sh;
-      // G4int ith_pad_in=arc_sh/pad_in_width;
-      // G4int ith_pad_out=arc_sh/pad_out_width;
-
-
-      // G4double delta_x=0.;
-
-      // if( m_pad_config ==1 ){
-      //   if(iLay<pad_in_num){   // const G4int pad_in_num=10;
-      // 	delta_x=arc_sh-ith_pad_in*pad_in_width;
-      // 	if(delta_x<0){
-      // 	  delta_x=delta_x+pad_in_width;
-      // 	}
-      //   }else if(iLay>=pad_in_num){
-      // 	delta_x=arc_sh-ith_pad_out*pad_out_width;
-      // 	if(delta_x<0){
-      // 	  delta_x=delta_x+pad_out_width;
-      // 	}
-      //   }
-      // }else if( m_pad_config ==2 ){
-      //   if(iLay<pad_in_num){   //
-
-      // 	ith_pad_in=arc_sh/seg_width[iLay];
-      // 	delta_x=arc_sh-ith_pad_in*seg_width[iLay];
-      // 	if(delta_x<0){
-      // 	  delta_x=delta_x+seg_width[iLay];
-      // 	}
-
-      //   }else if(iLay>=pad_in_num){
-      // 	ith_pad_out=arc_sh/seg_width[iLay];
-      // 	delta_x=arc_sh-ith_pad_out*seg_width[iLay];
-      // 	if(delta_x<0){
-      // 	  delta_x=delta_x+seg_width[iLay];
-      // 	}
-
-      //   }
-      // }
-
-
-      ///include saho-san's code
-
+			std::vector<double>ResPar;
+			if(iLay < 10){
+				ResPar = ResParamInnerLayerHSOn;
+			}
+			else{
+				ResPar = ResParamOuterLayerHSOn;
+			}
+			double par_t[6]={
+				ResPar[0],ResPar[1],ResPar[2],ResPar[3],ResPar[4],ResPar[5]};
+			double par_y[4] = {
+				ResPar[6],ResPar[1],ResPar[7],ResPar[8]};
       // G4double compy=0.;
       G4double compx=0.;
+			auto SmearingVector =
+				GetSmearingVector(sh_pos,mom,par_y,par_t);
 
-      // G4int n_electron=0; //output
-      // G4int n_pad=0;//output
-      // G4double x_rms=0;//output
-      // G4double x_track = delta_x;// pad edge
-      // G4double y_track = double(250.+50.+pos.getY());// 50 is office set
-      // if(y_track<0 || y_track>600) G4cout<<"Y_track estimation is wrong(y_track:y_pos)"<<y_track<<":"<<pos.getY()<<G4endl;
-
-
-      // G4double dxdz_track=tan(acos((sh_pos.getX()*mom.getX()+sh_pos.getZ()*mom.getZ())/(sqrt(sh_pos.getX()*sh_pos.getX()+sh_pos.getZ()*sh_pos.getZ())*sqrt(mom.getX()*mom.getX()+mom.getZ()*mom.getZ()))));
-
-
-      // //pad and particle angle
-
-
-      // G4double dydz_track=0;
-
-      // if( m_pad_config ==1){
-      //   if(iLay<pad_in_num){
-      // 	ResHypTPC reshyptpc(pad_in_width, pad_length_in, 0.1,0.18, 0);
-      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-      // 	compy = reshyptpc.getYDeviation(pos.getY());
-      //   }else if(iLay>=pad_in_num){
-      // 	ResHypTPC reshyptpc(pad_out_width, pad_length_out, 0.1,0.18, 0);
-      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-      // 	compy = reshyptpc.getYDeviation(pos.getY());
-      //   }
-
-
-      // }else if( m_pad_config ==2){
-      //   if(iLay<pad_in_num){
-      // 	ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_in, 0.1,0.18, 0);
-      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-      // 	compy = reshyptpc.getYDeviation(pos.getY());
-      //   }else if(iLay>=pad_in_num){
-      //ResHypTPC reshyptpc(double(seg_width[iLay]-0.5), pad_length_out, 0.1,0.18, 0);
-      // 	compx = reshyptpc.getXDeviation(n_electron, n_pad, x_rms, x_track, y_track, dxdz_track, dydz_track);
-      // 	compy = reshyptpc.getYDeviation(pos.getY());
-      //   }
-      // }
-      compx = GetTransverseRes(sh_y);
+			auto ResVector =
+				GetResVector(sh_pos,mom,par_y,par_t);
+			compx = ResVector.mag();
+  /*
+			compx = GetTransverseRes(sh_y);
       double s_compx = CLHEP::RandGauss::shoot(0.,compx);
 
       // std::cout<<"compx="<<compx<<", sh_sigmaY"<<sh_sigmaY<<std::endl;
@@ -1760,14 +1711,18 @@ TPCAnaManager::EndOfEventAction( void )
       G4double randz_com = CLHEP::RandGauss::shoot(0.,s0);
       G4double smear_x = sqrt(randx*randx + randx_com*randx_com )*(randx_com/fabs(randx_com));
       G4double smear_z = sqrt(randz*randz + randz_com*randz_com )*(randz_com/fabs(randz_com));
-
+*/
       counterData[hitnum].resoX = compx;
+      counterData[hitnum].resxtpc = ResVector.x();
+      counterData[hitnum].resytpc = ResVector.y();
+      counterData[hitnum].resztpc = ResVector.z();
 
-      // counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
+     // counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_alpha)+smear_z+tar_pos.getZ();
       // counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_alpha)+smear_x;
-      counterData[hitnum].pos[G4ThreeVector::Z] = sh_rho*cos(sh_smear_alpha)+tar_pos.getZ();
-      counterData[hitnum].pos[G4ThreeVector::X] = sh_rho*sin(sh_smear_alpha);
-      counterData[hitnum].pos[G4ThreeVector::Y] = CLHEP::RandGauss::shoot(sh_y,sh_sigmaY);
+ 
+			counterData[hitnum].pos[G4ThreeVector::X] = SmearingVector.x()+pos.x();
+			counterData[hitnum].pos[G4ThreeVector::Y] = SmearingVector.y()+pos.y();
+			counterData[hitnum].pos[G4ThreeVector::Z] = SmearingVector.z()+pos.z();
 
       counterData[hitnum].pos0[G4ThreeVector::X] = pos.getX();
       counterData[hitnum].pos0[G4ThreeVector::Y] = pos.getY();
@@ -1815,7 +1770,6 @@ TPCAnaManager::EndOfEventAction( void )
       counterData[hitnum].iRow = iRow;
       counterData[hitnum].parentID = parentid;
       HitNum++;
-
       if(particle==321)
 	HitNum_K++;
 

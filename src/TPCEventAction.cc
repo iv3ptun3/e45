@@ -106,6 +106,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     G4int nparticle=0;
     // G4cout << "TPC  " << nhits << G4endl;
     for( G4int i=0; i<nhits; ++i ){
+			if(nparticle >20) continue;
       G4ThreeVector vtxpos = (*padHC)[i]-> GetVtxPosition();
       G4ThreeVector vtxmom = (*padHC)[i]-> GetVtxMomentum();
       G4double vtxene =(*padHC)[i]-> GetVtxEnergy();

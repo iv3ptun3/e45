@@ -17,4 +17,5 @@ lib/
 rootfiles/
 rootfiles
 tmp/
+param/k18conf/*
 !.gitkeep

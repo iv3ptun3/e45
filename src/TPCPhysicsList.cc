@@ -199,6 +199,7 @@ TPCPhysicsList::ConstructEM( void )
 void
 TPCPhysicsList::ConstructGeneral( void )
 {
+	G4cout<<"Ennabling Decays"<<G4endl;
   auto theParticleIterator = GetParticleIterator();
   theParticleIterator->reset();
   auto theDecayProcess = new G4Decay;
@@ -224,16 +225,52 @@ TPCPhysicsList::ConstructGeneral( void )
     ////shhwang; include decay process
     G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    if(Lambda_decay==1){
+    if(1){
       G4VDecayChannel* mode;
       G4DecayTable* Table = new G4DecayTable();
       particle=particleTable->FindParticle("lambda");
       mode = new G4PhaseSpaceDecayChannel("lambda",1.0000,2,"proton","pi-");
-      Table->Insert(mode);
+			Table->Insert(mode);
       particle->SetDecayTable(Table);
     }
-    //////
-
+    //////Xi-////
+		if(1){
+			G4VDecayChannel* mode;
+			G4DecayTable* Table = new G4DecayTable();
+			particle = particleTable ->FindParticle("xi-");
+      mode = new G4PhaseSpaceDecayChannel("xi-",1.0000,2,"lambda","pi-");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+		}
+		////Xi0////
+		if(1){
+			G4VDecayChannel* mode;
+			G4DecayTable* Table = new G4DecayTable();
+			particle = particleTable ->FindParticle("xi0");
+      mode = new G4PhaseSpaceDecayChannel("xi0",1.0000,2,"lambda","pi0");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+		}
+		////Xi1530////
+    G4int XiStarToXiPi0 = gConf.Get<G4int>("XiStarToXiPi0");
+    G4int XiStarToXi0Pi = gConf.Get<G4int>("XiStarToXi0Pi");
+		if(XiStarToXiPi0){
+			G4VDecayChannel* mode;
+			G4DecayTable* Table = new G4DecayTable();
+			particle = particleTable ->FindParticle("xi(1530)-");
+      mode = new G4PhaseSpaceDecayChannel("xi(1530)-",1.0000,2,"xi-","pi0");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+		}
+		if(XiStarToXi0Pi){
+			G4VDecayChannel* mode;
+			G4DecayTable* Table = new G4DecayTable();
+			particle = particleTable ->FindParticle("xi(1530)-");
+      mode = new G4PhaseSpaceDecayChannel("xi(1530)-",1.0000,2,"xi0","pi-");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+		}
+		////
     ////k0
     G4int Ks_decay = gConf.Get<G4int>( "KsDecay" );
     if(Ks_decay==1){

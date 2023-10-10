@@ -42,6 +42,7 @@ private:
   void ConstructBC3( void );
   void ConstructBC4( void );
   void ConstructBH2( void );
+  void ConstructBVH( void );
   void ConstructFTOF( void );
   void ConstructHTOF( void );
   void ConstructHypTPC( void );

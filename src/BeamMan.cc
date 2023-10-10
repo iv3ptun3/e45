@@ -90,56 +90,108 @@ BeamMan::Initialize( void )
   G4int generator = gConf.Get<G4int>( "Generator" );
 	m_is_vi = ( gConf.Get<G4int>( "Generator" ) == 10 );
 	if( abs(generator) == 135 or abs(generator) == 493 or abs(generator) ==938 ){
-		m_is_realdata = 1;
+		m_is_k18 = 1;
+	}
+	if( abs(generator) == 100 ){
+		m_is_kurama = 1;
 	}
 
   m_primary_z = gGeom.GetLocalZ( "Vertex" );
+  m_target_z = gGeom.GetLocalZ( "SHSTarget" );
 //  double bh2_z = gGeom.GetLocalZ( "BH2" );
   if( !m_is_vi )
     m_primary_z -= 1318.9*CLHEP::mm; // from VO
 	TTree* tree = nullptr;
 	m_file = new TFile( m_file_name );
-	if(!m_is_realdata){
-		tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+	if(m_is_k18){
+		tree = dynamic_cast<TTree*>( m_file->Get( "k18track" ) );
+	}
+	else if (m_is_kurama){
+		tree = dynamic_cast<TTree*>( m_file->Get( "kurama" ) );
 	}
 	else{
-		tree = dynamic_cast<TTree*>( m_file->Get( "k18track" ) );
+		tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
 	}
 
 
   if( !m_file->IsOpen() || !tree )
     return false;
-	int ntK18,evnum,runnum;
+	int ntBeam,evnum,runnum;
 	double xout[5];
 	double yout[5];
 	double uout[5];
 	double vout[5];
-	double pHS[5];
+	double pBeam[5];
+	double qBeam[5];
+	double m2Beam[5];
 	int trigpat[32];
 
   BeamInfo beam;
-	if(!m_is_realdata){
-		tree->SetBranchAddress( "x", &beam.x );
-		tree->SetBranchAddress( "y", &beam.y );
-		tree->SetBranchAddress( "u", &beam.u );
-		tree->SetBranchAddress( "v", &beam.v );
-		tree->SetBranchAddress( "p", &beam.dp );
-	}
-	else{
-		tree->SetBranchAddress( "ntK18",&ntK18);
+	if(m_is_k18){
+		tree->SetBranchAddress( "ntK18",&ntBeam);
 		tree->SetBranchAddress( "evnum",&evnum);
 		tree->SetBranchAddress( "runnum",&runnum);
 		tree->SetBranchAddress( "xout",xout);
 		tree->SetBranchAddress( "yout",yout);
 		tree->SetBranchAddress( "uout",uout);
 		tree->SetBranchAddress( "vout",vout);
-		tree->SetBranchAddress( "pHS",pHS);
+		tree->SetBranchAddress( "pHS",pBeam);
 		tree->SetBranchAddress( "trigpat",trigpat);
+	}
+	else if (m_is_kurama){
+		tree->SetBranchAddress( "ntKurama",&ntBeam);
+		tree->SetBranchAddress( "evnum",&evnum);
+		tree->SetBranchAddress( "runnum",&runnum);
+		tree->SetBranchAddress( "xtgtKurama",xout);
+		tree->SetBranchAddress( "ytgtKurama",yout);
+		tree->SetBranchAddress( "utgtKurama",uout);
+		tree->SetBranchAddress( "vtgtKurama",vout);
+		tree->SetBranchAddress( "pKurama",pBeam);
+		tree->SetBranchAddress( "qKurama",qBeam);
+		tree->SetBranchAddress( "m2",m2Beam);
+		tree->SetBranchAddress( "trigpat",trigpat);
+	}
+	else{
+		tree->SetBranchAddress( "x", &beam.x );
+		tree->SetBranchAddress( "y", &beam.y );
+		tree->SetBranchAddress( "u", &beam.u );
+		tree->SetBranchAddress( "v", &beam.v );
+		tree->SetBranchAddress( "p", &beam.dp );
 	}
 	std::cout<<"BeamEvents = "<<tree->GetEntries()<<std::endl;
   for( Long64_t i=0, n=tree->GetEntries(); i<n; ++i ){
     tree->GetEntry( i );
-		if(!m_is_realdata){
+		if(m_is_k18 or m_is_kurama){
+			beam.x=0;
+			beam.y=0;
+			beam.z=0;
+			beam.u=0;
+			beam.v=0;
+			beam.p.set(0,0,0);
+			beam.evnum = evnum;
+			beam.runnum = runnum;
+			beam.ntBeam = ntBeam;
+			for(int it=0;it<ntBeam;++it){
+				beam.x = xout[0];
+				beam.y = yout[0];
+				beam.u = uout[0];// u,v definition = dxdz,dydz, not mrad. 
+				beam.v = yout[0];
+				double pz = pBeam[0] / sqrt(uout[0]*uout[0]+vout[0]*vout[0]+1);
+				beam.p.set(pz * uout[0],pz* vout[0], pz);
+				if(m_is_kurama){
+					beam.z = m_target_z;
+					beam.m2 = m2Beam[0];
+					beam.q = qBeam[0];
+				}
+				else{
+					beam.z = m_primary_z;//VO
+				}
+			}
+			for(int itrg=0;itrg<32;++itrg){
+				beam.trigpat[itrg] = trigpat[itrg];
+			}
+		}
+		else{
 			beam.x *= -1.*CLHEP::cm; // -cm -> mm
 			beam.y *= -1.*CLHEP::cm; // -cm -> mm
 			G4double dxdz = std::tan( -1.*beam.u*CLHEP::mrad ); // -mrad -> tan
@@ -150,29 +202,6 @@ BeamMan::Initialize( void )
 			beam.y += dydz * m_primary_z;
 			beam.z = m_primary_z;
 			beam.p.set( pz*dxdz, pz*dydz, pz );
-		}
-		else{
-			beam.x=0;
-			beam.y=0;
-			beam.z=0;
-			beam.u=0;
-			beam.v=0;
-			beam.p.set(0,0,0);
-			beam.evnum = evnum;
-			beam.runnum = runnum;
-			for(int it=0;it<ntK18;++it){
-				beam.x = xout[0]  ;
-				beam.y = yout[0];
-				beam.z = m_primary_z;//VO
-				beam.u = uout[0];// u,v definition = dxdz,dydz, not mrad. 
-				beam.v = yout[0];
-				double pz = pHS[0] / sqrt(uout[0]*uout[0]+vout[0]*vout[0]+1);
-		
-				beam.p.set(pz * uout[0],pz* vout[0], pz);
-			}
-			for(int itrg=0;itrg<32;++itrg){
-				beam.trigpat[itrg] = trigpat[itrg];
-			}
 		}
     m_param_array.push_back( beam );
   }

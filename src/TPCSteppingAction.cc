@@ -39,17 +39,39 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto theParticle = theTrack->GetParticleDefinition();
   auto particleName = theParticle->GetParticleName();
   auto prePoint = theStep->GetPreStepPoint();
+	auto prePosition = prePoint->GetPosition();
   auto prePV = prePoint->GetPhysicalVolume();
   auto prePVName = prePV->GetName();
   auto postPoint = theStep->GetPostStepPoint();
   auto theProcess = postPoint->GetProcessDefinedStep()->GetProcessName();
-
+  auto NStep = theTrack->GetCurrentStepNumber();
   // check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
 
   // check if it is primary
-  //  if( theTrack->GetParentID() != 0 ) { return; }
 
+	if( theTrack->GetParentID() != 0 ){
+		auto CreationProcess = theTrack->GetCreatorProcess()->GetProcessName();
+//		G4cout<<CreationProcess<<G4endl;
+		if(CreationProcess != "Decay"){
+			theTrack->SetTrackStatus( fStopAndKill );
+			return; 
+		}
+		if(NStep > 2000){
+			theTrack->SetTrackStatus( fStopAndKill );
+			return; 
+		}
+	}
+	if( particleName == "gamma" ) { 
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	/*
+	if(hypot(prePosition.x(),prePosition.z()) > 400 and theTrack->GetParentID() != 0){
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	*/
   // check if it is NOT muon
   //  auto definition = theTrack->GetDefinition();
   //  if( ( definition == G4MuonPlus::MuonPlusDefinition() ) ||

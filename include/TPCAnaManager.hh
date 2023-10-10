@@ -50,6 +50,9 @@ struct CounterData
   G4double pos0[3];
   G4double pos[3];
   G4double mom[4];
+	G4double resxtpc;
+	G4double resytpc;
+	G4double resztpc;
   G4int iLay;
   G4int iPad;
   G4int iRow;
@@ -233,6 +236,9 @@ struct Event
   Double_t y0tpc[MaxTrack];    // coordinates
   Double_t z0tpc[MaxTrack];    // coordinates
   Double_t resoX[MaxTrack];    // coordinates
+  Double_t resxtpc[MaxTrack];    // Resolution
+  Double_t resytpc[MaxTrack];    // Resolution
+  Double_t resztpc[MaxTrack];    // Resolution
 
   Double_t pxtpc[MaxTrack];    // momentum
   Double_t pytpc[MaxTrack];    // momentum
@@ -510,6 +516,11 @@ private:
   G4double pad_in[40];
   G4double pad_out[40];
   G4double tpc_rad;
+
+	G4double res_y_par_in[4];
+	G4double res_t_par_in[6];
+	G4double res_y_par_out[4];
+	G4double res_t_par_out[6];
 
 public:
   void BeginOfRunAction( G4int runnum );

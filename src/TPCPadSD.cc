@@ -96,8 +96,10 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   if(preStepPoint-> GetStepStatus() != fGeomBoundary) return false;
   //  if(preStepPoint-> GetStepStatus() == fGeomBoundary){
   G4String particleName;
-  if(aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge() == 0.)
+  /*
+	if(aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge() == 0.)
     return false;
+	*/
   particleName = aStep-> GetTrack()-> GetDefinition()-> GetParticleName();
 
   G4String particleType;
@@ -105,6 +107,8 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 
   ///lepton rejection
   if(particleType == "lepton")
+    return false;
+  if(particleType == "gamma")
     return false;
 
   G4TouchableHistory* theTouchable

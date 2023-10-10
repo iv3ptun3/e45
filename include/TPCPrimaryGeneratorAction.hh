@@ -79,6 +79,7 @@ public:
   void     GenerateBeamVO( G4Event* anEvent );
   void     GenerateUniformProton( G4Event* anEvent );
   void     GenerateUniformPim( G4Event* anEvent );
+  void     GenerateUniformKaonPlus( G4Event* anEvent );
   void     GenerateBeamProton( G4Event* anEvent );
   void     GenerateUniformProton_P( G4Event* anEvent );
   void     GenerateUniformProton_P_fixphi( G4Event* anEvent );
@@ -110,10 +111,11 @@ public:
   void     GeneratePionPlusKstarL( G4Event* anEvent ); //#13
   void     GeneratePionPlusKstarS( G4Event* anEvent ); //#14
   void     GenerateAll( G4Event* anEvent ); //#98
+  void     GenerateKurama( G4Event* anEvent ); //#100
   void     GeneratePionPlusBeamthrough( G4Event* anEvent ); //#135
-  void     GeneratePionMinusBeamthrough( G4Event* anEvent ); //#135
+  void     GeneratePionMinusBeamthrough( G4Event* anEvent ); //#-135
   void     GenerateKaonPlusBeamthrough( G4Event* anEvent ); //#493
-  void     GenerateKaonMinusBeamthrough( G4Event* anEvent ); //#493
+  void     GenerateKaonMinusBeamthrough( G4Event* anEvent ); //#-493
   void     GenerateProtonBeamthrough( G4Event* anEvent ); //#938
   void     GenerateDedxSingle( G4Event* anEvent ); //#99
   // E07
@@ -152,7 +154,9 @@ public:
   void     GenerateE45ElasticPionPlus( G4Event* anEvent ); //#4501
   void     GenerateE45ElasticPionMinus( G4Event* anEvent ); //#4502
   // Other methods
-  double   RandSin(void);
+  void     GenerateXiMinus( G4Event* anEvent ); //#-1321
+  void     GenerateLambda( G4Event* anEvent ); //#-1115
+	double   RandSin(void);
 };
 
 //_____________________________________________________________________________

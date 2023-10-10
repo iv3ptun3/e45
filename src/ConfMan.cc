@@ -18,6 +18,7 @@
 #include "FuncName.hh"
 #include "JamMan.hh"
 #include "IncMan.hh"
+#include "TPCParamMan.hh"
 
 //_____________________________________________________________________________
 ConfMan::ConfMan( void )
@@ -110,7 +111,8 @@ ConfMan::InitializeParameterFiles( void )
 	   InitializeParameter<BeamMan>("BEAM") &&
 	   InitializeParameter<DetSizeMan>("DSIZE") &&
 	   InitializeParameter<JamMan>("JAM") &&
-	   InitializeParameter<IncMan>("INC") );
+	   InitializeParameter<IncMan>("INC") &&
+	   InitializeParameter<TPCParamMan>("TPCParam") );
 }
 
 //_____________________________________________________________________________
