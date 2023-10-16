@@ -366,7 +366,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 			 m_target_pos.z() + TargetDepth);
 	// K+ angular distribution
 	G4double cosx = -100.;
-	cosx = G4RandFlat::shoot( 0.83, 1. );//cos_CM= 0.83 -> theta_lab = 25 deg
+	cosx = G4RandFlat::shoot( 0.73, 1. );//cos_CM= 0.83 -> theta_lab = 25 deg
 	////////////// harmonic motion
 	G4int type = G4RandFlat::shoot() * 6. < 2. ? 0 : 1 ;
 	G4ThreeVector p_fermi = Kinematics::HarmonicFermiMomentum( type );

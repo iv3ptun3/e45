@@ -102,8 +102,11 @@ TPCField::Initialize( void )
 
   if( m_shs_status &&
       gConf.Get<G4int>( "ShsFieldMap" ) == 1 ){
+		double nmr =  gConf.Get<G4double>( "SHSFLDNMR" ) ;
+		double scale_factor = gConf.Get<G4double>("HSFLDCALIB");
+		scale_factor *= nmr;
     m_shs_field_map->SetValueCalc( gConf.Get<G4double>( "SHSFLDCALC" ) );
-    m_shs_field_map->SetValueNMR( gConf.Get<G4double>( "SHSFLDNMR" ) );
+    m_shs_field_map->SetValueNMR( nmr);
     m_shs_field_map->Initialize();
   }
   if( m_kurama_status &&

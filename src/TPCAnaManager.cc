@@ -14,6 +14,7 @@
 
 #include "ConfMan.hh"
 #include "TPCParamMan.hh"
+#include "TPCSteppingAction.hh"
 #include "FuncName.hh"
 #include "ResHypTPC.hh"
 #include "RungeKuttaTracker.hh"
@@ -26,6 +27,7 @@ namespace
 {
   const ConfMan& gConf = ConfMan::GetInstance();
   const TPCParamMan& gTPC    = TPCParamMan::GetInstance();
+	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
   //TTree* tree;
   TTree* TPC_g;
   Event event;
@@ -46,6 +48,14 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "nhPrm", &event.nhPrm, "nhPrm/I" );
   TPC_g->Branch( "data_runnum", &event.data_runnum, "data_runnum/I" );
   TPC_g->Branch( "data_evnum", &event.data_evnum, "data_evnum/I" );
+  TPC_g->Branch( "NumberOfTracks",&event.NumberOfTracks, "NumberOfTracks/I" );
+  TPC_g->Branch( "PIDOfTrack",event.PIDOfTrack, "PIDOfTrack[1000]/I" );
+  TPC_g->Branch( "VertexOfTrack_x",event.VertexOfTrack_x, "VertexOfTrack_x[1000]/D" );
+  TPC_g->Branch( "VertexOfTrack_y",event.VertexOfTrack_y, "VertexOfTrack_y[1000]/D" );
+  TPC_g->Branch( "VertexOfTrack_z",event.VertexOfTrack_z, "VertexOfTrack_z[1000]/D" );
+  TPC_g->Branch( "MomentumOfTrack_x",event.MomentumOfTrack_x, "MomentumOfTrack_x[1000]/D" );
+  TPC_g->Branch( "MomentumOfTrack_y",event.MomentumOfTrack_y, "MomentumOfTrack_y[1000]/D" );
+  TPC_g->Branch( "MomentumOfTrack_z",event.MomentumOfTrack_z, "MomentumOfTrack_z[1000]/D" );
   TPC_g->Branch( "trigpat", event.trigpat, "trigpat[32]/I" );
   TPC_g->Branch( "pidPrm", event.pidPrm, "pidPrm[nhPrm]/I" );
   TPC_g->Branch( "xPrm", event.xPrm, "xPrm[nhPrm]/D" );
@@ -783,8 +793,6 @@ TPCAnaManager::BeginOfEventAction( void )
 
   for( G4int i=0; i<MaxHitsTPC;++i ){
     event.trpidtpc[i]  = -1;
-    event.trparentidtpc[i]  = -1;
-    event.trparentid_pid_tpc[i]  = -1;
 
 
     event.trpptpc[i]  = -9999.9999;
@@ -902,6 +910,17 @@ TPCAnaManager::EndOfEventAction( void )
     event.mm = CLHEP::mm;
   }
 
+	for(int it=0;it<1000;++it){
+		event.NumberOfTracks = gTrackBuffer.GetNumberOfTracks();
+		event.PIDOfTrack[it] = gTrackBuffer.GetPIDOfTrack()[it];
+		event.VertexOfTrack_x[it] = gTrackBuffer.GetVertexOfTrack_x()[it];
+		event.VertexOfTrack_y[it] = gTrackBuffer.GetVertexOfTrack_y()[it];
+		event.VertexOfTrack_z[it] = gTrackBuffer.GetVertexOfTrack_z()[it];
+		event.MomentumOfTrack_x[it] = gTrackBuffer.GetMomentumOfTrack_x()[it];
+		event.MomentumOfTrack_y[it] = gTrackBuffer.GetMomentumOfTrack_y()[it];
+		event.MomentumOfTrack_z[it] = gTrackBuffer.GetMomentumOfTrack_z()[it];
+	}
+
   if( HitNum > 0){
     G4int c[MAX_TRACK] = {};
 
@@ -939,6 +958,7 @@ TPCAnaManager::EndOfEventAction( void )
 
 
     G4int sh_paID[MAX_TRACK] = {};
+    G4int sh_paPID[MAX_TRACK] = {};
     for( G4int i=0; i<HitNum; i++){
       G4int ii=counterData[i].ntrk;
       x[ii][c[ii]]=counterData[i].pos[0];
@@ -1536,6 +1556,7 @@ TPCAnaManager::EndOfEventAction( void )
 	event.nthpad[event.nhittpc] = counterData[i].iPad;
 	event.laypad[event.nhittpc][event.nthlay[event.nhittpc]][event.nthpad[event.nhittpc]]
 	  = event.laypad[event.nhittpc][event.nthlay[event.nhittpc]][event.nthpad[event.nhittpc]]+1.;
+	event.parentID[event.nhittpc] = counterData[i].parentID;
 	event.nhittpc += 1;
       }
     }

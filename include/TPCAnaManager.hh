@@ -56,6 +56,7 @@ struct CounterData
   G4int iLay;
   G4int iPad;
   G4int iRow;
+  G4int parentPID;
   G4int parentID;
 };
 
@@ -124,6 +125,17 @@ struct Event
   Int_t HitNum_p;
   //  int tpctrNum_p;
 
+	int NumberOfTracks;
+	int PIDOfTrack[1000];
+	double VertexOfTrack_x[1000];
+	double VertexOfTrack_y[1000];
+	double VertexOfTrack_z[1000];
+	double MomentumOfTrack_x[1000];
+	double MomentumOfTrack_y[1000];
+	double MomentumOfTrack_z[1000];
+
+
+
   Int_t nhPrm;
 	Int_t data_runnum;
 	Int_t data_evnum;
@@ -183,7 +195,6 @@ struct Event
   Int_t trqqtpc[MaxHitsTPC];
   Int_t trpidtpc[MaxHitsTPC];
   Int_t trparentidtpc[MaxHitsTPC];
-  Int_t trparentid_pid_tpc[MaxHitsTPC];
   Double_t trpmtpc[MaxHitsTPC];
   Double_t trdetpc[MaxHitsTPC];
   Double_t trlentpc[MaxHitsTPC];

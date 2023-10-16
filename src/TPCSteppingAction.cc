@@ -11,12 +11,12 @@
 #include <G4Track.hh>
 #include <G4TrackStatus.hh>
 #include <G4VPhysicalVolume.hh>
-
+#include <TString.h>
 #include "ConfMan.hh"
-
 namespace
 {
   const auto& gConf = ConfMan::GetInstance();
+	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -36,10 +36,13 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   static const G4bool KillStepInIron = gConf.Get<G4bool>( "KillStepInIron" );
 
   auto theTrack = theStep->GetTrack();
+	int TrackID = theTrack->GetTrackID();
   auto theParticle = theTrack->GetParticleDefinition();
-  auto particleName = theParticle->GetParticleName();
-  auto prePoint = theStep->GetPreStepPoint();
+  int ParticleID = theParticle->GetPDGEncoding();
+	auto particleName = theParticle->GetParticleName();
+	auto prePoint = theStep->GetPreStepPoint();
 	auto prePosition = prePoint->GetPosition();
+	auto preMomentum = prePoint->GetMomentum();
   auto prePV = prePoint->GetPhysicalVolume();
   auto prePVName = prePV->GetName();
   auto postPoint = theStep->GetPostStepPoint();
@@ -47,9 +50,13 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto NStep = theTrack->GetCurrentStepNumber();
   // check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
-
+//	std::cout<<Form(" Processing track %d, Step %d" ,TrackID,NStep)<<std::endl;
   // check if it is primary
-
+	if(TrackID<1000){	
+		if(NStep==1){
+			gTrackBuffer.SetTrack(TrackID,ParticleID,prePosition,preMomentum);
+		}
+	}
 	if( theTrack->GetParentID() != 0 ){
 		auto CreationProcess = theTrack->GetCreatorProcess()->GetProcessName();
 //		G4cout<<CreationProcess<<G4endl;

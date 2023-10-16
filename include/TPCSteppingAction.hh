@@ -2,9 +2,8 @@
 
 #ifndef TPC_STEPPING_ACTION_HH
 #define TPC_STEPPING_ACTION_HH
-
+#include "TPCTrackBuffer.hh"
 #include <G4UserSteppingAction.hh>
-
 //_____________________________________________________________________________
 class TPCSteppingAction : public G4UserSteppingAction
 {

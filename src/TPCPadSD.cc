@@ -96,10 +96,10 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   if(preStepPoint-> GetStepStatus() != fGeomBoundary) return false;
   //  if(preStepPoint-> GetStepStatus() == fGeomBoundary){
   G4String particleName;
-  /*
+  
 	if(aStep-> GetTrack()-> GetDefinition()-> GetPDGCharge() == 0.)
     return false;
-	*/
+	
   particleName = aStep-> GetTrack()-> GetDefinition()-> GetParticleName();
 
   G4String particleType;

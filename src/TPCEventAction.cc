@@ -18,6 +18,7 @@
 #include "ConfMan.hh"
 #include "FuncName.hh"
 #include "TPCAnaManager.hh"
+#include "TPCSteppingAction.hh"
 #include "TPCACSD.hh"
 #include "TPCBH2SD.hh"
 #include "TPCFTOFSD.hh"
@@ -30,11 +31,12 @@
 #include "TPCTargetSD.hh"
 #include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
-
+#include "TPCTrackBuffer.hh"
 namespace
 {
   auto& gAnaMan = TPCAnaManager::GetInstance();
   const auto& gConf = ConfMan::GetInstance();
+	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -52,8 +54,9 @@ TPCEventAction::~TPCEventAction( void )
 void
 TPCEventAction::BeginOfEventAction( const G4Event* )
 {
-  // G4cout << FUNC_NAME << G4endl;
-  gAnaMan.BeginOfEventAction();
+	gTrackBuffer.ClearTrackBuffer();
+	std::cout<<FUNC_NAME<<" TrackBufferCleared"<<std::endl;
+	gAnaMan.BeginOfEventAction();
 }
 
 //_____________________________________________________________________________
@@ -61,7 +64,8 @@ void
 TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 {
   G4int eventID = anEvent-> GetEventID();
-  if( eventID % 100 == 0 ){
+	std::cout<<"nt = "<<gTrackBuffer.GetNumberOfTracks()<<std::endl;
+	if( eventID % 100 == 0 ){
     G4cout << FUNC_NAME << G4endl
 	   << "   Event number = " << eventID << G4endl;
   }
@@ -124,6 +128,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       G4int ilay = (*padHC)[i]-> GetPadLay();
       //      G4double mass = (*padHC)[i]-> GetPDGMass(); //mass(GeV)
       G4int parentid = (*padHC)[i]-> GetParentID();
+      G4int parentpid = (*padHC)[i]-> GetParentID_pid();
       G4double tlength = (*padHC)[i]-> GettLength();
       G4int irow=(*padHC)[i]-> GetPadRow();
       G4double beta = (*padHC)[i]-> GetBeta();
@@ -233,8 +238,7 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
       //      if(ilay>-1){ //--> ilay 1 : target ilay 0 : TPC, layer is from 2 to 38.
       if(ilay>-1){ //-->  -1 : TPC, layer is from 0 to 38. 2012.10.30
 	gAnaMan.SetCounterData( nparticle-1,tof, xyz, mom, tid, pid, ilay,
-				irow, beta, edep/CLHEP::MeV, parentid,
-				tlength,slength );
+				irow, beta, edep/CLHEP::MeV, parentid, tlength,slength );
       }
     }
     for(G4int i=0;i<nparticle;i++){
