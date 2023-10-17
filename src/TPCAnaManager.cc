@@ -50,6 +50,7 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "data_evnum", &event.data_evnum, "data_evnum/I" );
   TPC_g->Branch( "NumberOfTracks",&event.NumberOfTracks, "NumberOfTracks/I" );
   TPC_g->Branch( "PIDOfTrack",event.PIDOfTrack, "PIDOfTrack[1000]/I" );
+  TPC_g->Branch( "ParentIDOfTrack",event.ParentIDOfTrack, "ParentIDOfTrack[1000]/I" );
   TPC_g->Branch( "VertexOfTrack_x",event.VertexOfTrack_x, "VertexOfTrack_x[1000]/D" );
   TPC_g->Branch( "VertexOfTrack_y",event.VertexOfTrack_y, "VertexOfTrack_y[1000]/D" );
   TPC_g->Branch( "VertexOfTrack_z",event.VertexOfTrack_z, "VertexOfTrack_z[1000]/D" );
@@ -913,6 +914,7 @@ TPCAnaManager::EndOfEventAction( void )
 	for(int it=0;it<1000;++it){
 		event.NumberOfTracks = gTrackBuffer.GetNumberOfTracks();
 		event.PIDOfTrack[it] = gTrackBuffer.GetPIDOfTrack()[it];
+		event.ParentIDOfTrack[it] = gTrackBuffer.GetParentIDOfTrack()[it];
 		event.VertexOfTrack_x[it] = gTrackBuffer.GetVertexOfTrack_x()[it];
 		event.VertexOfTrack_y[it] = gTrackBuffer.GetVertexOfTrack_y()[it];
 		event.VertexOfTrack_z[it] = gTrackBuffer.GetVertexOfTrack_z()[it];

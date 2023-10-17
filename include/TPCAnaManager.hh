@@ -127,6 +127,7 @@ struct Event
 
 	int NumberOfTracks;
 	int PIDOfTrack[1000];
+	int ParentIDOfTrack[1000];
 	double VertexOfTrack_x[1000];
 	double VertexOfTrack_y[1000];
 	double VertexOfTrack_z[1000];

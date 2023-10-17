@@ -48,13 +48,14 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto postPoint = theStep->GetPostStepPoint();
   auto theProcess = postPoint->GetProcessDefinedStep()->GetProcessName();
   auto NStep = theTrack->GetCurrentStepNumber();
+	int parentID = theTrack->GetParentID();
   // check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
 //	std::cout<<Form(" Processing track %d, Step %d" ,TrackID,NStep)<<std::endl;
   // check if it is primary
 	if(TrackID<1000){	
 		if(NStep==1){
-			gTrackBuffer.SetTrack(TrackID,ParticleID,prePosition,preMomentum);
+			gTrackBuffer.SetTrack(TrackID,parentID,ParticleID,prePosition,preMomentum);
 		}
 	}
 	if( theTrack->GetParentID() != 0 ){

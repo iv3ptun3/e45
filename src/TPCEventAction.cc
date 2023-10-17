@@ -55,7 +55,6 @@ void
 TPCEventAction::BeginOfEventAction( const G4Event* )
 {
 	gTrackBuffer.ClearTrackBuffer();
-	std::cout<<FUNC_NAME<<" TrackBufferCleared"<<std::endl;
 	gAnaMan.BeginOfEventAction();
 }
 
@@ -64,7 +63,6 @@ void
 TPCEventAction::EndOfEventAction( const G4Event* anEvent )
 {
   G4int eventID = anEvent-> GetEventID();
-	std::cout<<"nt = "<<gTrackBuffer.GetNumberOfTracks()<<std::endl;
 	if( eventID % 100 == 0 ){
     G4cout << FUNC_NAME << G4endl
 	   << "   Event number = " << eventID << G4endl;

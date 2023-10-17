@@ -11,6 +11,7 @@ class TPCTrackBuffer{
 	private:
 		int NumberOfTracks;
 		int PIDOfTrack[MaxBufferSize];
+		int ParentIDOfTrack[MaxBufferSize];
 		double VertexOfTrack_x[MaxBufferSize];
 		double VertexOfTrack_y[MaxBufferSize];
 		double VertexOfTrack_z[MaxBufferSize];
@@ -29,6 +30,7 @@ class TPCTrackBuffer{
 			NumberOfTracks = -1;
 			for(int i=0;i<MaxBufferSize;++i){
 				PIDOfTrack[i]=0;
+				ParentIDOfTrack[i]=-1;
 				VertexOfTrack_x[i]=0;
 				VertexOfTrack_y[i]=0;
 				VertexOfTrack_z[i]=0;
@@ -37,9 +39,10 @@ class TPCTrackBuffer{
 				MomentumOfTrack_z[i]=0;
 			}	
 		}
-		void SetTrack(int ID,int PID,G4ThreeVector vert, G4ThreeVector mom){
+		void SetTrack(int ID,int ParentID,int PID,G4ThreeVector vert, G4ThreeVector mom){
 			if(ID > NumberOfTracks)NumberOfTracks = ID; 
 			PIDOfTrack[ID] = PID;
+			ParentIDOfTrack[ID] = ParentID;
 			VertexOfTrack_x[ID]=vert.x();
 			VertexOfTrack_y[ID]=vert.y();
 			VertexOfTrack_z[ID]=vert.z();
@@ -52,6 +55,9 @@ class TPCTrackBuffer{
 		}
 		int* GetPIDOfTrack(){
 			return PIDOfTrack;
+		}
+		int* GetParentIDOfTrack(){
+			return ParentIDOfTrack;
 		}
 		double* GetVertexOfTrack_x(){
 			return VertexOfTrack_x;
