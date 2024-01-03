@@ -15,6 +15,8 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include "TTreeReader.h"
+#include "TTreeReaderValue.h"
 
 #include "ConfMan.hh"
 #include "DCGeomMan.hh"
@@ -22,6 +24,26 @@
 #include "PrintHelper.hh"
 
 //_____________________________________________________________________________
+namespace{
+	int ntBeam,evnum,runnum;
+	double xout[5];
+	double yout[5];
+	double uout[5];
+	double vout[5];
+	double pBeam[5];
+	double qBeam[5];
+	double m2Beam[5];
+	int trigpat[32];
+	int ntK18,ntKurama;
+  TTreeReaderValue<vector<double>>* pHS=nullptr;
+  TTreeReaderValue<vector<double>>* utgtHS=nullptr;
+  TTreeReaderValue<vector<double>>* vtgtHS=nullptr;
+  TTreeReaderValue<vector<double>>* pTPCKurama=nullptr;
+  TTreeReaderValue<vector<double>>* qTPCKurama=nullptr;
+  TTreeReaderValue<vector<double>>* m2TPCKurama=nullptr;
+  TTreeReaderValue<vector<double>>* utgtTPCKurama=nullptr;
+  TTreeReaderValue<vector<double>>* vtgtTPCKurama=nullptr;
+}
 G4double
 BeamInfo::GetX( G4double offset ) const
 {
@@ -87,46 +109,44 @@ BeamMan::Initialize( void )
     return true;
   
 	m_param_array.clear();
+	m_mm_array.clear();
   G4int generator = gConf.Get<G4int>( "Generator" );
 	m_is_vi = ( gConf.Get<G4int>( "Generator" ) == 10 );
 	if( abs(generator) == 135 or abs(generator) == 493 or abs(generator) ==938 ){
 		m_is_k18 = 1;
+		G4cout<<"Generating K18 Beam"<<G4endl;
 	}
 	if( abs(generator) == 100 ){
 		m_is_kurama = 1;
 	}
-
+	if(	generator == 181321 ){
+		m_is_missmassXi = 1;
+	}
+	G4cout<<"Hello"<<G4endl;
   m_primary_z = gGeom.GetLocalZ( "Vertex" );
   m_target_z = gGeom.GetLocalZ( "SHSTarget" );
-//  double bh2_z = gGeom.GetLocalZ( "BH2" );
   if( !m_is_vi )
     m_primary_z -= 1318.9*CLHEP::mm; // from VO
 	TTree* tree = nullptr;
+	TTreeReader* reader = nullptr;
 	m_file = new TFile( m_file_name );
 	if(m_is_k18){
-		tree = dynamic_cast<TTree*>( m_file->Get( "k18track" ) );
+		tree = (TTree*) m_file->Get( "k18track" );
 	}
 	else if (m_is_kurama){
-		tree = dynamic_cast<TTree*>( m_file->Get( "kurama" ) );
+		tree = (TTree*) m_file->Get( "kurama" );
+	}
+	else if(m_is_missmassXi){
+		tree = (TTree*)  m_file->Get( "tpc"  );
 	}
 	else{
-		tree = dynamic_cast<TTree*>( m_file->Get( "tree" ) );
+		tree = (TTree*) m_file->Get("tree");
 	}
-
+	cout<<tree->GetEntries()<<endl;
 
   if( !m_file->IsOpen() || !tree )
     return false;
-	int ntBeam,evnum,runnum;
-	double xout[5];
-	double yout[5];
-	double uout[5];
-	double vout[5];
-	double pBeam[5];
-	double qBeam[5];
-	double m2Beam[5];
-	int trigpat[32];
-
-  BeamInfo beam;
+	BeamInfo beam;
 	if(m_is_k18){
 		tree->SetBranchAddress( "ntK18",&ntBeam);
 		tree->SetBranchAddress( "evnum",&evnum);
@@ -151,6 +171,23 @@ BeamMan::Initialize( void )
 		tree->SetBranchAddress( "m2",m2Beam);
 		tree->SetBranchAddress( "trigpat",trigpat);
 	}
+	else if (m_is_missmassXi){
+		reader = new TTreeReader("tpc",m_file);
+		tree->SetBranchAddress( "evnum",&evnum);
+		tree->SetBranchAddress( "runnum",&runnum);
+		tree->SetBranchAddress("ntK18",&ntK18);
+		
+		pHS = new TTreeReaderValue<vector<double>>(*reader,"pHS"); 
+		utgtHS = new TTreeReaderValue<vector<double>>(*reader,"utgtHS"); 
+		vtgtHS = new TTreeReaderValue<vector<double>>(*reader,"vtgtHS"); 
+		
+		tree->SetBranchAddress("ntKurama",&ntKurama);
+		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pTPCKurama"); 
+		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
+		utgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"utgtTPCKurama"); 
+		vtgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"vtgtTPCKurama"); 
+		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama"); 
+	}
 	else{
 		tree->SetBranchAddress( "x", &beam.x );
 		tree->SetBranchAddress( "y", &beam.y );
@@ -161,6 +198,8 @@ BeamMan::Initialize( void )
 	std::cout<<"BeamEvents = "<<tree->GetEntries()<<std::endl;
   for( Long64_t i=0, n=tree->GetEntries(); i<n; ++i ){
     tree->GetEntry( i );
+		if(i%100000==0)G4cout<<Form("Event %lld/%lld",i,tree->GetEntries())<<G4endl;
+    if(reader)reader->Next();
 		if(m_is_k18 or m_is_kurama){
 			beam.x=0;
 			beam.y=0;
@@ -190,6 +229,36 @@ BeamMan::Initialize( void )
 			for(int itrg=0;itrg<32;++itrg){
 				beam.trigpat[itrg] = trigpat[itrg];
 			}
+			m_param_array.push_back( beam );
+		}
+		else if(m_is_missmassXi){
+			for(int itk18=0;itk18<ntK18;++itk18){
+				double ub = (*utgtHS)->at(itk18);
+				double vb = (*vtgtHS)->at(itk18);
+				double nb = hypot(hypot(1,ub),vb);
+				double pb = (*pHS)->at(itk18);
+				double pzb = pb/nb;
+				G4ThreeVector TVKm(pzb*ub,pzb*vb,pzb);
+			for(int itkurama=0;itkurama<ntKurama;++itkurama){
+				double qKp = (*qTPCKurama)->at(itkurama);
+				double m2Kp = (*m2TPCKurama)->at(itkurama);
+				double pKp = (*pTPCKurama)->at(itkurama);
+				
+				double us = (*utgtTPCKurama)->at(itkurama);
+				double vs = (*vtgtTPCKurama)->at(itkurama);
+				double ns = hypot(hypot(1,us),vs);
+				double pzs = pKp/ns;
+				G4ThreeVector TVKp(pzs*us,pzs*vs,pzs);
+
+				if(pKp > 1.1 and pKp < 1.4 and qKp > 0 and m2Kp > 0.12 and m2Kp < 0.3){
+					MMVertex MMVert;
+					MMVert.Moms.push_back(TVKm);
+					MMVert.Moms.push_back(TVKp);
+					MMVert.Moms.push_back(TVKm-TVKp);
+					m_mm_array.push_back(MMVert);		
+				}
+			}
+			}
 		}
 		else{
 			beam.x *= -1.*CLHEP::cm; // -cm -> mm
@@ -202,13 +271,12 @@ BeamMan::Initialize( void )
 			beam.y += dydz * m_primary_z;
 			beam.z = m_primary_z;
 			beam.p.set( pz*dxdz, pz*dydz, pz );
+			m_param_array.push_back( beam );
 		}
-    m_param_array.push_back( beam );
   }
-
   m_file->Close();
   m_n_param = m_param_array.size();
-  m_is_ready = true;
+	m_is_ready = true;
   return true;
 }
 
@@ -230,7 +298,22 @@ BeamMan::Get( void ) const
 const BeamInfo&
 BeamMan::Get( G4int iev ) const
 {
-  return m_param_array.at( iev%m_n_param );
+	auto b =	m_param_array.at(iev);
+	return m_param_array.at( iev%m_n_param );
+}
+
+const MMVertex&
+BeamMan::GetVertex( void ) const
+{
+ 	int nev = m_mm_array.size(); 
+	return m_mm_array.at( G4RandFlat::shootInt( nev ) );
+}
+
+const MMVertex&
+BeamMan::GetVertex( G4int iev ) const
+{
+ 	int nev = m_mm_array.size(); 
+	return m_mm_array.at( iev%nev );
 }
 
 //_____________________________________________________________________________

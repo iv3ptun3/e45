@@ -9,9 +9,10 @@
 
 #include <globals.hh>
 #include <G4ThreeVector.hh>
+#include "TLorentzVector.h"
 
 #include <Rtypes.h>
-
+using namespace std;
 class TFile;
 
 //_____________________________________________________________________________
@@ -35,6 +36,19 @@ struct BeamInfo
 	G4int runnum;
 	G4int ntBeam;
 };
+struct MMVertex
+{
+  G4double      x; // [mm]
+  G4double      y; // [mm]
+  G4double      z; // [mm]
+	vector<G4ThreeVector> Moms;
+	vector<G4double> q;
+  G4int					trigpat[32];
+	G4int GetTrigPat(G4int flag) const;
+	G4int evnum;
+	G4int ntK18;
+	G4int ntKurama;
+};
 
 //_____________________________________________________________________________
 class BeamMan
@@ -51,14 +65,17 @@ private:
 
 private:
   typedef std::vector<BeamInfo> ParamArray;
+  typedef std::vector<MMVertex> MMArray;
   G4bool        m_is_ready;
   G4String      m_file_name;
   TFile*        m_file;
   ParamArray    m_param_array;
+  MMArray    		m_mm_array;
   G4int         m_n_param;
   G4bool        m_is_vi; // true:VI or false:VO
-  G4bool        m_is_k18;
-  G4bool        m_is_kurama;
+  G4bool        m_is_k18=0;
+  G4bool        m_is_kurama=0;
+  G4bool        m_is_missmassXi=0;
   G4double      m_primary_z; // from VI or VO
   G4double      m_target_z;
   G4ThreeVector m_vi_pos;
@@ -66,6 +83,8 @@ private:
 public:
   const BeamInfo&      Get( void ) const;
   const BeamInfo&      Get( G4int iev ) const;
+  const MMVertex&      GetVertex( void ) const;
+  const MMVertex&      GetVertex( G4int iev ) const;
   G4double             GetPrimaryZ( void ) const { return m_primary_z; }
   const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
   G4bool               Initialize( void );
@@ -73,6 +92,7 @@ public:
   G4bool               IsReady( void ) const { return m_is_ready; }
   G4bool               IsK18( void ) const { return m_is_k18; }
   G4bool               IsKurama( void ) const { return m_is_kurama; }
+  G4bool               IsMissMassXi( void ) const { return m_is_missmassXi; }
   void                 Print( void ) const;
   void                 SetPrimaryZ( G4double z ){ m_primary_z = z; }
   void                 SetVIPosition( G4ThreeVector pos ){ m_vi_pos = pos; }

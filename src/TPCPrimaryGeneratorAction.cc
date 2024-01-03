@@ -32,6 +32,7 @@
 #include "Kinematics.hh"
 #include "PrintHelper.hh"
 #include "TPCAnaManager.hh"
+#include "TPCTrackBuffer.hh"
 
 namespace
 {
@@ -46,6 +47,7 @@ namespace
   const auto& gJam  = JamMan::GetInstance();
   const auto& gInc  = IncMan::GetInstance();
   const auto particleTable = G4ParticleTable::GetParticleTable();
+	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -57,6 +59,7 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_target_size( gSize.GetSize( "Target" )*mm ),
     m_e45target_size( gSize.GetSize( "E45Target" )*mm ),
     m_beam( new BeamInfo ),
+    m_mm_vert( new MMVertex),
     m_beam_p0( gConf.Get<G4double>( "BeamMom" ) /* 1.80*GeV */ ),
     m_jam(),
     m_inc(),
@@ -99,6 +102,7 @@ TPCPrimaryGeneratorAction::~TPCPrimaryGeneratorAction( void )
 {
   delete m_particle_gun;
   delete m_beam;
+  delete m_mm_vert;
 }
 
 //_____________________________________________________________________________
@@ -109,10 +113,15 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 		if(gBeam.IsK18()){
     	G4int eventID = anEvent->GetEventID();
 			*m_beam = gBeam.Get(eventID);
+			if(m_beam->z == 0) return;
 		}
 		else if(gBeam.IsKurama()){
     	G4int eventID = anEvent->GetEventID();
 			*m_beam = gBeam.Get(eventID);
+		}
+		else if (gBeam.IsMissMassXi()){
+    	G4int eventID = anEvent->GetEventID();
+			*m_mm_vert = gBeam.GetVertex(eventID);
 		}
 		else{
     	*m_beam = gBeam.Get();
@@ -155,6 +164,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 14: GeneratePionPlusKstarS( anEvent ); break; // Study on pi-p --> KsS by using LL gen
   case 15: GenerateKpXi2Body( anEvent ); break;
   case 150: GenerateKpXi2BodyUniform( anEvent ); break;
+  case 151: GenerateKpXi1530Minus2BodyUniform( anEvent ); break;
   case 16: GenerateUniformProton( anEvent ); break;
   case 17: GenerateUniformPim( anEvent ); break;
   case 18: GenerateBeamProton( anEvent ); break;
@@ -225,7 +235,8 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 4502: GenerateE45ElasticPionMinus( anEvent ); break;
   case -1321: GenerateXiMinus( anEvent ); break;
   case 1115: GenerateLambda( anEvent ); break;
-  default:
+ 	case 181321:GenerateKuramaPKmKpXi( anEvent );	break; 
+	default:
     G4cerr << " * Generator number error : " << m_generator << G4endl;
     break;
   }
@@ -284,12 +295,12 @@ TPCPrimaryGeneratorAction::GenerateKpXi2Body( G4Event* anEvent )
     gAnaMan.SetFermiMomentum( p_fermi );
     KinemaFermi kinema( KaonMinusMass, ProtonMass, KaonPlusMass, XiMinusMass,
 			m_beam->p, p_fermi, cosx );
-    // if( kinema.GetTheta( 3 )/CLHEP::deg > 60. )
-    //   theta_flag = false;
+    // if( kinema.GetTheta( 3 )/CLHEP::deg > 60. ) //   theta_flag = false;
     KnLV = kinema.GetLorentzVector( 0 );
     PLV = kinema.GetLorentzVector( 1 );
     KpLV = kinema.GetLorentzVector( 2 );
     XiLV = kinema.GetLorentzVector( 3 );
+		gTrackBuffer.SetLV(XiLV,0);
 #ifdef DEBUG
     kinema.Print();
 #endif
@@ -366,7 +377,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 			 m_target_pos.z() + TargetDepth);
 	// K+ angular distribution
 	G4double cosx = -100.;
-	cosx = G4RandFlat::shoot( 0.73, 1. );//cos_CM= 0.83 -> theta_lab = 25 deg
+	cosx = G4RandFlat::shoot( 0.5, 1. );//cos_CM= 0.83 -> theta_lab = 25 deg
 	////////////// harmonic motion
 	G4int type = G4RandFlat::shoot() * 6. < 2. ? 0 : 1 ;
 	G4ThreeVector p_fermi = Kinematics::HarmonicFermiMomentum( type );
@@ -422,8 +433,102 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
   m_particle_gun->SetParticleMomentumDirection( XiLV.v() );
   m_particle_gun->SetParticleEnergy( ( XiLV.e() - XiMinusMass )*CLHEP::GeV );
   m_particle_gun->SetParticlePosition( gen_pos );
+	auto MomXi = XiLV.vect();
+	auto MomKm = KnLV.vect();
+	PLV = G4LorentzVector(PLV,ProtonMass);
+	auto CMLV = KnLV + PLV;
+//	G4cout<<CMLV.mag()<<G4endl;
+	gTrackBuffer.SetCMLV(CMLV);
+	auto SpinXi = MomXi.cross(MomKm);
+	SpinXi = SpinXi*(1./SpinXi.mag());
+	gTrackBuffer.SetPolarity(SpinXi,0);
+	gTrackBuffer.SetMomentum(MomXi,0);
   m_particle_gun->GeneratePrimaryVertex( anEvent );
   gAnaMan.SetPrimaryParticle( 2, XiLV.v(), XiMinusMass, XiMinusID );
+  gAnaMan.SetPrimaryVertex( 2, gen_pos );
+
+}
+
+//_____________________________________________________________________________
+//case 151 Generate KpXi* assuming uniform distribution on CM Frame
+void
+TPCPrimaryGeneratorAction::GenerateKpXi1530Minus2BodyUniform( G4Event* anEvent )
+{
+  static const G4double KaonMinusMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4double ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+  static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double XiMinusMass = m_XiMinus->GetPDGMass()/CLHEP::GeV;
+  static const G4double Xi1530MinusMass = m_Xi1530Minus->GetPDGMass()/CLHEP::GeV;
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int ProtonID = m_Proton->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int Xi1530MinusID = m_Xi1530Minus->GetPDGEncoding();
+
+  G4LorentzVector KnLV, PLV, KpLV, Xi1530MinusLV;
+	double TargetDepth = G4RandFlat::shoot(-10.,10.); 
+  G4ThreeVector gen_pos( m_beam->GetX( -m_beam->z ),
+			 m_beam->GetY( -m_beam->z ),
+			 m_target_pos.z() + TargetDepth);
+	// K+ angular distribution
+	G4double cosx = -100.;
+	cosx = G4RandFlat::shoot( -0., 1. );//cos_CM= 0.83 -> theta_lab = 25 deg
+	////////////// harmonic motion
+	G4int type = G4RandFlat::shoot() * 6. < 2. ? 0 : 1 ;
+	G4ThreeVector p_fermi = Kinematics::HarmonicFermiMomentum( type );
+	p_fermi*=0;
+	gAnaMan.SetFermiMomentum( p_fermi );
+	KinemaFermi kinema( KaonMinusMass, ProtonMass, KaonPlusMass, Xi1530MinusMass,
+			m_beam->p, p_fermi, cosx );
+	// if( kinema.GetTheta( 3 )/CLHEP::deg > 60. )
+	//   theta_flag = false;
+	KnLV = kinema.GetLorentzVector( 0 );
+	PLV = kinema.GetLorentzVector( 1 );
+	KpLV = kinema.GetLorentzVector( 2 );
+	Xi1530MinusLV = kinema.GetLorentzVector( 3 );
+#ifdef DEBUG
+	kinema.Print();
+#endif
+
+  // G4cout << "#D " << FUNC_NAME << " k+ mom: " << mom[2] << G4endl;
+  // m_cross_section->Fill(cosx);
+  // gAnaMan.FillCrossSection(cosx);
+  //  G4double momkpp=std::sqrt(std::pow(kp_mom_x,2)+std::pow(kp_mom_y,2)+std::pow(kp_mom_z,2));
+  // G4double momcmk[4]={0};
+  //  G4double beta= pbeam/(proton->GetPDGMass()/CLHEP::GeV+Ebeam);
+  // G4double momcmkpp = std::sqrt( momcmk[0]*momcmk[0] +
+  // 				 momcmk[1]*momcmk[1] +
+  // 				 momcmk[2]*momcmk[2] );
+  // m_cmk->Fill( std::acos(momcmk[2]/momcmkpp)/CLHEP::pi*180);
+  //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
+  // m_coscmk->Fill( momcmk[2]/momcmkpp );
+
+  gAnaMan.SetPrimaryBeam( m_beam->p );
+  gAnaMan.SetNumberOfPrimaryParticle( 3 );
+
+  ///// KaonMinus (produced to upstream assumed with KaonPlus).
+  m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleMomentumDirection( -KnLV.v() );
+	m_particle_gun->SetParticleEnergy( ( KnLV.e() - KaonMinusMass )*CLHEP::GeV );
+	m_particle_gun->SetParticlePosition( gen_pos );
+	m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 0, KnLV.v(), KaonMinusMass, KaonMinusID );
+  gAnaMan.SetPrimaryVertex( 0, gen_pos );
+  ///// Proton No Proton track
+  ///// KaonPlus
+  m_particle_gun->SetParticleDefinition( m_KaonPlus );
+  m_particle_gun->SetParticleMomentumDirection( KpLV.v() );
+  m_particle_gun->SetParticleEnergy( ( KpLV.e() - KaonPlusMass )*CLHEP::GeV );
+  m_particle_gun->SetParticlePosition( gen_pos );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 1, KpLV.v(), KaonPlusMass, KaonPlusID );
+  gAnaMan.SetPrimaryVertex( 1, gen_pos );
+  ///// Xi1530Minus
+  m_particle_gun->SetParticleDefinition( m_Xi1530Minus );
+  m_particle_gun->SetParticleMomentumDirection( Xi1530MinusLV.v() );
+  m_particle_gun->SetParticleEnergy( ( Xi1530MinusLV.e() - Xi1530MinusMass )*CLHEP::GeV );
+  m_particle_gun->SetParticlePosition( gen_pos );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+  gAnaMan.SetPrimaryParticle( 2, Xi1530MinusLV.v(), Xi1530MinusMass, Xi1530MinusID );
   gAnaMan.SetPrimaryVertex( 2, gen_pos );
 
 }
@@ -491,13 +596,14 @@ TPCPrimaryGeneratorAction::GenerateUniformPim( G4Event* anEvent )
 
   //angle
   G4double phi=G4RandFlat::shoot(-1.,1.)*3.141592654;
-  G4double mom_pi=G4RandFlat::shoot(0.05,1.0);
+ // G4double mom_pi=G4RandFlat::shoot(0.05,1.0);
+  G4double mom_pi=300;
   G4double theta=acos(G4RandFlat::shoot(0.,1.));
   //  G4cout<<theta*180/3.141592<<G4endl;
   mom_pi_x = mom_pi*sin(theta)*cos(phi);
   mom_pi_y = mom_pi*sin(theta)*sin(phi);
   mom_pi_z = mom_pi*cos(theta);
-  Energy_pi=sqrt(pow(mom_pi,2)+pow(m_PionMinus->GetPDGMass()/GeV,2))*GeV;
+  Energy_pi=sqrt(pow(mom_pi/GeV,2)+pow(m_PionMinus->GetPDGMass()/GeV,2));
 
 
   G4double rn_vtx=-1;  G4double rn_vtz=-1;
@@ -3605,7 +3711,6 @@ TPCPrimaryGeneratorAction::GeneratePionPlusBeamthrough( G4Event* anEvent )
   static const G4double PionPlusMass = m_PionPlus->GetPDGMass()/CLHEP::GeV;
   
   static const G4int PionPlusID = m_PionPlus->GetPDGEncoding();
-
   G4ThreeVector gen_pos( m_beam->GetX( 0 ),
 			 m_beam->GetY( 0 ),
 			 m_beam->z );//Z = V0
@@ -3641,7 +3746,6 @@ TPCPrimaryGeneratorAction::GeneratePionMinusBeamthrough( G4Event* anEvent )
   gAnaMan.SetNumberOfPrimaryParticle( 1 );
   gAnaMan.SetPrimaryParticle( 0, BeamMom, PionMinusMass, PionMinusID );
  	gAnaMan.SetRealBeamData(m_beam->runnum,m_beam->evnum,m_beam->trigpat);	
-  
 	m_particle_gun->SetParticleDefinition( m_PionMinus );
 	m_particle_gun->SetParticleEnergy(BeamEnergy * GeV);
 	m_particle_gun->SetParticlePosition(gen_pos );
@@ -4985,4 +5089,55 @@ TPCPrimaryGeneratorAction::RandSin( void )
       success = 1;
   }
   return x;
+}
+
+void
+TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
+	
+	
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int XiMinusID = m_XiMinus->GetPDGEncoding();
+  
+	
+	static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double XiMinusMass = m_XiMinus->GetPDGMass()/CLHEP::GeV;
+	auto MomKm=	m_mm_vert->Moms[0];	
+	auto MomKp=	m_mm_vert->Moms[1];	
+	auto MomXi=	m_mm_vert->Moms[2];	
+	double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+	double KpEnergy = hypot(KaonPlusMass,MomKp.mag()) - KaonPlusMass;
+	double XiEnergy = hypot(XiMinusMass,MomKp.mag()) - XiMinusMass;
+	
+	G4double dx = G4RandFlat::shoot(-15,15);
+	G4double dy = G4RandFlat::shoot(-25,25);
+	G4double dz = G4RandFlat::shoot(-153,-133);
+	G4ThreeVector gen_pos(dx,dy,dz);
+	MomKp.rotateZ(phi);
+	MomKm.rotateZ(phi);
+	MomXi.rotateZ(phi);
+
+	auto SpinXi = MomXi.cross(MomKm);
+	SpinXi = SpinXi*(1./SpinXi.mag());
+	gTrackBuffer.SetPolarity(SpinXi,0);
+	gTrackBuffer.SetMomentum(MomXi,0);
+  gAnaMan.SetNumberOfPrimaryParticle( 3 );
+	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
+	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
+	gAnaMan.SetPrimaryParticle(2,MomXi,XiMinusMass,XiMinusID);
+	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleEnergy(KpEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKp );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	
+	m_particle_gun->SetParticleDefinition( m_XiMinus );
+	m_particle_gun->SetParticleEnergy(XiEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomXi );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+
+
+
 }

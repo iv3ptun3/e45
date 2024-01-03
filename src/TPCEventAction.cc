@@ -54,7 +54,6 @@ TPCEventAction::~TPCEventAction( void )
 void
 TPCEventAction::BeginOfEventAction( const G4Event* )
 {
-	gTrackBuffer.ClearTrackBuffer();
 	gAnaMan.BeginOfEventAction();
 }
 
@@ -337,4 +336,5 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
   gAnaMan.EndOfEventAction();
+	gTrackBuffer.ClearTrackBuffer();
 }

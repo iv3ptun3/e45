@@ -22,7 +22,7 @@
 #include "track.hh"
 #include "VHitInfo.hh"
 #include "padHelper.hh"
-
+#include "TString.h"
 namespace
 {
   const ConfMan& gConf = ConfMan::GetInstance();
@@ -54,6 +54,7 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "VertexOfTrack_x",event.VertexOfTrack_x, "VertexOfTrack_x[1000]/D" );
   TPC_g->Branch( "VertexOfTrack_y",event.VertexOfTrack_y, "VertexOfTrack_y[1000]/D" );
   TPC_g->Branch( "VertexOfTrack_z",event.VertexOfTrack_z, "VertexOfTrack_z[1000]/D" );
+  TPC_g->Branch( "MomentumOfTrack",event.MomentumOfTrack, "MomentumOfTrack[1000]/D" );
   TPC_g->Branch( "MomentumOfTrack_x",event.MomentumOfTrack_x, "MomentumOfTrack_x[1000]/D" );
   TPC_g->Branch( "MomentumOfTrack_y",event.MomentumOfTrack_y, "MomentumOfTrack_y[1000]/D" );
   TPC_g->Branch( "MomentumOfTrack_z",event.MomentumOfTrack_z, "MomentumOfTrack_z[1000]/D" );
@@ -128,8 +129,7 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch("pxtpc",event.pxtpc,"pxtpc[nhittpc]/D");
   TPC_g->Branch("pytpc",event.pytpc,"pytpc[nhittpc]/D");
   TPC_g->Branch("pztpc",event.pztpc,"pztpc[nhittpc]/D");
-  TPC_g->Branch("pptpc",event.pptpc,"pptpc[nhittpc]/D");   // total mometum
-  TPC_g->Branch("masstpc",event.masstpc,"masstpc[nhittpc]/D");   // mass TPC
+  TPC_g->Branch("pptpc",event.pptpc,"pptpc[nhittpc]/D");   // total mometum TPC_g->Branch("masstpc",event.masstpc,"masstpc[nhittpc]/D");   // mass TPC
   TPC_g->Branch("timetpc",event.timetpc,"timetpc[nhittpc]/D");
   TPC_g->Branch("betatpc",event.betatpc,"betatpc[nhittpc]/D");
   TPC_g->Branch("edeptpc",event.edeptpc,"edeptpc[nhittpc]/D");
@@ -389,6 +389,30 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "vtyVp", event.vtyVp, "vtyVp[nhVp]/D" );
   TPC_g->Branch( "vtzVp", event.vtzVp, "vtzVp[nhVp]/D" );
   TPC_g->Branch( "lengthVp", event.lengthVp, "lengthVp[nhVp]/D" );
+
+	TPC_g->Branch( "SpinXi", &event.SpinXi,"SpinXi/D");
+	TPC_g->Branch( "SpinXi_x", &event.SpinXi_x,"SpinXi_x/D");
+	TPC_g->Branch( "SpinXi_y", &event.SpinXi_y,"SpinXi_y/D");
+	TPC_g->Branch( "SpinXi_z", &event.SpinXi_z,"SpinXi_x/D");
+	TPC_g->Branch( "MomXi", &event.MomXi,"MomXi/D");
+	TPC_g->Branch( "MomXi_x", &event.MomXi_x,"MomXi_x/D");
+	TPC_g->Branch( "MomXi_y", &event.MomXi_y,"MomXi_y/D");
+	TPC_g->Branch( "MomXi_z", &event.MomXi_z,"MomXi_z/D");
+	TPC_g->Branch( "MomLd", &event.MomLd,"MomLd/D");
+	TPC_g->Branch( "MomLd_x", &event.MomLd_x,"MomLd_x/D");
+	TPC_g->Branch( "MomLd_y", &event.MomLd_y,"MomLd_y/D");
+	TPC_g->Branch( "MomLd_z", &event.MomLd_z,"MomLd_z/D");
+	TPC_g->Branch( "CM_E", &event.CM_E,"CM_E/D");
+	TPC_g->Branch( "CM_x", &event.CM_x,"CM_x/D");
+	TPC_g->Branch( "CM_y", &event.CM_y,"CM_y/D");
+	TPC_g->Branch( "CM_z", &event.CM_z,"CM_z/D");
+	TPC_g->Branch( "ThXi_CM", &event.ThXi_CM,"ThXi_CM/D");
+	TPC_g->Branch( "MomP", &event.MomP,"MomP/D");
+	TPC_g->Branch( "MomP_x", &event.MomP_x,"MomP_x/D");
+	TPC_g->Branch( "MomP_y", &event.MomP_y,"MomP_y/D");
+	TPC_g->Branch( "MomP_z", &event.MomP_z,"MomP_z/D");
+	
+	TPC_g->Branch( "ThLd_CM", &event.ThLd_CM,"ThLd_CM/D");
 }
 
 //_____________________________________________________________________________
@@ -890,6 +914,28 @@ TPCAnaManager::BeginOfEventAction( void )
     event.rowtpc[i] = -1;
     event.parentID[i] = -1;
   }
+	event.SpinXi=0;
+	event.SpinXi_x=0;
+	event.SpinXi_y=0;
+	event.SpinXi_z=0;
+	event.MomXi=0;
+	event.MomXi_x=0;
+	event.MomXi_y=0;
+	event.MomXi_z=0;
+	event.MomLd=0;
+	event.MomLd_x=0;
+	event.MomLd_y=0;
+	event.MomLd_z=0;
+	event.MomP=0;
+	event.MomP_x=0;
+	event.MomP_y=0;
+	event.MomP_z=0;
+	event.CM_E=0;
+	event.CM_x=0;
+	event.CM_y=0;
+	event.CM_z=0;
+	event.ThXi_CM=0;
+	event.ThLd_CM=0;
 }
 
 //_____________________________________________________________________________
@@ -918,12 +964,60 @@ TPCAnaManager::EndOfEventAction( void )
 		event.VertexOfTrack_x[it] = gTrackBuffer.GetVertexOfTrack_x()[it];
 		event.VertexOfTrack_y[it] = gTrackBuffer.GetVertexOfTrack_y()[it];
 		event.VertexOfTrack_z[it] = gTrackBuffer.GetVertexOfTrack_z()[it];
+		event.MomentumOfTrack[it] = gTrackBuffer.GetMomentumOfTrack()[it];
 		event.MomentumOfTrack_x[it] = gTrackBuffer.GetMomentumOfTrack_x()[it];
 		event.MomentumOfTrack_y[it] = gTrackBuffer.GetMomentumOfTrack_y()[it];
 		event.MomentumOfTrack_z[it] = gTrackBuffer.GetMomentumOfTrack_z()[it];
 	}
+  auto SXi = gTrackBuffer.GetPolarity(0);
+  auto PXi = gTrackBuffer.GetMomentum(0);
+	event.SpinXi = SXi.mag();
+	event.SpinXi_x = SXi.x();
+	event.SpinXi_y = SXi.y();
+	event.SpinXi_z = SXi.z();
+	event.MomXi = PXi.mag();
+	event.MomXi_x = PXi.x();
+	event.MomXi_y = PXi.y();
+	event.MomXi_z = PXi.z();
+  
+	auto PLd = gTrackBuffer.GetMomentum(1);
+	event.MomLd = PLd.mag();
+	event.MomLd_x = PLd.x();
+	event.MomLd_y = PLd.y();
+	event.MomLd_z = PLd.z();
 
-  if( HitNum > 0){
+	auto XiLV = gTrackBuffer.GetLV(0);
+	auto XiU = XiLV.boostVector();
+	auto CMLV = gTrackBuffer.GetCMLV();
+	event.CM_E = CMLV.t();
+	event.CM_x = CMLV.x();
+	event.CM_y = CMLV.y();
+	event.CM_z = CMLV.z();
+	auto LdLV = gTrackBuffer.GetLV(1);
+	auto PLd_Lab = LdLV.vect();
+	double ThXi_Lab = acos(PLd_Lab*PXi*(1./PXi.mag()/PLd_Lab.mag()));
+	LdLV.boost(-XiU);
+	auto PLd_CM = LdLV.vect();
+	
+	double ThXi_CM = acos(PLd_CM*SXi*(1./SXi.mag()/PLd_CM.mag()));
+	event.ThXi_CM = ThXi_CM;
+
+	LdLV = gTrackBuffer.GetLV(1);
+  auto SLd = gTrackBuffer.GetPolarity(1);
+	auto LdU = LdLV.boostVector();
+
+	auto PLV = gTrackBuffer.GetLV(2);
+	auto PP = PLV.vect();
+	event.MomP = PP.mag();
+	event.MomP_x = PP.x();
+	event.MomP_y = PP.y();
+	event.MomP_z = PP.z();
+	PLV.boost(-LdU);
+	auto PP_CM = PLV.vect();
+	double ThLd_CM = acos(PP_CM*SLd*(1./SLd.mag()/PP_CM.mag()));
+	event.ThLd_CM = ThLd_CM;
+
+	if( HitNum > 0){
     G4int c[MAX_TRACK] = {};
 
     for(G4int i=0;i<MAX_TRACK;i++){

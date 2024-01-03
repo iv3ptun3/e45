@@ -131,6 +131,7 @@ struct Event
 	double VertexOfTrack_x[1000];
 	double VertexOfTrack_y[1000];
 	double VertexOfTrack_z[1000];
+	double MomentumOfTrack[1000];
 	double MomentumOfTrack_x[1000];
 	double MomentumOfTrack_y[1000];
 	double MomentumOfTrack_z[1000];
@@ -474,6 +475,17 @@ struct Event
   Double_t vtpzVp[MaxHits];
   Double_t vtppVp[MaxHits];
   Double_t lengthVp[MaxHits];
+
+
+	Double_t SpinXi_x,SpinXi_y,SpinXi_z,SpinXi;
+	Double_t MomXi_x,MomXi_y,MomXi_z,MomXi;
+	Double_t MomLd_x,MomLd_y,MomLd_z,MomLd;
+	Double_t CM_x,CM_y,CM_z,CM_E;
+	Double_t ThXi_CM;
+	
+	Double_t SpinLd_x,SpinLd_y,SpinLd_z,SpinLd;
+	Double_t MomP_x,MomP_y,MomP_z,MomP;
+	Double_t ThLd_CM;
 };
 
 //_____________________________________________________________________________

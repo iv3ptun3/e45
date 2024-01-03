@@ -1,7 +1,7 @@
 // -*- C++ -*-
 
 #include "TPCPhysicsList.hh"
-
+#include "TPCDecayChannel.hh"
 #include <G4ComptonScattering.hh>
 #include <G4Decay.hh>
 #include <G4DecayTable.hh>
@@ -224,22 +224,37 @@ TPCPhysicsList::ConstructGeneral( void )
 
     ////shhwang; include decay process
     G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
+		G4int PolarizedDecay = gConf.Get<G4int>("PolarizedDecay");
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     if(1){
-      G4VDecayChannel* mode;
       G4DecayTable* Table = new G4DecayTable();
       particle=particleTable->FindParticle("lambda");
-      mode = new G4PhaseSpaceDecayChannel("lambda",1.0000,2,"proton","pi-");
-			Table->Insert(mode);
+			if(PolarizedDecay){
+				TPCPolarizedDecayChannel* LdDecay;
+				LdDecay = new TPCPolarizedDecayChannel("lambda",1,0.75,1,"proton","pi-");
+				Table->Insert(LdDecay);
+			}
+			else{
+				G4VDecayChannel* mode;
+				mode = new G4PhaseSpaceDecayChannel("lambda",1.0000,2,"proton","pi-");
+				Table->Insert(mode);
+			}
       particle->SetDecayTable(Table);
     }
     //////Xi-////
 		if(1){
-			G4VDecayChannel* mode;
 			G4DecayTable* Table = new G4DecayTable();
 			particle = particleTable ->FindParticle("xi-");
-      mode = new G4PhaseSpaceDecayChannel("xi-",1.0000,2,"lambda","pi-");
-      Table->Insert(mode);
+			if(PolarizedDecay){
+				TPCPolarizedDecayChannel* XiDecay;
+				XiDecay = new TPCPolarizedDecayChannel("xi-",1,0.44,0,"lambda","pi-");
+				Table->Insert(XiDecay);
+			}
+			else{
+				G4VDecayChannel* mode;
+				mode = new G4PhaseSpaceDecayChannel("xi-",1.0000,2,"lambda","pi-");
+				Table->Insert(mode);
+			}
       particle->SetDecayTable(Table);
 		}
 		////Xi0////
@@ -252,9 +267,8 @@ TPCPhysicsList::ConstructGeneral( void )
       particle->SetDecayTable(Table);
 		}
 		////Xi1530////
-    G4int XiStarToXiPi0 = gConf.Get<G4int>("XiStarToXiPi0");
-    G4int XiStarToXi0Pi = gConf.Get<G4int>("XiStarToXi0Pi");
-		if(XiStarToXiPi0){
+    G4int XiStarToXiPi0 = gConf.Get<G4int>("XiStarDecayMode");
+		if(XiStarToXiPi0==0){
 			G4VDecayChannel* mode;
 			G4DecayTable* Table = new G4DecayTable();
 			particle = particleTable ->FindParticle("xi(1530)-");
@@ -262,11 +276,19 @@ TPCPhysicsList::ConstructGeneral( void )
       Table->Insert(mode);
       particle->SetDecayTable(Table);
 		}
-		if(XiStarToXi0Pi){
+		else if (XiStarToXiPi0==1){
 			G4VDecayChannel* mode;
 			G4DecayTable* Table = new G4DecayTable();
 			particle = particleTable ->FindParticle("xi(1530)-");
       mode = new G4PhaseSpaceDecayChannel("xi(1530)-",1.0000,2,"xi0","pi-");
+      Table->Insert(mode);
+      particle->SetDecayTable(Table);
+		}
+		else{
+			G4VDecayChannel* mode;
+			G4DecayTable* Table = new G4DecayTable();
+			particle = particleTable ->FindParticle("xi(1530)-");
+      mode = new G4PhaseSpaceDecayChannel("xi(1530)-",1.0000,2,"xi-","gamma");
       Table->Insert(mode);
       particle->SetDecayTable(Table);
 		}

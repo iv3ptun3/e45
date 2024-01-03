@@ -13,6 +13,7 @@ class TFile;
 class TTree;
 
 struct BeamInfo;
+struct MMVertex;
 struct JamInfo;
 struct IncInfo;
 
@@ -31,6 +32,7 @@ private:
   G4ThreeVector         m_target_size;
   G4ThreeVector         m_e45target_size;
   BeamInfo*             m_beam;
+  MMVertex*             m_mm_vert;
   G4double              m_beam_p0;
   JamInfo*              m_jam;
   IncInfo*              m_inc;
@@ -67,6 +69,7 @@ public:
 public:
   void     GenerateKpXi2Body( G4Event* anEvent );
   void     GenerateKpXi2BodyUniform( G4Event* anEvent );
+  void     GenerateKpXi1530Minus2BodyUniform( G4Event* anEvent );
   void     GenerateHanul( G4Event* anEvent );
   void     GeneratePhaseSpace( G4Event* anEvent );
   void     GenerateHdibaryon1( G4Event* anEvent );
@@ -118,6 +121,8 @@ public:
   void     GenerateKaonMinusBeamthrough( G4Event* anEvent ); //#-493
   void     GenerateProtonBeamthrough( G4Event* anEvent ); //#938
   void     GenerateDedxSingle( G4Event* anEvent ); //#99
+	void		 GenerateKuramaPKmKpXi(G4Event* anEvent);//181321;
+
   // E07
   void     GenerateE07Study( G4Event* anEvent ); //#700
   void     GenerateE07StudyAll( G4Event* anEvent ); //#701

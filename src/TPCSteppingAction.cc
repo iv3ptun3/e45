@@ -51,8 +51,26 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
 	int parentID = theTrack->GetParentID();
   // check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
-//	std::cout<<Form(" Processing track %d, Step %d" ,TrackID,NStep)<<std::endl;
+	//std::cout<<Form(" Processing track %d, Step %d" ,TrackID,NStep)<<std::endl;
   // check if it is primary
+	if(particleName == "xi-"){
+		gTrackBuffer.SetMomentum(preMomentum/CLHEP::GeV,0);		
+		gTrackBuffer.SetLV(G4LorentzVector(preMomentum/CLHEP::GeV,hypot(theParticle->GetPDGMass()/CLHEP::GeV,preMomentum.mag()/CLHEP::GeV)),0);	
+	}
+	if(particleName == "lambda" and gTrackBuffer.GetMomentum(1).mag()==0){
+//		gTrackBuffer.SetMomentum(preMomentum/CLHEP::GeV,1);		
+//		gTrackBuffer.SetLV(G4LorentzVector(preMomentum/CLHEP::GeV,hypot(theParticle->GetPDGMass()/CLHEP::GeV,preMomentum.mag()/CLHEP::GeV)),1);	
+//		auto MomXi = gTrackBuffer.GetMomentum(0);
+//		auto MomLd = gTrackBuffer.GetMomentum(1);
+//		auto SpinLd = MomLd.cross(MomXi);
+//		SpinLd = SpinLd*(1./SpinLd.mag());
+//		gTrackBuffer.SetPolarity(SpinLd,1);
+		gTrackBuffer.SetLambdaID(TrackID);
+	}
+	if(particleName == "proton" and gTrackBuffer.GetMomentum(2).mag()==0 and parentID == gTrackBuffer.GetLambdaID()){
+		gTrackBuffer.SetMomentum(preMomentum/CLHEP::GeV,2);
+		gTrackBuffer.SetLV(G4LorentzVector(preMomentum/CLHEP::GeV,hypot(theParticle->GetPDGMass()/CLHEP::GeV,preMomentum.mag()/CLHEP::GeV)),2);
+	}
 	if(TrackID<1000){	
 		if(NStep==1){
 			gTrackBuffer.SetTrack(TrackID,parentID,ParticleID,prePosition,preMomentum);

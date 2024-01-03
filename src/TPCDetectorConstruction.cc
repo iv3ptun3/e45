@@ -2135,7 +2135,8 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
   auto vp_solid = new G4Box( "VPSolid", 2.*m/2, 2.*m/2, 0.001*mm/2 );
   auto vp_lv = new G4LogicalVolume( vp_solid, m_material_map["Air"], "VPLV" );
   vp_lv->SetSensitiveDetector( vp_sd );
-  vp_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+  vp_lv->SetVisAttributes(G4Color::Blue());;
+			//G4VisAttributes::GetInvisible() );
   for( G4int i=0; i<NumOfSegVP; ++i ){
     auto vp_pos = ( gGeom.GetGlobalPosition( "KURAMA" ) +
 		    gGeom.GetGlobalPosition( Form( "VP%d", i+1 ) ) );
