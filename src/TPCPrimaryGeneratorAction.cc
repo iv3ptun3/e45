@@ -439,7 +439,7 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 	auto CMLV = KnLV + PLV;
 //	G4cout<<CMLV.mag()<<G4endl;
 	gTrackBuffer.SetCMLV(CMLV);
-	auto SpinXi = MomXi.cross(MomKm);
+	auto SpinXi = MomKm.cross(MomXi);
 	SpinXi = SpinXi*(1./SpinXi.mag());
 	gTrackBuffer.SetPolarity(SpinXi,0);
 	gTrackBuffer.SetMomentum(MomXi,0);
@@ -5117,7 +5117,7 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	MomKm.rotateZ(phi);
 	MomXi.rotateZ(phi);
 
-	auto SpinXi = MomXi.cross(MomKm);
+	auto SpinXi = MomKm.cross(MomXi);
 	SpinXi = SpinXi*(1./SpinXi.mag());
 	gTrackBuffer.SetPolarity(SpinXi,0);
 	gTrackBuffer.SetMomentum(MomXi,0);

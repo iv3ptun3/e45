@@ -13,11 +13,15 @@ TPCPolarizedDecayChannel
 ::TPCPolarizedDecayChannel(
 				G4String ParentName,
 				G4double BR,
-				G4double Alpha,
+				G4double* DecayParameter,
 				G4int Order,
 				G4String Daughter1Name,
 				G4String Daughter2Name){
 	order = Order;
+	Alpha = DecayParameter[0];
+	double Angle = DecayParameter[1]*TMath::DegToRad();
+	Beta = sqrt(1-Alpha*Alpha)*sin(Angle);
+	Gamma = sqrt(1-Alpha*Alpha)*cos(Angle);
 	Initialize(ParentName,BR,Alpha,
 			Daughter1Name,Daughter2Name);
 }
@@ -52,21 +56,6 @@ TPCPolarizedDecayChannel
 	
 
 }
-G4RotationMatrix
-TPCPolarizedDecayChannel::SpinToMomentum(){
-	double th_m = Polarity.theta();
-	double ph_m = Polarity.phi();
-	G4RotationMatrix Rot;
-	Rot.rotateZ(-ph_m);
-	Rot.rotateY(th_m);
-	auto mom_rot = Rot*MomVector;
-	auto ph_v = mom_rot.phi();
-	Rot.rotateZ(-ph_v);//p,e,s to x,y,z
-	auto RollBack = Rot;
-	G4RotationMatrix SpinToMom;
-	SpinToMom.rotateY(-acos(-1)/2);
-	return Rot*SpinToMom;
-}
 
 G4DecayProducts*
 TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
@@ -75,18 +64,17 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	G4double P_d = Pmx(ParentMass,DaughterMass[0],DaughterMass[1]);
 	double PI = acos(-1);
 	double Phi = 2*PI*G4UniformRand();
-	double Theta = acos(PDFCTheta.GetRandom());
-//	Theta = MomVector.theta();
-//	Phi = MomVector.phi();
+	Theta = acos(PDFCTheta.GetRandom());
 	double px = P_d*sin(Theta)*cos(Phi);
 	double py = P_d*sin(Theta)*sin(Phi);
 	double pz = P_d*cos(Theta);
-	G4ThreeVector DaughterMom1(px,py,pz);
-	G4ThreeVector DaughterMom2= -DaughterMom1;
+	auto Zaxis = Polarity*(1./Polarity.mag()); 
+	auto Yaxis = Polarity.cross(MomVector);
+	Yaxis = Yaxis*(1./Yaxis.mag());
+	auto Xaxis = Yaxis.cross(Zaxis);
 
-	auto STM = SpinToMomentum();
-	DaughterMom1 = STM*DaughterMom1;
-	DaughterMom2 = STM*DaughterMom2;
+	auto DaughterMom1 = px*Xaxis+py*Yaxis+pz*Zaxis;
+	auto DaughterMom2 =-DaughterMom1;
 	SavePolarityMomentum(DaughterMom1);
 
 	DaughterMom[0] = DaughterMom1;
@@ -115,7 +103,11 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	auto TVDaughter = LVDaughter.vect();
 	gTrackBuffer.SetMomentum(TVDaughter,order+1);		
 	gTrackBuffer.SetLV(LVDaughter,order+1);		
-	auto SpinDaughter = TVDaughter.cross(MomVector);
+	MomD = MomD*(1./MomD.mag());
+	auto PolM = Polarity*(1./Polarity.mag());
+	auto PxM = MomD.cross(PolM); 
+	auto MxPxM =MomD.cross(PxM);
+	auto SpinDaughter = (Alpha+cos(Theta))*MomD + Beta*PxM + Gamma * MxPxM;
 	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
 }
@@ -129,66 +121,4 @@ G4double TPCPolarizedDecayChannel::Pmx(G4double e,G4double p1, G4double p2){
 	 if (ppp>0) return std::sqrt(ppp);
 	 else       return -1.;
 }
-/*
-XiToLdPiChannel
-::XiToLdPiChannel(
-				G4String ParentName,
-				G4double BR,
-				G4double Alpha,
-				G4String Daughter1Name,
-				G4String Daughter2Name){
-	Initialize(ParentName,BR,Alpha,
-			Daughter1Name,Daughter2Name);
-}
-void XiToLdPiChannel::LoadPolarityMomentum(){
-	Polarity = gTrackBuffer.GetPolarity(order);
-	MomVector = gTrackBuffer.GetMomentum(order);
-	if(Polarity.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Polarity not set!"<<G4endl;
-	if(MomVector.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Momentum cannot be tracked!"<<G4endl;
-}
-void XiToLdPiChannel::SavePolarityMomentum(G4ThreeVector MomM,G4ThreeVector MomD){
-	auto LVParent = G4LorentzVector(MomM,hypot(ParentMass,MomM.mag()));
-	auto ParentFrame = LVParent.boostVector();
-	auto LVDaughter = G4LorentzVector(MomD,hypot(DaughterMass[0],MomD.mag()));
-	LVDaughter.boost(ParentFrame);
-	auto TVDaughter = LVDaughter.vect();
-	gTrackBuffer.SetMomentum(TVDaughter,order+1);		
-	gTrackBuffer.SetLV(LVDaughter,order+1);		
-	auto SpinDaughter = TVDaughter.cross(MomM);
-	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
-	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
-}
-
-LdToPPiChannel
-::LdToPPiChannel(
-				G4String ParentName,
-				G4double BR,
-				G4double Alpha,
-				G4String Daughter1Name,
-				G4String Daughter2Name){
-	Initialize(ParentName,BR,Alpha,
-			Daughter1Name,Daughter2Name);
-}
-
-void LdToPPiChannel::LoadPolarityMomentum(){
-	Polarity = gTrackBuffer.GetPolarity(1);
-	MomVector = gTrackBuffer.GetMomentum(1);
-	if(Polarity.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Polarity not set!"<<G4endl;
-	if(MomVector.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Momentum cannot be tracked!"<<G4endl;
-}
-
-void LdToPPiChannel::SavePolarityMomentum(G4ThreeVector MomM,G4ThreeVector MomD){
-	auto LVParent = G4LorentzVector(MomM,hypot(ParentMass,MomM.mag()));
-	auto ParentFrame = LVParent.boostVector();
-	auto LVDaughter = G4LorentzVector(MomD,hypot(DaughterMass[0],MomD.mag()));
-	LVDaughter.boost(ParentFrame);
-	auto TVDaughter = LVDaughter.vect();
-	gTrackBuffer.SetMomentum(TVDaughter,2);		
-	gTrackBuffer.SetLV(LVDaughter,2);		
-	auto SpinDaughter = TVDaughter.cross(MomM);
-	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
-	gTrackBuffer.SetPolarity(SpinDaughter,2);
-}
-
-*/
 #endif

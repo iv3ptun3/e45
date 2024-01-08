@@ -21,7 +21,7 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 		TPCPolarizedDecayChannel(
 				G4String Parent,
 				G4double BR,
-				G4double Alpha,
+				G4double* DecayParam,
 				G4int Order,
 				G4String Daughter1,
 				G4String Daughter2);
@@ -34,19 +34,17 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 		G4double Pmx(G4double e,G4double p1, G4double p2);
 		G4ThreeVector SetPolarity();
 		G4ThreeVector GetPolarity();
-		void SetAlpha(double Alpha){alpha = Alpha;}
 	protected:
 		G4double ParentMass;
 		G4ThreeVector Polarity;//Z axis on mother frame
 		G4ThreeVector MomVector;//X axis on mother frame
 		TF1 PDFCTheta;
 		int order;
-		double alpha;
-		double GetTheta();
+		double Alpha,Beta,Gamma;
+		double Theta;
 		G4ParticleDefinition* Daughters[2];
 		G4ParticleDefinition* parent;
 		G4ThreeVector DaughterMom[2];
-		G4RotationMatrix SpinToMomentum();
 		void Initialize(
 				G4String Parent,
 				G4double BR,

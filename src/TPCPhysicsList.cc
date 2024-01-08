@@ -231,7 +231,8 @@ TPCPhysicsList::ConstructGeneral( void )
       particle=particleTable->FindParticle("lambda");
 			if(PolarizedDecay){
 				TPCPolarizedDecayChannel* LdDecay;
-				LdDecay = new TPCPolarizedDecayChannel("lambda",1,0.75,1,"proton","pi-");
+				double DecayPar[2] = {0.732,-6.5};//Alpha,phi(in degree)
+				LdDecay = new TPCPolarizedDecayChannel("lambda",1,DecayPar,1,"proton","pi-");
 				Table->Insert(LdDecay);
 			}
 			else{
@@ -247,7 +248,8 @@ TPCPhysicsList::ConstructGeneral( void )
 			particle = particleTable ->FindParticle("xi-");
 			if(PolarizedDecay){
 				TPCPolarizedDecayChannel* XiDecay;
-				XiDecay = new TPCPolarizedDecayChannel("xi-",1,0.44,0,"lambda","pi-");
+				double DecayPar[2] = {-0.401,-2.1};//Alpha,phi(in degree)
+				XiDecay = new TPCPolarizedDecayChannel("xi-",1,DecayPar,0,"lambda","pi-");
 				Table->Insert(XiDecay);
 			}
 			else{
