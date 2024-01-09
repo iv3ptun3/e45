@@ -385,8 +385,6 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 	gAnaMan.SetFermiMomentum( p_fermi );
 	KinemaFermi kinema( KaonMinusMass, ProtonMass, KaonPlusMass, XiMinusMass,
 			m_beam->p, p_fermi, cosx );
-	// if( kinema.GetTheta( 3 )/CLHEP::deg > 60. )
-	//   theta_flag = false;
 	KnLV = kinema.GetLorentzVector( 0 );
 	PLV = kinema.GetLorentzVector( 1 );
 	KpLV = kinema.GetLorentzVector( 2 );
@@ -395,18 +393,6 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 	kinema.Print();
 #endif
 
-  // G4cout << "#D " << FUNC_NAME << " k+ mom: " << mom[2] << G4endl;
-  // m_cross_section->Fill(cosx);
-  // gAnaMan.FillCrossSection(cosx);
-  //  G4double momkpp=std::sqrt(std::pow(kp_mom_x,2)+std::pow(kp_mom_y,2)+std::pow(kp_mom_z,2));
-  // G4double momcmk[4]={0};
-  //  G4double beta= pbeam/(proton->GetPDGMass()/CLHEP::GeV+Ebeam);
-  // G4double momcmkpp = std::sqrt( momcmk[0]*momcmk[0] +
-  // 				 momcmk[1]*momcmk[1] +
-  // 				 momcmk[2]*momcmk[2] );
-  // m_cmk->Fill( std::acos(momcmk[2]/momcmkpp)/CLHEP::pi*180);
-  //  G4double cmphik=atan2(momk[1],momk[0])*180/3.141592654;
-  // m_coscmk->Fill( momcmk[2]/momcmkpp );
 
   gAnaMan.SetPrimaryBeam( m_beam->p );
   gAnaMan.SetNumberOfPrimaryParticle( 3 );
@@ -437,7 +423,6 @@ TPCPrimaryGeneratorAction::GenerateKpXi2BodyUniform( G4Event* anEvent )
 	auto MomKm = KnLV.vect();
 	PLV = G4LorentzVector(PLV,ProtonMass);
 	auto CMLV = KnLV + PLV;
-//	G4cout<<CMLV.mag()<<G4endl;
 	gTrackBuffer.SetCMLV(CMLV);
 	auto SpinXi = MomKm.cross(MomXi);
 	SpinXi = SpinXi*(1./SpinXi.mag());
@@ -5107,7 +5092,7 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	auto MomXi=	m_mm_vert->Moms[2];	
 	double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
 	double KpEnergy = hypot(KaonPlusMass,MomKp.mag()) - KaonPlusMass;
-	double XiEnergy = hypot(XiMinusMass,MomKp.mag()) - XiMinusMass;
+	double XiEnergy = hypot(XiMinusMass,MomXi.mag()) - XiMinusMass;
 	
 	G4double dx = G4RandFlat::shoot(-15,15);
 	G4double dy = G4RandFlat::shoot(-25,25);

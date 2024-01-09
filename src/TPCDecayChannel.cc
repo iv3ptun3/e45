@@ -72,7 +72,6 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	auto Yaxis = Polarity.cross(MomVector);
 	Yaxis = Yaxis*(1./Yaxis.mag());
 	auto Xaxis = Yaxis.cross(Zaxis);
-
 	auto DaughterMom1 = px*Xaxis+py*Yaxis+pz*Zaxis;
 	auto DaughterMom2 =-DaughterMom1;
 	SavePolarityMomentum(DaughterMom1);

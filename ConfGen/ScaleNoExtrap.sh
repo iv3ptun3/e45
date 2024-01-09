@@ -3,8 +3,9 @@ set -o noclobber
 #for i in {5187,5188,5191,5200,5207,5212,5219,5220,5221,5808,5814,5808,5814,5818,5821,5824,5828,5835,5837,5838,5840,5842,5844,5846,5847,5851,5851,5855,5856,5858,5860,5862,5864,5866}//Beamthrough
 #for i in {5721,5764}
 #for i in {6380..6383}
-for i in {5723..5756}
+#for i in {5723..5756}
 #for i in {5177..5178}
+for i in {5113,5176,5177,5188,5219,5220,5221,5723,5724,5725,5726,5727,5728,5729,5730,5731,5732,5733,5734,5735,5736,5737,5738,5739,5740,5741,5742,5744,5745,5746,5747,5748,5749,5808,5831,5837,5838,5855}
 do
 #	file="./param/k18conf/run0${i}.conf"
 	file="./param/k18conf_NoExtrap/run0${i}.conf"
@@ -53,6 +54,7 @@ do
 	echo "##### PHYSICS">>$file
 	echo "Physics	USER">>$file
 	echo "Decay	0">>$file
+	echo "PolarizedDecay	0">>$file
 	echo "EM	1">>$file
 	echo "Hadron	0">>$file
 	echo "HdibaryonMass	2.25 ">>$file

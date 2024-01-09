@@ -299,7 +299,7 @@ const BeamInfo&
 BeamMan::Get( G4int iev ) const
 {
 	auto b =	m_param_array.at(iev);
-	return m_param_array.at( iev%m_n_param );
+	return m_param_array.at( iev%m_param_array.size() );
 }
 
 const MMVertex&
