@@ -32,10 +32,14 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 		virtual	G4DecayProducts* DecayIt(G4double);
 	public:
 		G4double Pmx(G4double e,G4double p1, G4double p2);
+		void SetPolarization(double pol){
+			Polarization = pol;
+		}
 		G4ThreeVector SetPolarity();
 		G4ThreeVector GetPolarity();
 	protected:
 		G4double ParentMass;
+		G4double Polarization = 1;
 		G4ThreeVector Polarity;//Z axis on mother frame
 		G4ThreeVector MomVector;//X axis on mother frame
 		TF1 PDFCTheta;

@@ -5091,6 +5091,7 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	auto MomKp=	m_mm_vert->Moms[1];	
 	auto MomXi=	m_mm_vert->Moms[2];	
 	double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+	double KmEnergy = hypot(KaonPlusMass,MomKm.mag()) - KaonPlusMass;
 	double KpEnergy = hypot(KaonPlusMass,MomKp.mag()) - KaonPlusMass;
 	double XiEnergy = hypot(XiMinusMass,MomXi.mag()) - XiMinusMass;
 	
@@ -5098,6 +5099,7 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	G4double dy = G4RandFlat::shoot(-25,25);
 	G4double dz = G4RandFlat::shoot(-153,-133);
 	G4ThreeVector gen_pos(dx,dy,dz);
+	MomKm = - MomKm;
 	MomKp.rotateZ(phi);
 	MomKm.rotateZ(phi);
 	MomXi.rotateZ(phi);
@@ -5110,6 +5112,12 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
 	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
 	gAnaMan.SetPrimaryParticle(2,MomXi,XiMinusMass,XiMinusID);
+	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleEnergy(KmEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKm );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	
 	m_particle_gun->SetParticleDefinition( m_KaonPlus );
 	m_particle_gun->SetParticleEnergy(KpEnergy * GeV);
 	m_particle_gun->SetParticlePosition(gen_pos );

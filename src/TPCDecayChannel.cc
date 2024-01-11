@@ -42,7 +42,7 @@ TPCPolarizedDecayChannel
 	daughters_name[1] = new G4String(Daughter2Name);
 	numberOfDaughters = 2;
 	PDFCTheta = TF1("PDF","1 + [0]*[1]*x",-1,1);	
-	PDFCTheta.SetParameter(0,Alpha);
+	PDFCTheta.SetParameter(0,Alpha*Polarization);
 	PDFCTheta.SetParameter(1,1);
 
 	Daughters[0] = G4ParticleTable::GetParticleTable()->FindParticle(Daughter1Name);
@@ -106,7 +106,7 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	auto PolM = Polarity*(1./Polarity.mag());
 	auto PxM = MomD.cross(PolM); 
 	auto MxPxM =MomD.cross(PxM);
-	auto SpinDaughter = (Alpha+cos(Theta))*MomD + Beta*PxM + Gamma * MxPxM;
+	auto SpinDaughter = (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM;
 	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
 }
