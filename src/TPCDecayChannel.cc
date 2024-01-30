@@ -16,7 +16,8 @@ TPCPolarizedDecayChannel
 				G4double* DecayParameter,
 				G4int Order,
 				G4String Daughter1Name,
-				G4String Daughter2Name){
+				G4String Daughter2Name
+				){
 	order = Order;
 	Alpha = DecayParameter[0];
 	double Angle = DecayParameter[1]*TMath::DegToRad();
@@ -31,10 +32,10 @@ TPCPolarizedDecayChannel
 ::Initialize(
 				G4String ParentName,
 				G4double BR,
-				G4double Alpha,
+				G4double alpha,
 				G4String Daughter1Name,
-				G4String Daughter2Name){
-	
+				G4String Daughter2Name
+				){
 	rbranch = BR;
 	parent_name = new G4String(ParentName);
 	daughters_name = new G4String*[2];
@@ -42,8 +43,7 @@ TPCPolarizedDecayChannel
 	daughters_name[1] = new G4String(Daughter2Name);
 	numberOfDaughters = 2;
 	PDFCTheta = TF1("PDF","1 + [0]*[1]*x",-1,1);	
-	PDFCTheta.SetParameter(0,Alpha*Polarization);
-	PDFCTheta.SetParameter(1,1);
+	PDFCTheta.SetParameter(0,alpha);
 
 	Daughters[0] = G4ParticleTable::GetParticleTable()->FindParticle(Daughter1Name);
 	Daughters[1] = G4ParticleTable::GetParticleTable()->FindParticle(Daughter2Name);
@@ -61,6 +61,7 @@ G4DecayProducts*
 TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	
 	LoadPolarityMomentum();	
+	PDFCTheta.SetParameter(1,Polarization);
 	G4double P_d = Pmx(ParentMass,DaughterMass[0],DaughterMass[1]);
 	double PI = acos(-1);
 	double Phi = 2*PI*G4UniformRand();
@@ -69,9 +70,9 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	double py = P_d*sin(Theta)*sin(Phi);
 	double pz = P_d*cos(Theta);
 	auto Zaxis = Polarity*(1./Polarity.mag()); 
-	auto Yaxis = Polarity.cross(MomVector);
-	Yaxis = Yaxis*(1./Yaxis.mag());
-	auto Xaxis = Yaxis.cross(Zaxis);
+	auto Xaxis = MomVector.cross(Polarity);
+	Xaxis = Xaxis*(1./Xaxis.mag());
+	auto Yaxis = Zaxis.cross(Xaxis);
 	auto DaughterMom1 = px*Xaxis+py*Yaxis+pz*Zaxis;
 	auto DaughterMom2 =-DaughterMom1;
 	SavePolarityMomentum(DaughterMom1);
@@ -90,7 +91,13 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 }
 void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
 	Polarity = gTrackBuffer.GetPolarity(order);
+	Polarization = gTrackBuffer.GetPolarization(order); 
 	MomVector = gTrackBuffer.GetMomentum(order);
+//	G4cout<<*parent_name<<" Polarization P = "<<Polarization<<G4endl;
+	if(abs(Polarization) >1.01 or isnan(Polarization)){
+		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! P = "<<Polarization<<G4endl;
+		Polarization = 0;
+	}
 	if(Polarity.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Polarity not set!"<<G4endl;
 	if(MomVector.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Momentum cannot be tracked!"<<G4endl;
 }
@@ -101,16 +108,22 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	LVDaughter.boost(ParentFrame);
 	auto TVDaughter = LVDaughter.vect();
 	gTrackBuffer.SetMomentum(TVDaughter,order+1);		
+	gTrackBuffer.SetVertexMomentum(TVDaughter,order+1);		
 	gTrackBuffer.SetLV(LVDaughter,order+1);		
+	gTrackBuffer.SetVertexLV(LVDaughter,order+1);		
 	MomD = MomD*(1./MomD.mag());
 	auto PolM = Polarity*(1./Polarity.mag());
-	auto PxM = MomD.cross(PolM); 
+	auto PxM = PolM.cross(MomD); 
 	auto MxPxM =MomD.cross(PxM);
-	auto SpinDaughter = (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM;
+	auto SpinDaughter =( (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM) * 1./(1 + Alpha * Polarization * cos(Theta));
+	auto PolDaughter = SpinDaughter.mag();
 	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
+	gTrackBuffer.SetPolarization(PolDaughter,order+1);
 }
-
+void TPCPolarizedDecayChannel::SetPolarization(G4double pol){
+	gTrackBuffer.SetPolarization(pol,order);
+}
 
 
 

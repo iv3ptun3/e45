@@ -450,6 +450,31 @@ struct Event
   Double_t vtpzWc[MaxHits];
   Double_t vtppWc[MaxHits];
   Double_t lengthWc[MaxHits];
+  //BVH
+	Int_t nhBvh;
+  Int_t tidBvh[MaxHits];
+  Int_t pidBvh[MaxHits];
+  Int_t didBvh[MaxHits];
+  Int_t prtBvh[MaxHits];
+  Int_t qBvh[MaxHits];
+  Double_t massBvh[MaxHits];
+  Double_t xBvh[MaxHits];
+  Double_t yBvh[MaxHits];
+  Double_t zBvh[MaxHits];
+  Double_t pxBvh[MaxHits];
+  Double_t pyBvh[MaxHits];
+  Double_t pzBvh[MaxHits];
+  Double_t ppBvh[MaxHits];
+  Double_t deBvh[MaxHits];
+  Double_t tBvh[MaxHits];
+  Double_t vtxBvh[MaxHits];
+  Double_t vtyBvh[MaxHits];
+  Double_t vtzBvh[MaxHits];
+  Double_t vtpxBvh[MaxHits];
+  Double_t vtpyBvh[MaxHits];
+  Double_t vtpzBvh[MaxHits];
+  Double_t vtppBvh[MaxHits];
+  Double_t lengthBvh[MaxHits];
   // VP
   Int_t nhVp;
   Int_t tidVp[MaxHits];
@@ -569,6 +594,7 @@ public:
   void SetLACData( const VHitInfo* hit );
   void SetSCHData( const VHitInfo* hit );
   void SetSDCData( const VHitInfo* hit );
+  void SetBVHData( const VHitInfo* hit );
   void SetVPData( const VHitInfo* hit );
   void SetWCData( const VHitInfo* hit );
   void SetGeneratorID(G4int gen);

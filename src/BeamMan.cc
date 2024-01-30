@@ -182,7 +182,7 @@ BeamMan::Initialize( void )
 		vtgtHS = new TTreeReaderValue<vector<double>>(*reader,"vtgtHS"); 
 		
 		tree->SetBranchAddress("ntKurama",&ntKurama);
-		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pTPCKurama"); 
+		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC"); 
 		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
 		utgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"utgtTPCKurama"); 
 		vtgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"vtgtTPCKurama"); 

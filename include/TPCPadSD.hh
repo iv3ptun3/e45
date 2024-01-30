@@ -32,6 +32,9 @@ private:
   G4int m_gem_dead_plane_division;
   G4double m_dead_area;
 
+	G4double DensityEffectCorrection(G4double betagamma, G4double* par);
+	G4double TPCdEdx(G4double mass, G4double beta);
+
 public:
   G4int ntrk;
   virtual G4bool ProcessHits( G4Step* aStep, G4TouchableHistory* ROhist );

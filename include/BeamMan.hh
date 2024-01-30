@@ -48,6 +48,9 @@ struct MMVertex
 	G4int evnum;
 	G4int ntK18;
 	G4int ntKurama;
+	G4int Bh2Seg[8];
+	G4int SchSeg[64];
+	G4int TofSeg[24];
 };
 
 //_____________________________________________________________________________

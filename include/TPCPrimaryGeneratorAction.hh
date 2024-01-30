@@ -56,6 +56,7 @@ private:
   G4ParticleDefinition* m_KaonMinus;
   G4ParticleDefinition* m_KaonZeroS;
   G4ParticleDefinition* m_KaonStarZero;
+  G4ParticleDefinition* m_Phi;
   G4ParticleDefinition* m_Hdibaryon;
   G4ParticleDefinition* m_HdibaryonS;
   G4ParticleDefinition* m_HdibaryonLL;
@@ -70,7 +71,8 @@ public:
   void     GenerateKpXi2Body( G4Event* anEvent );
   void     GenerateKpXi2BodyUniform( G4Event* anEvent );
   void     GenerateKpXi1530Minus2BodyUniform( G4Event* anEvent );
-  void     GenerateHanul( G4Event* anEvent );
+	void     GeneratePPBar2Phi( G4Event* anEvent );
+	void     GenerateHanul( G4Event* anEvent );
   void     GeneratePhaseSpace( G4Event* anEvent );
   void     GenerateHdibaryon1( G4Event* anEvent );
   void     GenerateHdibaryon2( G4Event* anEvent );

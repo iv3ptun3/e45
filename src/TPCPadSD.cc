@@ -343,8 +343,10 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
       //  if(hitx < (-hitz+5*sqrt(2)) && hitx > (-hitz-5*sqrt(2))  )
       //    return false;
     }//end discharge
-  G4double edep = aStep->GetTotalEnergyDeposit();
-  // if (edep<0.0005){
+//  G4double edep = aStep->GetTotalEnergyDeposit();
+ 
+
+	// if (edep<0.0005){
   //   return false;
   // }
   G4ThreeVector VertexPosition = aTrack->GetVertexPosition();
@@ -385,6 +387,18 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   G4int iLay= padHelper::getLayerID(iPad);
   G4int iRow= padHelper::getRowID(iPad);
   
+	G4double PadLen = padHelper::getLength(iLay);
+	G4ThreeVector PadPos(hitx,0,hitz + 143); 
+	G4ThreeVector MomT(mom.x(),0,mom.z());	
+	G4double alpha = PadPos.theta()-MomT.theta();
+	G4double PathT = PadLen * 1./cos(alpha);
+	G4double Pitch = mom.y()/MomT.mag();
+	G4double Path = PathT * sqrt(1+Pitch*Pitch);
+
+	G4double edepMean =TPCdEdx(mass,beta)*Path; 
+	G4double IonEn = 13*eV;
+	G4double edepSig = sqrt(edepMean / IonEn ) * IonEn;
+	G4double edep = G4RandGauss::shoot(edepMean,edepSig);
 #ifdef DEBUG
   
   //for test 
@@ -449,7 +463,54 @@ void
 TPCPadSD::DrawAll( void )
 {
 }
+G4double
+TPCPadSD::TPCdEdx(Double_t mass/*MeV/c2*/, Double_t beta){
 
+  Double_t rho=0.; //[g cm-3]
+  Double_t ZoverA=0.; //[mol g-1]
+  Double_t I=0.; //[eV]
+  Double_t density_effect_par[6]={0.}; //Sternheimer’s parameterization
+  //P10  
+	rho = TMath::Power(10.,-3)*(0.9*1.662 + 0.1*0.6672);
+	ZoverA = 17.2/37.6;
+	I = 0.9*188.0 + 0.1*41.7;
+	density_effect_par[0] = 0.9*0.19714 + 0.1*0.09253;
+	density_effect_par[1] = 0.9*2.9618 + 0.1*3.6257;
+	density_effect_par[2] = 0.9*1.7635 + 0.1*1.6263;
+	density_effect_par[3] = 0.9*4.4855 + 0.1*3.9716;
+	density_effect_par[4] = 0.9*11.9480 + 0.1*9.5243;
+	density_effect_par[5] = 0.;
+
+  Double_t Z = 1.;
+  Double_t me = 0.5109989461; //[MeV]
+  Double_t K = 0.307075; //[MeV cm2 mol-1]
+  Double_t constant = rho*K*ZoverA; //[MeV cm-1]
+	constant = constant/ cm;
+  Double_t I2 = I*I; //Mean excitaion energy [eV]
+  Double_t beta2 = beta*beta;
+  Double_t gamma2 = 1./(1.-beta2);
+  Double_t MeVToeV = TMath::Power(10.,6);
+  Double_t Wmax = 2*me*beta2*gamma2/((me/mass+1.)*(me/mass+1.)+2*(me/mass)*(TMath::Sqrt(gamma2)-1));
+  Double_t delta = DensityEffectCorrection(TMath::Sqrt(beta2*gamma2), density_effect_par);
+  Double_t dedx = constant*Z*Z/beta2*(0.5*TMath::Log(2*me*beta2*gamma2*Wmax*MeVToeV*MeVToeV/I2) - beta2 - 0.5*delta);
+  return dedx;
+
+}
+G4double
+TPCPadSD::DensityEffectCorrection(Double_t betagamma, Double_t *par){
+
+    //reference : Sternheimer’s parameterizatio(PDG)
+    //notation : par[0] : a, par[1] : k, par[2] : x0, par[3] : x1, par[4] : _C, par[5] : delta0
+    Double_t constant = 2*TMath::Log(10);
+    Double_t delta = 0.;
+    Double_t X = log10(betagamma);
+    if(X<=par[2]) delta = par[5]*TMath::Power(10., 2*(X - par[2]));
+    else if(par[2]<X && X<par[3]) delta = constant*X - par[4] + par[0]*pow((par[3] - X), par[1]);
+    else if(X>=par[3]) delta = constant*X - par[4];
+
+  return delta;
+
+}
 //_____________________________________________________________________________
 void
 TPCPadSD::PrintAll( void )

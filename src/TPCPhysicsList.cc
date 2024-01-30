@@ -207,24 +207,25 @@ TPCPhysicsList::ConstructGeneral( void )
     auto particle = theParticleIterator->value();
     auto pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-    if(particleName != "kaon+"){
-      if (theDecayProcess->IsApplicable(*particle)) {
-	pmanager ->AddProcess(theDecayProcess);
-	// set ordering for PostStepDoIt and AtRestDoIt
-	pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
-	pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
-      }
-    }
-    else if (theDecayProcess->IsApplicable(*particle)) {
-      pmanager ->AddProcess(theDecayProcess);
-      // set ordering for PostStepDoIt and AtRestDoIt
-      pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
-      pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
-    }
+		if(particleName != "kaon+"){
+			if (theDecayProcess->IsApplicable(*particle)) {
+				pmanager ->AddProcess(theDecayProcess);
+				// set ordering for PostStepDoIt and AtRestDoIt
+				pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
+				pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
+			}
+		}
+		else if (theDecayProcess->IsApplicable(*particle)) {
+			pmanager ->AddProcess(theDecayProcess);
+			// set ordering for PostStepDoIt and AtRestDoIt
+			pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
+			pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
+		}
 
     ////shhwang; include decay process
     G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
 		G4int PolarizedDecay = gConf.Get<G4int>("PolarizedDecay");
+		double XiPolarization = gConf.Get<G4double>("XiPolarization");
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     if(1){
       G4DecayTable* Table = new G4DecayTable();
@@ -250,6 +251,7 @@ TPCPhysicsList::ConstructGeneral( void )
 				TPCPolarizedDecayChannel* XiDecay;
 				double DecayPar[2] = {-0.401,-2.1};//Alpha,phi(in degree)
 				XiDecay = new TPCPolarizedDecayChannel("xi-",1,DecayPar,0,"lambda","pi-");
+				XiDecay->SetPolarization(XiPolarization);
 				Table->Insert(XiDecay);
 			}
 			else{
@@ -305,7 +307,14 @@ TPCPhysicsList::ConstructGeneral( void )
       Table1->Insert(mode1);
       particle->SetDecayTable(Table1);
     }
-    // H-dibaryon
+		//phi meson
+		{
+			particle = particleTable->FindParticle("phi");
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+			mode = new G4PhaseSpaceDecayChannel("phi",1,2,"kaon+","kaon-");	
+		}
+		// H-dibaryon
     {
       G4VDecayChannel* mode;
       G4DecayTable* Table = new G4DecayTable();

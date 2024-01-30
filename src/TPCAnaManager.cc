@@ -364,7 +364,32 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "vtyWc", event.vtyWc, "vtyWc[nhWc]/D" );
   TPC_g->Branch( "vtzWc", event.vtzWc, "vtzWc[nhWc]/D" );
   TPC_g->Branch( "lengthWc", event.lengthWc, "lengthWc[nhWc]/D" );
-  // VP
+	//BVH 
+  TPC_g->Branch( "nhBvh", &event.nhBvh, "nhBvh/I" );
+  TPC_g->Branch( "tidBvh", event.tidBvh, "tidBvh[nhBvh]/I" );
+  TPC_g->Branch( "pidBvh", event.pidBvh, "pidBvh[nhBvh]/I" );
+  TPC_g->Branch( "didBvh", event.didBvh, "didBvh[nhBvh]/I" );
+  TPC_g->Branch( "prtBvh", event.prtBvh, "prtBvh[nhBvh]/I" );
+  TPC_g->Branch( "qBvh", event.qBvh, "qBvh[nhBvh]/I" );
+  TPC_g->Branch( "massBvh", event.massBvh, "massBvh[nhBvh]/D" );
+  TPC_g->Branch( "xBvh", event.xBvh, "xBvh[nhBvh]/D" );
+  TPC_g->Branch( "yBvh", event.yBvh, "yBvh[nhBvh]/D" );
+  TPC_g->Branch( "zBvh", event.zBvh, "zBvh[nhBvh]/D" );
+  TPC_g->Branch( "pxBvh", event.pxBvh, "pxBvh[nhBvh]/D" );
+  TPC_g->Branch( "pyBvh", event.pyBvh, "pyBvh[nhBvh]/D" );
+  TPC_g->Branch( "pzBvh", event.pzBvh, "pzBvh[nhBvh]/D" );
+  TPC_g->Branch( "ppBvh", event.ppBvh, "ppBvh[nhBvh]/D" );
+  TPC_g->Branch( "deBvh", event.deBvh, "deBvh[nhBvh]/D" );
+  TPC_g->Branch( "tBvh", event.tBvh, "tBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtpxBvh", event.vtpxBvh, "vtpxBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtpyBvh", event.vtpyBvh, "vtpyBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtpzBvh", event.vtpzBvh, "vtpzBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtppBvh", event.vtppBvh, "vtppBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtxBvh", event.vtxBvh, "vtxBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtyBvh", event.vtyBvh, "vtyBvh[nhBvh]/D" );
+  TPC_g->Branch( "vtzBvh", event.vtzBvh, "vtzBvh[nhBvh]/D" );
+  TPC_g->Branch( "lengthBvh", event.lengthBvh, "lengthBvh[nhBvh]/D" );
+	// VP
   TPC_g->Branch( "nhVp", &event.nhVp, "nhVp/I" );
   TPC_g->Branch( "tidVp", event.tidVp, "tidVp[nhVp]/I" );
   TPC_g->Branch( "pidVp", event.pidVp, "pidVp[nhVp]/I" );
@@ -398,6 +423,10 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch( "MomXi_x", &event.MomXi_x,"MomXi_x/D");
 	TPC_g->Branch( "MomXi_y", &event.MomXi_y,"MomXi_y/D");
 	TPC_g->Branch( "MomXi_z", &event.MomXi_z,"MomXi_z/D");
+	TPC_g->Branch( "SpinLd", &event.SpinLd,"SpinLd/D");
+	TPC_g->Branch( "SpinLd_x", &event.SpinLd_x,"SpinLd_x/D");
+	TPC_g->Branch( "SpinLd_y", &event.SpinLd_y,"SpinLd_y/D");
+	TPC_g->Branch( "SpinLd_z", &event.SpinLd_z,"SpinLd_x/D");
 	TPC_g->Branch( "MomLd", &event.MomLd,"MomLd/D");
 	TPC_g->Branch( "MomLd_x", &event.MomLd_x,"MomLd_x/D");
 	TPC_g->Branch( "MomLd_y", &event.MomLd_y,"MomLd_y/D");
@@ -615,6 +644,7 @@ TPCAnaManager::BeginOfEventAction( void )
   event.nhFtof = 0;
   event.nhLac = 0;
   event.nhWc = 0;
+  event.nhBvh = 0;
   event.nhVp = 0;
   for( G4int i=0; i<MaxHits; ++i ){
     // BH2
@@ -776,6 +806,27 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxWc[i] = -9999.;
     event.vtyWc[i] = -9999.;
     event.vtzWc[i] = -9999.;
+    //Bvh
+		event.tidBvh[i] = -9999;
+    event.pidBvh[i] = -9999;
+    event.didBvh[i] = -9999;
+    event.prtBvh[i] = -9999;
+    event.qBvh[i] = -9999;
+    event.massBvh[i] = -9999.;
+    event.xBvh[i] = -9999.;
+    event.yBvh[i] = -9999.;
+    event.zBvh[i] = -9999.;
+    event.pxBvh[i] = -9999.;
+    event.pyBvh[i] = -9999.;
+    event.pzBvh[i] = -9999.;
+    event.tBvh[i] = -9999.;
+    event.vtppBvh[i] = -9999.;
+    event.vtpxBvh[i] = -9999.;
+    event.vtpyBvh[i] = -9999.;
+    event.vtpzBvh[i] = -9999.;
+    event.vtxBvh[i] = -9999.;
+    event.vtyBvh[i] = -9999.;
+    event.vtzBvh[i] = -9999.;
     // VP
     event.tidVp[i] = -9999;
     event.pidVp[i] = -9999;
@@ -922,6 +973,10 @@ TPCAnaManager::BeginOfEventAction( void )
 	event.MomXi_x=0;
 	event.MomXi_y=0;
 	event.MomXi_z=0;
+	event.SpinLd=0;
+	event.SpinLd_x=0;
+	event.SpinLd_y=0;
+	event.SpinLd_z=0;
 	event.MomLd=0;
 	event.MomLd_x=0;
 	event.MomLd_y=0;
@@ -980,7 +1035,7 @@ TPCAnaManager::EndOfEventAction( void )
 	event.MomXi_y = PXi.y();
 	event.MomXi_z = PXi.z();
   
-	auto PLd = gTrackBuffer.GetMomentum(1);
+	auto PLd = gTrackBuffer.GetVertexMomentum(1);
 	event.MomLd = PLd.mag();
 	event.MomLd_x = PLd.x();
 	event.MomLd_y = PLd.y();
@@ -993,27 +1048,33 @@ TPCAnaManager::EndOfEventAction( void )
 	event.CM_x = CMLV.x();
 	event.CM_y = CMLV.y();
 	event.CM_z = CMLV.z();
-	auto LdLV = gTrackBuffer.GetLV(1);
-	auto PLd_Lab = LdLV.vect();
-	double ThXi_Lab = acos(PLd_Lab*PXi*(1./PXi.mag()/PLd_Lab.mag()));
-	LdLV.boost(-XiU);
-	auto PLd_CM = LdLV.vect();
+	auto LdVLV = gTrackBuffer.GetVertexLV(1);
+	auto PLd_Lab = LdVLV.vect();
+	double ThXi_Lab = acos(PLd_Lab*SXi*(1./SXi.mag()/PLd_Lab.mag()));
+	LdVLV.boost(-XiU);
+	auto PLd_CM = LdVLV.vect();
 	
 	double ThXi_CM = acos(PLd_CM*SXi*(1./SXi.mag()/PLd_CM.mag()));
 	event.ThXi_CM = ThXi_CM;
 
-	LdLV = gTrackBuffer.GetLV(1);
+
+
+	auto LdLV = gTrackBuffer.GetLV(1);
   auto SLd = gTrackBuffer.GetPolarity(1);
 	auto LdU = LdLV.boostVector();
 
-	auto PLV = gTrackBuffer.GetLV(2);
-	auto PP = PLV.vect();
+	auto PVLV = gTrackBuffer.GetVertexLV(2);
+	auto PP = PVLV.vect();
+	event.SpinLd = SLd.mag();
+	event.SpinLd_x = SLd.x();
+	event.SpinLd_y = SLd.y();
+	event.SpinLd_z = SLd.z();
 	event.MomP = PP.mag();
 	event.MomP_x = PP.x();
 	event.MomP_y = PP.y();
 	event.MomP_z = PP.z();
-	PLV.boost(-LdU);
-	auto PP_CM = PLV.vect();
+	PVLV.boost(-LdU);
+	auto PP_CM = PVLV.vect();
 	double ThLd_CM = acos(PP_CM*SLd*(1./SLd.mag()/PP_CM.mag()));
 	event.ThLd_CM = ThLd_CM;
 
@@ -2039,6 +2100,30 @@ TPCAnaManager::EndOfEventAction( void )
       event.deSdc[i] = hit->GetEnergyDeposit();
       event.tSdc[i] = hit->GetTime();
       event.nhSdc++;
+    }
+  }
+
+  void
+    TPCAnaManager::SetBVHData( const VHitInfo* hit )
+  {
+    if( event.nhBvh >= MaxHits ){
+      G4cerr << FUNC_NAME << " too much nhit " << event.nhBvh << G4endl;
+    } else {
+      Int_t i = event.nhBvh;
+      event.tidBvh[i] = hit->GetTrackID();
+      event.pidBvh[i] = hit->GetParticleID();
+      event.didBvh[i] = hit->GetDetectorID();
+      event.prtBvh[i] = hit->GetParentID();
+      event.xBvh[i] = hit->GetPosition().x();
+      event.yBvh[i] = hit->GetPosition().y();
+      event.zBvh[i] = hit->GetPosition().z();
+      event.pxBvh[i] = hit->GetMomentum().x();
+      event.pyBvh[i] = hit->GetMomentum().y();
+      event.pzBvh[i] = hit->GetMomentum().z();
+      event.ppBvh[i] = hit->GetMomentum().mag();
+      event.deBvh[i] = hit->GetEnergyDeposit();
+      event.tBvh[i] = hit->GetTime();
+      event.nhBvh++;
     }
   }
 

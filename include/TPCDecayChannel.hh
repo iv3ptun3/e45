@@ -24,7 +24,8 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 				G4double* DecayParam,
 				G4int Order,
 				G4String Daughter1,
-				G4String Daughter2);
+				G4String Daughter2
+				);
 
 	public:
 		 ~TPCPolarizedDecayChannel(){};
@@ -32,11 +33,9 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 		virtual	G4DecayProducts* DecayIt(G4double);
 	public:
 		G4double Pmx(G4double e,G4double p1, G4double p2);
-		void SetPolarization(double pol){
-			Polarization = pol;
-		}
 		G4ThreeVector SetPolarity();
 		G4ThreeVector GetPolarity();
+		void SetPolarization(G4double pol);
 	protected:
 		G4double ParentMass;
 		G4double Polarization = 1;
@@ -54,7 +53,8 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 				G4double BR,
 				G4double Alpha,
 				G4String Daughter1,
-				G4String Daughter2);
+				G4String Daughter2
+				);
 		void LoadPolarityMomentum();
 		void SavePolarityMomentum(G4ThreeVector MomDauthger);
 		G4double DaughterMass[2];

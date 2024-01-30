@@ -21,9 +21,12 @@ class TPCTrackBuffer{
 		double MomentumOfTrack_y[MaxBufferSize];
 		double MomentumOfTrack_z[MaxBufferSize];
 		G4ThreeVector Polarity[10];
+		G4double Polarization[10];
 		G4ThreeVector Momentum[10];
+		G4ThreeVector VertexMomentum[10];
 		G4LorentzVector LVCM;	
 		G4LorentzVector LV[10];
+		G4LorentzVector VertexLV[10];
 		int LambdaID;
 	public:
 		TPCTrackBuffer(){
@@ -39,9 +42,12 @@ class TPCTrackBuffer{
 			LambdaID = -1;
 			LVCM = G4LorentzVector(0,0,0,0);
 			for(int i=0;i<10;++i){
+//				Polarization[i] = 0;
 				Polarity[i] = G4ThreeVector(0,0,0); 
 				Momentum[i] = G4ThreeVector(0,0,0);
+				VertexMomentum[i] = G4ThreeVector(0,0,0);
 				LV[i] = G4LorentzVector(0,0,0,0);
+				VertexLV[i] = G4LorentzVector(0,0,0,0);
 			}
 			for(int i=0;i<MaxBufferSize;++i){
 				PIDOfTrack[i]=0;
@@ -100,11 +106,20 @@ class TPCTrackBuffer{
 		void SetPolarity(G4ThreeVector pol,int i){
 			Polarity[i] = 	pol;
 		}
+		void SetPolarization(G4double pol,int i){
+			Polarization[i] = pol;
+		}
 		void SetMomentum(G4ThreeVector mom,int i){
 			Momentum[i] = 	mom;
 		}
+		void SetVertexMomentum(G4ThreeVector mom,int i){
+			VertexMomentum[i] = 	mom;
+		}
 		void SetLV(G4LorentzVector lv,int i){
 			LV[i] = 	lv;
+		}
+		void SetVertexLV(G4LorentzVector lv,int i){
+			VertexLV[i] = 	lv;
 		}
 		void SetCMLV(G4LorentzVector lv){
 			LVCM = 	lv;
@@ -112,11 +127,20 @@ class TPCTrackBuffer{
 		G4ThreeVector GetPolarity(int i){
 			return Polarity[i];
 		}
+		G4double GetPolarization(int i){
+			return Polarization[i];
+		}
 		G4ThreeVector GetMomentum(int i){
 			return Momentum[i];
 		}
+		G4ThreeVector GetVertexMomentum(int i){
+			return VertexMomentum[i];
+		}
 		G4LorentzVector GetLV(int i){
 			return LV[i];
+		}
+		G4LorentzVector GetVertexLV(int i){
+			return VertexLV[i];
 		}
 		G4LorentzVector GetCMLV(){
 			return LVCM;
