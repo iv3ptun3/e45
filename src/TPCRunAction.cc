@@ -15,7 +15,7 @@
 #include "FuncName.hh"
 #include "GetNumberFromKernelEntropyPool.hh"
 #include "TPCAnaManager.hh"
-
+#include <chrono>
 namespace
 {
   TPCAnaManager& gAnaMan = TPCAnaManager::GetInstance();
@@ -48,10 +48,11 @@ TPCRunAction::BeginOfRunAction( const G4Run* aRun )
   //      G4UImanager* UI = G4UImanager::GetUIpointer();
   //      UI->ApplyCommand("/vis/scene/notifyHandlers");
   //    }
-
+	auto now = std::chrono::high_resolution_clock::now();
+	auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
   // int initSeed = GetIntFromKernelEntropyPool()&0x7FFFFFFF;
   // G4Random::setTheSeed(initSeed);
-  G4Random::setTheSeed( std::time( nullptr ) );
+  G4Random::setTheSeed( nanos );
 #ifdef DEBUG
   G4cout << "   Initial Seed = " << G4Random::getTheSeed() << G4endl;
   G4Random::showEngineStatus();
