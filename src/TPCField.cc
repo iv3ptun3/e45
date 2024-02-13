@@ -104,7 +104,6 @@ TPCField::Initialize( void )
       gConf.Get<G4int>( "ShsFieldMap" ) == 1 ){
 		double nmr =  gConf.Get<G4double>( "SHSFLDNMR" ) ;
 		double scale_factor = gConf.Get<G4double>("HSFLDCALIB");
-		std::cout<<"Field Scale = "<<scale_factor<<std::endl;
 		nmr*=scale_factor;
     m_shs_field_map->SetValueCalc( gConf.Get<G4double>( "SHSFLDCALC" ) );
     m_shs_field_map->SetValueNMR( nmr);

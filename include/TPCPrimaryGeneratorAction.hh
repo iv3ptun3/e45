@@ -38,6 +38,7 @@ private:
   IncInfo*              m_inc;
   G4ParticleDefinition* m_Neutron;
   G4ParticleDefinition* m_Proton;
+  G4ParticleDefinition* m_AntiProton;
   G4ParticleDefinition* m_Lambda;
   G4ParticleDefinition* m_Lambda1405;
   G4ParticleDefinition* m_Lambda1405R;

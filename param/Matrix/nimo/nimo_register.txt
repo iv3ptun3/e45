@@ -1,0 +1,27 @@
+######################################################
+# Example IOM register file of MTX3D-E03E42
+######################################################
+# #: Indicates comment line
+#
+# Command list
+#  Trig3D:      0
+#  Trig2Dveto1: 1
+#  Trig2Dveto2: 2
+#  Trig2D1:     3
+#  Trig2D2:     4
+#  tofOR:       5
+#  schOR:       6
+#  bh2OR:       7
+
+#################
+#### NIM-OUT ####
+#################
+# OUT1  5
+# OUT2  6
+# OUT3  7
+# OUT4  0
+
+OUT1  3
+OUT2  4
+OUT3  0
+OUT4  6

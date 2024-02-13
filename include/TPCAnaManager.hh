@@ -6,10 +6,14 @@
 #include <G4ThreeVector.hh>
 
 #include <TVector3.h>
+#include <TH1.h>
+#include <TH2.h>
 
 struct Track;
 
 class VHitInfo;
+static std::map<TString, TH1*> hmap;
+static std::map<TString, TH2*> hmap2d;
 
 //_____________________________________________________________________________
 static const G4int MaxHits    = 500;

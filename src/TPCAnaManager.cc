@@ -1,14 +1,13 @@
 // -*- C++ -*-
 
 #include "TPCAnaManager.hh"
+#include "MatrixReader.hh"
 
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4ThreeVector.hh>
 #include <Randomize.hh>
 
 #include <TFile.h>
-#include <TH1.h>
-#include <TH2.h>
 #include <TString.h>
 #include <TTree.h>
 
@@ -31,16 +30,21 @@ namespace
   //TTree* tree;
   TTree* TPC_g;
   Event event;
-  std::map<TString, TH1*> hmap;
   const auto& ResParamInnerLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Inner layers
   const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, true); //B=1 T, Outer layers
   const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Inner layers
   const auto& ResParamOuterLayerHSOff = gTPC.TPCResolutionParams(false, true); //B=0, Outer layers
+ 	const auto& DiscardData = gConf.Get<G4bool> ("DiscardData");
+// 	const ng& Matrix_2D  = gConf.Get<G4String> ("MTX2D");
 }
 
 //_____________________________________________________________________________
 TPCAnaManager::TPCAnaManager( void )
 {
+	const TString Matrix_2D = "param/Matrix/mtx2d1/mtx2d1_e42_Kaon_20210602";
+	MatrixReader::mat2d = Matrix_2D;
+	MatrixReader::ReadMatrix();
+//	if(Matrix_2D)
   TPC_g = new TTree( "TPC_g", "GEANT4 simulation for HypTPC" );
   event.pb = new TVector3;
   TPC_g->Branch( "evnum", &event.evnum, "evnum/I" );
@@ -593,6 +597,9 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
   for( auto& p : hmap ){
     delete p.second;
   }
+  for( auto& p : hmap2d ){
+    delete p.second;
+  }
   hmap.clear();
   TString key;
   key = "Time";
@@ -609,14 +616,21 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     hmap[key] = new TH1D( key, key, 500, -1.0*CLHEP::GeV, 1.0*CLHEP::GeV );
     hmap[key]->GetXaxis()->SetTitle( "[MeV/c]" );
   }
+	key ="BeamGen";
+	hmap2d[key] = new TH2D(key,key,300,0,30,160,0.4,2.);
+	key ="BeamAcpt";
+	hmap2d[key] =hmap2d[key] = new TH2D(key,key,300,0,30,160,0.4,2.);
 }
 
 //_____________________________________________________________________________
 void
 TPCAnaManager::EndOfRunAction( void )
 {
-  TPC_g->Write();
-  for( auto& p : hmap ){
+		TPC_g->Write();
+	for( auto& p : hmap ){
+    p.second->Write();
+  }
+	for( auto& p : hmap2d ){
     p.second->Write();
   }
 }
@@ -998,6 +1012,7 @@ int
 TPCAnaManager::EndOfEventAction( void )
 {
   event.evnum++;
+	auto Mat2D = MatrixReader::Mat2D;
 
     if(tpctrNum>9){
       G4cout<<"Error--> over the number of tracks in the TPC:"<<tpctrNum<<G4endl;
@@ -1011,7 +1026,6 @@ TPCAnaManager::EndOfEventAction( void )
     event.theta_CM = primaryInfo.theta_CM;
     event.mm = CLHEP::mm;
   }
-
 	for(int it=0;it<1000;++it){
 		event.NumberOfTracks = gTrackBuffer.GetNumberOfTracks();
 		event.PIDOfTrack[it] = gTrackBuffer.GetPIDOfTrack()[it];
@@ -1740,9 +1754,11 @@ TPCAnaManager::EndOfEventAction( void )
       // 			  );
     }
   }//trigger parts
-
-  TPC_g->Fill();
-
+	if(DiscardData){
+	}
+	else{
+  	TPC_g->Fill();
+	}
   event.pb->SetXYZ( 0., 0., 0. );
   event.nhPrm = 0;
   for( Int_t i=0; i<MaxPrimaryParticle; ++i ){
@@ -1758,6 +1774,74 @@ TPCAnaManager::EndOfEventAction( void )
     event.thetaPrm[i] = -9999.;
     event.phiPrm[i] = -9999.;
   }
+	bool Trig = false;
+	bool SDC = false;
+	int nhSdc1=0;
+	int nhSdc2=0;
+	int nhSdc3=0;
+	int nhSdc4=0;
+	for(int ih=0;ih<event.nhSdc;++ih){
+		double zsdc = event.zSdc[ih];
+		if(zsdc<1000){
+			nhSdc1++;
+		}
+		else if(zsdc<1500){
+			nhSdc2++;
+		}
+		else if(zsdc<2700){
+			nhSdc3++;
+		}
+		else if(zsdc<3000){
+			nhSdc4++;
+		}
+	}
+	int nhSdcIn= nhSdc1+nhSdc2;
+	int nhSdcOut= nhSdc3+nhSdc4;
+	if(nhSdcIn>=8 and nhSdcOut>=6)SDC = true;
+	int ToFHit = -1;
+	int ToFHit2 = -1;
+	int SchHit = -1;
+	for(int ih=0;ih<event.nhFtof;++ih){
+		if(event.tidFtof[ih] !=1) continue;
+		ToFHit = event.didFtof[ih] ;
+	}
+	for(int ih=0;ih<event.nhBvh;++ih){
+		if(event.tidBvh[ih] !=1) continue;
+		int ibbb= event.didBvh[ih];
+		if(ibbb < 2) ToFHit2 = 24;
+		else if(ibbb < 5) ToFHit2 = 25;
+		else if(ibbb < 9) ToFHit2 = 26;
+		else if(ibbb < 14) ToFHit2 = 27;
+	}
+	for(int ih=0;ih<event.nhSch;++ih){
+		if(event.tidSch[ih] !=1) continue;
+		SchHit = event.didSch[ih];
+	}
+	/*	for(int itof=0;itof<24;++itof){
+		for(int isch=0;isch<64;++isch){
+		}
+	}
+	*/
+	if(ToFHit > 0 and SchHit > 0){
+		if(Mat2D[ToFHit][SchHit])Trig = true;	
+	}
+	if(ToFHit2 > 0 and SchHit > 0){
+		if(Mat2D[ToFHit2][SchHit])Trig = true;	
+	}
+	TString key = "BeamGen"; 
+	auto H1 = hmap2d[key];
+	double pk = event.MomentumOfTrack[1]*0.001;
+	double pkx = event.MomentumOfTrack_x[1];
+	double pky = event.MomentumOfTrack_y[1];
+	double pkz = event.MomentumOfTrack_z[1];
+	G4ThreeVector pkk(pkx,pky,pkz);
+	double pkth = pkk.theta()*180./acos(-1);
+	H1->Fill(pkth,pk);
+	key ="BeamAcpt";
+	auto H2 = hmap2d[key];	
+	if(Trig and SDC){
+		H2->Fill(pkth,pk);
+	}
   return 0;
 }
 

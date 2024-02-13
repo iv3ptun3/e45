@@ -1,0 +1,52 @@
+######################################################
+# Example register file of MTX3D-E03E42
+######################################################
+# #: Indicates comment line
+#
+# DWG: Delay & Width generator
+#      Delay range : 0-31
+#      Width range : 1-32
+#
+# Clock frequency: 350 MHz
+# LSB of DWG bit:  2.857... ns
+
+#################
+#### MTX2D-1 ####
+#################
+MTX2D1::Tof::Delay     10
+MTX2D1::TofExt::Delay  0
+MTX2D1::Sch::Delay     13
+MTX2D1::Trig::Delay    0
+
+MTX2D1::Tof::Width     1
+MTX2D1::TofExt::Width  1
+MTX2D1::Sch::Width     18
+MTX2D1::Trig::Width    5
+
+#################
+#### MTX2D-2 ####
+#################
+MTX2D2::Tof::Delay     10
+MTX2D2::TofExt::Delay  0
+MTX2D2::Sch::Delay     13
+MTX2D2::Trig::Delay    0
+
+MTX2D2::Tof::Width     1
+MTX2D2::TofExt::Width  1
+MTX2D2::Sch::Width     18
+MTX2D2::Trig::Width    5
+
+#################
+####  MTX3D  ####
+#################
+MTX3D::Tof::Delay     10
+MTX3D::TofExt::Delay  0
+MTX3D::Sch::Delay     13
+MTX3D::Bh2::Delay     12
+MTX3D::Trig::Delay    0
+
+MTX3D::Tof::Width     1
+MTX3D::TofExt::Width  1
+MTX3D::Sch::Width     16
+MTX3D::Bh2::Width     16
+MTX3D::Trig::Width    10

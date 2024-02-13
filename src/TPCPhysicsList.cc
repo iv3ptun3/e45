@@ -313,6 +313,8 @@ TPCPhysicsList::ConstructGeneral( void )
       G4VDecayChannel* mode;
       G4DecayTable* Table = new G4DecayTable();
 			mode = new G4PhaseSpaceDecayChannel("phi",1,2,"kaon+","kaon-");	
+      Table->Insert(mode);
+			particle -> SetDecayTable(Table);
 		}
 		// H-dibaryon
     {

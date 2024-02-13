@@ -394,9 +394,9 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 	G4double PathT = PadLen * 1./cos(alpha);
 	G4double Pitch = mom.y()/MomT.mag();
 	G4double Path = PathT * sqrt(1+Pitch*Pitch);
-
+	slength = Path;
 	G4double edepMean =TPCdEdx(mass,beta)*Path; 
-	G4double IonEn = 13*eV;
+	G4double IonEn = (0.9 * 188 + 0.1 * 41.7)*eV;
 	G4double edepSig = sqrt(edepMean / IonEn ) * IonEn;
 	G4double edep = G4RandGauss::shoot(edepMean,edepSig);
 #ifdef DEBUG
