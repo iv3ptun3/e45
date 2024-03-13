@@ -395,10 +395,15 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 	G4double Pitch = mom.y()/MomT.mag();
 	G4double Path = PathT * sqrt(1+Pitch*Pitch);
 	slength = Path;
+
+	
 	G4double edepMean =TPCdEdx(mass,beta)*Path; 
-	G4double IonEn = (0.9 * 188 + 0.1 * 41.7)*eV;
-	G4double edepSig = sqrt(edepMean / IonEn ) * IonEn;
+	//	G4double IonEn = (0.9 * 188 + 0.1 * 41.7)*eV;
+//	G4double edepSig = sqrt(edepMean / IonEn ) * IonEn;
+	G4double edepSig =TPCdEdxSig(mass,mom.mag())*Path;
+	if(edepSig / edepMean < 0.01 or edepSig/edepMean > 0.5)edepSig = 0.2*edepMean;
 	G4double edep = G4RandGauss::shoot(edepMean,edepSig);
+	if(edep <0.1* edepMean)edep = 0.1*edepMean;
 #ifdef DEBUG
   
   //for test 
@@ -485,7 +490,7 @@ TPCPadSD::TPCdEdx(Double_t mass/*MeV/c2*/, Double_t beta){
   Double_t me = 0.5109989461; //[MeV]
   Double_t K = 0.307075; //[MeV cm2 mol-1]
   Double_t constant = rho*K*ZoverA; //[MeV cm-1]
-	constant = constant/ cm;
+	constant = constant;
   Double_t I2 = I*I; //Mean excitaion energy [eV]
   Double_t beta2 = beta*beta;
   Double_t gamma2 = 1./(1.-beta2);
@@ -493,8 +498,26 @@ TPCPadSD::TPCdEdx(Double_t mass/*MeV/c2*/, Double_t beta){
   Double_t Wmax = 2*me*beta2*gamma2/((me/mass+1.)*(me/mass+1.)+2*(me/mass)*(TMath::Sqrt(gamma2)-1));
   Double_t delta = DensityEffectCorrection(TMath::Sqrt(beta2*gamma2), density_effect_par);
   Double_t dedx = constant*Z*Z/beta2*(0.5*TMath::Log(2*me*beta2*gamma2*Wmax*MeVToeV*MeVToeV/I2) - beta2 - 0.5*delta);
-  return dedx;
+	
+	G4double conversion_factor = 11073.3;
+  return conversion_factor*dedx;
 
+}
+double
+TPCPadSD::TPCdEdxSig(Double_t mass/*MeV/c2*/, Double_t mom){
+	double par[3]={0,0,0} ;
+	if(mass < 0.2){//pion;
+		par[0] = 7.792;
+		par[1] =	-8.704;
+		par[2] = 4.477;
+	}
+	else if(mass > 0.7){//proton;
+		par[0] = 33.92;
+		par[1] = -26.24;
+		par[2] = 6.259; 
+	}
+	double value = par[0]+par[1]*mom+par[2]*mom*mom;
+	return value;
 }
 G4double
 TPCPadSD::DensityEffectCorrection(Double_t betagamma, Double_t *par){

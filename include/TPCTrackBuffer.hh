@@ -1,5 +1,6 @@
 #ifndef TPC_TRACK_BUFFER_HH
 #define TPC_TRACK_BUFFER_HH 
+#include <TMath.h>
 #include <stdio.h>
 #include <iostream>
 #include "globals.hh"
@@ -7,6 +8,7 @@
 #include "G4LorentzVector.hh"
 namespace{
 	const int MaxBufferSize = 1000;
+	const auto qnan = TMath::QuietNaN();
 }
 class TPCTrackBuffer{
 	private:
@@ -50,15 +52,15 @@ class TPCTrackBuffer{
 				VertexLV[i] = G4LorentzVector(0,0,0,0);
 			}
 			for(int i=0;i<MaxBufferSize;++i){
-				PIDOfTrack[i]=0;
-				ParentIDOfTrack[i]=-1;
-				VertexOfTrack_x[i]=0;
-				VertexOfTrack_y[i]=0;
-				VertexOfTrack_z[i]=0;
-				MomentumOfTrack[i]=0;
-				MomentumOfTrack_x[i]=0;
-				MomentumOfTrack_y[i]=0;
-				MomentumOfTrack_z[i]=0;
+				PIDOfTrack[i]=qnan;
+				ParentIDOfTrack[i]=qnan;
+				VertexOfTrack_x[i]=qnan;
+				VertexOfTrack_y[i]=qnan;
+				VertexOfTrack_z[i]=qnan;
+				MomentumOfTrack[i]=qnan;
+				MomentumOfTrack_x[i]=qnan;
+				MomentumOfTrack_y[i]=qnan;
+				MomentumOfTrack_z[i]=qnan;
 			}	
 		}
 		void SetTrack(int ID,int ParentID,int PID,G4ThreeVector vert, G4ThreeVector mom){

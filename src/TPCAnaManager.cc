@@ -619,7 +619,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	key ="BeamGen";
 	hmap2d[key] = new TH2D(key,key,300,0,30,160,0.4,2.);
 	key ="BeamAcpt";
-	hmap2d[key] =hmap2d[key] = new TH2D(key,key,300,0,30,160,0.4,2.);
+	hmap2d[key] =hmap2d[key] = new TH2D(key,key,300,0,30,320,0.4,2.);
 }
 
 //_____________________________________________________________________________

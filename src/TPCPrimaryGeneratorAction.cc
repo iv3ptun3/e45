@@ -5138,13 +5138,13 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
 	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
 	gAnaMan.SetPrimaryParticle(2,MomXi,XiMinusMass,XiMinusID);
-	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
 	m_particle_gun->SetParticleEnergy(KmEnergy * GeV);
 	m_particle_gun->SetParticlePosition(gen_pos );
 	m_particle_gun->SetParticleMomentumDirection(MomKm );
   m_particle_gun->GeneratePrimaryVertex( anEvent );
 	
-	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
 	m_particle_gun->SetParticleEnergy(KpEnergy * GeV);
 	m_particle_gun->SetParticlePosition(gen_pos );
 	m_particle_gun->SetParticleMomentumDirection(MomKp );

@@ -34,6 +34,7 @@ private:
 
 	G4double DensityEffectCorrection(G4double betagamma, G4double* par);
 	G4double TPCdEdx(G4double mass, G4double beta);
+	G4double TPCdEdxSig(G4double mass, G4double mom);
 
 public:
   G4int ntrk;
