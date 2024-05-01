@@ -24,12 +24,12 @@
 #include "TString.h"
 namespace
 {
+	Event event;
   const ConfMan& gConf = ConfMan::GetInstance();
   const TPCParamMan& gTPC    = TPCParamMan::GetInstance();
 	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
   //TTree* tree;
   TTree* TPC_g;
-  Event event;
   const auto& ResParamInnerLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Inner layers
   const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, true); //B=1 T, Outer layers
   const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Inner layers
@@ -152,7 +152,37 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch("dztpc_pad",event.dztpc_pad,"dztpc_pad[nhittpc]/D");//z0tpc - ztpc_pad
 
 
-
+	//Spectrometer for Databased simulation//
+  TPC_g->Branch( "ntK18",      &event.ntK18);
+  TPC_g->Branch( "xvpHS",    &event.xvpHS);
+  TPC_g->Branch( "yvpHS",    &event.yvpHS);
+  TPC_g->Branch( "zvpHS",    &event.zvpHS);
+  TPC_g->Branch( "xtgtHS",    &event.xtgtHS);
+  TPC_g->Branch( "ytgtHS",    &event.ytgtHS);
+  TPC_g->Branch( "ztgtHS",    &event.ztgtHS);
+  TPC_g->Branch( "p_3rd",       &event.p_3rd);
+  TPC_g->Branch( "xoutK18",    &event.xoutK18);
+  TPC_g->Branch( "youtK18",    &event.youtK18);
+  TPC_g->Branch( "uoutK18",    &event.uoutK18);
+  TPC_g->Branch( "voutK18",    &event.voutK18);
+  TPC_g->Branch( "layerK18",    &event.layerK18);
+  TPC_g->Branch( "wireK18",    &event.wireK18);
+  TPC_g->Branch( "localhitposK18",    &event.localhitposK18);
+	TPC_g->Branch( "ntKurama",      &event.ntKurama);
+  TPC_g->Branch( "xout",    &event.xout);
+  TPC_g->Branch( "yout",    &event.yout);
+  TPC_g->Branch( "zout",    &event.zout);
+  TPC_g->Branch( "pxout",    &event.pxout);
+  TPC_g->Branch( "pyout",    &event.pyout);
+  TPC_g->Branch( "pzout",    &event.pzout);
+  TPC_g->Branch( "xvpKurama",     &event.xvpKurama);
+  TPC_g->Branch( "yvpKurama",     &event.yvpKurama);
+  TPC_g->Branch( "zvpKurama",     &event.zvpKurama);
+  TPC_g->Branch( "xtgtKurama",     &event.xtgtKurama);
+  TPC_g->Branch( "ytgtKurama",     &event.ytgtKurama);
+  TPC_g->Branch( "layer",    &event.layer);
+  TPC_g->Branch( "wire",    &event.wire);
+  TPC_g->Branch( "localhitpos",    &event.localhitpos);
 
 
   //// Study on multiplicity
@@ -616,10 +646,86 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     hmap[key] = new TH1D( key, key, 500, -1.0*CLHEP::GeV, 1.0*CLHEP::GeV );
     hmap[key]->GetXaxis()->SetTitle( "[MeV/c]" );
   }
-	key ="BeamGen";
-	hmap2d[key] = new TH2D(key,key,300,0,30,160,0.4,2.);
-	key ="BeamAcpt";
-	hmap2d[key] =hmap2d[key] = new TH2D(key,key,300,0,30,320,0.4,2.);
+	key ="BeamGenThetaP";
+	hmap2d[key] = new TH2D(key,key,100,0,30,80,0.4,2.);
+	key ="BeamGenCosTP";
+	hmap2d[key] = new TH2D(key,key,100,0.85,1,80,0.4,2.);
+	key ="BeamGenCosTPhi";
+	hmap2d[key] = new TH2D(key,key,100,0.85,1,100,-3.15,3.15);
+	key ="BeamGenPhiP";
+	hmap2d[key] = new TH2D(key,key,100,-3.15,3.15,80,0.4,2.);
+	key ="BeamGenXThetaP";
+	hmap2d[key] = new TH2D(key,key,100,-30,30,80,0.4,2.);
+	key ="BeamGenYThetaP";
+	hmap2d[key] = new TH2D(key,key,100,-30,30,80,0.4,2.);
+
+
+	key ="Sdc1Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="Sdc2Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="Sdc3Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="Sdc4Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+
+
+	key ="VP1Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="VP2Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="VP3Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="VP4Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+	key ="VP5Hitpat";
+	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
+
+	key ="BeamGenZP_th[0,5)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamGenZP_th[5,10)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamGenZP_th[10,15)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamGenZP_th[15,20)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamGenZP_th[20,25)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamGenZP_th[25,30)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+
+	
+	
+	key ="BeamAcptThetaP";
+	hmap2d[key] = new TH2D(key,key,100,0,30,80,0.4,2.);
+	key ="BeamAcptCosTP";
+	hmap2d[key] =hmap2d[key] = new TH2D(key,key,100,0.85,1,80,0.4,2.);
+	key ="BeamAcptCosTPhi";
+	hmap2d[key] = new TH2D(key,key,100,0.85,1,100,-3.15,3.15);
+	key ="BeamAcptPhiP";
+	hmap2d[key] = new TH2D(key,key,100,-3.15,3.15,80,0.4,2.);
+	key ="BeamAcptXThetaP";
+	hmap2d[key] = new TH2D(key,key,100,-30,30,80,0.4,2.);
+	key ="BeamAcptYThetaP";
+	hmap2d[key] = new TH2D(key,key,100,-30,30,80,0.4,2.);
+
+
+
+
+	key ="BeamAcptZP_th[0,5)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamAcptZP_th[5,10)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamAcptZP_th[10,15)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamAcptZP_th[15,20)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamAcptZP_th[20,25)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+	key ="BeamAcptZP_th[25,30)";
+	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+
+
 }
 
 //_____________________________________________________________________________
@@ -1755,9 +1861,11 @@ TPCAnaManager::EndOfEventAction( void )
     }
   }//trigger parts
 	if(DiscardData){
+		event.Clear();
 	}
 	else{
   	TPC_g->Fill();
+		event.Clear();
 	}
   event.pb->SetXYZ( 0., 0., 0. );
   event.nhPrm = 0;
@@ -1780,19 +1888,45 @@ TPCAnaManager::EndOfEventAction( void )
 	int nhSdc2=0;
 	int nhSdc3=0;
 	int nhSdc4=0;
+	double xSdc1=-9999;
+	double ySdc1=-9999;
+	double xSdc2=-9999;
+	double ySdc2=-9999;
+	double xSdc3=-9999;
+	double ySdc3=-9999;
+	double xSdc4=-9999;
+	double ySdc4=-9999;
 	for(int ih=0;ih<event.nhSdc;++ih){
+		if(event.tidSdc[ih]!=1) continue;
 		double zsdc = event.zSdc[ih];
+		if(zsdc<0) continue;
 		if(zsdc<1000){
 			nhSdc1++;
+			if(zsdc<787){
+				xSdc1 = event.xSdc[ih];
+				ySdc1 = event.ySdc[ih];
+			}
 		}
 		else if(zsdc<1500){
 			nhSdc2++;
+			if(zsdc < 1240){
+				xSdc2 = event.xSdc[ih];
+				ySdc2 = event.ySdc[ih];
+			}
 		}
 		else if(zsdc<2700){
 			nhSdc3++;
+			if(zsdc>2644){
+				xSdc3 = event.xSdc[ih];
+				ySdc3 = event.ySdc[ih];
+			}
 		}
 		else if(zsdc<3000){
 			nhSdc4++;
+			if(zsdc>2905){
+				xSdc4 = event.xSdc[ih];
+				ySdc4 = event.ySdc[ih];
+			}
 		}
 	}
 	int nhSdcIn= nhSdc1+nhSdc2;
@@ -1828,19 +1962,195 @@ TPCAnaManager::EndOfEventAction( void )
 	if(ToFHit2 > 0 and SchHit > 0){
 		if(Mat2D[ToFHit2][SchHit])Trig = true;	
 	}
-	TString key = "BeamGen"; 
-	auto H1 = hmap2d[key];
+
+	double xVP1=-9999;
+	double yVP1=-9999;
+	double xVP2=-9999;
+	double yVP2=-9999;
+	double xVP3=-9999;
+	double yVP3=-9999;
+	double xVP4=-9999;
+	double yVP4=-9999;
+	double xVP5=-9999;
+	double yVP5=-9999;
+	for(int ih=0;ih<event.nhVp;++ih){
+		if(event.tidVp[ih]!=1)continue;
+		TVector3 KuramaPos(50,0,1719.5);
+		TVector3 VPPos(event.xVp[ih],event.yVp[ih],event.zVp[ih]);
+		VPPos-=KuramaPos;
+		if(abs(VPPos.Z()+400)<1){
+			xVP1=VPPos.X();
+			yVP1=VPPos.y();
+		}
+		if(abs(VPPos.Z()+200)<1){
+			xVP2=VPPos.X();
+			yVP2=VPPos.y();
+		}
+		if(abs(VPPos.Z()+0)<1){
+			xVP3=VPPos.X();
+			yVP3=VPPos.y();
+		}
+		if(abs(VPPos.Z()-200)<1){
+			xVP4=VPPos.X();
+			yVP4=VPPos.y();
+		}
+		if(abs(VPPos.Z()-400)<1){
+			xVP5=VPPos.X();
+			yVP5=VPPos.y();
+		}
+	}
+
+
+	
 	double pk = event.MomentumOfTrack[1]*0.001;
-	double pkx = event.MomentumOfTrack_x[1];
-	double pky = event.MomentumOfTrack_y[1];
-	double pkz = event.MomentumOfTrack_z[1];
+	double pkx = event.MomentumOfTrack_x[1]*0.001;
+	double pky = event.MomentumOfTrack_y[1]*0.001;
+	double pkz = event.MomentumOfTrack_z[1]*0.001;
 	G4ThreeVector pkk(pkx,pky,pkz);
-	double pkth = pkk.theta()*180./acos(-1);
+	double pkth = cos(pkk.theta());
+	double pkph = pkk.phi();
+	double vtx_z = event.VertexOfTrack_z[1];	
+	double pkangle = acos(pkth)*180./acos(-1); 
+	
+	TString key = "BeamGenThetaP"; 
+	auto H0 = hmap2d[key];
+	key = "BeamGenCosTP"; 
+	auto H1 = hmap2d[key];
+	key ="BeamGenCosTPhi";
+	auto H2 = hmap2d[key];
+	key ="BeamGenPhiP";
+	auto H3 = hmap2d[key];
+
+	key ="BeamGenZP_th[0,5)";
+	auto H4 = hmap2d[key];
+	key ="BeamGenZP_th[5,10)";
+	auto H5 = hmap2d[key];
+	key ="BeamGenZP_th[10,15)";
+	auto H6 = hmap2d[key];
+	key ="BeamGenZP_th[15,20)";
+	auto H7 = hmap2d[key];
+	key ="BeamGenZP_th[20,25)";
+	auto H8 = hmap2d[key];
+	key ="BeamGenZP_th[25,30)";
+	auto H9 = hmap2d[key];
+
+
+	key ="BeamGenXThetaP";
+	auto H10 = hmap2d[key];
+	key ="BeamGenYThetaP";
+	auto H11 = hmap2d[key];
+
+
+
+	key ="Sdc1Hitpat";
+	auto Sdc1Hit = hmap2d[key];
+	key ="Sdc2Hitpat";
+	auto Sdc2Hit = hmap2d[key];
+	key ="Sdc3Hitpat";
+	auto Sdc3Hit = hmap2d[key];
+	key ="Sdc3Hitpat";
+	auto Sdc4Hit = hmap2d[key];
+	
+	key ="VP1Hitpat";
+	auto VP1Hit = hmap2d[key];
+	key ="VP2Hitpat";
+	auto VP2Hit = hmap2d[key];
+	key ="VP3Hitpat";
+	auto VP3Hit = hmap2d[key];
+	key ="VP4Hitpat";
+	auto VP4Hit = hmap2d[key];
+	key ="VP5Hitpat";
+	auto VP5Hit = hmap2d[key];
+
+
+	key ="BeamAcptThetaP";
+	auto HA0 = hmap2d[key];	
+	key ="BeamAcptCosTP";
+	auto HA1 = hmap2d[key];	
+	key ="BeamAcptCosTPhi";
+	auto HA2 = hmap2d[key];	
+	key ="BeamAcptPhiP";
+	auto HA3 = hmap2d[key];	
+	
+	key ="BeamAcptZP_th[0,5)";
+	auto HA4 = hmap2d[key];
+	key ="BeamAcptZP_th[5,10)";
+	auto HA5 = hmap2d[key];
+	key ="BeamAcptZP_th[10,15)";
+	auto HA6 = hmap2d[key];
+	key ="BeamAcptZP_th[15,20)";
+	auto HA7 = hmap2d[key];
+	key ="BeamAcptZP_th[20,25)";
+	auto HA8 = hmap2d[key];
+	key ="BeamAcptZP_th[25,30)";
+	auto HA9 = hmap2d[key];
+	
+	key ="BeamAcptXThetaP";
+	auto HA10 = hmap2d[key];
+	key ="BeamAcptYThetaP";
+	auto HA11 = hmap2d[key];
+
+	H0->Fill(pkangle,pk);
 	H1->Fill(pkth,pk);
-	key ="BeamAcpt";
-	auto H2 = hmap2d[key];	
+	H2->Fill(pkth,pkph);
+	H3->Fill(pkph,pk);
+	H10->Fill(180*asin(pkx/pk)/acos(-1),pk);
+	H11->Fill(180*asin(pky/pk)/acos(-1),pk);
+{
+	if(pkangle < 5){
+		H4->Fill(vtx_z,pk);
+	}
+	else if(pkangle < 10){
+		H5->Fill(vtx_z,pk);
+	}
+	else if(pkangle<15){
+		H6->Fill(vtx_z,pk);
+	}
+	else if(pkangle < 20){
+		H7->Fill(vtx_z,pk);
+	}
+	else if(pkangle < 25){
+		H8->Fill(vtx_z,pk);
+	}
+	else{
+		H9->Fill(vtx_z,pk);
+	};
+}
+
 	if(Trig and SDC){
-		H2->Fill(pkth,pk);
+		HA0->Fill(pkangle,pk);
+		HA1->Fill(pkth,pk);
+		HA2->Fill(pkth,pkph);
+		HA3->Fill(pkph,pk);
+		if(pkangle < 5){
+			HA4->Fill(vtx_z,pk);
+		}
+		else if(pkangle < 10){
+			HA5->Fill(vtx_z,pk);
+		}
+		else if(pkangle<15){
+			HA6->Fill(vtx_z,pk);
+		}
+		else if(pkangle < 20){
+			HA7->Fill(vtx_z,pk);
+		}
+		else if(pkangle < 25){
+			HA8->Fill(vtx_z,pk);
+		}
+		else{
+			HA9->Fill(vtx_z,pk);
+		}
+		HA10->Fill(180*asin(pkx/pk)/acos(-1),pk);
+		HA11->Fill(180*asin(pky/pk)/acos(-1),pk);
+		Sdc1Hit->Fill(xSdc1,ySdc1);	
+		Sdc2Hit->Fill(xSdc2,ySdc2);	
+		Sdc3Hit->Fill(xSdc3,ySdc3);	
+		Sdc4Hit->Fill(xSdc4,ySdc4);	
+		VP1Hit->Fill(xVP1,yVP1);	
+		VP2Hit->Fill(xVP2,yVP2);	
+		VP3Hit->Fill(xVP3,yVP3);	
+		VP4Hit->Fill(xVP4,yVP4);	
+		VP5Hit->Fill(xVP5,yVP5);	
 	}
   return 0;
 }
@@ -2614,6 +2924,38 @@ TPCAnaManager::EndOfEventAction( void )
     }
   }
 
+	void TPCAnaManager::SetMMVertex(MMVertex* vert){
+		event.ntK18 = vert->ntK18;
+		event.xvpHS = vert->xvpHS;
+		event.yvpHS = vert->yvpHS;
+		event.zvpHS = vert->zvpHS;
+		event.xtgtHS = vert->xtgtHS;
+		event.ytgtHS = vert->ytgtHS;
+		event.ztgtHS = vert->ztgtHS;
+		event.xoutK18 = vert->xoutK18;
+		event.youtK18 = vert->youtK18;
+		event.uoutK18 = vert->uoutK18;
+		event.voutK18 = vert->voutK18;
+		event.p_3rd = vert->p_3rd;
+		event.layerK18 = vert->layerK18;
+		event.wireK18 = vert->wireK18;
+		event.localhitposK18 = vert->localhitposK18;
+		event.ntKurama = vert->ntKurama;
+		event.xvpKurama = vert->xvpKurama;
+		event.yvpKurama = vert->yvpKurama;
+		event.zvpKurama = vert->zvpKurama;
+		event.xtgtKurama = vert->xtgtKurama;
+		event.ytgtKurama = vert->ytgtKurama;
+		event.xout = vert->xout;
+		event.yout = vert->yout;
+		event.zout = vert->zout;
+		event.pxout = vert->pxout;
+		event.pyout = vert->pyout;
+		event.pzout = vert->pzout;
+		event.layer = vert->layer;
+		event.wire = vert->wire;
+		event.localhitpos = vert->localhitpos;
+	}
   /*************************************
    *************************************/
   /*void setTrack(Track* tracks,int ntrk, double* x, double* y, double* z, double* ede, double* nhit){

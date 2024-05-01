@@ -4,7 +4,7 @@
 #for i in {5177,5723}
 for i in {0..999}
 do
-	name="bsub -q l ./bin/Linux-g++/hyptpc1 param/conf/KpUniformCH2.conf rootfiles_ana/KpUniformHist0${i}_Geant4.root g4macro/run_1M.mac"
+	name="bsub -q s ./bin/Linux-g++/hyptpc1 param/conf/KpUniformCH2.conf rootfiles_ana/KpUniformHistAdj0${i}_Geant4.root g4macro/run_100k.mac"
 	$name
 done
 

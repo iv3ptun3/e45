@@ -10,7 +10,6 @@
 #include <globals.hh>
 #include <G4ThreeVector.hh>
 #include "TLorentzVector.h"
-
 #include <Rtypes.h>
 using namespace std;
 class TFile;
@@ -46,11 +45,58 @@ struct MMVertex
   G4int					trigpat[32];
 	G4int GetTrigPat(G4int flag) const;
 	G4int evnum;
-	G4int ntK18;
-	G4int ntKurama;
 	G4int Bh2Seg[8];
 	G4int SchSeg[64];
 	G4int TofSeg[24];
+	
+	G4int ntK18;
+	vector<vector<double>>xvpHS;
+	vector<vector<double>>yvpHS;
+	vector<vector<double>>zvpHS;
+	vector<double>xtgtHS;
+	vector<double>ytgtHS;
+	vector<double>ztgtHS;
+	vector<double>xoutK18;
+	vector<double>youtK18;
+	vector<double>uoutK18;
+	vector<double>voutK18;
+	vector<double>p_3rd;
+	vector<vector<double>> layerK18;
+	vector<vector<double>> wireK18;
+	vector<vector<double>> localhitposK18;
+	G4int ntKurama;
+	vector<vector<double>>xvpKurama;
+	vector<vector<double>>yvpKurama;
+	vector<vector<double>>zvpKurama;
+	vector<double>xtgtKurama;
+	vector<double>ytgtKurama;
+	vector<double>xout;
+	vector<double>yout;
+	vector<double>zout;
+	vector<double>pxout;
+	vector<double>pyout;
+	vector<double>pzout;
+	vector<vector<double>> layer;
+	vector<vector<double>> wire;
+	vector<vector<double>> localhitpos;
+};
+struct KpKurama
+{
+	G4int ntKurama;
+	vector<vector<double>>xvpKurama;
+	vector<vector<double>>yvpKurama;
+	vector<vector<double>>zvpKurama;
+	vector<double>xtgtKurama;
+	vector<double>ytgtKurama;
+	vector<double>xout;
+	vector<double>yout;
+	vector<double>zout;
+	vector<double>pxout;
+	vector<double>pyout;
+	vector<double>pzout;
+	vector<vector<double>> layer;
+	vector<vector<double>> wire;
+	vector<vector<double>> localhitpos;
 };
 
 //_____________________________________________________________________________

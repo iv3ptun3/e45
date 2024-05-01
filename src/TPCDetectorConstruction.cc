@@ -2378,12 +2378,13 @@ TPCDetectorConstruction::ConstructSDC1( void )
     G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
   }
 
+	const auto& sdc1_offset = ThreeVector(-48.5,0,0);
   const auto& sdc1_pos = ( gGeom.GetGlobalPosition("KURAMA") +
 			   ( gGeom.GetGlobalPosition("SDC1-V1") +
-			     gGeom.GetGlobalPosition("SDC1-U2") ) * 0.5 );
+			     gGeom.GetGlobalPosition("SDC1-U2") ) * 0.5 +sdc1_offset);
   const auto& frame_size = gSize.GetSize( "Sdc1Frame" ) * 0.5 * mm;
   const auto& drift_size = gSize.GetSize( "Sdc1Drift" ) * 0.5 * mm;
-  auto sdc1_solid = new G4Box( "Sdc1Solid", frame_size.x(),
+	auto sdc1_solid = new G4Box( "Sdc1Solid", frame_size.x(),
 			       frame_size.y(), frame_size.z() );
   auto sdc1_lv = new G4LogicalVolume( sdc1_solid, m_material_map["Argon"],
 				      "Sdc1LV", 0, 0, 0 );
@@ -2396,12 +2397,15 @@ TPCDetectorConstruction::ConstructSDC1( void )
 			    "Sdc1X2", "Sdc1U1", "Sdc1U2" };
   for( G4int i=0; i<NumOfLayersSDC1; ++i ){
     G4ThreeVector pos;
-    switch (i) {
+    G4RotationMatrix* rot = new G4RotationMatrix;
+		switch (i) {
     case 0:
       pos.setZ( -22.5985*mm );
+//			rot->rotateZ(15.*deg);
       break;
     case 1:
       pos.setZ( -17.4015*mm );
+//			rot->rotateZ(15.*deg);
       break;
     case 2:
       pos.setZ( -2.5985*mm );
@@ -2411,16 +2415,19 @@ TPCDetectorConstruction::ConstructSDC1( void )
       break;
     case 4:
       pos.setZ( 17.4015*mm );
+//			rot->rotateZ(-15.*deg);
       break;
     case 5:
       pos.setZ( 22.5985*mm );
+//			rot->rotateZ(-15.*deg);
       break;
     }
     auto sdc1pl_lv = new G4LogicalVolume( sdc1pl_solid,
 					  m_material_map["Argon"],
 					  plane_name[i] + "LV", 0, 0, 0 );
     sdc1pl_lv->SetSensitiveDetector( m_sdc_sd );
-    new G4PVPlacement( nullptr, pos, sdc1pl_lv, plane_name[i] + "PV",
+
+    new G4PVPlacement( rot, pos, sdc1pl_lv, plane_name[i] + "PV",
 		       sdc1_lv, false, 101+i );
   }
 }

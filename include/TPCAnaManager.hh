@@ -8,9 +8,10 @@
 #include <TVector3.h>
 #include <TH1.h>
 #include <TH2.h>
-
+#include <vector>
+#include "BeamMan.hh"
 struct Track;
-
+using namespace std;
 class VHitInfo;
 static std::map<TString, TH1*> hmap;
 static std::map<TString, TH2*> hmap2d;
@@ -515,7 +516,72 @@ struct Event
 	Double_t SpinLd_x,SpinLd_y,SpinLd_z,SpinLd;
 	Double_t MomP_x,MomP_y,MomP_z,MomP;
 	Double_t ThLd_CM;
+	G4int ntK18;
+	vector<vector<double>>xvpHS;
+	vector<vector<double>>yvpHS;
+	vector<vector<double>>zvpHS;
+	vector<double>xtgtHS;
+	vector<double>ytgtHS;
+	vector<double>ztgtHS;
+	vector<double>xoutK18;
+	vector<double>youtK18;
+	vector<double>uoutK18;
+	vector<double>voutK18;
+	vector<double>p_3rd;
+	vector<vector<double>> layerK18;
+	vector<vector<double>> wireK18;
+	vector<vector<double>> localhitposK18;
+	G4int ntKurama;
+	vector<vector<double>>xvpKurama;
+	vector<vector<double>>yvpKurama;
+	vector<vector<double>>zvpKurama;
+	vector<double>xtgtKurama;
+	vector<double>ytgtKurama;
+	vector<double>xout;
+	vector<double>yout;
+	vector<double>zout;
+	vector<double>pxout;
+	vector<double>pyout;
+	vector<double>pzout;
+	vector<vector<double>> wire;
+	vector<vector<double>> layer;
+	vector<vector<double>> localhitpos;
+
+	void Clear(){
+		ntK18 = 0;
+		xvpHS.clear();
+		yvpHS.clear();
+		zvpHS.clear();
+		xtgtHS.clear();
+		ytgtHS.clear();
+		ztgtHS.clear();
+		xoutK18.clear();
+		youtK18.clear();
+		uoutK18.clear();
+		voutK18.clear();
+		p_3rd.clear();
+		layerK18.clear();
+		wireK18.clear();
+		localhitposK18.clear();
+		ntKurama = 0;
+		xvpKurama.clear();
+		yvpKurama.clear();
+		zvpKurama.clear();
+		xtgtKurama.clear();
+		ytgtKurama.clear();
+		xout.clear();
+		yout.clear();
+		zout.clear();
+		pxout.clear();
+		pyout.clear();
+		pzout.clear();
+		layer.clear();
+		wire.clear();
+		localhitpos.clear();
+	}
+	
 };
+
 
 //_____________________________________________________________________________
 class TPCAnaManager
@@ -574,6 +640,7 @@ private:
 	G4double res_t_par_in[6];
 	G4double res_y_par_out[4];
 	G4double res_t_par_out[6];
+	
 
 public:
   void BeginOfRunAction( G4int runnum );
@@ -864,7 +931,7 @@ public:
   //   //  *Pz=aa*(RadiusMes*0.299792458);
   //   return  mVariance;
   // }
-
+	void SetMMVertex(MMVertex* vert);
 };
 
 //_____________________________________________________________________________
