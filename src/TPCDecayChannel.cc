@@ -105,8 +105,10 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	auto LVParent = G4LorentzVector(MomVector,hypot(ParentMass/CLHEP::GeV,MomVector.mag()));
 	auto ParentFrame = LVParent.boostVector();
 	auto LVDaughter = G4LorentzVector(MomD,hypot(DaughterMass[0],MomD.mag()))/CLHEP::GeV;
+	auto LVDBK = LVDaughter;
 	LVDaughter.boost(ParentFrame);
 	auto TVDaughter = LVDaughter.vect();
+	auto TVVertParent = gTrackBuffer.GetVertexMomentum(order);		
 	gTrackBuffer.SetMomentum(TVDaughter,order+1);		
 	gTrackBuffer.SetVertexMomentum(TVDaughter,order+1);		
 	gTrackBuffer.SetLV(LVDaughter,order+1);		
@@ -120,6 +122,64 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
 	gTrackBuffer.SetPolarization(PolDaughter,order+1);
+	if(abs(PolDaughter) >1.01 or isnan(PolDaughter)){
+		auto Px=gTrackBuffer.GetMomentumOfTrack_x();
+		auto Py=gTrackBuffer.GetMomentumOfTrack_y();
+		auto Pz=gTrackBuffer.GetMomentumOfTrack_z();
+		auto Vx=gTrackBuffer.GetVertexOfTrack_x();
+		auto Vy=gTrackBuffer.GetVertexOfTrack_y();
+		auto Vz=gTrackBuffer.GetVertexOfTrack_z();
+		auto Kmx =	Px[1];
+		auto Kmy =	Py[1];
+		auto Kmz =	Pz[1];
+		auto Kpx =	Px[2];
+		auto Kpy =	Py[2];
+		auto Kpz =	Pz[2];
+		auto Xpx =	Px[3];
+		auto Xpy =	Py[3];
+		auto Xpz =	Pz[3];
+		auto Vpx =	Vx[1];
+		auto Vpy =	Vy[1];
+		auto Vpz =	Vz[1];
+		
+		double VpXx,VpXy,VpXz;
+		double VpLx,VpLy,VpLz;
+		auto pid = gTrackBuffer.GetPIDOfTrack();
+		auto parid = gTrackBuffer.GetParentIDOfTrack();
+		G4ThreeVector VtxXiDecay;	
+		G4ThreeVector VtxLdDecay;	
+		for(int in=0;in<1000;++in){
+			if(parid[in] == 3312){
+				VpXx =	Vx[in];
+				VpXy =	Vy[in];
+				VpXz =	Vz[in];
+				VtxXiDecay=G4ThreeVector(VpXx,VpXy,VpXz);
+			}
+			if(parid[in] == 3112){
+				VpXx =	Vx[in];
+				VpXy =	Vy[in];
+				VpXz =	Vz[in];
+				VtxLdDecay=G4ThreeVector(VpXx,VpXy,VpXz);
+			}
+		}
+		G4ThreeVector TVKm(Kmx,Kmy,Kmz);
+		G4ThreeVector TVKp(Kpx,Kpy,Kpz);
+		G4ThreeVector Vtx(Vpx,Vpy,Vpz);
+
+		G4cout<<"Warning! Unphysical Polarization "<<*parent_name<<G4endl;
+		G4cout<<Form("PKm=(%g,%g,%g)",TVKm.x(),TVKm.y(),TVKm.z())<<G4endl;
+		G4cout<<Form("PKp=(%g,%g,%g)",TVKp.x(),TVKp.y(),TVKp.z())<<G4endl;
+		G4cout<<Form("ProdVert=(%g,%g,%g)",Vtx.x(),Vtx.y(),Vtx.z())<<G4endl;
+		G4cout<<Form("XiDVert=(%g,%g,%g)",VtxXiDecay.x(),VtxXiDecay.y(),VtxXiDecay.z())<<G4endl;
+		G4cout<<Form("LdDVert=(%g,%g,%g)",VtxLdDecay.x(),VtxLdDecay.y(),VtxLdDecay.z())<<G4endl;
+		
+		
+		
+		G4cout<<Form("Parent Mom = (%g,%g,%g) ",LVParent.x(),LVParent.y(),LVParent.z())<<G4endl;
+		G4cout<<Form("Parent VertMom = (%g,%g,%g) ",TVVertParent.x(),TVVertParent.y(),TVVertParent.z())<<G4endl;
+		G4cout<<Form("Daughter Mom = (%g,%g,%g) ",LVDaughter.x(),LVDaughter.y(),LVDaughter.z())<<G4endl;
+		G4cout<<Form("Daughter MomCM = (%g,%g,%g) ",LVDBK.x(),LVDBK.y(),LVDBK.z())<<G4endl;
+	}
 }
 void TPCPolarizedDecayChannel::SetPolarization(G4double pol){
 	gTrackBuffer.SetPolarization(pol,order);

@@ -647,7 +647,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     hmap[key]->GetXaxis()->SetTitle( "[MeV/c]" );
   }
 	key ="BeamGenThetaP";
-	hmap2d[key] = new TH2D(key,key,100,0,30,80,0.4,2.);
+	hmap2d[key] = new TH2D(key,key,300,0,30,320,0.4,2.);
 	key ="BeamGenCosTP";
 	hmap2d[key] = new TH2D(key,key,100,0.85,1,80,0.4,2.);
 	key ="BeamGenCosTPhi";
@@ -697,7 +697,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	
 	
 	key ="BeamAcptThetaP";
-	hmap2d[key] = new TH2D(key,key,100,0,30,80,0.4,2.);
+	hmap2d[key] = new TH2D(key,key,300,0,30,320,0.4,2.);
 	key ="BeamAcptCosTP";
 	hmap2d[key] =hmap2d[key] = new TH2D(key,key,100,0.85,1,80,0.4,2.);
 	key ="BeamAcptCosTPhi";

@@ -69,6 +69,9 @@ namespace{
   TTreeReaderValue<vector<vector<double>>>* localhitpos=nullptr;
 
 */
+	TTreeReaderValue<vector<int>>* isgoodTPCK18=nullptr;
+	TTreeReaderValue<vector<int>>* isgoodTPCKurama=nullptr;
+	
 	TTreeReaderValue<vector<int>>* inside=nullptr;
 	TTreeReaderValue<vector<double>>* pHS=nullptr;
   TTreeReaderValue<vector<double>>* xtgtHS=nullptr;
@@ -216,10 +219,11 @@ BeamMan::Initialize( void )
 		reader = new TTreeReader("tpc",m_file);
 //		tree->SetBranchAddress( "evnum",&evnum);
 //		tree->SetBranchAddress( "runnum",&runnum);
-		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntTPCK18");		
+		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");		
+		isgoodTPCK18 = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCK18");		
 		inside = new TTreeReaderValue<vector<int>>(*reader,"inside"); 
 		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC"); 
-		pHS = new TTreeReaderValue<vector<double>>(*reader,"pTPCK18"); 
+		pHS = new TTreeReaderValue<vector<double>>(*reader,"pK18"); 
 		xvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpTPCK18"); 
 		yvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpTPCK18"); 
 //		zvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpTPCK18"); 
@@ -240,7 +244,8 @@ BeamMan::Initialize( void )
 
 */
 //		tree->SetBranchAddress("ntKurama",&ntKurama);
-		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntTPCKurama");		
+		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");		
+		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");		
 		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC"); 
 		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
 		xtgtKurama = new TTreeReaderValue<vector<double>>(*reader,"xsTPC"); 
@@ -313,8 +318,11 @@ BeamMan::Initialize( void )
 			double mm = (*MissMass)->at(0);
 			int ntK18 = **ntTPCK18;
 			int ntKurama = **ntTPCKurama;
+			int goodTPCK18 = (*isgoodTPCK18)->at(0);
+			int goodTPCKurama = (*isgoodTPCKurama)->at(0);
 			for(int itk18=0;itk18<ntK18;++itk18){
 				if(ntK18!= 1 or ntKurama !=1) continue;
+				if(!goodTPCK18 or !goodTPCKurama) continue;
 				double ub = (*utgtHS)->at(itk18);
 				double vb = (*vtgtHS)->at(itk18);
 				double nb = hypot(hypot(1,ub),vb);

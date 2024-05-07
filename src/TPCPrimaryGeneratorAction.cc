@@ -5131,18 +5131,21 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	if(abs(ey<25)) dy = ey;
 	G4double dz = G4RandFlat::shoot(-153,-133);
 	G4ThreeVector gen_pos(dx,dy,dz);
-	MomKm = - MomKm;
 /*
 	MomKp.rotateZ(phi);
 	MomKm.rotateZ(phi);
 	MomXi.rotateZ(phi);
 */
-	
+	gTrackBuffer.SetTrack(1,0,-321,gen_pos,MomKm);	
+	MomKm = - MomKm;
+	gTrackBuffer.SetTrack(2,0,321,gen_pos,MomKp);	
+	gTrackBuffer.SetTrack(3,0,3312,gen_pos,MomXi);	
 	auto SpinXi = MomKm.cross(MomXi);
 	SpinXi = SpinXi*(1./SpinXi.mag());
 	gTrackBuffer.SetPolarity(SpinXi,0);
 	gTrackBuffer.SetMomentum(MomXi,0);
-  gAnaMan.SetNumberOfPrimaryParticle( 3 );
+	gTrackBuffer.SetVertexMomentum(MomXi,0);
+	gAnaMan.SetNumberOfPrimaryParticle( 3 );
 	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
 	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
 	gAnaMan.SetPrimaryParticle(2,MomXi,XiMinusMass,XiMinusID);
