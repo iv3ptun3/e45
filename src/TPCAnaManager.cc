@@ -245,6 +245,8 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "xTgt", event.xTgt, "xTgt[nhTgt]/D" );
   TPC_g->Branch( "yTgt", event.yTgt, "yTgt[nhTgt]/D" );
   TPC_g->Branch( "zTgt", event.zTgt, "zTgt[nhTgt]/D" );
+  TPC_g->Branch( "uTgt", event.uTgt, "uTgt[nhTgt]/D" );
+  TPC_g->Branch( "vTgt", event.vTgt, "vTgt[nhTgt]/D" );
   TPC_g->Branch( "vtxTgt", event.vtxTgt, "vtxTgt[nhTgt]/D" );
   TPC_g->Branch( "vtyTgt", event.vtyTgt, "vtyTgt[nhTgt]/D" );
   TPC_g->Branch( "vtzTgt", event.vtzTgt, "vtzTgt[nhTgt]/D" );
@@ -795,6 +797,8 @@ TPCAnaManager::BeginOfEventAction( void )
     event.xTgt[i] = -9999.;
     event.yTgt[i] = -9999.;
     event.zTgt[i] = -9999.;
+    event.uTgt[i] = -9999.;
+    event.vTgt[i] = -9999.;
     event.vtxTgt[i] = -9999.;
     event.vtyTgt[i] = -9999.;
     event.vtzTgt[i] = -9999.;
@@ -2769,7 +2773,10 @@ TPCAnaManager::EndOfEventAction( void )
       event.xTgt[i] = hit->GetPosition().x();
       event.yTgt[i] = hit->GetPosition().y();
       event.zTgt[i] = hit->GetPosition().z();
-      event.vtxTgt[i] = hit->GetVertexPosition().x();
+      auto pTgt = hit->GetMomentum();
+			event.uTgt[i] = pTgt.x()/pTgt.z();
+			event.vTgt[i] = pTgt.y()/pTgt.z();
+			event.vtxTgt[i] = hit->GetVertexPosition().x();
       event.vtyTgt[i] = hit->GetVertexPosition().y();
       event.vtzTgt[i] = hit->GetVertexPosition().z();
       event.nhTgt++;
