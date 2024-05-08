@@ -681,17 +681,17 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	key ="VP5Hitpat";
 	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
 
-	key ="BeamGenZP_th[0,5)";
+	key ="BeamGenZP_th_0_5";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th[5,10)";
+	key ="BeamGenZP_th_5_10";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th[10,15)";
+	key ="BeamGenZP_th_10_15";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th[15,20)";
+	key ="BeamGenZP_th_15_20";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th[20,25)";
+	key ="BeamGenZP_th_20_25";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th[25,30)";
+	key ="BeamGenZP_th_25_30";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
 	
@@ -712,17 +712,17 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 
 
 
-	key ="BeamAcptZP_th[0,5)";
+	key ="BeamAcptZP_th_0_5";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th[5,10)";
+	key ="BeamAcptZP_th_5_10";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th[10,15)";
+	key ="BeamAcptZP_th_10_15";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th[15,20)";
+	key ="BeamAcptZP_th_15_20";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th[20,25)";
+	key ="BeamAcptZP_th_20_25";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th[25,30)";
+	key ="BeamAcptZP_th_25_30";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
 
@@ -2021,17 +2021,17 @@ TPCAnaManager::EndOfEventAction( void )
 	key ="BeamGenPhiP";
 	auto H3 = hmap2d[key];
 
-	key ="BeamGenZP_th[0,5)";
+	key ="BeamGenZP_th_0_5";
 	auto H4 = hmap2d[key];
-	key ="BeamGenZP_th[5,10)";
+	key ="BeamGenZP_th_5_10";
 	auto H5 = hmap2d[key];
-	key ="BeamGenZP_th[10,15)";
+	key ="BeamGenZP_th_10_15";
 	auto H6 = hmap2d[key];
-	key ="BeamGenZP_th[15,20)";
+	key ="BeamGenZP_th_15_20";
 	auto H7 = hmap2d[key];
-	key ="BeamGenZP_th[20,25)";
+	key ="BeamGenZP_th_20_25";
 	auto H8 = hmap2d[key];
-	key ="BeamGenZP_th[25,30)";
+	key ="BeamGenZP_th_25_30";
 	auto H9 = hmap2d[key];
 
 
@@ -2072,17 +2072,17 @@ TPCAnaManager::EndOfEventAction( void )
 	key ="BeamAcptPhiP";
 	auto HA3 = hmap2d[key];	
 	
-	key ="BeamAcptZP_th[0,5)";
+	key ="BeamAcptZP_th_0_5";
 	auto HA4 = hmap2d[key];
-	key ="BeamAcptZP_th[5,10)";
+	key ="BeamAcptZP_th_5_10";
 	auto HA5 = hmap2d[key];
-	key ="BeamAcptZP_th[10,15)";
+	key ="BeamAcptZP_th_10_15";
 	auto HA6 = hmap2d[key];
-	key ="BeamAcptZP_th[15,20)";
+	key ="BeamAcptZP_th_15_20";
 	auto HA7 = hmap2d[key];
-	key ="BeamAcptZP_th[20,25)";
+	key ="BeamAcptZP_th_20_25";
 	auto HA8 = hmap2d[key];
-	key ="BeamAcptZP_th[25,30)";
+	key ="BeamAcptZP_th_25_30";
 	auto HA9 = hmap2d[key];
 	
 	key ="BeamAcptXThetaP";

@@ -2378,10 +2378,9 @@ TPCDetectorConstruction::ConstructSDC1( void )
     G4SDManager::GetSDMpointer()->AddNewDetector( m_sdc_sd );
   }
 
-	const auto& sdc1_offset = ThreeVector(-48.5,0,0);
   const auto& sdc1_pos = ( gGeom.GetGlobalPosition("KURAMA") +
 			   ( gGeom.GetGlobalPosition("SDC1-V1") +
-			     gGeom.GetGlobalPosition("SDC1-U2") ) * 0.5 +sdc1_offset);
+			     gGeom.GetGlobalPosition("SDC1-U2") ) * 0.5 );
   const auto& frame_size = gSize.GetSize( "Sdc1Frame" ) * 0.5 * mm;
   const auto& drift_size = gSize.GetSize( "Sdc1Drift" ) * 0.5 * mm;
 	auto sdc1_solid = new G4Box( "Sdc1Solid", frame_size.x(),
