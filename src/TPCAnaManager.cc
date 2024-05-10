@@ -727,7 +727,14 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	key ="BeamAcptZP_th_25_30";
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
+  key = "K18HSTgtProfile";
+  hmap2d[key] = new TH2D( key, key, 1000, -100.0, 100.0 ,1000,-50,50);
 
+  key = "K18HSBeamProfile";
+  hmap2d[key] = new TH2D( key, key, 1000, -100.0, 100.0 ,1000,-50,50);
+
+  key = "TargetEdep";
+  hmap[key] = new TH1D(key,key,1000,0,20);
 }
 
 //_____________________________________________________________________________
@@ -768,6 +775,7 @@ TPCAnaManager::BeginOfEventAction( void )
   event.nhWc = 0;
   event.nhBvh = 0;
   event.nhVp = 0;
+  event.nhTgtVp = 0;
   for( G4int i=0; i<MaxHits; ++i ){
     // BH2
     event.tidBh2[i] = -9999;
@@ -951,6 +959,16 @@ TPCAnaManager::BeginOfEventAction( void )
     event.vtxBvh[i] = -9999.;
     event.vtyBvh[i] = -9999.;
     event.vtzBvh[i] = -9999.;
+    // TgtVP
+    event.tidTgtVp[i] = -9999;
+    event.xTgtVp[i] = -9999;
+    event.yTgtVp[i] = -9999;
+    event.zTgtVp[i] = -9999;
+    event.pxTgtVp[i] = -9999;
+    event.pyTgtVp[i] = -9999;
+    event.pzTgtVp[i] = -9999;
+    
+
     // VP
     event.tidVp[i] = -9999;
     event.pidVp[i] = -9999;
@@ -1863,9 +1881,29 @@ TPCAnaManager::EndOfEventAction( void )
       // 			  vtx_flag[i], a_fory[i], b_fory[i]
       // 			  );
     }
+    double EdepTgt=0;
+    TString TargetEdep = "TargetEdep";
+    TString K18HSTgtProfile = "K18HSTgtProfile";
+    for(int ih=0;ih<event.nhTgt;++ih){
+      if(event.tidTgt[ih]==1){
+        EdepTgt+=event.EdepTgt[ih];
+        if(ih==0){
+          hmap2d[K18HSTgtProfile]->Fill(event.xTgt[ih],event.yTgt[ih]);
+        }
+      }
+    }
+    if(EdepTgt!=0)hmap[TargetEdep]->Fill(EdepTgt);
+    TString K18HSBeamProfile = "K18HSBeamProfile";
+    for(int ih=0;ih<event.nhTgtVp;++ih){
+      if(event.tidTgtVp[ih]==1 and ih == 0){
+        hmap2d[K18HSBeamProfile]->Fill(event.xTgtVp[ih],event.yTgtVp[ih]);
+      }
+    }
+ 
+ 
   }//trigger parts
 	if(DiscardData){
-		event.Clear();
+		event.Clear();//Clears real data only
 	}
 	else{
   	TPC_g->Fill();
@@ -2524,6 +2562,24 @@ TPCAnaManager::EndOfEventAction( void )
       event.nhBvh++;
     }
   }
+  //_____________________________________________________________________________
+  void
+   TPCAnaManager::SetTargetVPData( const VHitInfo* hit)
+   {
+      if( event.nhTgtVp >= MaxHits ){
+        G4cerr << FUNC_NAME << " too much nhit " << event.nhTgtVp << G4endl;
+      } else {
+        Int_t i = event.nhTgtVp;
+        event.tidTgtVp[i] = hit->GetTrackID();
+        event.xTgtVp[i] = hit->GetPosition().x();
+        event.yTgtVp[i] = hit->GetPosition().y();
+        event.zTgtVp[i] = hit->GetPosition().z();
+        event.pxTgtVp[i] = hit->GetMomentum().x();
+        event.pyTgtVp[i] = hit->GetMomentum().y();
+        event.pzTgtVp[i] = hit->GetMomentum().z();
+        event.nhTgtVp++;
+      }
+   }
 
   //_____________________________________________________________________________
   void
@@ -2773,6 +2829,7 @@ TPCAnaManager::EndOfEventAction( void )
       event.xTgt[i] = hit->GetPosition().x();
       event.yTgt[i] = hit->GetPosition().y();
       event.zTgt[i] = hit->GetPosition().z();
+      event.EdepTgt[i] = hit->GetEnergyDeposit();
       auto pTgt = hit->GetMomentum();
 			event.uTgt[i] = pTgt.x()/pTgt.z();
 			event.vTgt[i] = pTgt.y()/pTgt.z();

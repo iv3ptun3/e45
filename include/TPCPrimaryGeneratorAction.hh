@@ -55,6 +55,7 @@ private:
   G4ParticleDefinition* m_KaonPlus;
   G4ParticleDefinition* m_sKaonPlus;
   G4ParticleDefinition* m_KaonMinus;
+  G4ParticleDefinition* m_sKaonMinus;
   G4ParticleDefinition* m_KaonZeroS;
   G4ParticleDefinition* m_KaonStarZero;
   G4ParticleDefinition* m_Phi;

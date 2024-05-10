@@ -93,6 +93,7 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_KaonPlus( particleTable->FindParticle( "kaon+" ) ),
     m_sKaonPlus( particleTable->FindParticle( "skaon+" ) ),
     m_KaonMinus( particleTable->FindParticle( "kaon-" ) ),
+    m_sKaonMinus( particleTable->FindParticle( "skaon-" ) ),
     m_KaonZeroS( particleTable->FindParticle( "kaon0S" ) ),
     m_KaonStarZero( particleTable->FindParticle( "k_star0" ) ),
     m_Phi(particleTable->FindParticle("phi")),
@@ -125,7 +126,9 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   if( gBeam.IsReady() ){
 		if(gBeam.IsK18()){
     	G4int eventID = anEvent->GetEventID();
-			*m_beam = gBeam.Get(eventID);
+			auto NBeam = gBeam.GetNBeam();
+	    if(eventID>=NBeam)return;
+      *m_beam = gBeam.Get(eventID);
 			if(m_beam->z == 0) return;
 		}
 		else if(gBeam.IsKurama()){

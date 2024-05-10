@@ -34,6 +34,7 @@ namespace{
 	double qBeam[5];
 	double m2Beam[5];
 	int trigpat[32];
+	int trigflag[32];
 	int ntK18,ntKurama;
   TTreeReaderValue<int>* ntTPCK18;
   TTreeReaderValue<int>* ntTPCKurama;
@@ -42,7 +43,6 @@ namespace{
 //  TTreeReaderValue<vector<vector<double>>>* zvpHS=nullptr;
   TTreeReaderValue<vector<vector<double>>>* uvpHS=nullptr;
   TTreeReaderValue<vector<vector<double>>>* vvpHS=nullptr;
-  
 	TTreeReaderValue<vector<vector<double>>>* xvpKurama=nullptr;
   TTreeReaderValue<vector<vector<double>>>* yvpKurama=nullptr;
 //  TTreeReaderValue<vector<vector<double>>>* zvpKurama=nullptr;
@@ -201,6 +201,7 @@ BeamMan::Initialize( void )
 		tree->SetBranchAddress( "vout",vout);
 		tree->SetBranchAddress( "pHS",pBeam);
 		tree->SetBranchAddress( "trigpat",trigpat);
+		tree->SetBranchAddress( "trigflag",trigflag);
 	}
 	else if (m_is_kurama){
 		tree->SetBranchAddress( "ntKurama",&ntBeam);
@@ -292,6 +293,7 @@ BeamMan::Initialize( void )
 			beam.evnum = evnum;
 			beam.runnum = runnum;
 			beam.ntBeam = ntBeam;
+			if(m_is_k18 and trigflag[14]<0) continue;
 			for(int it=0;it<ntBeam;++it){
 				beam.x = xout[0];
 				beam.y = yout[0];
@@ -311,6 +313,7 @@ BeamMan::Initialize( void )
 			for(int itrg=0;itrg<32;++itrg){
 				beam.trigpat[itrg] = trigpat[itrg];
 			}
+			m_nBeam++;
 			m_param_array.push_back( beam );
 		}
 		else if(m_is_missmassXi){

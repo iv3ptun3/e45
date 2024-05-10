@@ -29,6 +29,7 @@
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCTargetVPSD.hh"
 #include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
 #include "TPCTrackBuffer.hh"
@@ -327,7 +328,15 @@ TPCEventAction::EndOfEventAction( const G4Event* anEvent )
     }
   }
 
-  static const G4int id_vp = SDManager-> GetCollectionID("VP/hit");
+  static const G4int id_tgtvp = SDManager-> GetCollectionID("TGTVP/hit");
+  if( id_tgtvp >= 0 ){
+    const auto HC = (G4THitsCollection<TPCTargetVPHit>*)HCTE->GetHC( id_tgtvp );
+    for( G4int i=0, n=HC->entries(); i<n; ++i ){
+      gAnaMan.SetTargetVPData( (*HC)[i] );
+    }
+	}
+  
+	static const G4int id_vp = SDManager-> GetCollectionID("VP/hit");
   if( id_vp >= 0 ){
     const auto HC = (G4THitsCollection<TPCVPHit>*)HCTE->GetHC( id_vp );
     for( G4int i=0, n=HC->entries(); i<n; ++i ){

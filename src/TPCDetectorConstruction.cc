@@ -43,6 +43,7 @@
 #include "TPCSCHSD.hh"
 #include "TPCSDCSD.hh"
 #include "TPCTargetSD.hh"
+#include "TPCTargetVPSD.hh"
 #include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
 #include "padHelper.hh"
@@ -70,6 +71,8 @@ namespace
   const G4Colour LAVENDER( 0.901, 0.901, 0.98 );
   const G4Colour MAROON( 0.5, 0.0, 0.0 );
   const G4Colour PINK( 1.0, 0.753, 0.796 );
+ 	const auto& DiscardData = gConf.Get<G4bool> ("DiscardData");
+ 	const auto& Generator = gConf.Get<G4bool> ("Generator");
 }
 
 //_____________________________________________________________________________
@@ -929,12 +932,17 @@ void
 TPCDetectorConstruction::ConstructHypTPC( void )
 {
 
-  auto tpc_sd = new TPCPadSD("/TPC");
-  G4SDManager::GetSDMpointer()->AddNewDetector( tpc_sd );
   const auto& tpc_pos = gGeom.GetGlobalPosition("HypTPC");
+  
+  bool BeamData =  (DiscardData and ( abs(Generator) == 135 or abs(Generator) == 493 or abs(Generator) == 938 ));
   // Target
   auto target_sd = new TPCTargetSD( "/TGT" );
   G4SDManager::GetSDMpointer()->AddNewDetector( target_sd );
+  auto tpc_sd = new TPCPadSD("/TPC");
+	G4SDManager::GetSDMpointer()->AddNewDetector( tpc_sd );
+	//
+  auto vp_sd = new TPCTargetVPSD("/TGTVP");
+  G4SDManager::GetSDMpointer()->AddNewDetector( vp_sd );
   const auto target_pos = gGeom.GetGlobalPosition( "SHSTarget" ) * mm;
   const auto target_size = gSize.GetSize( "Target" ) * 0.5 * mm;
   const auto holder_size = gSize.GetSize( "TargetHolder" ) * mm;
@@ -976,7 +984,13 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   target_lv->SetVisAttributes( G4Colour::Red() );
   new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
   		     m_world_lv, true, 0 );
-  auto holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
+ 	double vp_th = 0.001*mm;
+	auto vp_solid = new G4Box( "TGTVPSolid", 10.*cm/2, 6.*cm/2, vp_th/2 );
+	auto vp_lv = new G4LogicalVolume( vp_solid, m_material_map["P10"], "VPLV" );
+	vp_lv->SetSensitiveDetector( vp_sd );
+	vp_lv->SetVisAttributes(G4Color::Blue());
+  
+	auto holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
 					"TargetHolderLV");
   holder_lv->SetVisAttributes( G4Colour::Blue() );
   // new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
@@ -996,11 +1010,26 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 					  22.5*deg, ( 360. + 22.5 )*deg,
 					  NumOfSide, NumOfZPlane,
 					  zPlane, rInner, rOuter );
-    auto pos = target_pos;
+    auto target_w_vp1 = new G4UnionSolid("Target_w_VP1",target_solid,vp_solid,nullptr,G4ThreeVector(0,0,-target_size.z()-vp_th/2));
+    auto target_w_vp2 = new G4UnionSolid("Target_w_VP1",target_w_vp1,vp_solid,nullptr,G4ThreeVector(0,0,target_size.z()+vp_th/2));
+		
+		
+		auto Empty_volume = new G4Box("hollow",10*cm/2,6*cm/2,22*mm);
+		
+		
+		auto pos = target_pos;
     pos.rotateX( 90.*deg );
-    auto tpc_solid = new G4SubtractionSolid( "TpcSolid",
+		G4VSolid* tpc_solid = nullptr;
+		if(BeamData){
+			tpc_solid = new G4SubtractionSolid( "TpcSolid",
 					     tpc_out_solid, target_solid,
 					     nullptr, pos );
+				}
+		else{
+			tpc_solid = new G4SubtractionSolid( "TpcSolid",
+					     tpc_out_solid, Empty_volume,
+					     nullptr, pos );
+		}
     auto rot = new G4RotationMatrix;
     rot->rotateX( 90.*deg );
     m_tpc_lv = new G4LogicalVolume( tpc_solid, m_material_map["P10"],
@@ -1009,8 +1038,18 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     new G4PVPlacement( rot, tpc_pos, m_tpc_lv, "TpcPV",
 		       m_world_lv, false, 0 );
     m_tpc_lv->SetVisAttributes( G4Colour::White() );
+		auto before_tgt = target_pos - G4ThreeVector(0,0,target_size.z()+2*mm); 
+//		new G4PVPlacement(nullptr,before_tgt,vp_lv,"VPTargetBefore",
+		new G4PVPlacement(nullptr,target_pos-G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetBefore",
+				m_world_lv,false,0);
+		auto after_tgt = target_pos + G4ThreeVector(0,0,target_size.z()+2*mm) ; 
+		new G4PVPlacement(nullptr,target_pos+G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetAfter",
+				m_world_lv,false,1);
     //m_tpc_lv->SetSensitiveDetector( tpc_sd );
   }
+
+
+
   // Field Cage
   {
     const G4double Rin  = gSize.Get( "TpcRinFieldCage" )*mm*0.5;
@@ -1176,7 +1215,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     pad_lv[i]  = new G4LogicalVolume( pad_solid[i], m_material_map["P10"],
 				     Form("TpcPadLV%d", i) );
     pad_lv[i]->SetVisAttributes( ORANGE );
-    new G4PVPlacement( nullptr, padpos, pad_lv[i], Form("TpcPadPV%d", i),
+      new G4PVPlacement( nullptr, padpos, pad_lv[i], Form("TpcPadPV%d", i),
 		       m_tpc_lv, true, i );
   }
   // Dead area

@@ -1,18 +1,18 @@
 // -*- C++ -*-
 
-#include "TPCTargetSD.hh"
+#include "TPCTargetVPSD.hh"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
 #include <G4Track.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VTouchable.hh>
-
+#include "TString.h"
 #include "FuncName.hh"
-#include "TPCTargetHit.hh"
+#include "TPCTargetVPHit.hh"
 
 //_____________________________________________________________________________
-TPCTargetSD::TPCTargetSD( const G4String& name )
+TPCTargetVPSD::TPCTargetVPSD( const G4String& name )
   : G4VSensitiveDetector( name ),
     m_hits_collection()
 {
@@ -20,23 +20,22 @@ TPCTargetSD::TPCTargetSD( const G4String& name )
 }
 
 //_____________________________________________________________________________
-TPCTargetSD::~TPCTargetSD( void )
+TPCTargetVPSD::~TPCTargetVPSD( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetSD::Initialize( G4HCofThisEvent* HCTE )
+TPCTargetVPSD::Initialize( G4HCofThisEvent* HCTE )
 {
-  m_hits_collection =
-    new G4THitsCollection<TPCTargetHit>( SensitiveDetectorName,
-					 collectionName[0] );
+  m_hits_collection = new G4THitsCollection<TPCTargetVPHit>( SensitiveDetectorName,
+							 collectionName[0] );
   HCTE->AddHitsCollection( GetCollectionID(0), m_hits_collection );
 }
 
 //_____________________________________________________________________________
 G4bool
-TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
+TPCTargetVPSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 {
   const auto preStepPoint = aStep->GetPreStepPoint();
   const auto aTrack = aStep->GetTrack();
@@ -44,7 +43,9 @@ TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   const G4String particleName = Definition->GetParticleName();
   const G4String particleType = Definition->GetParticleType();
 	auto pos = preStepPoint->GetPosition(); 	
-
+  const auto postStepPoint = aStep->GetPostStepPoint();
+	auto postpos = postStepPoint->GetPosition(); 	
+//	G4cout<<Form("VPHit! (%g,%g,%g) ",pos.x(),pos.y(),pos.z())<<G4endl;
   if( preStepPoint->GetStepStatus() != fGeomBoundary )
     return false;
   if( Definition->GetPDGCharge() == 0. )
@@ -64,26 +65,26 @@ TPCTargetSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   // if( particleType == "lepton" )
   //   return false;
 
-  m_hits_collection->insert( new TPCTargetHit( SensitiveDetectorName, aStep ) );
+  m_hits_collection->insert( new TPCTargetVPHit( SensitiveDetectorName, aStep ) );
 
   return true;
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
+TPCTargetVPSD::EndOfEvent( G4HCofThisEvent* /* HCTE */ )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetSD::DrawAll( void )
+TPCTargetVPSD::DrawAll( void )
 {
 }
 
 //_____________________________________________________________________________
 void
-TPCTargetSD::PrintAll( void )
+TPCTargetVPSD::PrintAll( void )
 {
   m_hits_collection->PrintAllHits();
 }

@@ -128,12 +128,14 @@ private:
   G4double      m_primary_z; // from VI or VO
   G4double      m_target_z;
   G4ThreeVector m_vi_pos;
+	G4int         m_nBeam=0;
 
 public:
   const BeamInfo&      Get( void ) const;
   const BeamInfo&      Get( G4int iev ) const;
   const MMVertex&      GetVertex( void ) const;
   const MMVertex&      GetVertex( G4int iev ) const;
+  const G4int&       	 GetNBeam()const {return m_nBeam; }
   G4double             GetPrimaryZ( void ) const { return m_primary_z; }
   const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
   G4bool               Initialize( void );

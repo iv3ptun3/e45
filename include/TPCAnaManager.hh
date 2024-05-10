@@ -307,6 +307,7 @@ struct Event
   Double_t vtxTgt[MaxHits];
   Double_t vtyTgt[MaxHits];
   Double_t vtzTgt[MaxHits];
+	Double_t EdepTgt[MaxHits];
   // HTOF
   Int_t nhHtof;
   Int_t tidHtof[MaxHits];
@@ -482,7 +483,17 @@ struct Event
   Double_t vtpzBvh[MaxHits];
   Double_t vtppBvh[MaxHits];
   Double_t lengthBvh[MaxHits];
-  // VP
+ 	// TargetVP
+  Int_t nhTgtVp;
+  Int_t tidTgtVp[MaxHits];
+  Double_t xTgtVp[MaxHits];
+  Double_t yTgtVp[MaxHits];
+  Double_t zTgtVp[MaxHits];
+  Double_t pxTgtVp[MaxHits];
+  Double_t pyTgtVp[MaxHits];
+  Double_t pzTgtVp[MaxHits];
+	
+	// VP
   Int_t nhVp;
   Int_t tidVp[MaxHits];
   Int_t pidVp[MaxHits];
@@ -669,6 +680,7 @@ public:
   void SetSDCData( const VHitInfo* hit );
   void SetBVHData( const VHitInfo* hit );
   void SetVPData( const VHitInfo* hit );
+  void SetTargetVPData( const VHitInfo* hit );
   void SetWCData( const VHitInfo* hit );
   void SetGeneratorID(G4int gen);
   void SetModeID(G4int mode);

@@ -414,6 +414,12 @@ TPCPhysicsList::ConstructStableHyperons( void )
   // G4int anti_encoding = 0,
   // G4double magneticMoment = 0.0
   // )
+  
+	// skaon- non-decay K-
+  particle = new G4ParticleDefinition( "skaon-", 0.493677*GeV, 5.315e-14*MeV,
+				       -eplus, 0, -1, 0, 1, 1, 0,
+				       "meson", 0, 0, 321,
+				       true, 0, nullptr );
 
   // skaon+ non-decay K+
   particle = new G4ParticleDefinition( "skaon+", 0.493677*GeV, 5.315e-14*MeV,
