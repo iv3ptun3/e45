@@ -985,7 +985,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
   		     m_world_lv, true, 0 );
  	double vp_th = 0.001*mm;
-	auto vp_solid = new G4Box( "TGTVPSolid", 10.*cm/2, 6.*cm/2, vp_th/2 );
+	auto vp_solid = new G4Box( "TGTVPSolid", 30.*cm/2, 12.*cm/2, vp_th/2 );
 	auto vp_lv = new G4LogicalVolume( vp_solid, m_material_map["P10"], "VPLV" );
 	vp_lv->SetSensitiveDetector( vp_sd );
 	vp_lv->SetVisAttributes(G4Color::Blue());

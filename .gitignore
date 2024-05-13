@@ -21,4 +21,5 @@ tmp/
 param/k18conf/*
 param/k18conf*
 param/conf*
+param/k18hs*
 !.gitkeep

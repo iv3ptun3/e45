@@ -35,6 +35,7 @@ namespace{
 	double m2Beam[5];
 	int trigpat[32];
 	int trigflag[32];
+	
 	int ntK18,ntKurama;
   TTreeReaderValue<int>* ntTPCK18;
   TTreeReaderValue<int>* ntTPCKurama;
@@ -293,7 +294,7 @@ BeamMan::Initialize( void )
 			beam.evnum = evnum;
 			beam.runnum = runnum;
 			beam.ntBeam = ntBeam;
-			if(m_is_k18 and trigflag[14]<0) continue;
+			if(m_is_k18 and trigflag[14]<0 and trigflag[23]<0) continue;
 			for(int it=0;it<ntBeam;++it){
 				beam.x = xout[0];
 				beam.y = yout[0];

@@ -1,4 +1,4 @@
-// -*- C++ -*-
+// -*-C++ -*-
 
 #ifndef TPC_ANA_MANAGER_HH
 #define TPC_ANA_MANAGER_HH
@@ -308,6 +308,7 @@ struct Event
   Double_t vtyTgt[MaxHits];
   Double_t vtzTgt[MaxHits];
 	Double_t EdepTgt[MaxHits];
+	Double_t PathTgt[MaxHits];
   // HTOF
   Int_t nhHtof;
   Int_t tidHtof[MaxHits];

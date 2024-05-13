@@ -50,6 +50,7 @@ public:
   G4double GetCharge( void ) const { return m_charge; }
   G4int    GetParentID( void ) const { return m_parent_id; }
   G4double GetTrackLength( void ) const { return m_track_length; }
+  G4double GetStepLength( void ) const { return m_step_length; }
   const G4ThreeVector& GetVertexPosition( void ) const
   { return m_vertex_position; }
   const G4ThreeVector& GetVertexMomentum( void ) const

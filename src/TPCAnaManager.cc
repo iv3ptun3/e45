@@ -728,13 +728,19 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
   key = "K18HSTgtProfile";
-  hmap2d[key] = new TH2D( key, key, 1000, -100.0, 100.0 ,1000,-50,50);
+  hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
 
   key = "K18HSBeamProfile";
-  hmap2d[key] = new TH2D( key, key, 1000, -100.0, 100.0 ,1000,-50,50);
+  hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
 
   key = "TargetEdep";
   hmap[key] = new TH1D(key,key,1000,0,20);
+
+  key = "TargetPath";
+  hmap[key] = new TH1D(key,key,1000,0,25);
+
+	key = "TargetEdepPath";
+  hmap2d[key] = new TH2D(key,key,1000,0,25,1000,0,20);
 }
 
 //_____________________________________________________________________________
@@ -1882,17 +1888,25 @@ TPCAnaManager::EndOfEventAction( void )
       // 			  );
     }
     double EdepTgt=0;
+    double PathTgt=0;
     TString TargetEdep = "TargetEdep";
+    TString TargetPath = "TargetPath";
+    TString TargetEdepPath = "TargetEdepPath";
     TString K18HSTgtProfile = "K18HSTgtProfile";
     for(int ih=0;ih<event.nhTgt;++ih){
       if(event.tidTgt[ih]==1){
         EdepTgt+=event.EdepTgt[ih];
+        PathTgt+=event.PathTgt[ih];
         if(ih==0){
           hmap2d[K18HSTgtProfile]->Fill(event.xTgt[ih],event.yTgt[ih]);
         }
       }
     }
-    if(EdepTgt!=0)hmap[TargetEdep]->Fill(EdepTgt);
+    if(EdepTgt!=0){
+      hmap[TargetEdep]->Fill(EdepTgt);
+      hmap[TargetPath]->Fill(PathTgt);
+      hmap2d[TargetEdepPath]->Fill(PathTgt,EdepTgt);
+    }
     TString K18HSBeamProfile = "K18HSBeamProfile";
     for(int ih=0;ih<event.nhTgtVp;++ih){
       if(event.tidTgtVp[ih]==1 and ih == 0){
@@ -2830,6 +2844,7 @@ TPCAnaManager::EndOfEventAction( void )
       event.yTgt[i] = hit->GetPosition().y();
       event.zTgt[i] = hit->GetPosition().z();
       event.EdepTgt[i] = hit->GetEnergyDeposit();
+      event.PathTgt[i] = hit->GetStepLength();
       auto pTgt = hit->GetMomentum();
 			event.uTgt[i] = pTgt.x()/pTgt.z();
 			event.vTgt[i] = pTgt.y()/pTgt.z();
