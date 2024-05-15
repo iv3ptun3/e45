@@ -511,10 +511,15 @@ TPCPadSD::TPCdEdxSig(Double_t mass/*MeV/c2*/, Double_t mom){
 		par[1] =	-8.704;
 		par[2] = 4.477;
 	}
-	else if(mass > 0.7){//proton;
+	else if(mass > 0.7){//proton or heavier;
 		par[0] = 33.92;
 		par[1] = -26.24;
 		par[2] = 6.259; 
+	}
+	else {//Kaon -> temp value
+		par[0] = 7.792;
+		par[1] =	-8.704;
+		par[2] = 4.477;
 	}
 	double value = par[0]+par[1]*mom+par[2]*mom*mom;
 	return value;

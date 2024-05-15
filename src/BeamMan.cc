@@ -39,44 +39,29 @@ namespace{
 	int ntK18,ntKurama;
   TTreeReaderValue<int>* ntTPCK18;
   TTreeReaderValue<int>* ntTPCKurama;
-	TTreeReaderValue<vector<vector<double>>>* xvpHS=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* yvpHS=nullptr;
-//  TTreeReaderValue<vector<vector<double>>>* zvpHS=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* uvpHS=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* vvpHS=nullptr;
-	TTreeReaderValue<vector<vector<double>>>* xvpKurama=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* yvpKurama=nullptr;
-//  TTreeReaderValue<vector<vector<double>>>* zvpKurama=nullptr;
-/*
-	
-	TTreeReaderValue<vector<double>>* xoutK18=nullptr;
-  TTreeReaderValue<vector<double>>* youtK18=nullptr;
-  TTreeReaderValue<vector<double>>* uoutK18=nullptr;
-  TTreeReaderValue<vector<double>>* voutK18=nullptr;
-  TTreeReaderValue<vector<double>>* p_3rd=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* layerK18=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* wireK18=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* localhitposK18=nullptr;
- 
 
-	TTreeReaderValue<vector<double>>* xout_=nullptr;
-  TTreeReaderValue<vector<double>>* yout_=nullptr;
-  TTreeReaderValue<vector<double>>* zout_=nullptr;
-	TTreeReaderValue<vector<double>>* pxout=nullptr;
-  TTreeReaderValue<vector<double>>* pyout=nullptr;
-  TTreeReaderValue<vector<double>>* pzout=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* layer=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* wire=nullptr;
-  TTreeReaderValue<vector<vector<double>>>* localhitpos=nullptr;
+  TTreeReaderValue<vector<int>> *isgoodTPCK18 = nullptr;
+  TTreeReaderValue<vector<int>> *isgoodTPCKurama = nullptr;
 
-*/
-	TTreeReaderValue<vector<int>>* isgoodTPCK18=nullptr;
-	TTreeReaderValue<vector<int>>* isgoodTPCKurama=nullptr;
-	
-	TTreeReaderValue<vector<int>>* inside=nullptr;
-	TTreeReaderValue<vector<double>>* pHS=nullptr;
+  TTreeReaderValue<vector<int>> *inside = nullptr;
+  TTreeReaderValue<vector<double>> *pHS = nullptr;
+  TTreeReaderValue<vector<double>>* xbTPC=nullptr;
+  TTreeReaderValue<vector<double>>* ybTPC=nullptr;
+  TTreeReaderValue<vector<double>>* ubTPC=nullptr;
+  TTreeReaderValue<vector<double>>* vbTPC=nullptr;
+  
+  TTreeReaderValue<vector<double>>* xsTPC=nullptr;
+  TTreeReaderValue<vector<double>>* ysTPC=nullptr;
+  TTreeReaderValue<vector<double>>* usTPC=nullptr;
+  TTreeReaderValue<vector<double>>* vsTPC=nullptr;
+
+  TTreeReaderValue<vector<double>>* vtxTPC=nullptr;
+  TTreeReaderValue<vector<double>>* vtyTPC=nullptr;
+  TTreeReaderValue<vector<double>>* vtzTPC=nullptr;
+
   TTreeReaderValue<vector<double>>* xtgtHS=nullptr;
   TTreeReaderValue<vector<double>>* ytgtHS=nullptr;
+  TTreeReaderValue<vector<double>>* ztgtHS=nullptr;
   TTreeReaderValue<vector<double>>* utgtHS=nullptr;
   TTreeReaderValue<vector<double>>* vtgtHS=nullptr;
   TTreeReaderValue<vector<double>>* pTPCKurama=nullptr;
@@ -87,6 +72,34 @@ namespace{
   TTreeReaderValue<vector<double>>* vtgtTPCKurama=nullptr;
   TTreeReaderValue<vector<double>>* xtgtKurama=nullptr;
   TTreeReaderValue<vector<double>>* ytgtKurama=nullptr;
+  
+// For kurama data  
+  TTreeReaderValue<vector<vector<double>>> *xvpHS = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *yvpHS = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *zvpHS = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *xvpKurama = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *yvpKurama = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *zvpKurama = nullptr;
+
+  TTreeReaderValue<vector<double>> *xoutK18 = nullptr;
+  TTreeReaderValue<vector<double>> *youtK18 = nullptr;
+  TTreeReaderValue<vector<double>> *uoutK18 = nullptr;
+  TTreeReaderValue<vector<double>> *voutK18 = nullptr;
+  TTreeReaderValue<vector<double>> *p_3rd = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *layerK18 = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *wireK18 = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *localhitposK18 = nullptr;
+
+  TTreeReaderValue<vector<double>> *xout_ = nullptr;
+  TTreeReaderValue<vector<double>> *yout_ = nullptr;
+  TTreeReaderValue<vector<double>> *zout_ = nullptr;
+  TTreeReaderValue<vector<double>> *pxout = nullptr;
+  TTreeReaderValue<vector<double>> *pyout = nullptr;
+  TTreeReaderValue<vector<double>> *pzout = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *layer = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *wire = nullptr;
+  TTreeReaderValue<vector<vector<double>>> *localhitpos = nullptr;
+  TTreeReaderValue<vector<double>> *m2Kurama = nullptr;
 
 
 }
@@ -226,41 +239,48 @@ BeamMan::Initialize( void )
 		inside = new TTreeReaderValue<vector<int>>(*reader,"inside"); 
 		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC"); 
 		pHS = new TTreeReaderValue<vector<double>>(*reader,"pK18"); 
-		xvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpTPCK18"); 
-		yvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpTPCK18"); 
-//		zvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpTPCK18"); 
-		xtgtHS = new TTreeReaderValue<vector<double>>(*reader,"xbTPC"); 
-		ytgtHS = new TTreeReaderValue<vector<double>>(*reader,"ybTPC"); 
-//		ztgtHS = new TTreeReaderValue<vector<double>>(*reader,"ztgtHS"); 
-		utgtHS = new TTreeReaderValue<vector<double>>(*reader,"ubTPC"); 
-		vtgtHS = new TTreeReaderValue<vector<double>>(*reader,"vbTPC"); 
-		/*
-		xoutK18 = new TTreeReaderValue<vector<double>>(*reader,"xoutK18"); 
-		youtK18 = new TTreeReaderValue<vector<double>>(*reader,"youtK18"); 
-		uoutK18 = new TTreeReaderValue<vector<double>>(*reader,"uoutK18"); 
-		voutK18 = new TTreeReaderValue<vector<double>>(*reader,"voutK18"); 
-		p_3rd = new TTreeReaderValue<vector<double>>(*reader,"p_3rd"); 
-		layerK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"layerK18"); 
-		wireK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"wireK18"); 
-		localhitposK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitposK18"); 
+		xbTPC = new TTreeReaderValue<vector<double>>(*reader,"xbTPC"); 
+		ybTPC = new TTreeReaderValue<vector<double>>(*reader,"ybTPC"); 
+		ubTPC = new TTreeReaderValue<vector<double>>(*reader,"ubTPC"); 
+		vbTPC = new TTreeReaderValue<vector<double>>(*reader,"vbTPC"); 
+		vtxTPC = new TTreeReaderValue<vector<double>>(*reader,"vtxTPC");
+		vtyTPC = new TTreeReaderValue<vector<double>>(*reader,"vtyTPC");
+		vtzTPC = new TTreeReaderValue<vector<double>>(*reader,"vtzTPC");
 
-*/
+
+		
 //		tree->SetBranchAddress("ntKurama",&ntKurama);
 		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");		
 		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");		
 		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC"); 
 		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
-		xtgtKurama = new TTreeReaderValue<vector<double>>(*reader,"xsTPC"); 
-		ytgtKurama = new TTreeReaderValue<vector<double>>(*reader,"ysTPC"); 
-		utgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"usTPC"); 
-		vtgtTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"vsTPC"); 
+		xsTPC = new TTreeReaderValue<vector<double>>(*reader,"xsTPC"); 
+		ysTPC = new TTreeReaderValue<vector<double>>(*reader,"ysTPC"); 
+		usTPC = new TTreeReaderValue<vector<double>>(*reader,"usTPC"); 
+		vsTPC = new TTreeReaderValue<vector<double>>(*reader,"vsTPC"); 
 		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama"); 
 		
-//		xvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpTPCKurama"); 
-//		yvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpKurama"); 
-//		zvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpKurama"); 
-		
-/*		
+// For kurama data  
+		p_3rd = new TTreeReaderValue<vector<double>>(*reader,"p_3rd");
+		xoutK18 = new TTreeReaderValue<vector<double>>(*reader,"xoutK18");
+		youtK18 = new TTreeReaderValue<vector<double>>(*reader,"youtK18");
+		uoutK18 = new TTreeReaderValue<vector<double>>(*reader,"uoutK18");
+		voutK18 = new TTreeReaderValue<vector<double>>(*reader,"voutK18");
+		xvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpHS"); 
+		yvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpHS"); 
+		zvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpHS"); 
+		xtgtHS = new TTreeReaderValue<vector<double>>(*reader,"xtgtHS");
+		ytgtHS = new TTreeReaderValue<vector<double>>(*reader,"ytgtHS");
+		ztgtHS = new TTreeReaderValue<vector<double>>(*reader,"ztgtHS");
+		layerK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"layerK18");
+		wireK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"wireK18");
+		localhitposK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitposK18");
+
+		xvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpKurama"); 
+		yvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpKurama"); 
+		zvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpKurama"); 
+		xtgtKurama = new TTreeReaderValue<vector<double>>(*reader,"xtgtKurama");
+		ytgtKurama = new TTreeReaderValue<vector<double>>(*reader,"ytgtKurama");
 		xout_ = new TTreeReaderValue<vector<double>>(*reader,"xout"); 
 		yout_ = new TTreeReaderValue<vector<double>>(*reader,"yout"); 
 		zout_ = new TTreeReaderValue<vector<double>>(*reader,"zout"); 
@@ -270,7 +290,7 @@ BeamMan::Initialize( void )
 		layer = new TTreeReaderValue<vector<vector<double>>>(*reader,"layer"); 
 		wire = new TTreeReaderValue<vector<vector<double>>>(*reader,"wire"); 
 		localhitpos = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitpos"); 
-*/		
+		
 	}
 	else{
 		tree->SetBranchAddress( "x", &beam.x );
@@ -327,8 +347,8 @@ BeamMan::Initialize( void )
 			for(int itk18=0;itk18<ntK18;++itk18){
 				if(ntK18!= 1 or ntKurama !=1) continue;
 				if(!goodTPCK18 or !goodTPCKurama) continue;
-				double ub = (*utgtHS)->at(itk18);
-				double vb = (*vtgtHS)->at(itk18);
+				double ub = (*ubTPC)->at(itk18);
+				double vb = (*vbTPC)->at(itk18);
 				double nb = hypot(hypot(1,ub),vb);
 				double pb = (*pHS)->at(itk18);
 				double pzb = pb/nb;
@@ -338,30 +358,40 @@ BeamMan::Initialize( void )
 				double m2Kp = (*m2TPCKurama)->at(itkurama);
 				double pKp = (*pTPCKurama)->at(itkurama);
 				
-				double us = (*utgtTPCKurama)->at(itkurama);
-				double vs = (*vtgtTPCKurama)->at(itkurama);
+				double us = (*usTPC)->at(itkurama);
+				double vs = (*vsTPC)->at(itkurama);
 				double ns = hypot(hypot(1,us),vs);
 				double pzs = pKp/ns;
 				G4ThreeVector TVKp(pzs*us,pzs*vs,pzs);
+				if((*vtzTPC)->at(0)==0 )continue;
 
 				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.12 and m2Kp < 0.4 and in){
 					MMVertex MMVert;
-					MMVert.x = (*xtgtHS)->at(0);
-					MMVert.y = (*ytgtHS)->at(0);
+					MMVert.x = ((*vtxTPC)->at(0));
+					MMVert.y = ((*vtyTPC)->at(0));
 					MMVert.ntK18 = ntK18;
 					MMVert.ntKurama = ntKurama;
 					MMVert.Moms.push_back(TVKm);
 					MMVert.Moms.push_back(TVKp);
 					MMVert.Moms.push_back(TVKm-TVKp);
-/*
+
 					//					vector<double>& xoutk18 = *(xoutK18->Get()); 
+					MMVert.p_3rd = *(p_3rd->Get());
+					MMVert.xoutK18 = *(xoutK18->Get());
+					MMVert.youtK18 = *(youtK18->Get());
+					MMVert.uoutK18 = *(uoutK18->Get());
+					MMVert.voutK18 = *(voutK18->Get());	
 					MMVert.xvpHS = *(xvpHS->Get());	
-					MMVert.p_3rd = *(p_3rd->Get());	
 					MMVert.yvpHS = *(yvpHS->Get());	
 					MMVert.zvpHS = *(zvpHS->Get());	
 					MMVert.xtgtHS = *(xtgtHS->Get());	
 					MMVert.ytgtHS = *(ytgtHS->Get());	
-//					MMVert.ztgtHS = *(ztgtHS->Get());	
+					MMVert.ztgtHS = *(ztgtHS->Get());	
+					MMVert.layerK18 = *(layerK18->Get());	
+					MMVert.wireK18 = *(wireK18->Get());	
+					MMVert.localhitposK18 = *(localhitposK18->Get());	
+					
+					
 					MMVert.xvpKurama = *(xvpKurama->Get());	
 					MMVert.yvpKurama = *(yvpKurama->Get());	
 					MMVert.zvpKurama = *(zvpKurama->Get());	
@@ -372,9 +402,6 @@ BeamMan::Initialize( void )
 					MMVert.youtK18 = *(youtK18->Get());	
 					MMVert.uoutK18 = *(uoutK18->Get());	
 					MMVert.voutK18 = *(voutK18->Get());	
-					MMVert.layerK18 = *(layerK18->Get());	
-					MMVert.wireK18 = *(wireK18->Get());	
-					MMVert.localhitposK18 = *(localhitposK18->Get());	
 					MMVert.xout = *(xout_->Get());	
 					MMVert.yout = *(yout_->Get());	
 					MMVert.zout = *(zout_->Get());	
@@ -384,7 +411,7 @@ BeamMan::Initialize( void )
 					MMVert.layer = *(layer->Get());	
 					MMVert.wire = *(wire->Get());	
 					MMVert.localhitpos = *(localhitpos->Get());	
-				*/	
+					
 					m_mm_array.push_back(MMVert);		
 				}
 			}
