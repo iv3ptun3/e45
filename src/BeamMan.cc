@@ -365,7 +365,7 @@ BeamMan::Initialize( void )
 				G4ThreeVector TVKp(pzs*us,pzs*vs,pzs);
 				if((*vtzTPC)->at(0)==0 )continue;
 
-				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.12 and m2Kp < 0.4 and in){
+				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.12 and m2Kp < 0.4 and in and abs(mm-1.321)<0.1){
 					MMVertex MMVert;
 					MMVert.x = ((*vtxTPC)->at(0));
 					MMVert.y = ((*vtyTPC)->at(0));
