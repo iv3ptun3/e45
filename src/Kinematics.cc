@@ -3,13 +3,30 @@
 #include "Kinematics.hh"
 
 #include <Randomize.hh>
+#include <cmath>
+#include <cstdio>
 
+#include <TF2.h>
 #include "FuncName.hh"
+#include <TMath.h>
 
 namespace Kinematics
 {
 
 const G4double b = 1.62 * CLHEP::GeV * CLHEP::fermi / CLHEP::hbarc;
+static int gNumOfTracks;
+static std::vector<double> gX0;
+static std::vector<double> gY0;
+static std::vector<double> gU0;
+static std::vector<double> gV0;
+static void fcn_vertex(int &npar, double *gin, double &f, double *par, int iflag){
+  double chisqr=0.;
+  for(int i=0; i<gNumOfTracks; ++i){
+    chisqr += TMath::Power(par[0]-gX0[i]-gU0[i]*par[2], 2);
+    chisqr += TMath::Power(par[1]-gY0[i]-gV0[i]*par[2], 2);
+  };
+  f = chisqr;
+};
 
 
 //______________________________________________________________________________
@@ -168,5 +185,69 @@ Legendre( G4int order, G4double x )
     return 0.;
   }
 }
+
+G4ThreeVector
+MultitrackVertex(int ntrack, double *x0, double *y0, double *u0, double *v0){
+
+  gNumOfTracks = ntrack;
+  gX0.clear();
+  gY0.clear();
+  gU0.clear();
+  gV0.clear();
+  for(int i=0; i<gNumOfTracks; ++i){
+    gX0.push_back(x0[i]);
+    gY0.push_back(y0[i]);
+    gU0.push_back(u0[i]);
+    gV0.push_back(v0[i]);
+  }
+
+  double par[3] = {0, 0, 0};
+  double err[3] = {999., 999., 999.};
+
+  TMinuit *minuit = new TMinuit(3);
+  minuit->SetPrintLevel(-1);
+  minuit->SetFCN(fcn_vertex);
+
+  double arglist[10];
+  int ierflg = 0;
+
+  arglist[0] = 1; //error level for ch2 minimization
+  minuit->mnexcm("SET ERR", arglist, 1, ierflg);
+  minuit->mnexcm("SET NOW", arglist, 1, ierflg);
+
+  TString name[3] = {"x", "y" ,"z"};
+  const double FitStep[3] = {0.001, 0.001, 0.001};
+  const double LowLimit[3] = {-50., -50., -100};
+  const double UpLimit[3] = {50., 50., 100};
+  for(int i=0; i<3; i++){
+    minuit->mnparm(i, name[i], par[i], FitStep[i], LowLimit[i], UpLimit[i], ierflg);
+  }
+  minuit->Command("SET STRategy 0");
+
+  //arglist[0] = 500.;
+  //arglist[1] = 1;
+  arglist[0] = 1000.;
+  arglist[1] = 0.1;
+
+  int Err;
+  double bnd1, bnd2;
+  minuit->mnexcm("MIGRAD", arglist, 2, ierflg);
+  //minuit->mnimpr();
+  //minuit->mnexcm("MINOS", arglist, 0, ierflg);
+  //minuit->mnexcm("SET ERR", arglist, 2, ierflg);
+
+  double amin, edm, errdef;
+  int nvpar, nparx, icstat;
+  minuit->mnstat(amin, edm, errdef, nvpar, nparx, icstat);
+  for(int i=0; i<3; i++){
+    minuit->mnpout(i, name[i], par[i], err[i], bnd1, bnd2, Err);
+  }
+  delete minuit;
+
+  return G4ThreeVector(par[0], par[1], par[2] - 143);
+}
+
+
+
 
 }

@@ -125,10 +125,12 @@ private:
   G4bool        m_is_k18=0;
   G4bool        m_is_kurama=0;
   G4bool        m_is_missmassXi=0;
+  G4bool        m_is_TPCXi=0;
   G4double      m_primary_z; // from VI or VO
   G4double      m_target_z;
   G4ThreeVector m_vi_pos;
 	G4int         m_nBeam=0;
+
 
 public:
   const BeamInfo&      Get( void ) const;
@@ -144,6 +146,7 @@ public:
   G4bool               IsK18( void ) const { return m_is_k18; }
   G4bool               IsKurama( void ) const { return m_is_kurama; }
   G4bool               IsMissMassXi( void ) const { return m_is_missmassXi; }
+  G4bool               IsReconXi( void ) const { return m_is_TPCXi; }
   void                 Print( void ) const;
   void                 SetPrimaryZ( G4double z ){ m_primary_z = z; }
   void                 SetVIPosition( G4ThreeVector pos ){ m_vi_pos = pos; }

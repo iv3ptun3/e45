@@ -139,6 +139,10 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     	G4int eventID = anEvent->GetEventID();
 			*m_mm_vert = gBeam.GetVertex(eventID);
 		}
+    else if (gBeam.IsReconXi()){
+      G4int eventID = anEvent->GetEventID();
+      *m_mm_vert = gBeam.GetVertex(eventID);
+    }
 		else{
     	*m_beam = gBeam.Get();
 		}
@@ -254,7 +258,8 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case -1321: GenerateXiMinus( anEvent ); break;
   case 1115: GenerateLambda( anEvent ); break;
  	case 181321:GenerateKuramaPKmKpXi( anEvent );	break; 
-	default:
+	case 1001321:GenerateTPCXiKmKp(anEvent); break;
+  default:
     G4cerr << " * Generator number error : " << m_generator << G4endl;
     break;
   }
@@ -5133,6 +5138,67 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	if(abs(ex<15)) dx = ex;
 	if(abs(ey<25)) dy = ey;
 	G4double dz = G4RandFlat::shoot(-153,-133);
+	G4ThreeVector gen_pos(dx,dy,dz);
+/*
+	MomKp.rotateZ(phi);
+	MomKm.rotateZ(phi);
+	MomXi.rotateZ(phi);
+*/
+	gTrackBuffer.SetTrack(1,0,-321,gen_pos,MomKm);	
+	MomKm = - MomKm;
+	gTrackBuffer.SetTrack(2,0,321,gen_pos,MomKp);	
+	gTrackBuffer.SetTrack(3,0,3312,gen_pos,MomXi);	
+	auto SpinXi = MomKm.cross(MomXi);
+	SpinXi = SpinXi*(1./SpinXi.mag());
+	gTrackBuffer.SetPolarity(SpinXi,0);
+	gTrackBuffer.SetMomentum(MomXi,0);
+	gTrackBuffer.SetVertexMomentum(MomXi,0);
+	gAnaMan.SetNumberOfPrimaryParticle( 3 );
+	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
+	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
+	gAnaMan.SetPrimaryParticle(2,MomXi,XiMinusMass,XiMinusID);
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
+	m_particle_gun->SetParticleEnergy(KmEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKm );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
+	m_particle_gun->SetParticleEnergy(KpEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKp );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	
+	m_particle_gun->SetParticleDefinition( m_XiMinus );
+	m_particle_gun->SetParticleEnergy(XiEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomXi );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
+//1001321//
+void
+TPCPrimaryGeneratorAction::GenerateTPCXiKmKp(G4Event* anEvent){
+	
+	
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int XiMinusID = m_XiMinus->GetPDGEncoding();
+  
+	
+	static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double XiMinusMass = m_XiMinus->GetPDGMass()/CLHEP::GeV;
+	auto MomKm=	m_mm_vert->Moms[0];	
+	auto MomKp=	m_mm_vert->Moms[1];	
+	auto MomXi=	m_mm_vert->Moms[2];
+	gAnaMan.SetMMVertex(m_mm_vert);
+	double KmEnergy = hypot(KaonPlusMass,MomKm.mag()) - KaonPlusMass;
+	double KpEnergy = hypot(KaonPlusMass,MomKp.mag()) - KaonPlusMass;
+	double XiEnergy = hypot(XiMinusMass,MomXi.mag()) - XiMinusMass;
+	
+	
+	double dx = m_mm_vert->x;
+	double dy = m_mm_vert->y;
+	double dz = m_mm_vert->z;
 	G4ThreeVector gen_pos(dx,dy,dz);
 /*
 	MomKp.rotateZ(phi);

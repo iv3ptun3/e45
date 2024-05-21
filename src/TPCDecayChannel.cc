@@ -95,7 +95,7 @@ void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
 	MomVector = gTrackBuffer.GetMomentum(order);
 //	G4cout<<*parent_name<<" Polarization P = "<<Polarization<<G4endl;
 	if(abs(Polarization) >1.01 or isnan(Polarization)){
-		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! P = "<<Polarization<<G4endl;
+		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
 		Polarization = 0;
 	}
 	if(Polarity.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Polarity not set!"<<G4endl;

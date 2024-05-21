@@ -7,12 +7,16 @@
 #include <G4ThreeVector.hh>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
+#include "TMinuit.h"
 
 namespace Kinematics
 {
   G4ThreeVector HarmonicFermiMomentum( G4int type );
   G4int         HarmonicFermiMomentumDeuteron( G4double* Kf );
   G4double      Legendre( G4int order, G4double x );
+
+	G4ThreeVector MultitrackVertex(int ntrack, double *x0, double *y0,
+			    double *u0, double *v0);
 
   inline G4String ClassName( void )
   {

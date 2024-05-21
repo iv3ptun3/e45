@@ -35,7 +35,7 @@ FC = gfortran -m32
 FFLAGS +=  -c ./include
 
 LDLIBS   += $(ROOTLIBS)
-
+LDLIBS   += "-lMinuit"
 ##LDLIBS +=$(CLIB)
 #ifndef G4INSTALL
 #  G4INSTALL = ../

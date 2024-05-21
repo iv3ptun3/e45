@@ -72,11 +72,6 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
 		}
 		gTrackBuffer.SetMomentum(postMomentum/CLHEP::GeV,1);		
 		gTrackBuffer.SetLV(G4LorentzVector(postMomentum/CLHEP::GeV,hypot(theParticle->GetPDGMass()/CLHEP::GeV,postMomentum.mag()/CLHEP::GeV)),1);	
-//		auto MomXi = gTrackBuffer.GetMomentum(0);
-//		auto MomLd = gTrackBuffer.GetMomentum(1);
-//		auto SpinLd = MomLd.cross(MomXi);
-//		SpinLd = SpinLd*(1./SpinLd.mag());
-//		gTrackBuffer.SetPolarity(SpinLd,1);
 		gTrackBuffer.SetLambdaID(TrackID);
 	}
 	if(particleName == "proton" and  parentID == gTrackBuffer.GetLambdaID()){

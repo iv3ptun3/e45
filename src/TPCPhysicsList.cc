@@ -21,6 +21,7 @@
 #include <G4PhaseSpaceDecayChannel.hh>
 #include <G4PhotoElectricEffect.hh>
 #include <G4ProcessManager.hh>
+#include <G4ProcessVector.hh>
 // Particle Constructor
 #include <G4BaryonConstructor.hh>
 #include <G4BosonConstructor.hh>
@@ -36,7 +37,7 @@
 #include <G4IonPhysics.hh>
 #include <G4NeutronTrackingCut.hh>
 #include <G4HadronPhysicsQGSP_BERT.hh>
-
+#include "G4XiMinus.hh"
 #include "ConfMan.hh"
 
 namespace
@@ -130,10 +131,10 @@ TPCPhysicsList::ConstructProcess( void )
   AddTransportation();
   if( gConf.Get<G4bool>( "EM" ) )
     ConstructEM();
-  if( gConf.Get<G4bool>( "Decay" ) )
-    ConstructGeneral(); // for test
   if( gConf.Get<G4bool>( "Hadron" ) )
     ConstructHadron();
+  if( gConf.Get<G4bool>( "Decay" ) )
+    ConstructGeneral(); // for test
 }
 
 //_____________________________________________________________________________
@@ -199,7 +200,11 @@ TPCPhysicsList::ConstructEM( void )
 void
 TPCPhysicsList::ConstructGeneral( void )
 {
-	G4cout<<"Ennabling Decays"<<G4endl;
+  G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
+  G4int PolarizedDecay = gConf.Get<G4int>("PolarizedDecay");
+  double XiPolarization = gConf.Get<G4double>("XiPolarization");
+  int DisableXiMaterialEffect = gConf.Get<int>("DisableXiMaterialEffect");
+  G4cout<<"Ennabling Decays"<<G4endl;
   auto theParticleIterator = GetParticleIterator();
   theParticleIterator->reset();
   auto theDecayProcess = new G4Decay;
@@ -223,9 +228,6 @@ TPCPhysicsList::ConstructGeneral( void )
 		}
 
     ////shhwang; include decay process
-    G4int Lambda_decay = gConf.Get<G4int>("LambdaDecay");
-		G4int PolarizedDecay = gConf.Get<G4int>("PolarizedDecay");
-		double XiPolarization = gConf.Get<G4double>("XiPolarization");
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     if(1){
       G4DecayTable* Table = new G4DecayTable();
@@ -370,7 +372,22 @@ TPCPhysicsList::ConstructGeneral( void )
   //  table->Insert(mode);
   ///
   */
-
+  }
+  if(DisableXiMaterialEffect){
+    G4ProcessManager* pmanager = G4XiMinus::XiMinus()->GetProcessManager(); 
+    if(pmanager){
+      G4ProcessVector* processVector = pmanager->GetProcessList();  
+      for(size_t i=0;i<processVector->size();i++){
+        G4VProcess* process = (*processVector)[i];
+        if(process->GetProcessName()=="ionIoni"
+          or process->GetProcessName()=="hIoni"
+          or process->GetProcessName()=="msc" 
+          or process->GetProcessName()=="hmsc"
+        ){
+           pmanager->RemoveProcess(process);
+        }
+      } 
+    } 
   }
 }
 

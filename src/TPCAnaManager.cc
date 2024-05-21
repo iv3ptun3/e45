@@ -683,20 +683,18 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	key ="VP5Hitpat";
 	hmap2d[key] = new TH2D(key,key,1000,-1000,1000,1000,-500,500);
 
-	key ="BeamGenZP_th_0_5";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th_5_10";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th_10_15";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th_15_20";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th_20_25";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamGenZP_th_25_30";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
-	
+  
+  double dTh = 2.;
+  double maxTh = 30.;
+  int n_Th = maxTh/dTh;
+  for(int i=0;i<n_Th;i++){
+    key = Form("BeamGenZP_th_%g_%g",i*dTh,(i+1)*dTh);
+    hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+    key = Form("BeamAcptZP_th_%g_%g",i*dTh,(i+1)*dTh);
+    hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2); 
+  }
+
 	
 	key ="BeamAcptThetaP";
 	hmap2d[key] = new TH2D(key,key,300,0,30,320,0.4,2.);
@@ -713,19 +711,6 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 
 
 
-
-	key ="BeamAcptZP_th_0_5";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th_5_10";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th_10_15";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th_15_20";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th_20_25";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
-	key ="BeamAcptZP_th_25_30";
-	hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
 
   key = "K18HSTgtProfile";
   hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
@@ -2076,22 +2061,8 @@ TPCAnaManager::EndOfEventAction( void )
 	auto H2 = hmap2d[key];
 	key ="BeamGenPhiP";
 	auto H3 = hmap2d[key];
-
-	key ="BeamGenZP_th_0_5";
-	auto H4 = hmap2d[key];
-	key ="BeamGenZP_th_5_10";
-	auto H5 = hmap2d[key];
-	key ="BeamGenZP_th_10_15";
-	auto H6 = hmap2d[key];
-	key ="BeamGenZP_th_15_20";
-	auto H7 = hmap2d[key];
-	key ="BeamGenZP_th_20_25";
-	auto H8 = hmap2d[key];
-	key ="BeamGenZP_th_25_30";
-	auto H9 = hmap2d[key];
-
-
-	key ="BeamGenXThetaP";
+	
+  key ="BeamGenXThetaP";
 	auto H10 = hmap2d[key];
 	key ="BeamGenYThetaP";
 	auto H11 = hmap2d[key];
@@ -2127,21 +2098,22 @@ TPCAnaManager::EndOfEventAction( void )
 	auto HA2 = hmap2d[key];	
 	key ="BeamAcptPhiP";
 	auto HA3 = hmap2d[key];	
+
+  double dTh = 2.;
+  double maxTh = 30.;
+  int n_Th = maxTh/dTh;
+  TH2D* histZPGen[100];
+  TH2D* histZPAcpt[100];
+  for(int i=0;i<n_Th;++i){
+    double th = i*dTh;
+    double th2 = (i+1)*dTh;
+    key = Form("BeamGenZP_th_%g_%g",th,th2);
+    histZPGen[i] = (TH2D*)hmap2d[key];
+    key = Form("BeamAcptZP_th_%g_%g",th,th2);
+    histZPAcpt[i] = (TH2D*)hmap2d[key];
+  }
 	
-	key ="BeamAcptZP_th_0_5";
-	auto HA4 = hmap2d[key];
-	key ="BeamAcptZP_th_5_10";
-	auto HA5 = hmap2d[key];
-	key ="BeamAcptZP_th_10_15";
-	auto HA6 = hmap2d[key];
-	key ="BeamAcptZP_th_15_20";
-	auto HA7 = hmap2d[key];
-	key ="BeamAcptZP_th_20_25";
-	auto HA8 = hmap2d[key];
-	key ="BeamAcptZP_th_25_30";
-	auto HA9 = hmap2d[key];
-	
-	key ="BeamAcptXThetaP";
+  key ="BeamAcptXThetaP";
 	auto HA10 = hmap2d[key];
 	key ="BeamAcptYThetaP";
 	auto HA11 = hmap2d[key];
@@ -2152,50 +2124,11 @@ TPCAnaManager::EndOfEventAction( void )
 	H3->Fill(pkph,pk);
 	H10->Fill(180*asin(pkx/pk)/acos(-1),pk);
 	H11->Fill(180*asin(pky/pk)/acos(-1),pk);
-{
-	if(pkangle < 5){
-		H4->Fill(vtx_z,pk);
-	}
-	else if(pkangle < 10){
-		H5->Fill(vtx_z,pk);
-	}
-	else if(pkangle<15){
-		H6->Fill(vtx_z,pk);
-	}
-	else if(pkangle < 20){
-		H7->Fill(vtx_z,pk);
-	}
-	else if(pkangle < 25){
-		H8->Fill(vtx_z,pk);
-	}
-	else{
-		H9->Fill(vtx_z,pk);
-	};
-}
-
 	if(Trig and SDC){
 		HA0->Fill(pkangle,pk);
 		HA1->Fill(pkth,pk);
 		HA2->Fill(pkth,pkph);
 		HA3->Fill(pkph,pk);
-		if(pkangle < 5){
-			HA4->Fill(vtx_z,pk);
-		}
-		else if(pkangle < 10){
-			HA5->Fill(vtx_z,pk);
-		}
-		else if(pkangle<15){
-			HA6->Fill(vtx_z,pk);
-		}
-		else if(pkangle < 20){
-			HA7->Fill(vtx_z,pk);
-		}
-		else if(pkangle < 25){
-			HA8->Fill(vtx_z,pk);
-		}
-		else{
-			HA9->Fill(vtx_z,pk);
-		}
 		HA10->Fill(180*asin(pkx/pk)/acos(-1),pk);
 		HA11->Fill(180*asin(pky/pk)/acos(-1),pk);
 		Sdc1Hit->Fill(xSdc1,ySdc1);	
@@ -2208,6 +2141,19 @@ TPCAnaManager::EndOfEventAction( void )
 		VP4Hit->Fill(xVP4,yVP4);	
 		VP5Hit->Fill(xVP5,yVP5);	
 	}
+{
+  for(int i=0;i<n_Th;++i){
+    double th = i*dTh;
+    double th2 = (i+1)*dTh;
+    if(pkangle>th and pkangle<th2){
+      histZPGen[i]->Fill(vtx_z,pk);
+      if(Trig and SDC){
+        histZPAcpt[i]->Fill(vtx_z,pk);
+      }
+    }
+  }
+}
+
   return 0;
 }
 
