@@ -14,6 +14,9 @@
 #include "TMatrixD.h"
 #include "TVector3.h"
 using namespace std;
+namespace{
+	static int PolaFail = 0;
+}
 class TPCPolarizedDecayChannel : public G4VDecayChannel
 {
 	public:
@@ -38,7 +41,7 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 		void SetPolarization(G4double pol);
 	protected:
 		G4double ParentMass;
-		G4double Polarization = 1;
+		G4double Polarization = 0;
 		G4ThreeVector Polarity;//Z axis on mother frame
 		G4ThreeVector MomVector;//X axis on mother frame
 		TF1 PDFCTheta;

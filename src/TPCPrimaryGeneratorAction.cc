@@ -143,6 +143,8 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
       G4int eventID = anEvent->GetEventID();
       *m_mm_vert = gBeam.GetVertex(eventID);
     }
+    else if (gBeam.IsKpUniform()){
+    }
 		else{
     	*m_beam = gBeam.Get();
 		}
@@ -688,8 +690,7 @@ TPCPrimaryGeneratorAction::GenerateUniformKaonPlus( G4Event* anEvent )
     vtx=rn_vtx;
     vtz=rn_vtz+m_target_pos.z();
   }else if( gConf.Get<G4int>("Experiment") == 42. ){
-    vtx = G4RandFlat::shoot(-15.,15.)*mm;
-    vty = G4RandFlat::shoot(-10.,10.)*mm;
+    gBeam.GetHitProfile(vtx,vty);
     vtz = G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2,m_target_pos.z()+m_target_size.z()/2)*mm;
   }
 

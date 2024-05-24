@@ -709,8 +709,18 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	key ="BeamAcptYThetaP";
 	hmap2d[key] = new TH2D(key,key,100,-30,30,80,0.4,2.);
 
-
-
+  double dP = 0.05;//GeV
+  double maxP = 2.;
+  double minP = 0.4;
+  int n_P = (maxP-minP)/dP;
+  for(int i=0;i<n_P;i++){
+    int p_low = 1000*(minP+i*dP);
+    int p_high = 1000*(minP+(i+1)*dP);
+    key = Form("BeamGenThPh_P_%d_%d",p_low,p_high);
+    hmap2d[key] = new TH2D(key,key,100,0,30,100,-3.15,3.15);
+    key = Form("BeamAcptThPh_P_%d_%d",p_low,p_high);  
+    hmap2d[key] = new TH2D(key,key,100,0,30,100,-3.15,3.15);
+  }
 
   key = "K18HSTgtProfile";
   hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
@@ -2112,7 +2122,7 @@ TPCAnaManager::EndOfEventAction( void )
     key = Form("BeamAcptZP_th_%g_%g",th,th2);
     histZPAcpt[i] = (TH2D*)hmap2d[key];
   }
-	
+
   key ="BeamAcptXThetaP";
 	auto HA10 = hmap2d[key];
 	key ="BeamAcptYThetaP";
@@ -2124,6 +2134,22 @@ TPCAnaManager::EndOfEventAction( void )
 	H3->Fill(pkph,pk);
 	H10->Fill(180*asin(pkx/pk)/acos(-1),pk);
 	H11->Fill(180*asin(pky/pk)/acos(-1),pk);
+
+
+  double dP = 0.05;
+  double maxP = 2.;
+  double minP = 0.4;
+  int pk_bin = (pk-minP)/dP;
+  if(minP < pk and pk < maxP){
+  int p_low = 1000*(minP+pk_bin*dP);
+  int p_high = 1000*(minP+(pk_bin+1)*dP);
+  key = Form("BeamGenThPh_P_%d_%d",p_low,p_high);
+  hmap2d[key]->Fill(pkangle,pkph);
+  }
+
+
+
+
 	if(Trig and SDC){
 		HA0->Fill(pkangle,pk);
 		HA1->Fill(pkth,pk);
@@ -2139,7 +2165,13 @@ TPCAnaManager::EndOfEventAction( void )
 		VP2Hit->Fill(xVP2,yVP2);	
 		VP3Hit->Fill(xVP3,yVP3);	
 		VP4Hit->Fill(xVP4,yVP4);	
-		VP5Hit->Fill(xVP5,yVP5);	
+		VP5Hit->Fill(xVP5,yVP5);
+    if(minP < pk and pk < maxP){
+    int p_low = 1000*(minP+pk_bin*dP);
+    int p_high = 1000*(minP+(pk_bin+1)*dP);
+    key = Form("BeamAcptThPh_P_%d_%d",p_low,p_high);
+    hmap2d[key]->Fill(pkangle,pkph);	
+    }
 	}
 {
   for(int i=0;i<n_Th;++i){

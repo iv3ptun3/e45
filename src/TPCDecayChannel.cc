@@ -98,8 +98,6 @@ void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
 		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
 		Polarization = 0;
 	}
-	if(Polarity.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Polarity not set!"<<G4endl;
-	if(MomVector.mag()==0)G4cout<<"Warning! "<<*parent_name<<" Momentum cannot be tracked!"<<G4endl;
 }
 void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	auto LVParent = G4LorentzVector(MomVector,hypot(ParentMass/CLHEP::GeV,MomVector.mag()));
@@ -179,6 +177,8 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 		G4cout<<Form("Parent VertMom = (%g,%g,%g) ",TVVertParent.x(),TVVertParent.y(),TVVertParent.z())<<G4endl;
 		G4cout<<Form("Daughter Mom = (%g,%g,%g) ",LVDaughter.x(),LVDaughter.y(),LVDaughter.z())<<G4endl;
 		G4cout<<Form("Daughter MomCM = (%g,%g,%g) ",LVDBK.x(),LVDBK.y(),LVDBK.z())<<G4endl;
+		PolaFail++;
+		G4cout<<"FailedPola = "<<PolaFail<<G4endl;
 	}
 }
 void TPCPolarizedDecayChannel::SetPolarization(G4double pol){

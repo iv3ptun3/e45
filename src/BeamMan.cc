@@ -199,6 +199,9 @@ BeamMan::Initialize( void )
 	if( generator == 1001321){
 		m_is_TPCXi = 1;
 	}
+	if( generator == 25){
+		m_is_KpUniform = 1;
+	}
   m_primary_z = gGeom.GetLocalZ( "Vertex" );
   m_target_z = gGeom.GetLocalZ( "SHSTarget" );
   if( !m_is_vi )
@@ -215,13 +218,19 @@ BeamMan::Initialize( void )
 	else if(m_is_missmassXi or m_is_TPCXi){
 		tree = (TTree*)  m_file->Get( "tpc"  );
 	}
+	else if(m_is_KpUniform){
+		auto h = (TH2D*)m_file->Get("K18HSTgtProfile");
+		HitProfile= (TH2D*)h->Clone("K18HSTgtProfile");
+		delete h;
+		G4cout<<"HitProfile is set:: "<<HitProfile->GetEntries()<<G4endl;
+		m_is_ready = true;
+	}
 	else{
 		tree = (TTree*) m_file->Get("tree");
 	}
-	G4cout<<tree->GetEntries()<<G4endl;
 
-  if( !m_file->IsOpen() || !tree )
-    return false;
+  if( !m_file->IsOpen() || !tree )return m_is_ready;
+	G4cout<<tree->GetEntries()<<G4endl;
 	BeamInfo beam;
 	if(m_is_k18){
 		tree->SetBranchAddress( "ntK18",&ntBeam);
@@ -547,7 +556,9 @@ BeamMan::Initialize( void )
 			m_param_array.push_back( beam );
 		}
   }
+  G4cout<<"Closing files"<<G4endl;
   m_file->Close();
+  G4cout<<"File Closed"<<G4endl;
   m_n_param = m_param_array.size();
 	m_is_ready = true;
   return true;
@@ -608,4 +619,9 @@ BeamMan::Print( void ) const
 	   << std::setw(w) << b.p.z() << ")" << G4endl;
   }
   G4cout << "   nparam = " << m_param_array.size() << G4endl;
+}
+void
+BeamMan::GetHitProfile(double& x, double& y) const
+{
+	HitProfile->GetRandom2(x,y);
 }
