@@ -692,7 +692,11 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     key = Form("BeamGenZP_th_%g_%g",i*dTh,(i+1)*dTh);
     hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
     key = Form("BeamAcptZP_th_%g_%g",i*dTh,(i+1)*dTh);
-    hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2); 
+    hmap2d[key] = new TH2D(key,key,100,-153,-133,80,0.4,2);
+    key = Form("BeamGenPhiP_th_%g_%g",i*dTh,(i+1)*dTh);
+    hmap2d[key] = new TH2D(key,key,300,-3.15,3.15,80,0.4,2);
+    key = Form("BeamAcptPhiP_th_%g_%g",i*dTh,(i+1)*dTh);
+    hmap2d[key] = new TH2D(key,key,300,-3.15,3.15,80,0.4,2);
   }
 
 	
@@ -721,6 +725,7 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
     key = Form("BeamAcptThPh_P_%d_%d",p_low,p_high);  
     hmap2d[key] = new TH2D(key,key,100,0,30,100,-3.15,3.15);
   }
+
 
   key = "K18HSTgtProfile";
   hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
@@ -2114,6 +2119,8 @@ TPCAnaManager::EndOfEventAction( void )
   int n_Th = maxTh/dTh;
   TH2D* histZPGen[100];
   TH2D* histZPAcpt[100];
+  TH2D* histPhiPGen[100];
+  TH2D* histPhiPAcpt[100];
   for(int i=0;i<n_Th;++i){
     double th = i*dTh;
     double th2 = (i+1)*dTh;
@@ -2121,6 +2128,10 @@ TPCAnaManager::EndOfEventAction( void )
     histZPGen[i] = (TH2D*)hmap2d[key];
     key = Form("BeamAcptZP_th_%g_%g",th,th2);
     histZPAcpt[i] = (TH2D*)hmap2d[key];
+    key = Form("BeamGenPhiP_th_%g_%g",i*dTh,(i+1)*dTh);
+    histPhiPGen[i] = (TH2D*)hmap2d[key];
+    key = Form("BeamAcptPhiP_th_%g_%g",i*dTh,(i+1)*dTh);
+    histPhiPAcpt[i] = (TH2D*)hmap2d[key];
   }
 
   key ="BeamAcptXThetaP";
@@ -2179,8 +2190,10 @@ TPCAnaManager::EndOfEventAction( void )
     double th2 = (i+1)*dTh;
     if(pkangle>th and pkangle<th2){
       histZPGen[i]->Fill(vtx_z,pk);
+      histPhiPGen[i]->Fill(pkph,pk);
       if(Trig and SDC){
         histZPAcpt[i]->Fill(vtx_z,pk);
+        histPhiPAcpt[i]->Fill(pkph,pk);
       }
     }
   }

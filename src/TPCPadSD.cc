@@ -125,9 +125,14 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
     return false;
   */
   //dead layer 45 deg
-  G4double deadlayer=12.;
-  if(hitx < (hitz+deadlayer/2.*sqrt(2)) && hitx > (hitz-deadlayer/2.*sqrt(2))  )    return false;
-  if(hitx < (-hitz+deadlayer/2.*sqrt(2)) && hitx > (-hitz-deadlayer/2.*sqrt(2))  )    return false;
+ 
+
+
+	G4double deadlayer=12.;
+//  if(hitx < (hitz+deadlayer/2.*sqrt(2)) && hitx > (hitz-deadlayer/2.*sqrt(2))  )    return false;
+ // if(hitx < (-hitz+deadlayer/2.*sqrt(2)) && hitx > (-hitz-deadlayer/2.*sqrt(2))  )    return false;
+  if(hitx < (hitz+deadlayer) && hitx > (hitz-deadlayer  ))    return false;
+  if(hitx < (-hitz+deadlayer) && hitx > (-hitz-deadlayer  ))    return false;
   //////////end dead layer
 
   if( m_gem_discharge > 0 ){
