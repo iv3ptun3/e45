@@ -205,7 +205,7 @@ G4double
 GetHorizontalRes(G4double t,G4double y, G4double* par){
 	double p0 = par[0],p1 = par[1],p2 = par[2],p3=par[3],p4=par[4],p5=par[5];
 	double dl = y + 300;
-	double val = 1. * sqrt(
+	double val = 1.2 * sqrt(
 			p0*p0 + p2*p2*dl/(p3*exp(-p1*dl))
 			+p4*p4*tan(t)*tan(t)/(12*p5));
 	return val;
@@ -231,7 +231,7 @@ GetSmearingVector(G4ThreeVector pos,G4ThreeVector mom, G4double* par_y, G4double
 	double smear_y = CLHEP::RandGauss::shoot(0,res_y);
 	double smear_t = CLHEP::RandGauss::shoot(0,res_t);
 	double smear_x = cos(PadAngle) *smear_t; 	
-	double smear_z = sin(PadAngle) *smear_t; 	
+	double smear_z = -sin(PadAngle) *smear_t; 	
 	return G4ThreeVector(smear_x,smear_y,smear_z);
 }
 
