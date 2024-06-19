@@ -302,6 +302,9 @@ struct Event
   Double_t xTgt[MaxHits];
   Double_t yTgt[MaxHits];
   Double_t zTgt[MaxHits];
+  Double_t xTgtOut[MaxHits];
+  Double_t yTgtOut[MaxHits];
+  Double_t zTgtOut[MaxHits];
   Double_t uTgt[MaxHits];
   Double_t vTgt[MaxHits];
   Double_t vtxTgt[MaxHits];

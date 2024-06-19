@@ -383,7 +383,7 @@ BeamMan::Initialize( void )
 			beam.evnum = evnum;
 			beam.runnum = runnum;
 			beam.ntBeam = ntBeam;
-			if(m_is_k18 and trigflag[14]<0 and trigflag[23]<0) continue;
+			if(m_is_k18 and (trigflag[14]<0 or trigflag[23]<0)) continue;
 			for(int it=0;it<ntBeam;++it){
 				beam.x = xout[0];
 				beam.y = yout[0];
@@ -524,7 +524,7 @@ BeamMan::Initialize( void )
 					MMVert.x = **xiprodvtx_x;
 					MMVert.y = **xiprodvtx_y;
 					MMVert.z = **xiprodvtx_z+6;
-
+					
 					if(abs(MMVert.x)> 15 or abs(MMVert.y)>10 or abs(MMVert.z+143)>10) continue;	
 					MMVert.xtgtHS = (*xbTPC->Get());
 					MMVert.ytgtHS = (*ybTPC->Get());
@@ -535,6 +535,7 @@ BeamMan::Initialize( void )
 					MMVert.Moms.push_back(TVKm);
 					MMVert.Moms.push_back(TVKp);
 					G4ThreeVector TVXi(PxXi,PyXi,PzXi);	
+	//				TVXi = TVXi*0.1;
 					MMVert.Moms.push_back(TVXi);
 					m_mm_array.push_back(MMVert);		
 				}

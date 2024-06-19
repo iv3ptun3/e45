@@ -71,10 +71,27 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	double pz = P_d*cos(Theta);
 	auto Zaxis = Polarity*(1./Polarity.mag()); 
 	auto Xaxis = MomVector.cross(Polarity);
+	int nitr = 0;
+	while((isnan(Xaxis.mag()) or Xaxis.mag()==0 )and nitr < 10){
+		G4cout<<"Warning! "<<*parent_name<<"Momentum and Polarization is numerically parallel! Mom = "<<MomVector <<" Pol = "<<Polarity<<G4endl;	
+		G4cout<<"Xaxis will be randomly set..."<<G4endl;
+		double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+		double theta = acos(G4RandFlat::shoot(-1,1));
+		auto RandDir = G4ThreeVector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+		Xaxis = -MomVector.cross(RandDir);//If polarization is numerically equal to momentum, Xaxis will be randomly set, perpendicular to momentum. 
+		nitr++;
+	}
+	if(nitr >= 10){
+		G4cout<<"Warning! "<<*parent_name<<" Xaxis is not set properly! Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
+	}
 	Xaxis = Xaxis*(1./Xaxis.mag());
 	auto Yaxis = Zaxis.cross(Xaxis);
 	auto DaughterMom1 = px*Xaxis+py*Yaxis+pz*Zaxis;
 	auto DaughterMom2 =-DaughterMom1;
+	if(isnan(DaughterMom1.mag()) or DaughterMom1.mag() <0.001){
+		G4cout<<"Warning! "<<*parent_name<<" DaughterMom1 is not set properly!"<<G4endl;
+		G4cout<<"Xaxis = "<<Xaxis<<" Mom = "<<DaughterMom1<<Form(" (%g,%g,%g)",P_d,Theta,Phi)<<G4endl;
+	}
 	SavePolarityMomentum(DaughterMom1);
 
 	DaughterMom[0] = DaughterMom1;
@@ -87,6 +104,8 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	G4DynamicParticle* Daughter2 = new G4DynamicParticle(Daughters[1],DaughterMom[1]); 
 	products->PushProducts(Daughter1);
 	products->PushProducts(Daughter2);
+//	G4cout<<"Debug:: "<<*parent_name<<"Decaying..."<<G4endl;
+//	G4cout<<"Debug:: Daughter1 = "<<*daughters_name[0]<<" CMMom = "<<Form("(%g,%g,%g)",DaughterMom[0].x(),DaughterMom[0].y(),DaughterMom[0].z())<<G4endl;
 	return products;
 }
 void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
@@ -94,6 +113,7 @@ void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
 	Polarization = gTrackBuffer.GetPolarization(order); 
 	MomVector = gTrackBuffer.GetMomentum(order);
 //	G4cout<<*parent_name<<" Polarization P = "<<Polarization<<G4endl;
+//	G4cout<<"Debug:: "<<*parent_name<<" Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
 	if(abs(Polarization) >1.01 or isnan(Polarization)){
 		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
 		Polarization = 0;
@@ -111,11 +131,27 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	gTrackBuffer.SetVertexMomentum(TVDaughter,order+1);		
 	gTrackBuffer.SetLV(LVDaughter,order+1);		
 	gTrackBuffer.SetVertexLV(LVDaughter,order+1);		
+	auto MomOrg = MomD;
 	MomD = MomD*(1./MomD.mag());
 	auto PolM = Polarity*(1./Polarity.mag());
-	auto PxM = PolM.cross(MomD); 
+	auto PxM = MomD.cross(PolM);
+	int nitr=0;
+	while((isnan(PxM.mag()) or PxM.mag()==0) and nitr < 10){
+		G4cout<<"Warning! "<<*parent_name<<" PxM is not set properly! Mom = "<<Form("(%g,%g,%g)",MomOrg.x(),MomOrg.y(),MomOrg.z()) <<" P = "<<Polarity<<G4endl;	
+		G4cout<<"PxM will be randomly set..."<<G4endl;
+		double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+		double theta = acos(G4RandFlat::shoot(-1,1));
+		auto RandDir = G4ThreeVector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
+		PxM = -MomD.cross(RandDir);
+		nitr++;
+	}
+	if(nitr >= 10){
+		G4cout<<"Warning! "<<*parent_name<<" PxM is not set properly! Mom = "<<Form("(%g,%g,%g)",MomOrg.x(),MomOrg.y(),MomOrg.z()) <<" P = "<<Polarity<<G4endl;
+	}
+	PxM = PxM*(1./PxM.mag());
 	auto MxPxM =MomD.cross(PxM);
 	auto SpinDaughter =( (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM) * 1./(1 + Alpha * Polarization * cos(Theta));
+	auto SpinDaughter_org = SpinDaughter;
 	auto PolDaughter = SpinDaughter.mag();
 	SpinDaughter = SpinDaughter*(1./SpinDaughter.mag());
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
@@ -165,6 +201,7 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 		G4ThreeVector Vtx(Vpx,Vpy,Vpz);
 
 		G4cout<<"Warning! Unphysical Polarization "<<*parent_name<<G4endl;
+		G4cout<<Form("Polarity : (%g,%g,%g)",Polarity.x(),Polarity.y(),Polarity.z())<<G4endl;
 		G4cout<<Form("PKm=(%g,%g,%g)",TVKm.x(),TVKm.y(),TVKm.z())<<G4endl;
 		G4cout<<Form("PKp=(%g,%g,%g)",TVKp.x(),TVKp.y(),TVKp.z())<<G4endl;
 		G4cout<<Form("ProdVert=(%g,%g,%g)",Vtx.x(),Vtx.y(),Vtx.z())<<G4endl;

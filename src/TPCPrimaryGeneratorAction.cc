@@ -141,7 +141,8 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 		}
     else if (gBeam.IsReconXi()){
       G4int eventID = anEvent->GetEventID();
-      *m_mm_vert = gBeam.GetVertex(eventID);
+//      *m_mm_vert = gBeam.GetVertex(eventID);
+      *m_mm_vert = gBeam.GetVertex();
     }
     else if (gBeam.IsKpUniform()){
     }
@@ -5249,6 +5250,7 @@ TPCPrimaryGeneratorAction::GeneratePPBar2Phi(G4Event* anEvent){
 	G4double KaonMass = m_KaonMinus->GetPDGMass();
 	G4double ProtonMass = m_Proton->GetPDGMass();
 	G4double NeutronMass = m_Neutron->GetPDGMass();
+  G4double PionZeroMass = m_PionZero->GetPDGMass(); 
 	G4double PhiMass = m_Phi->GetPDGMass();
 	G4double DeuteronMass = 1875.612942;
 	G4double dx = G4RandFlat::shoot(-15,15);
@@ -5263,6 +5265,7 @@ TPCPrimaryGeneratorAction::GeneratePPBar2Phi(G4Event* anEvent){
 	G4double Mass2PiPP[4] = {PionMass,PionMass,ProtonMass,ProtonMass};
 	G4double Mass2PiPhi[3] = {PhiMass,PionMass,PionMass};
 	G4double Mass2Pi2K[4] = {PionMass,PionMass,KaonMass,KaonMass};
+  G4double Mass5Pi[5] = {PionMass,PionMass,PionMass,PionMass,PionZeroMass};  
 	if(target_material == "LH2"){
 		LV_target = TLorentzVector(0,0,0,ProtonMass); 
 		auto LV_Vert = LV_beam + LV_target;
@@ -5441,6 +5444,56 @@ TPCPrimaryGeneratorAction::GeneratePPBar2Phi(G4Event* anEvent){
   		m_particle_gun->SetParticleEnergy( LVKP.E()-KaonMass );
 			m_particle_gun->GeneratePrimaryVertex( anEvent );
 		}
+    else if (EvConf == 6){
+      PBarP.SetDecay(LV_Vert, 5,Mass5Pi);
+      PBarP.Generate();
+  
+      auto LVPiM1 = *PBarP.GetDecay(0);
+      auto TVPiM1 = LVPiM1.Vect();
+      G4ThreeVector PPiM1(TVPiM1.x(),TVPiM1.y(),TVPiM1.z());
+      m_particle_gun->SetParticleDefinition( m_PionMinus );
+      m_particle_gun->SetParticlePosition( GenPos );
+      m_particle_gun->SetParticleMomentumDirection( PPiM1 );
+      m_particle_gun->SetParticleEnergy( LVPiM1.E()-PionMass );
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+      auto LVPiP1 = *PBarP.GetDecay(1);
+      auto TVPiP1 = LVPiP1.Vect();
+      G4ThreeVector PPiP1(TVPiP1.x(),TVPiP1.y(),TVPiP1.z());
+      m_particle_gun->SetParticleDefinition( m_PionPlus );
+      m_particle_gun->SetParticlePosition( GenPos );
+      m_particle_gun->SetParticleMomentumDirection( PPiP1 );
+      m_particle_gun->SetParticleEnergy( LVPiP1.E() -PionMass);
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
+      
+      auto LVPiM2 = *PBarP.GetDecay(2);
+      auto TVPiM2 = LVPiM2.Vect();
+      G4ThreeVector PPiM2(TVPiM2.x(),TVPiM2.y(),TVPiM2.z());
+      m_particle_gun->SetParticleDefinition( m_PionMinus );
+      m_particle_gun->SetParticlePosition( GenPos );
+      m_particle_gun->SetParticleMomentumDirection( PPiM2 );
+      m_particle_gun->SetParticleEnergy( LVPiM2.E() -PionMass);
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+      auto LVPiP2 = *PBarP.GetDecay(3);
+      auto TVPiP2 = LVPiP2.Vect();
+      G4ThreeVector PPiP2(TVPiP2.x(),TVPiP2.y(),TVPiP2.z()); 
+      m_particle_gun->SetParticleDefinition( m_PionPlus );
+      m_particle_gun->SetParticlePosition( GenPos );
+      m_particle_gun->SetParticleMomentumDirection( PPiP2 );
+      m_particle_gun->SetParticleEnergy( LVPiP2.E()-PionMass );
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+      auto LVPi0 = *PBarP.GetDecay(4);
+      auto TVPi0 = LVPi0.Vect();
+      G4ThreeVector PPi0(TVPi0.x(),TVPi0.y(),TVPi0.z());
+      m_particle_gun->SetParticleDefinition( m_PionZero );
+      m_particle_gun->SetParticlePosition( GenPos );
+      m_particle_gun->SetParticleMomentumDirection( PPi0 );
+      m_particle_gun->SetParticleEnergy( LVPi0.E()-PionZeroMass );
+      m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+    }
 	}
 	if(target_material == "LD2"){
 		TGenPhaseSpace DPBar;

@@ -20,9 +20,11 @@ private:
   G4String      m_detector_name;
   G4String      m_particle_name;
   G4ThreeVector m_position;
+  G4ThreeVector m_postposition;
   G4ThreeVector m_momentum;
   G4double      m_time;
   G4double      m_energy_deposit;
+  G4int         m_step_id;
   G4int         m_track_id;
   G4int         m_particle_id;
   G4int         m_detector_id;
@@ -34,12 +36,12 @@ private:
   G4ThreeVector m_vertex_position;
   G4ThreeVector m_vertex_momentum;
   G4double      m_vertex_kinetic_energy; // sqrt(p^2+m^2)-m
-
 public:
   void     AddEnergyDeposit( G4double de ){ m_energy_deposit += de; }
   G4String GetDetectorName( void ) const { return m_detector_name; }
   G4String GetParticleName( void ) const { return m_particle_name; }
   const G4ThreeVector& GetPosition( void ) const { return m_position; }
+  const G4ThreeVector& GetPostPosition( void ) const { return m_postposition; }
   const G4ThreeVector& GetMomentum( void ) const { return m_momentum; }
   G4double GetTime( void ) const { return m_time; }
   G4double GetEnergyDeposit( void ) const { return m_energy_deposit; }

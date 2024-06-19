@@ -245,6 +245,9 @@ TPCAnaManager::TPCAnaManager( void )
   TPC_g->Branch( "xTgt", event.xTgt, "xTgt[nhTgt]/D" );
   TPC_g->Branch( "yTgt", event.yTgt, "yTgt[nhTgt]/D" );
   TPC_g->Branch( "zTgt", event.zTgt, "zTgt[nhTgt]/D" );
+  TPC_g->Branch( "xTgtOut", event.xTgtOut, "xTgtOut[nhTgtOut]/D" );
+  TPC_g->Branch( "yTgtOut", event.yTgtOut, "yTgtOut[nhTgtOut]/D" );
+  TPC_g->Branch( "zTgtOut", event.zTgtOut, "zTgtOut[nhTgtOut]/D" );
   TPC_g->Branch( "uTgt", event.uTgt, "uTgt[nhTgt]/D" );
   TPC_g->Branch( "vTgt", event.vTgt, "vTgt[nhTgt]/D" );
   TPC_g->Branch( "vtxTgt", event.vtxTgt, "vtxTgt[nhTgt]/D" );
@@ -1894,7 +1897,7 @@ TPCAnaManager::EndOfEventAction( void )
     TString TargetEdepPath = "TargetEdepPath";
     TString K18HSTgtProfile = "K18HSTgtProfile";
     for(int ih=0;ih<event.nhTgt;++ih){
-      if(event.tidTgt[ih]==1){
+			if(event.tidTgt[ih]==1){
         EdepTgt+=event.EdepTgt[ih];
         PathTgt+=event.PathTgt[ih];
         if(ih==0){
@@ -1906,6 +1909,10 @@ TPCAnaManager::EndOfEventAction( void )
       hmap[TargetEdep]->Fill(EdepTgt);
       hmap[TargetPath]->Fill(PathTgt);
       hmap2d[TargetEdepPath]->Fill(PathTgt,EdepTgt);
+			if(TargetPath<19){
+				for(int ih=0;ih<event.nhTgt;++ih){
+				}
+			}
     }
     TString K18HSBeamProfile = "K18HSBeamProfile";
     for(int ih=0;ih<event.nhTgtVp;++ih){
@@ -2834,6 +2841,9 @@ TPCAnaManager::EndOfEventAction( void )
       event.xTgt[i] = hit->GetPosition().x();
       event.yTgt[i] = hit->GetPosition().y();
       event.zTgt[i] = hit->GetPosition().z();
+      event.xTgtOut[i] = hit->GetPostPosition().x();
+      event.yTgtOut[i] = hit->GetPostPosition().y();
+      event.zTgtOut[i] = hit->GetPostPosition().z();
       event.EdepTgt[i] = hit->GetEnergyDeposit();
       event.PathTgt[i] = hit->GetStepLength();
       auto pTgt = hit->GetMomentum();

@@ -31,11 +31,14 @@ VHitInfo::VHitInfo( const G4String& name, G4Step* step )
   if( step ){
     const auto track = step->GetTrack();
     const auto point = step->GetPreStepPoint();
+    const auto postpoint = step->GetPostStepPoint();
     m_particle_name = track->GetDefinition()->GetParticleName();
     m_position = point->GetPosition();
+    m_postposition = postpoint->GetPosition();
     m_momentum = point->GetMomentum();
     m_time = point->GetGlobalTime();
     m_energy_deposit = step->GetTotalEnergyDeposit();
+    m_step_id = track->GetCurrentStepNumber();
     m_track_id = track->GetTrackID();
     m_particle_id = track->GetDefinition()->GetPDGEncoding();
     m_detector_id = point->GetPhysicalVolume()->GetCopyNo();
@@ -69,6 +72,7 @@ VHitInfo::Print( void ) const
 	 << "   Time                = " << m_time/CLHEP::ns << " ns" << G4endl
 	 << "   EnergyDeposit       = " << m_energy_deposit/CLHEP::MeV
 	 << " MeV" << G4endl
+	 << "   StepID             = " << m_step_id << G4endl
 	 << "   TrackID             = " << m_track_id << G4endl
 	 << "   ParticleID          = " << m_particle_id << G4endl
 	 << "   DetectorID          = " << m_detector_id << G4endl

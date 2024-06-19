@@ -59,7 +59,7 @@ class TPCPolarizedDecayChannel : public G4VDecayChannel
 				G4String Daughter2
 				);
 		void LoadPolarityMomentum();
-		void SavePolarityMomentum(G4ThreeVector MomDauthger);
+		void SavePolarityMomentum(G4ThreeVector MomDauthger);	
 		G4double DaughterMass[2];
 		//		TLorentzVector ToCM(TLorentzVector LV);
 //		TLorentzVector ToLab(TLorentzVector LV);
