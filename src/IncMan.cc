@@ -133,8 +133,19 @@ IncMan::Get( Int_t i ) const
 {
   auto curr_file = gFile;
   m_file->cd();
-  m_tree->GetEntry( i );
-  if( curr_file )
+	bool good = 1;
+	while(1){
+		if(i>=m_n_event)i=0;
+  	m_tree->GetEntry( i );
+  	for(int ip=0;ip<m_event->np;++ip){
+			if(isnan(m_event->px[ip]))good = 0;
+			if(isnan(m_event->py[ip]))good = 0;
+			if(isnan(m_event->pz[ip]))good = 0;
+		}
+		if(good)break;
+		++i;
+	}
+	if( curr_file )
     curr_file->cd();
   return m_event;
 }
