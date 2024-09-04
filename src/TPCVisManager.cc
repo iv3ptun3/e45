@@ -51,7 +51,7 @@
 #endif
 
 #ifdef G4VIS_USE_VRMLFILE
-#include <G4VRML1File.hh>
+// #include <G4VRML1File.hh>
 #include <G4VRML2File.hh>
 #endif
 
@@ -121,7 +121,7 @@ TPCVisManager::RegisterGraphicsSystems( void )
 
 #ifdef G4VIS_USE_VRMLFILE
   G4cout << "*  Visualizaton Driver: VRML1/2 File" << G4endl;
-  RegisterGraphicsSystem( new G4VRML1File );
+  // RegisterGraphicsSystem( new G4VRML1File );
   RegisterGraphicsSystem( new G4VRML2File );
 #endif
 

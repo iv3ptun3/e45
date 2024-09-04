@@ -68,7 +68,7 @@ IncMan::~IncMan( void )
 G4bool
 IncMan::Initialize( void )
 {
-  if( m_file_name.isNull() )
+  if( m_file_name.empty() )
     return true;
 
   m_file = new TFile( m_file_name );
@@ -93,7 +93,7 @@ IncMan::Initialize( void )
   m_tree->SetBranchAddress( "px", m_event->px );
   m_tree->SetBranchAddress( "py", m_event->py );
   m_tree->SetBranchAddress( "pz", m_event->pz );
-  
+
   m_tree->SetBranchStatus( "*", false );
   m_tree->SetBranchStatus( "ich", true );
 
@@ -106,7 +106,7 @@ IncMan::Initialize( void )
   m_tree->SetBranchStatus( "px", true );
   m_tree->SetBranchStatus( "py", true );
   m_tree->SetBranchStatus( "pz", true );
-  
+
   m_n_event = m_tree->GetEntries();
   m_is_ready = true;
   return true;

@@ -35,7 +35,7 @@ namespace{
 	double m2Beam[5];
 	int trigpat[32];
 	int trigflag[32];
-	
+
 	int ntK18,ntKurama;
   TTreeReaderValue<int>* ntTPCK18;
   TTreeReaderValue<int>* ntTPCKurama;
@@ -49,7 +49,7 @@ namespace{
   TTreeReaderValue<vector<double>>* ybTPC=nullptr;
   TTreeReaderValue<vector<double>>* ubTPC=nullptr;
   TTreeReaderValue<vector<double>>* vbTPC=nullptr;
-  
+
   TTreeReaderValue<vector<double>>* xsTPC=nullptr;
   TTreeReaderValue<vector<double>>* ysTPC=nullptr;
   TTreeReaderValue<vector<double>>* usTPC=nullptr;
@@ -72,8 +72,8 @@ namespace{
   TTreeReaderValue<vector<double>>* vtgtTPCKurama=nullptr;
   TTreeReaderValue<vector<double>>* xtgtKurama=nullptr;
   TTreeReaderValue<vector<double>>* ytgtKurama=nullptr;
-  
-// For kurama data  
+
+// For kurama data
   TTreeReaderValue<vector<vector<double>>> *xvpHS = nullptr;
   TTreeReaderValue<vector<vector<double>>> *yvpHS = nullptr;
   TTreeReaderValue<vector<vector<double>>> *zvpHS = nullptr;
@@ -132,7 +132,7 @@ BeamInfo::GetY( G4double offset ) const
 }
 
 //_____________________________________________________________________________
-G4int 
+G4int
 BeamInfo::GetTrigPat(G4int flag) const
 {
 	return trigpat[flag];
@@ -179,9 +179,9 @@ BeamMan::Initialize( void )
   const auto& gGeom = DCGeomMan::GetInstance();
   const G4double p0 = gConf.Get<G4double>( "BeamMom" );
 
-  if( m_file_name.isNull() )
+  if( m_file_name.empty() )
     return true;
-  
+
 	m_param_array.clear();
 	m_mm_array.clear();
   G4int generator = gConf.Get<G4int>( "Generator" );
@@ -261,41 +261,41 @@ BeamMan::Initialize( void )
 		reader = new TTreeReader("tpc",m_file);
 //		tree->SetBranchAddress( "evnum",&evnum);
 //		tree->SetBranchAddress( "runnum",&runnum);
-		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");		
-		isgoodTPCK18 = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCK18");		
-		inside = new TTreeReaderValue<vector<int>>(*reader,"inside"); 
-		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC"); 
-		pHS = new TTreeReaderValue<vector<double>>(*reader,"pK18"); 
-		xbTPC = new TTreeReaderValue<vector<double>>(*reader,"xbTPC"); 
-		ybTPC = new TTreeReaderValue<vector<double>>(*reader,"ybTPC"); 
-		ubTPC = new TTreeReaderValue<vector<double>>(*reader,"ubTPC"); 
-		vbTPC = new TTreeReaderValue<vector<double>>(*reader,"vbTPC"); 
+		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");
+		isgoodTPCK18 = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCK18");
+		inside = new TTreeReaderValue<vector<int>>(*reader,"inside");
+		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC");
+		pHS = new TTreeReaderValue<vector<double>>(*reader,"pK18");
+		xbTPC = new TTreeReaderValue<vector<double>>(*reader,"xbTPC");
+		ybTPC = new TTreeReaderValue<vector<double>>(*reader,"ybTPC");
+		ubTPC = new TTreeReaderValue<vector<double>>(*reader,"ubTPC");
+		vbTPC = new TTreeReaderValue<vector<double>>(*reader,"vbTPC");
 		vtxTPC = new TTreeReaderValue<vector<double>>(*reader,"vtxTPC");
 		vtyTPC = new TTreeReaderValue<vector<double>>(*reader,"vtyTPC");
 		vtzTPC = new TTreeReaderValue<vector<double>>(*reader,"vtzTPC");
 
 
-		
+
 //		tree->SetBranchAddress("ntKurama",&ntKurama);
-		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");		
-		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");		
-		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC"); 
-		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
-		xsTPC = new TTreeReaderValue<vector<double>>(*reader,"xsTPC"); 
-		ysTPC = new TTreeReaderValue<vector<double>>(*reader,"ysTPC"); 
-		usTPC = new TTreeReaderValue<vector<double>>(*reader,"usTPC"); 
-		vsTPC = new TTreeReaderValue<vector<double>>(*reader,"vsTPC"); 
-		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama"); 
-		
-// For kurama data  
+		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");
+		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");
+		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC");
+		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama");
+		xsTPC = new TTreeReaderValue<vector<double>>(*reader,"xsTPC");
+		ysTPC = new TTreeReaderValue<vector<double>>(*reader,"ysTPC");
+		usTPC = new TTreeReaderValue<vector<double>>(*reader,"usTPC");
+		vsTPC = new TTreeReaderValue<vector<double>>(*reader,"vsTPC");
+		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama");
+
+// For kurama data
 		p_3rd = new TTreeReaderValue<vector<double>>(*reader,"p_3rd");
 		xoutK18 = new TTreeReaderValue<vector<double>>(*reader,"xoutK18");
 		youtK18 = new TTreeReaderValue<vector<double>>(*reader,"youtK18");
 		uoutK18 = new TTreeReaderValue<vector<double>>(*reader,"uoutK18");
 		voutK18 = new TTreeReaderValue<vector<double>>(*reader,"voutK18");
-		xvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpHS"); 
-		yvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpHS"); 
-		zvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpHS"); 
+		xvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpHS");
+		yvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpHS");
+		zvpHS = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpHS");
 		xtgtHS = new TTreeReaderValue<vector<double>>(*reader,"xtgtHS");
 		ytgtHS = new TTreeReaderValue<vector<double>>(*reader,"ytgtHS");
 		ztgtHS = new TTreeReaderValue<vector<double>>(*reader,"ztgtHS");
@@ -303,45 +303,45 @@ BeamMan::Initialize( void )
 		wireK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"wireK18");
 		localhitposK18 = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitposK18");
 
-		xvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpKurama"); 
-		yvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpKurama"); 
-		zvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpKurama"); 
+		xvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"xvpKurama");
+		yvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"yvpKurama");
+		zvpKurama = new TTreeReaderValue<vector<vector<double>>>(*reader,"zvpKurama");
 		xtgtKurama = new TTreeReaderValue<vector<double>>(*reader,"xtgtKurama");
 		ytgtKurama = new TTreeReaderValue<vector<double>>(*reader,"ytgtKurama");
-		xout_ = new TTreeReaderValue<vector<double>>(*reader,"xout"); 
-		yout_ = new TTreeReaderValue<vector<double>>(*reader,"yout"); 
-		zout_ = new TTreeReaderValue<vector<double>>(*reader,"zout"); 
-		pxout = new TTreeReaderValue<vector<double>>(*reader,"pxout"); 
-		pyout = new TTreeReaderValue<vector<double>>(*reader,"pyout"); 
-		pzout = new TTreeReaderValue<vector<double>>(*reader,"pzout"); 
-		layer = new TTreeReaderValue<vector<vector<double>>>(*reader,"layer"); 
-		wire = new TTreeReaderValue<vector<vector<double>>>(*reader,"wire"); 
-		localhitpos = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitpos"); 
-		
+		xout_ = new TTreeReaderValue<vector<double>>(*reader,"xout");
+		yout_ = new TTreeReaderValue<vector<double>>(*reader,"yout");
+		zout_ = new TTreeReaderValue<vector<double>>(*reader,"zout");
+		pxout = new TTreeReaderValue<vector<double>>(*reader,"pxout");
+		pyout = new TTreeReaderValue<vector<double>>(*reader,"pyout");
+		pzout = new TTreeReaderValue<vector<double>>(*reader,"pzout");
+		layer = new TTreeReaderValue<vector<vector<double>>>(*reader,"layer");
+		wire = new TTreeReaderValue<vector<vector<double>>>(*reader,"wire");
+		localhitpos = new TTreeReaderValue<vector<vector<double>>>(*reader,"localhitpos");
+
 	}
 	else if(m_is_TPCXi){
 		reader = new TTreeReader("tpc",m_file);
 
-		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");		
+		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");
 		pHS = new TTreeReaderValue<vector<double>>(*reader,"pK18");
-		xbTPC = new TTreeReaderValue<vector<double>>(*reader,"xtgtK18");	
+		xbTPC = new TTreeReaderValue<vector<double>>(*reader,"xtgtK18");
 		ybTPC = new TTreeReaderValue<vector<double>>(*reader,"ytgtK18");
 		ubTPC = new TTreeReaderValue<vector<double>>(*reader,"utgtK18");
 		vbTPC = new TTreeReaderValue<vector<double>>(*reader,"vtgtK18");
 
-		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");		
-		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");		
-		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC"); 
-		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama"); 
-		xsTPC = new TTreeReaderValue<vector<double>>(*reader,"xtgtTPCKurama"); 
-		ysTPC = new TTreeReaderValue<vector<double>>(*reader,"ytgtTPCKurama");	
-		usTPC = new TTreeReaderValue<vector<double>>(*reader,"utgtTPCKurama");	
-		vsTPC = new TTreeReaderValue<vector<double>>(*reader,"vtgtTPCKurama");	
-		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama"); 
-		
-		
-		inside = new TTreeReaderValue<vector<int>>(*reader,"insideTPC"); 
-		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC"); 
+		ntTPCKurama = new TTreeReaderValue<int>(*reader,"ntKurama");
+		isgoodTPCKurama = new TTreeReaderValue<vector<int>>(*reader,"isgoodTPCKurama");
+		pTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"pCorrDETPC");
+		qTPCKurama = new TTreeReaderValue<vector<double>>(*reader,"qTPCKurama");
+		xsTPC = new TTreeReaderValue<vector<double>>(*reader,"xtgtTPCKurama");
+		ysTPC = new TTreeReaderValue<vector<double>>(*reader,"ytgtTPCKurama");
+		usTPC = new TTreeReaderValue<vector<double>>(*reader,"utgtTPCKurama");
+		vsTPC = new TTreeReaderValue<vector<double>>(*reader,"vtgtTPCKurama");
+		m2TPCKurama = new TTreeReaderValue<vector<double>>(*reader,"m2TPCKurama");
+
+
+		inside = new TTreeReaderValue<vector<int>>(*reader,"insideTPC");
+		MissMass = new TTreeReaderValue<vector<double>>(*reader,"MissMassCorrDETPC");
 		vtxTPC = new TTreeReaderValue<vector<double>>(*reader,"vtxTPC");
 		vtyTPC = new TTreeReaderValue<vector<double>>(*reader,"vtyTPC");
 		vtzTPC = new TTreeReaderValue<vector<double>>(*reader,"vtzTPC");
@@ -387,7 +387,7 @@ BeamMan::Initialize( void )
 			for(int it=0;it<ntBeam;++it){
 				beam.x = xout[0];
 				beam.y = yout[0];
-				beam.u = uout[0];// u,v definition = dxdz,dydz, not mrad. 
+				beam.u = uout[0];// u,v definition = dxdz,dydz, not mrad.
 				beam.v = yout[0];
 				double pz = pBeam[0] / sqrt(uout[0]*uout[0]+vout[0]*vout[0]+1);
 				beam.p.set(pz * uout[0],pz* vout[0], pz);
@@ -426,7 +426,7 @@ BeamMan::Initialize( void )
 				double qKp = (*qTPCKurama)->at(itkurama);
 				double m2Kp = (*m2TPCKurama)->at(itkurama);
 				double pKp = (*pTPCKurama)->at(itkurama);
-				
+
 				double us = (*usTPC)->at(itkurama);
 				double vs = (*vsTPC)->at(itkurama);
 				double ns = hypot(hypot(1,us),vs);
@@ -444,44 +444,44 @@ BeamMan::Initialize( void )
 					MMVert.Moms.push_back(TVKp);
 					MMVert.Moms.push_back(TVKm-TVKp);
 
-					//					vector<double>& xoutk18 = *(xoutK18->Get()); 
+					//					vector<double>& xoutk18 = *(xoutK18->Get());
 					MMVert.p_3rd = *(p_3rd->Get());
 					MMVert.xoutK18 = *(xoutK18->Get());
 					MMVert.youtK18 = *(youtK18->Get());
 					MMVert.uoutK18 = *(uoutK18->Get());
-					MMVert.voutK18 = *(voutK18->Get());	
-					MMVert.xvpHS = *(xvpHS->Get());	
-					MMVert.yvpHS = *(yvpHS->Get());	
-					MMVert.zvpHS = *(zvpHS->Get());	
-					MMVert.xtgtHS = *(xtgtHS->Get());	
-					MMVert.ytgtHS = *(ytgtHS->Get());	
-					MMVert.ztgtHS = *(ztgtHS->Get());	
-					MMVert.layerK18 = *(layerK18->Get());	
-					MMVert.wireK18 = *(wireK18->Get());	
-					MMVert.localhitposK18 = *(localhitposK18->Get());	
-					
-					
-					MMVert.xvpKurama = *(xvpKurama->Get());	
-					MMVert.yvpKurama = *(yvpKurama->Get());	
-					MMVert.zvpKurama = *(zvpKurama->Get());	
-					MMVert.xtgtKurama = *(xtgtKurama->Get());	
-					MMVert.ytgtKurama = *(ytgtKurama->Get());	
-					
-					MMVert.xoutK18 = *(xoutK18->Get());	
-					MMVert.youtK18 = *(youtK18->Get());	
-					MMVert.uoutK18 = *(uoutK18->Get());	
-					MMVert.voutK18 = *(voutK18->Get());	
-					MMVert.xout = *(xout_->Get());	
-					MMVert.yout = *(yout_->Get());	
-					MMVert.zout = *(zout_->Get());	
-					MMVert.pxout = *(pxout->Get());	
-					MMVert.pyout = *(pyout->Get());	
-					MMVert.pzout = *(pzout->Get());	
-					MMVert.layer = *(layer->Get());	
-					MMVert.wire = *(wire->Get());	
-					MMVert.localhitpos = *(localhitpos->Get());	
-					
-					m_mm_array.push_back(MMVert);		
+					MMVert.voutK18 = *(voutK18->Get());
+					MMVert.xvpHS = *(xvpHS->Get());
+					MMVert.yvpHS = *(yvpHS->Get());
+					MMVert.zvpHS = *(zvpHS->Get());
+					MMVert.xtgtHS = *(xtgtHS->Get());
+					MMVert.ytgtHS = *(ytgtHS->Get());
+					MMVert.ztgtHS = *(ztgtHS->Get());
+					MMVert.layerK18 = *(layerK18->Get());
+					MMVert.wireK18 = *(wireK18->Get());
+					MMVert.localhitposK18 = *(localhitposK18->Get());
+
+
+					MMVert.xvpKurama = *(xvpKurama->Get());
+					MMVert.yvpKurama = *(yvpKurama->Get());
+					MMVert.zvpKurama = *(zvpKurama->Get());
+					MMVert.xtgtKurama = *(xtgtKurama->Get());
+					MMVert.ytgtKurama = *(ytgtKurama->Get());
+
+					MMVert.xoutK18 = *(xoutK18->Get());
+					MMVert.youtK18 = *(youtK18->Get());
+					MMVert.uoutK18 = *(uoutK18->Get());
+					MMVert.voutK18 = *(voutK18->Get());
+					MMVert.xout = *(xout_->Get());
+					MMVert.yout = *(yout_->Get());
+					MMVert.zout = *(zout_->Get());
+					MMVert.pxout = *(pxout->Get());
+					MMVert.pyout = *(pyout->Get());
+					MMVert.pzout = *(pzout->Get());
+					MMVert.layer = *(layer->Get());
+					MMVert.wire = *(wire->Get());
+					MMVert.localhitpos = *(localhitpos->Get());
+
+					m_mm_array.push_back(MMVert);
 				}
 			}
 			}
@@ -505,7 +505,7 @@ BeamMan::Initialize( void )
 				double qKp = (*qTPCKurama)->at(itkurama);
 				double m2Kp = (*m2TPCKurama)->at(itkurama);
 				double pKp = (*pTPCKurama)->at(itkurama);
-				
+
 				double us = (*usTPC)->at(itkurama);
 				double vs = (*vsTPC)->at(itkurama);
 				double ns = hypot(hypot(1,us),vs);
@@ -524,8 +524,8 @@ BeamMan::Initialize( void )
 					MMVert.x = **xiprodvtx_x;
 					MMVert.y = **xiprodvtx_y;
 					MMVert.z = **xiprodvtx_z+6;
-					
-					if(abs(MMVert.x)> 15 or abs(MMVert.y)>10 or abs(MMVert.z+143)>10) continue;	
+
+					if(abs(MMVert.x)> 15 or abs(MMVert.y)>10 or abs(MMVert.z+143)>10) continue;
 					MMVert.xtgtHS = (*xbTPC->Get());
 					MMVert.ytgtHS = (*ybTPC->Get());
 					MMVert.xtgtKurama = (*xsTPC->Get());
@@ -534,10 +534,10 @@ BeamMan::Initialize( void )
 					MMVert.ntKurama = ntKurama;
 					MMVert.Moms.push_back(TVKm);
 					MMVert.Moms.push_back(TVKp);
-					G4ThreeVector TVXi(PxXi,PyXi,PzXi);	
+					G4ThreeVector TVXi(PxXi,PyXi,PzXi);
 	//				TVXi = TVXi*0.1;
 					MMVert.Moms.push_back(TVXi);
-					m_mm_array.push_back(MMVert);		
+					m_mm_array.push_back(MMVert);
 				}
 			}
 		}
@@ -590,14 +590,14 @@ BeamMan::Get( G4int iev ) const
 const MMVertex&
 BeamMan::GetVertex( void ) const
 {
- 	int nev = m_mm_array.size(); 
+ 	int nev = m_mm_array.size();
 	return m_mm_array.at( G4RandFlat::shootInt( nev ) );
 }
 
 const MMVertex&
 BeamMan::GetVertex( G4int iev ) const
 {
- 	int nev = m_mm_array.size(); 
+ 	int nev = m_mm_array.size();
 	return m_mm_array.at( iev%nev );
 }
 
