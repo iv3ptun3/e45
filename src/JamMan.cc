@@ -61,7 +61,7 @@ JamMan::~JamMan( void )
 G4bool
 JamMan::Initialize( void )
 {
-  if( m_file_name.isNull() )
+  if( m_file_name.empty() )
     return true;
 
   m_file = new TFile( m_file_name );

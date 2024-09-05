@@ -66,7 +66,7 @@ ConfMan::Initialize( void )
     std::istringstream iss( line );
     G4String key, val;
     iss >> key >> val;
-    if( key.isNull() || val.isNull() )
+    if( key.empty() || val.empty() )
       continue;
     G4cout << " key = "   << std::setw(20) << std::left << key
 	   << " value = " << std::setw(30) << std::left << val

@@ -6,7 +6,6 @@
 
 #include <G4Run.hh>
 #include <G4RunManager.hh>
-#include <G4RunMessenger.hh>
 #include <G4StateManager.hh>
 #include <G4Timer.hh>
 #include <G4UIterminal.hh>
