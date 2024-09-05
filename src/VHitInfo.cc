@@ -38,6 +38,7 @@ VHitInfo::VHitInfo( const G4String& name, G4Step* step )
     m_momentum = point->GetMomentum();
     m_time = point->GetGlobalTime();
     m_energy_deposit = step->GetTotalEnergyDeposit();
+    m_kinetic_energy = point->GetKineticEnergy();
     m_step_id = track->GetCurrentStepNumber();
     m_track_id = track->GetTrackID();
     m_particle_id = track->GetDefinition()->GetPDGEncoding();

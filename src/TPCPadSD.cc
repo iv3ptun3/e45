@@ -20,10 +20,12 @@
 #include "FuncName.hh"
 #include "TPCPadHit.hh"
 #include "padHelper.hh"
+#include "DCGeomMan.hh"
 
 namespace
 {
   const auto& gConf = ConfMan::GetInstance();
+  const auto& gGeom = DCGeomMan::GetInstance();
 }
 
 //_____________________________________________________________________________
@@ -33,8 +35,11 @@ TPCPadSD::TPCPadSD( const G4String& name )
     m_gem_fix_dead( gConf.Get<G4int>( "GemFixDead" ) ),
     m_gem_dead_plane( gConf.Get<G4int>( "GemDeadPlane" ) ),
     m_gem_dead_plane_division( gConf.Get<G4int>( "GemDeadPlaneDivision" ) ),
-    m_dead_area( gConf.Get<G4double>( "DeadArea" ) )
+    m_dead_area( gConf.Get<G4double>( "DeadArea" ) ),
+	m_target_z( gGeom.GetLocalZ("SHSTarget") ),
+	m_center_z( gGeom.GetLocalZ("SHSTarget") )
 {
+  const auto& gGeom = DCGeomMan::GetInstance();
   collectionName.insert("hit");
   G4cout << FUNC_NAME << G4endl
 	 << "   Study on GEM discharge = " << m_gem_discharge << G4endl;
@@ -92,7 +97,6 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   const G4StepPoint* preStepPoint= aStep-> GetPreStepPoint();
   const G4Track* aTrack = aStep->GetTrack();
   G4int copyNo = preStepPoint -> GetPhysicalVolume()->GetCopyNo();
-
   if(preStepPoint-> GetStepStatus() != fGeomBoundary) return false;
   //  if(preStepPoint-> GetStepStatus() == fGeomBoundary){
   G4String particleName;
@@ -115,6 +119,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
     = (G4TouchableHistory*)(aStep->GetPreStepPoint()->GetTouchable());
   G4ThreeVector pos= preStepPoint-> GetPosition();
   G4double hitx=pos.getX();
+  G4double hity=pos.getY();
   G4double hitz=pos.getZ();
 
   //dead layer cross x and z
@@ -134,7 +139,9 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   if(hitx < (hitz+deadlayer) && hitx > (hitz-deadlayer  ))    return false;
   if(hitx < (-hitz+deadlayer) && hitx > (-hitz-deadlayer  ))    return false;
   //////////end dead layer
-
+  //TargetHolder
+	if(hity > - 30 and abs(hitx )< 15.1 and abs(hitz -m_target_z + 6) < 10.1 ) return false;//Target Holder. A bit smaller than real, since patricles that did not pass through pad center can also make hits. 
+	//6mm Offset given...
   if( m_gem_discharge > 0 ){
     if( m_gem_discharge == 1 ){
       if(num_plane==1){
@@ -393,7 +400,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   G4int iRow= padHelper::getRowID(iPad);
   
 	G4double PadLen = padHelper::getLength(iLay);
-	G4ThreeVector PadPos(hitx,0,hitz + 143); 
+	G4ThreeVector PadPos(hitx,0,hitz - m_center_z); 
 	G4ThreeVector MomT(mom.x(),0,mom.z());	
 	G4double alpha = PadPos.theta()-MomT.theta();
 	G4double PathT = PadLen * 1./cos(alpha);
@@ -412,7 +419,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 #ifdef DEBUG
   
   //for test 
-  G4double radius = sqrt( hitx*hitx + (hitz+143.)*(hitz+143.));
+  G4double radius = sqrt( hitx*hitx + (hitz-m_center_z.)*(hitz-m_center_z));
   TVector3 Point = padHelper::getPoint(iPad);
   G4int iPad_re = padHelper::findPadID(Point.z(), Point.x());
   G4cout<<"hitx = "<< hitx

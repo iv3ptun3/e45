@@ -685,6 +685,13 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 
 	key = "K18HSBeamProfile";
 	hmap2d[key] = new TH2D( key, key, 1000, -350.0, 350.0 ,1000,-150,150);
+	
+	key = "K18HSScatXYProfile";
+	hmap2d[key] = new TH2D( key, key, 1000, -1e-1, 1e-1 ,1000,-1e-1,1e-1);
+	
+	key = "K18HSScatUVProfile";
+	hmap2d[key] = new TH2D( key, key, 1000, -1e-1, 1e-1 ,1000,-1e-1,1e-1);
+
 
 	key = "TargetEdep";
 	hmap[key] = new TH1D(key,key,1000,0,20);
@@ -693,7 +700,12 @@ TPCAnaManager::BeginOfRunAction( G4int /* runnum */ )
 	hmap[key] = new TH1D(key,key,1000,0,25);
 
 	key = "TargetEdepPath";
-	hmap2d[key] = new TH2D(key,key,1000,0,25,1000,0,20);
+	hmap2d[key] = new TH2D(key,key,1000,0,25,1000,0,50);
+
+	for(int i=0;i<5;i++){
+		key = Form("TargetMomEdep_Path_%d_%d",i*4,(i+1)*4);
+		hmap2d[key] = new TH2D(key,key,100,0,2,500,0,50);
+	}
 }
 
 //_____________________________________________________________________________
@@ -764,6 +776,12 @@ TPCAnaManager::BeginOfEventAction( void )
 		event.xTgt[i] = -9999.;
 		event.yTgt[i] = -9999.;
 		event.zTgt[i] = -9999.;
+		event.pxTgt[i] = -9999.;
+		event.pyTgt[i] = -9999.;
+		event.pzTgt[i] = -9999.;
+		event.xTgtOut[i] = -9999.;
+		event.yTgtOut[i] = -9999.;
+		event.zTgtOut[i] = -9999.;
 		event.uTgt[i] = -9999.;
 		event.vTgt[i] = -9999.;
 		event.vtxTgt[i] = -9999.;
@@ -923,10 +941,17 @@ TPCAnaManager::BeginOfEventAction( void )
 		event.xTgtVp[i] = -9999;
 		event.yTgtVp[i] = -9999;
 		event.zTgtVp[i] = -9999;
+		event.eTgtVp[i] = -9999;
 		event.pxTgtVp[i] = -9999;
 		event.pyTgtVp[i] = -9999;
 		event.pzTgtVp[i] = -9999;
-
+		event.xTgtVtxVp[i] = -9999;
+		event.yTgtVtxVp[i] = -9999;
+		event.zTgtVtxVp[i] = -9999;
+		event.eTgtVtxVp[i] = -9999;
+		event.pxTgtVtxVp[i] = -9999;
+		event.pyTgtVtxVp[i] = -9999;
+		event.pzTgtVtxVp[i] = -9999;
 
 		// VP
 		event.tidVp[i] = -9999;
@@ -1262,11 +1287,33 @@ TPCAnaManager::EndOfEventAction( void )
 				for(int ih=0;ih<event.nhTgt;++ih){
 				}
 			}
+			
 		}
 		TString K18HSBeamProfile = "K18HSBeamProfile";
+		TString K18HSScatXYProfile = "K18HSScatXYProfile";
+		TString K18HSScatUVProfile = "K18HSScatUVProfile";
 		for(int ih=0;ih<event.nhTgtVp;++ih){
 			if(event.tidTgtVp[ih]==1 and ih == 0){
 				hmap2d[K18HSBeamProfile]->Fill(event.xTgtVp[ih],event.yTgtVp[ih]);
+			}
+			if(event.tidTgtVp[ih]==1 and  event.zTgtVp[ih]> -143){
+				hmap2d[K18HSScatXYProfile]->Fill(event.xTgtVp[ih],event.yTgtVp[ih]);
+				G4ThreeVector VtxMom(event.pxTgtVtxVp[ih],event.pyTgtVtxVp[ih],event.pzTgtVtxVp[ih]);//MeV unit
+				G4ThreeVector VpMom(event.pxTgtVp[ih],event.pyTgtVp[ih],event.pzTgtVp[ih]);//MeV unit
+				double u = VpMom.unit().x();
+				double v = VpMom.unit().y();
+				hmap2d[K18HSScatUVProfile]->Fill(u,v);
+
+				auto Ke0 = event.eTgtVtxVp[ih];
+				auto Ke = event.eTgtVp[ih];
+				double dE = Ke0 - Ke;
+				G4ThreeVector Pos0(event.xTgtVp[ih],event.yTgtVp[ih],event.zTgtVp[ih]);
+				G4ThreeVector Pos(event.xTgtVtxVp[ih],event.yTgtVtxVp[ih],event.zTgtVtxVp[ih]);
+				double dL = (Pos-Pos0).mag();
+				int iL = dL / 4;
+				if(iL > 4) iL = 4;	
+				TString key = Form("TargetMomEdep_Path_%d_%d",4*iL,4*(iL+1));
+				hmap2d[key]->Fill(VpMom.mag()*0.001, dE);
 			}
 		}
 
@@ -1277,6 +1324,7 @@ TPCAnaManager::EndOfEventAction( void )
 	}
 	else{
 		TPC_g->Fill();
+		if(event.evnum %100==0) TPC_g->Write("",TObject::kOverwrite);
 		event.Clear();
 	}
 	event.pb->SetXYZ( 0., 0., 0. );
@@ -1935,9 +1983,17 @@ TPCAnaManager::SetTargetVPData( const VHitInfo* hit)
 		event.xTgtVp[i] = hit->GetPosition().x();
 		event.yTgtVp[i] = hit->GetPosition().y();
 		event.zTgtVp[i] = hit->GetPosition().z();
+		event.eTgtVp[i] = hit->GetKineticEnergy();
 		event.pxTgtVp[i] = hit->GetMomentum().x();
 		event.pyTgtVp[i] = hit->GetMomentum().y();
 		event.pzTgtVp[i] = hit->GetMomentum().z();
+		event.xTgtVtxVp[i] = hit->GetVertexPosition().x();
+		event.yTgtVtxVp[i] = hit->GetVertexPosition().y();
+		event.zTgtVtxVp[i] = hit->GetVertexPosition().z();
+		event.eTgtVtxVp[i] = hit->GetVertexKineticEnergy();
+		event.pxTgtVtxVp[i] = hit->GetVertexMomentum().x();
+		event.pyTgtVtxVp[i] = hit->GetVertexMomentum().y();
+		event.pzTgtVtxVp[i] = hit->GetVertexMomentum().z();
 		event.nhTgtVp++;
 	}
 }
@@ -2190,6 +2246,9 @@ TPCAnaManager::SetTargetData( const VHitInfo* hit )
 		event.xTgt[i] = hit->GetPosition().x();
 		event.yTgt[i] = hit->GetPosition().y();
 		event.zTgt[i] = hit->GetPosition().z();
+		event.pxTgt[i] = hit->GetMomentum().x();
+		event.pyTgt[i] = hit->GetMomentum().y();
+		event.pzTgt[i] = hit->GetMomentum().z();
 		event.xTgtOut[i] = hit->GetPostPosition().x();
 		event.yTgtOut[i] = hit->GetPostPosition().y();
 		event.zTgtOut[i] = hit->GetPostPosition().z();
@@ -2355,11 +2414,16 @@ void initTrack_ku(Track* tracks){
 
 void TPCAnaManager::SetMMVertex(MMVertex* vert){
 	event.ntK18 = vert->ntK18;
+	event.xtgtHS = vert->xtgtHS;
+	event.ytgtHS = vert->ytgtHS;
+	event.ntKurama = vert->ntKurama;
+	event.xtgtKurama = vert->xtgtKurama;
+	event.ytgtKurama = vert->ytgtKurama;
+	
+#if 0
 	event.xvpHS = vert->xvpHS;
 	event.yvpHS = vert->yvpHS;
 	event.zvpHS = vert->zvpHS;
-	event.xtgtHS = vert->xtgtHS;
-	event.ytgtHS = vert->ytgtHS;
 	event.ztgtHS = vert->ztgtHS;
 	event.xoutK18 = vert->xoutK18;
 	event.youtK18 = vert->youtK18;
@@ -2369,12 +2433,9 @@ void TPCAnaManager::SetMMVertex(MMVertex* vert){
 	event.layerK18 = vert->layerK18;
 	event.wireK18 = vert->wireK18;
 	event.localhitposK18 = vert->localhitposK18;
-	event.ntKurama = vert->ntKurama;
 	event.xvpKurama = vert->xvpKurama;
 	event.yvpKurama = vert->yvpKurama;
 	event.zvpKurama = vert->zvpKurama;
-	event.xtgtKurama = vert->xtgtKurama;
-	event.ytgtKurama = vert->ytgtKurama;
 	event.xout = vert->xout;
 	event.yout = vert->yout;
 	event.zout = vert->zout;
@@ -2384,6 +2445,7 @@ void TPCAnaManager::SetMMVertex(MMVertex* vert){
 	event.layer = vert->layer;
 	event.wire = vert->wire;
 	event.localhitpos = vert->localhitpos;
+#endif
 }
 /*************************************
  *************************************/

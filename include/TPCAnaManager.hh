@@ -302,6 +302,9 @@ struct Event
   Double_t xTgt[MaxHits];
   Double_t yTgt[MaxHits];
   Double_t zTgt[MaxHits];
+  Double_t pxTgt[MaxHits];
+  Double_t pyTgt[MaxHits];
+  Double_t pzTgt[MaxHits];
   Double_t xTgtOut[MaxHits];
   Double_t yTgtOut[MaxHits];
   Double_t zTgtOut[MaxHits];
@@ -496,7 +499,15 @@ struct Event
   Double_t pxTgtVp[MaxHits];
   Double_t pyTgtVp[MaxHits];
   Double_t pzTgtVp[MaxHits];
-	
+  Double_t eTgtVp[MaxHits];
+  Double_t xTgtVtxVp[MaxHits];
+  Double_t yTgtVtxVp[MaxHits];
+  Double_t zTgtVtxVp[MaxHits];
+  Double_t pxTgtVtxVp[MaxHits];
+  Double_t pyTgtVtxVp[MaxHits];
+  Double_t pzTgtVtxVp[MaxHits];
+  Double_t eTgtVtxVp[MaxHits];
+
 	// VP
   Int_t nhVp;
   Int_t tidVp[MaxHits];

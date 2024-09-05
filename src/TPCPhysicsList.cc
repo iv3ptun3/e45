@@ -37,9 +37,9 @@
 #include <G4IonPhysics.hh>
 #include <G4NeutronTrackingCut.hh>
 #include <G4HadronPhysicsQGSP_BERT.hh>
+#include <G4StepLimiter.hh>
 #include "G4XiMinus.hh"
 #include "ConfMan.hh"
-
 namespace
 {
   using CLHEP::eplus;
@@ -208,6 +208,7 @@ TPCPhysicsList::ConstructGeneral( void )
   auto theParticleIterator = GetParticleIterator();
   theParticleIterator->reset();
   auto theDecayProcess = new G4Decay;
+  G4StepLimiter* stepLimiter = new G4StepLimiter();
   while( (*theParticleIterator)() ){
     auto particle = theParticleIterator->value();
     auto pmanager = particle->GetProcessManager();
@@ -226,9 +227,14 @@ TPCPhysicsList::ConstructGeneral( void )
 			pmanager ->SetProcessOrdering(theDecayProcess, idxPostStep);
 			pmanager ->SetProcessOrdering(theDecayProcess, idxAtRest);
 		}
-
     ////shhwang; include decay process
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+    if(pmanager){
+  //    pmanager->AddProcess(stepLimiter,-1,-1,3);
+ //     pmanager->SetProcessOrdering(stepLimiter, idxAlongStep);
+//      pmanager->SetProcessOrdering(stepLimiter, idxPostStep);
+   //   G4cout<<particleName<<"StepLimitter added"<<G4endl;
+    }
     if(1){
       G4DecayTable* Table = new G4DecayTable();
       particle=particleTable->FindParticle("lambda");
@@ -372,6 +378,7 @@ TPCPhysicsList::ConstructGeneral( void )
   //  table->Insert(mode);
   ///
   */
+  
   }
   if(DisableXiMaterialEffect){
     G4ProcessManager* pmanager = G4XiMinus::XiMinus()->GetProcessManager(); 

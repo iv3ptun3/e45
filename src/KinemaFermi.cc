@@ -106,10 +106,12 @@ KinemaFermi::Calculate( G4double m1, G4double m2, G4double m3, G4double m4,
   G4ThreeVector v4(
 		   (cos(phi1)*cos(deg2rad(theta4))*sin(theta1) +
 		    cos(theta1)*cos(phi1)*cos(deg2rad(phi4))*sin(deg2rad(theta4)) -
-		    sin(phi1)*sin(deg2rad(phi4))*sin(deg2rad(theta4))),
+		    sin(phi1)*sin(deg2rad(phi4))*sin(deg2rad(theta4))),//x
+        
 		   (sin(phi1)*cos(deg2rad(theta4))*sin(theta1) +
 		    cos(theta1)*sin(phi1)*cos(deg2rad(phi4))*sin(deg2rad(theta4)) +
-		    cos(phi1)*sin(deg2rad(phi4))*sin(deg2rad(theta4))),
+		    cos(phi1)*sin(deg2rad(phi4))*sin(deg2rad(theta4))),//y
+
 		   cos(deg2rad(theta4))*cos(theta1) -
 		   sin(theta1)*cos(deg2rad(phi4))*sin(deg2rad(theta4)) );
   v4.setMag( m_kinema2body.GetMomentumLab(4) );

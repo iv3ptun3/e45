@@ -11,6 +11,7 @@
 #include <G4Track.hh>
 #include <G4TrackStatus.hh>
 #include <G4VPhysicalVolume.hh>
+#include <G4StepLimiter.hh>
 #include <TString.h>
 #include "ConfMan.hh"
 namespace

@@ -14,7 +14,8 @@ namespace Kinematics
   G4ThreeVector HarmonicFermiMomentum( G4int type );
   G4int         HarmonicFermiMomentumDeuteron( G4double* Kf );
   G4double      Legendre( G4int order, G4double x );
-
+  G4ThreeVector SphericalRandom( void );
+  G4ThreeVector FermiGasMomentum(double p_f = 250);//MeV
 	G4ThreeVector MultitrackVertex(int ntrack, double *x0, double *y0,
 			    double *u0, double *v0);
 

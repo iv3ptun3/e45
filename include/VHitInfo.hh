@@ -24,6 +24,7 @@ private:
   G4ThreeVector m_momentum;
   G4double      m_time;
   G4double      m_energy_deposit;
+  G4double      m_kinetic_energy;
   G4int         m_step_id;
   G4int         m_track_id;
   G4int         m_particle_id;
@@ -45,6 +46,7 @@ public:
   const G4ThreeVector& GetMomentum( void ) const { return m_momentum; }
   G4double GetTime( void ) const { return m_time; }
   G4double GetEnergyDeposit( void ) const { return m_energy_deposit; }
+  G4double GetKineticEnergy( void ) const { return m_kinetic_energy; }
   G4int    GetTrackID( void ) const { return m_track_id; }
   G4int    GetParticleID( void ) const { return m_particle_id; }
   G4int    GetDetectorID( void ) const { return m_detector_id; }

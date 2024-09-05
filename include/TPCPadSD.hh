@@ -25,6 +25,8 @@ private:
   G4int num_plane;
   G4int num_deadarea;
   G4int select_dead;
+  G4double m_target_z;
+  G4double m_center_z;
 
   G4int m_gem_discharge;
   G4int m_gem_fix_dead;

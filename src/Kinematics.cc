@@ -248,6 +248,18 @@ MultitrackVertex(int ntrack, double *x0, double *y0, double *u0, double *v0){
 }
 
 
-
-
+G4ThreeVector SphericalRandom(){
+  G4double theta = std::acos( G4RandFlat::shoot( -1., 1. ) );
+  G4double phi   = G4RandFlat::shoot( -CLHEP::pi, CLHEP::pi );
+  return G4ThreeVector( std::sin(theta) * std::cos(phi),
+      std::sin(theta) * std::sin(phi),
+      std::cos(theta) );
+}
+G4ThreeVector FermiGasMomentum(double p_f){
+  double u = G4RandFlat::shoot(0.,1.);
+  u = TMath::Power(u, 1./3.);
+  double p = p_f * u;
+  G4ThreeVector dir = SphericalRandom();
+  return p * dir;
+}
 }

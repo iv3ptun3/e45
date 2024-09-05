@@ -72,7 +72,7 @@ namespace
   const G4Colour MAROON( 0.5, 0.0, 0.0 );
   const G4Colour PINK( 1.0, 0.753, 0.796 );
  	const auto& DiscardData = gConf.Get<G4bool> ("DiscardData");
- 	const auto& Generator = gConf.Get<G4bool> ("Generator");
+ 	const auto& Generator = gConf.Get<G4int> ("Generator");
 }
 
 //_____________________________________________________________________________
@@ -332,7 +332,7 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=8 );
   // CH2 Polyethelene
   name = "CH2";
-  m_material_map[name] = new G4Material( name, density=0.95*g/cm3, nel=2 );
+  m_material_map[name] = new G4Material( name, density=1.13*g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=2 );
   // Silica Aerogel for LAC
@@ -985,17 +985,28 @@ TPCDetectorConstruction::ConstructHypTPC( void )
   new G4PVPlacement( nullptr, target_pos, target_lv, "TargetPV",
   		     m_world_lv, true, 0 );
  	double vp_th = 0.001*mm;
-	auto vp_solid = new G4Box( "TGTVPSolid", 30.*cm/2, 12.*cm/2, vp_th/2 );
+	auto vp_solid = new G4Box( "TGTVPSolid", 30.*cm/2, 20.*cm/2, vp_th/2 );
 	auto vp_lv = new G4LogicalVolume( vp_solid, m_material_map["P10"], "VPLV" );
 	vp_lv->SetSensitiveDetector( vp_sd );
 	vp_lv->SetVisAttributes(G4Color::Blue());
-  
 	auto holder_lv = new G4LogicalVolume( holder_solid, m_material_map["P10"],
 					"TargetHolderLV");
   holder_lv->SetVisAttributes( G4Colour::Blue() );
   // new G4PVPlacement( nullptr, holder_pos, holder_lv, "TargetHolderPV",
   // 		     m_world_lv, true, 0 );
   // HypTPC
+  if(BeamData){
+    auto vp_lv_dummy = new G4LogicalVolume( vp_solid, m_material_map["P10"], "TpcPadLV0" ); 
+    vp_lv_dummy->SetSensitiveDetector( tpc_sd );
+      new G4PVPlacement(nullptr,target_pos-G4ThreeVector(0,0,target_size.z()+3*vp_th/2),vp_lv_dummy,"TpcPadPV0",
+          m_world_lv,0,0);
+  }
+		new G4PVPlacement(nullptr,target_pos-G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetBefore",
+				m_world_lv,0,0);
+		auto after_tgt = target_pos + G4ThreeVector(0,0,target_size.z()+2*mm) ; 
+		new G4PVPlacement(nullptr,target_pos+G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetAfter",
+				m_world_lv,0,1);
+  if(BeamData)return;
   {
     const G4double Rin  = gSize.Get( "TpcRin" )*mm/2;
     const G4double Rout = gSize.Get( "TpcRout" )*mm/2;
@@ -1013,14 +1024,15 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     auto target_w_vp1 = new G4UnionSolid("Target_w_VP1",target_solid,vp_solid,nullptr,G4ThreeVector(0,0,-target_size.z()-vp_th/2));
     auto target_w_vp2 = new G4UnionSolid("Target_w_VP1",target_w_vp1,vp_solid,nullptr,G4ThreeVector(0,0,target_size.z()+vp_th/2));
 		
-		
-		auto Empty_volume = new G4Box("hollow",10*cm/2,6*cm/2,22*mm);
-		
+    G4ThreeVector Empty_Volume_Dim(32*mm,22*mm,22*mm);
+    if(BeamData)Empty_Volume_Dim *= 2;
+		auto Empty_volume = new G4Box("hollow",Empty_Volume_Dim.x()/2,Empty_Volume_Dim.y()/2,Empty_Volume_Dim.z()/2);
 		
 		auto pos = target_pos;
     pos.rotateX( 90.*deg );
 		G4VSolid* tpc_solid = nullptr;
-		if(BeamData){
+	/*
+  	if(BeamData){
 			tpc_solid = new G4SubtractionSolid( "TpcSolid",
 					     tpc_out_solid, target_solid,
 					     nullptr, pos );
@@ -1030,6 +1042,10 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 					     tpc_out_solid, Empty_volume,
 					     nullptr, pos );
 		}
+    */
+			tpc_solid = new G4SubtractionSolid( "TpcSolid",
+					     tpc_out_solid, Empty_volume,
+					     nullptr, pos );
     auto rot = new G4RotationMatrix;
     rot->rotateX( 90.*deg );
     m_tpc_lv = new G4LogicalVolume( tpc_solid, m_material_map["P10"],
@@ -1040,14 +1056,8 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     m_tpc_lv->SetVisAttributes( G4Colour::White() );
 		auto before_tgt = target_pos - G4ThreeVector(0,0,target_size.z()+2*mm); 
 //		new G4PVPlacement(nullptr,before_tgt,vp_lv,"VPTargetBefore",
-		new G4PVPlacement(nullptr,target_pos-G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetBefore",
-				m_world_lv,false,0);
-		auto after_tgt = target_pos + G4ThreeVector(0,0,target_size.z()+2*mm) ; 
-		new G4PVPlacement(nullptr,target_pos+G4ThreeVector(0,0,target_size.z()+vp_th/2),vp_lv,"VPTargetAfter",
-				m_world_lv,false,1);
     //m_tpc_lv->SetSensitiveDetector( tpc_sd );
   }
-
 
 
   // Field Cage
@@ -1169,13 +1179,13 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 
   G4double below_target = 0;
   if(m_experiment==42){
-    below_target=32.4;
+    below_target=0.2;
   }else if(m_experiment==45||m_experiment==27){
     below_target=60.4;
   }
   // Inner Pads
   for( G4int i=0; i<NumOfPadTPCIn; ++i ){
-    if( pad_out[i]<below_target ){
+    if( pad_out[i]+pad_length_in/2<below_target ){
       if(m_experiment==42){
 	pad_solid[i] = new G4Tubs( Form("TpcPadSolid%d", i), pad_in[i]*mm,
 				   pad_out[i]*mm, 120.*mm, 0.,

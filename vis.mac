@@ -41,6 +41,8 @@
 #
 /tracking/storeTrajectory 1
 /vis/scene/endOfEventAction accumulate
+/vis/viewer/pan 0 -2.5
+/vis/viewer/zoom 4
 #
 # At end of each run, an automatic flush causes graphical output.
 #/run/beamOn 1

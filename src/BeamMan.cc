@@ -107,8 +107,8 @@ namespace{
   TTreeReaderValue<double> * KFXiPz = nullptr;
 
   TTreeReaderValue<bool> *XiFlight = nullptr;
-  TTreeReaderValue<bool> *XiProd = nullptr;
-
+  TTreeReaderValue<bool> *Xiflag = nullptr;
+	
   TTreeReaderValue<double>* xiprodvtx_x = nullptr;
   TTreeReaderValue<double>* xiprodvtx_y = nullptr;
   TTreeReaderValue<double>* xiprodvtx_z = nullptr;
@@ -203,6 +203,8 @@ BeamMan::Initialize( void )
 		m_is_KpUniform = 1;
 	}
   m_primary_z = gGeom.GetLocalZ( "Vertex" );
+//  m_target_z = -143;
+ // G4cout<<"BeamMan"<<G4endl;
   m_target_z = gGeom.GetLocalZ( "SHSTarget" );
   if( !m_is_vi )
     m_primary_z -= 1318.9*CLHEP::mm; // from VO
@@ -257,6 +259,7 @@ BeamMan::Initialize( void )
 		tree->SetBranchAddress( "m2",m2Beam);
 		tree->SetBranchAddress( "trigpat",trigpat);
 	}
+#if 0
 	else if (m_is_missmassXi){
 		reader = new TTreeReader("tpc",m_file);
 //		tree->SetBranchAddress( "evnum",&evnum);
@@ -320,6 +323,9 @@ BeamMan::Initialize( void )
 		
 	}
 	else if(m_is_TPCXi){
+#else
+	else if(m_is_TPCXi or m_is_missmassXi){
+#endif
 		reader = new TTreeReader("tpc",m_file);
 
 		ntTPCK18 = new TTreeReaderValue<int>(*reader,"ntK18");		
@@ -346,20 +352,20 @@ BeamMan::Initialize( void )
 		vtyTPC = new TTreeReaderValue<vector<double>>(*reader,"vtyTPC");
 		vtzTPC = new TTreeReaderValue<vector<double>>(*reader,"vtzTPC");
 
-		KFpvalXi = new TTreeReaderValue<double>(*reader,"KFpvalXi");
-		KFXiPx = new TTreeReaderValue<double>(*reader,"KFXimom_x");
-		KFXiPy = new TTreeReaderValue<double>(*reader,"KFXimom_y");
-		KFXiPz = new TTreeReaderValue<double>(*reader,"KFXimom_z");
+//		KFpvalXi = new TTreeReaderValue<double>(*reader,"KFpvalXi");
+//		KFXiPx = new TTreeReaderValue<double>(*reader,"KFXimom_x");
+//		KFXiPy = new TTreeReaderValue<double>(*reader,"KFXimom_y");
+//		KFXiPz = new TTreeReaderValue<double>(*reader,"KFXimom_z");
 
-		XiFlight = new TTreeReaderValue<bool>(*reader,"XiFlight");
-		XiProd = new TTreeReaderValue<bool>(*reader,"XiProd");
+//		XiFlight = new TTreeReaderValue<bool>(*reader,"XiFlight");
+		Xiflag = new TTreeReaderValue<bool>(*reader,"Xiflag");
 
-		xiprodvtx_x = new TTreeReaderValue<double>(*reader,"xiprodvtx_x");
-		xiprodvtx_y = new TTreeReaderValue<double>(*reader,"xiprodvtx_y");
-		xiprodvtx_z = new TTreeReaderValue<double>(*reader,"xiprodvtx_z");
-		xiprodmom_x = new TTreeReaderValue<double>(*reader,"xiprodmom_x");
-		xiprodmom_y = new TTreeReaderValue<double>(*reader,"xiprodmom_y");
-		xiprodmom_z = new TTreeReaderValue<double>(*reader,"xiprodmom_z");
+		xiprodvtx_x = new TTreeReaderValue<double>(*reader,"GFXiProductionVtx_x");
+		xiprodvtx_y = new TTreeReaderValue<double>(*reader,"GFXiProductionVtx_y");
+		xiprodvtx_z = new TTreeReaderValue<double>(*reader,"GFXiProductionVtx_z");
+		xiprodmom_x = new TTreeReaderValue<double>(*reader,"GFXiProductionVtxMom_x");
+		xiprodmom_y = new TTreeReaderValue<double>(*reader,"GFXiProductionVtxMom_y");
+		xiprodmom_z = new TTreeReaderValue<double>(*reader,"GFXiProductionVtxMom_z");
 	}
 	else{
 		tree->SetBranchAddress( "x", &beam.x );
@@ -409,13 +415,11 @@ BeamMan::Initialize( void )
 		else if(m_is_missmassXi){
 			int in = (*inside)->at(0);
 			double mm = (*MissMass)->at(0);
-			int ntK18 = **ntTPCK18;
 			int ntKurama = **ntTPCKurama;
-			int goodTPCK18 = (*isgoodTPCK18)->at(0);
-			int goodTPCKurama = (*isgoodTPCKurama)->at(0);
+			int ntK18 = **ntTPCK18;
 			for(int itk18=0;itk18<ntK18;++itk18){
 				if(ntK18!= 1 or ntKurama !=1) continue;
-				if(!goodTPCK18 or !goodTPCKurama) continue;
+				if((*ubTPC)->size()==0) continue;
 				double ub = (*ubTPC)->at(itk18);
 				double vb = (*vbTPC)->at(itk18);
 				double nb = hypot(hypot(1,ub),vb);
@@ -423,28 +427,37 @@ BeamMan::Initialize( void )
 				double pzb = pb/nb;
 				G4ThreeVector TVKm(pzb*ub,pzb*vb,pzb);
 			for(int itkurama=0;itkurama<ntKurama;++itkurama){
+				if((*pTPCKurama)->size()==0) continue;
+				if((*pTPCKurama)->at(itkurama)==0) continue;
 				double qKp = (*qTPCKurama)->at(itkurama);
 				double m2Kp = (*m2TPCKurama)->at(itkurama);
 				double pKp = (*pTPCKurama)->at(itkurama);
-				
+				if((*usTPC)->size()==0) continue;	
 				double us = (*usTPC)->at(itkurama);
 				double vs = (*vsTPC)->at(itkurama);
 				double ns = hypot(hypot(1,us),vs);
 				double pzs = pKp/ns;
 				G4ThreeVector TVKp(pzs*us,pzs*vs,pzs);
+				if((*vtzTPC)->size()==0 )continue;
 				if((*vtzTPC)->at(0)==0 )continue;
-
-				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.12 and m2Kp < 0.4 and in and abs(mm-1.321)<0.1){
+				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.14 and m2Kp < 0.34 and in and abs(mm-1.321)<0.05){
 					MMVertex MMVert;
 					MMVert.x = ((*vtxTPC)->at(0));
 					MMVert.y = ((*vtyTPC)->at(0));
-					MMVert.ntK18 = ntK18;
-					MMVert.ntKurama = ntKurama;
+					if(abs(MMVert.x) > 15 or abs(MMVert.y) > 10) continue;	
 					MMVert.Moms.push_back(TVKm);
 					MMVert.Moms.push_back(TVKp);
 					MMVert.Moms.push_back(TVKm-TVKp);
-
+					
+					MMVert.ntK18 = ntK18;
+					MMVert.xtgtHS = *(xbTPC->Get());	
+					MMVert.ytgtHS = *(ybTPC->Get());	
+					
+					MMVert.ntKurama = ntKurama;
+					MMVert.xtgtKurama = *(xsTPC->Get());	
+					MMVert.ytgtKurama = *(ysTPC->Get());	
 					//					vector<double>& xoutk18 = *(xoutK18->Get()); 
+#if 0	
 					MMVert.p_3rd = *(p_3rd->Get());
 					MMVert.xoutK18 = *(xoutK18->Get());
 					MMVert.youtK18 = *(youtK18->Get());
@@ -453,19 +466,11 @@ BeamMan::Initialize( void )
 					MMVert.xvpHS = *(xvpHS->Get());	
 					MMVert.yvpHS = *(yvpHS->Get());	
 					MMVert.zvpHS = *(zvpHS->Get());	
-					MMVert.xtgtHS = *(xtgtHS->Get());	
-					MMVert.ytgtHS = *(ytgtHS->Get());	
-					MMVert.ztgtHS = *(ztgtHS->Get());	
-					MMVert.layerK18 = *(layerK18->Get());	
-					MMVert.wireK18 = *(wireK18->Get());	
-					MMVert.localhitposK18 = *(localhitposK18->Get());	
-					
+					MMVert.ztgtHS = *(ztgtHS->Get());
 					
 					MMVert.xvpKurama = *(xvpKurama->Get());	
 					MMVert.yvpKurama = *(yvpKurama->Get());	
 					MMVert.zvpKurama = *(zvpKurama->Get());	
-					MMVert.xtgtKurama = *(xtgtKurama->Get());	
-					MMVert.ytgtKurama = *(ytgtKurama->Get());	
 					
 					MMVert.xoutK18 = *(xoutK18->Get());	
 					MMVert.youtK18 = *(youtK18->Get());	
@@ -480,7 +485,10 @@ BeamMan::Initialize( void )
 					MMVert.layer = *(layer->Get());	
 					MMVert.wire = *(wire->Get());	
 					MMVert.localhitpos = *(localhitpos->Get());	
-					
+					MMVert.layerK18 = *(layerK18->Get());	
+					MMVert.wireK18 = *(wireK18->Get());	
+					MMVert.localhitposK18 = *(localhitposK18->Get());	
+#endif
 					m_mm_array.push_back(MMVert);		
 				}
 			}
@@ -491,6 +499,8 @@ BeamMan::Initialize( void )
 			int ntKurama = **ntTPCKurama;
 			for(int itk18=0;itk18<ntK18;++itk18){
 				if(ntK18!= 1 or ntKurama !=1) continue;
+				if((*inside)->size()==0)continue;
+				if((*MissMass)->size()==0)continue;
 				int in = (*inside)->at(0);
 				double mm = (*MissMass)->at(0);
 				double ub = (*ubTPC)->at(itk18);
@@ -500,8 +510,6 @@ BeamMan::Initialize( void )
 				double pzb = pb/nb;
 				G4ThreeVector TVKm(pzb*ub,pzb*vb,pzb);
 			for(int itkurama=0;itkurama<ntKurama;++itkurama){
-
-
 				double qKp = (*qTPCKurama)->at(itkurama);
 				double m2Kp = (*m2TPCKurama)->at(itkurama);
 				double pKp = (*pTPCKurama)->at(itkurama);
@@ -512,20 +520,20 @@ BeamMan::Initialize( void )
 				double pzs = pKp/ns;
 				G4ThreeVector TVKp(pzs*us,pzs*vs,pzs);
 				if((*vtzTPC)->at(0)==0 )continue;
-				double KFpval = **KFpvalXi;
-				if(!**XiProd) continue;
+//				double KFpval = **KFpvalXi;
+				if(!**Xiflag) continue;
 				if(pKp < 1.4 and qKp > 0 and m2Kp > 0.12
 				 and m2Kp < 0.4 and in
-				 and abs(mm-1.321)<0.1 and KFpval>0.005){
+				 and abs(mm-1.321)<0.1){ 
 					MMVertex MMVert;
 					double PxXi = **xiprodmom_x;
 					double PyXi = **xiprodmom_y;
 					double PzXi = **xiprodmom_z;
+					if(isnan(PzXi) or PzXi==0) continue;
 					MMVert.x = **xiprodvtx_x;
 					MMVert.y = **xiprodvtx_y;
 					MMVert.z = **xiprodvtx_z+6;
-					
-					if(abs(MMVert.x)> 15 or abs(MMVert.y)>10 or abs(MMVert.z+143)>10) continue;	
+					if(abs(MMVert.x)> 15 or abs(MMVert.y)>10 or abs(MMVert.z-m_target_z)>10) continue;	
 					MMVert.xtgtHS = (*xbTPC->Get());
 					MMVert.ytgtHS = (*ybTPC->Get());
 					MMVert.xtgtKurama = (*xsTPC->Get());
@@ -535,6 +543,7 @@ BeamMan::Initialize( void )
 					MMVert.Moms.push_back(TVKm);
 					MMVert.Moms.push_back(TVKp);
 					G4ThreeVector TVXi(PxXi,PyXi,PzXi);	
+	//				TVXi = TVKm - TVKp;
 	//				TVXi = TVXi*0.1;
 					MMVert.Moms.push_back(TVXi);
 					m_mm_array.push_back(MMVert);		

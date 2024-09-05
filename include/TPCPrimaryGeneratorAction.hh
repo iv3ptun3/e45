@@ -166,6 +166,7 @@ public:
   // Other methods
   void     GenerateXiMinus( G4Event* anEvent ); //#-1321
   void     GenerateLambda( G4Event* anEvent ); //#-1115
+  void     GenerateKaonMinus( G4Event* anEvent ); //#-4930
 	double   RandSin(void);
 };
 

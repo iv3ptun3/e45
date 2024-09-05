@@ -133,8 +133,8 @@ IncMan::Get( Int_t i ) const
 {
   auto curr_file = gFile;
   m_file->cd();
-	bool good = 1;
 	while(1){
+		bool good = 1;
 		if(i>=m_n_event)i=0;
   	m_tree->GetEntry( i );
   	for(int ip=0;ip<m_event->np;++ip){
@@ -143,6 +143,7 @@ IncMan::Get( Int_t i ) const
 			if(isnan(m_event->pz[ip]))good = 0;
 		}
 		if(good)break;
+		G4cout<<"Warning! broken events! "<<i<<" -> "<<i+1<<G4endl;
 		++i;
 	}
 	if( curr_file )
