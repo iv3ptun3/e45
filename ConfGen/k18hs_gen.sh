@@ -51,7 +51,7 @@ for(( run=$run_start; run<=$run_end; run++));do
 		echo "PolarizedDecay	0">>$file
 		echo "EM	1">>$file
 		echo "Hadron	1">>$file
-		echo "KillStepInIron	0">>$file
+		echo "KillStepInIron	1">>$file
 		echo "HdibaryonMass	2.25 ">>$file
 		echo "HdibaryonWidth	0.0 #GeV">>$file
 		echo "HdibaryonLifeTime	10.0 #ns">>$file

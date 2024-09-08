@@ -2247,7 +2247,7 @@ TPCPrimaryGeneratorAction::GenerateIncInput( G4Event* anEvent )
     G4ThreeVector p( m_inc->px[i]*GeV, m_inc->py[i]*GeV, m_inc->pz[i]*GeV );
     m_particle_gun->SetParticleDefinition( particle );
     m_particle_gun->SetParticleMomentumDirection( p );
-    G4double m = particle->GetPDGMass()/GeV;
+    G4double m = particle->GetPDGMass();
     G4double ke = std::sqrt( m*m + p.mag2() ) - m;
 		if(isnan(ke) or ke<=0){
 			G4cout<<"Warning! Nan or negative energy!"<<G4endl;

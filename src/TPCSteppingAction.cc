@@ -52,7 +52,10 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto theProcess = postPoint->GetProcessDefinedStep()->GetProcessName();
   auto NStep = theTrack->GetCurrentStepNumber();
 	int parentID = theTrack->GetParentID();
-  // check if it is alive
+	if(NStep>300){
+			theTrack->SetTrackStatus( fStopAndKill );
+	}
+	// check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
 	//std::cout<<Form(" Processing track %d, Step %d" ,TrackID,NStep)<<std::endl;
   // check if it is primary
