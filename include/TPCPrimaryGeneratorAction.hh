@@ -14,6 +14,7 @@ class TTree;
 
 struct BeamInfo;
 struct MMVertex;
+struct KmKpL;
 struct JamInfo;
 struct IncInfo;
 
@@ -33,6 +34,8 @@ private:
   G4ThreeVector         m_e45target_size;
   BeamInfo*             m_beam;
   MMVertex*             m_mm_vert;
+  KmKpL*                m_kmkpl;
+  KmKpL*                m_kmkpl2;
   G4double              m_beam_p0;
   JamInfo*              m_jam;
   IncInfo*              m_inc;
@@ -167,6 +170,8 @@ public:
   void     GenerateXiMinus( G4Event* anEvent ); //#-1321
   void     GenerateLambda( G4Event* anEvent ); //#-1115
   void     GenerateKaonMinus( G4Event* anEvent ); //#-4930
+  void     GenerateKmKpLL_BE( G4Event* anEvent ); //#1811161116
+
 	double   RandSin(void);
 };
 

@@ -74,6 +74,8 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_e45target_size( gSize.GetSize( "E45Target" )*mm ),
     m_beam( new BeamInfo ),
     m_mm_vert( new MMVertex),
+		m_kmkpl( new KmKpL),
+		m_kmkpl2( new KmKpL),
     m_beam_p0( gConf.Get<G4double>( "BeamMom" ) /* 1.80*GeV */ ),
     m_jam(),
     m_inc(),
@@ -146,6 +148,36 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
       G4int eventID = anEvent->GetEventID();
 //      *m_mm_vert = gBeam.GetVertex(eventID);
       *m_mm_vert = gBeam.GetVertex();
+    }
+    else if (gBeam.IsLL_BE()){
+			int cnt = 0;
+			bool selecting = 1;
+			static const auto m12C = 11.174864;
+			static const auto m11B = 10.252548;
+			static const auto m10Be = 9.325504;
+			static const auto KaonMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+			static const auto ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+			static const auto LambdaMass = m_Lambda->GetPDGMass()/CLHEP::GeV;
+			while(selecting){
+      	G4int eventID = anEvent->GetEventID();
+				*m_kmkpl =  gBeam.GetKmKpL();
+				*m_kmkpl2 = gBeam.GetKmKpL();
+				G4ThreeVector TVKm = m_kmkpl->Moms[0];
+				G4ThreeVector TVKp = m_kmkpl->Moms[1];
+				G4ThreeVector TVL1 = m_kmkpl->Moms[2];
+				G4ThreeVector TVL2 = m_kmkpl2->Moms[2];
+				cnt++;
+				if(TVL1.mag()==TVL2.mag())continue;
+				G4LorentzVector LVKm(TVKm,hypot(TVKm.mag(),KaonMass));
+				G4LorentzVector LVKp(TVKp,hypot(TVKp.mag(),KaonMass));
+				G4LorentzVector LVL1(TVL1,hypot(TVL1.mag(),LambdaMass));
+				G4LorentzVector LVL2(TVL2,hypot(TVL2.mag(),LambdaMass));
+				G4LorentzVector LV12C(0,0,0,m12C);
+				auto BeExcitation = (LVKm+LV12C - LVKp - LVL1-LVL2).m() - m10Be;
+				if(abs(BeExcitation) < 0.05) {
+					selecting = false;
+				}
+			}
     }
     else if (gBeam.IsKpUniform()){
     }
@@ -266,6 +298,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
  	case 181321:GenerateKuramaPKmKpXi( anEvent );	break; 
 	case 1001321:GenerateTPCXiKmKp(anEvent); break;
   case -4930: GenerateKaonMinus( anEvent ); break;
+  case 1811161116: GenerateKmKpLL_BE( anEvent ); break;
   default:
     G4cerr << " * Generator number error : " << m_generator << G4endl;
     break;
@@ -5572,4 +5605,56 @@ TPCPrimaryGeneratorAction::GenerateKaonMinus( G4Event* anEvent ){
   m_particle_gun->SetParticleEnergy( energy );
   m_particle_gun->SetParticlePosition( gen_pos );
   m_particle_gun->GeneratePrimaryVertex( anEvent );
+}
+
+//1811161116//
+void
+TPCPrimaryGeneratorAction::GenerateKmKpLL_BE( G4Event* anEvent ){
+  static const auto m12C = 11.174864;
+  static const auto m11B = 10.252548;
+  static const auto m10Be = 9.325504;
+  static const auto KaonMass = m_KaonMinus->GetPDGMass()/CLHEP::GeV;
+  static const auto ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
+  static const auto LambdaMass = m_Lambda->GetPDGMass()/CLHEP::GeV;
+	G4int eventID = anEvent->GetEventID();
+	G4ThreeVector TVKm = m_kmkpl->Moms[0];
+	TVKm = - TVKm;
+	G4ThreeVector TVKp = m_kmkpl->Moms[1];
+	G4ThreeVector TVL1 = m_kmkpl->Moms[2];
+	G4ThreeVector TVL2 = m_kmkpl2->Moms[2];
+	G4cout<<"LL Selected: "<<G4endl;
+	G4LorentzVector LVL1(TVL1,hypot(TVL1.mag(),LambdaMass));
+	G4LorentzVector LVL2(TVL2,hypot(TVL2.mag(),LambdaMass));
+	auto LL = LVL1+LVL2;
+	G4cout<<"L1 = "<<TVL1<<", L2 = "<<TVL2<<G4endl;
+	G4cout<<"CM = "<<LL.m()<<G4endl;
+	double EKm = hypot(KaonMass,TVKm.mag()) - KaonMass;
+	double EKp = hypot(KaonMass,TVKp.mag()) - KaonMass;
+	double EL1 = hypot(LambdaMass,TVL1.mag()) - LambdaMass;
+	double EL2 = hypot(LambdaMass,TVL2.mag()) - LambdaMass;
+	G4ThreeVector gen_pos(m_kmkpl->x,m_kmkpl->y,G4RandFlat::shoot(-153,-133));
+
+	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleEnergy(EKm * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos);
+	m_particle_gun->SetParticleMomentumDirection(TVKm);
+	m_particle_gun->GeneratePrimaryVertex( anEvent );
+  
+	m_particle_gun->SetParticleDefinition( m_KaonPlus );
+	m_particle_gun->SetParticleEnergy(EKp * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos);
+	m_particle_gun->SetParticleMomentumDirection(TVKp);
+	m_particle_gun->GeneratePrimaryVertex( anEvent );
+  
+	m_particle_gun->SetParticleDefinition( m_Lambda );
+	m_particle_gun->SetParticleEnergy(EL1 * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos);
+	m_particle_gun->SetParticleMomentumDirection(TVL1);
+	m_particle_gun->GeneratePrimaryVertex( anEvent );
+	
+	m_particle_gun->SetParticleDefinition( m_Lambda );
+	m_particle_gun->SetParticleEnergy(EL2 * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos);
+	m_particle_gun->SetParticleMomentumDirection(TVL2);
+	m_particle_gun->GeneratePrimaryVertex( anEvent );
 }

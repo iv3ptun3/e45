@@ -98,6 +98,13 @@ struct KpKurama
 	vector<vector<double>> wire;
 	vector<vector<double>> localhitpos;
 };
+struct KmKpL
+{
+  G4double x;
+  G4double y;
+  G4double z;
+  vector<G4ThreeVector> Moms;
+};
 
 //_____________________________________________________________________________
 class BeamMan
@@ -115,11 +122,13 @@ private:
 private:
   typedef std::vector<BeamInfo> ParamArray;
   typedef std::vector<MMVertex> MMArray;
+  typedef std::vector<KmKpL> KmKpLArray;
   G4bool        m_is_ready;
   G4String      m_file_name;
   TFile*        m_file;
   ParamArray    m_param_array;
   MMArray    		m_mm_array;
+  KmKpLArray    m_kmkpl_array;
   G4int         m_n_param;
   G4bool        m_is_vi; // true:VI or false:VO
   G4bool        m_is_k18=0;
@@ -127,6 +136,7 @@ private:
   G4bool        m_is_missmassXi=0;
   G4bool        m_is_TPCXi=0;
   G4bool        m_is_KpUniform=0;
+  G4bool        m_is_LL_BE=0;
   G4double      m_primary_z; // from VI or VO
   G4double      m_target_z;
   G4ThreeVector m_vi_pos;
@@ -138,6 +148,7 @@ public:
   const BeamInfo&      Get( G4int iev ) const;
   const MMVertex&      GetVertex( void ) const;
   const MMVertex&      GetVertex( G4int iev ) const;
+  const KmKpL         GetKmKpL( void ) const; 
   const G4int&       	 GetNBeam()const {return m_nBeam; }
   G4double             GetPrimaryZ( void ) const { return m_primary_z; }
   const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
@@ -149,6 +160,7 @@ public:
   G4bool               IsMissMassXi( void ) const { return m_is_missmassXi; }
   G4bool               IsReconXi( void ) const { return m_is_TPCXi; }
   G4bool               IsKpUniform( void ) const { return m_is_KpUniform; } 
+  G4bool               IsLL_BE( void ) const { return m_is_LL_BE; }
   void                 Print( void ) const;
   void                 SetPrimaryZ( G4double z ){ m_primary_z = z; }
   void                 SetVIPosition( G4ThreeVector pos ){ m_vi_pos = pos; }
