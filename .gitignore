@@ -24,3 +24,4 @@ param/conf*
 param/k18hs*
 !.gitkeep
 .vscode/settings.json 
+*.sh

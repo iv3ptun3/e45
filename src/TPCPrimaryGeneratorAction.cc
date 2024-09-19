@@ -728,7 +728,7 @@ TPCPrimaryGeneratorAction::GenerateUniformKaonPlus( G4Event* anEvent )
     vtx=rn_vtx;
     vtz=rn_vtz+m_target_pos.z();
   }else if( gConf.Get<G4int>("Experiment") == 42. ){
-    gBeam.GetHitProfile(vtx,vty);
+//    gBeam.GetHitProfile(vtx,vty);
     vtz = G4RandFlat::shoot(m_target_pos.z()-m_target_size.z()/2,m_target_pos.z()+m_target_size.z()/2)*mm;
   }
 
@@ -737,8 +737,10 @@ TPCPrimaryGeneratorAction::GenerateUniformKaonPlus( G4Event* anEvent )
 
   //  G4double ratio=G4RandFlat::shoot(0.,1.);
   //  ratio = 0.1;
-
-  // pi- //
+	vtx=0;vty=0;
+  int vtz_i = vtz;
+	vtz = 4 * (vtz_i/4);
+	// pi- //
   //Energy_p=sqrt(pow(mom_p,2)+pow(m_PionMinus->GetPDGMass()/GeV,2));
   m_particle_gun->SetParticleDefinition(m_KaonPlus);
   m_particle_gun->SetParticleMomentumDirection(G4ThreeVector(mom_kp_x,mom_kp_y,mom_kp_z));
