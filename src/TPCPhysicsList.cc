@@ -351,6 +351,17 @@ TPCPhysicsList::ConstructGeneral( void )
       Table->Insert( mode );
       particle->SetDecayTable( Table );
     }
+    G4int SigmaPlusDecayMode = gConf.Get<G4int>( "SigmaPlusDecayMode" );
+    if(SigmaPlusDecayMode==1)
+    {
+      G4VDecayChannel* mode;
+      G4DecayTable* Table = new G4DecayTable();
+      particle=particleTable->FindParticle("sigma+");
+      mode = new G4PhaseSpaceDecayChannel( "sigma+", 1.0, 2,
+               "neutron", "pi+" );
+      Table->Insert( mode );
+      particle->SetDecayTable( Table );
+    }
     /*
   ////Decay mode control of lambda 1405. L1405 --> Lambda + gamma
   //    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
