@@ -53,7 +53,7 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
   auto NStep = theTrack->GetCurrentStepNumber();
 	int parentID = theTrack->GetParentID();
 	if(NStep>300){
-			theTrack->SetTrackStatus( fStopAndKill );
+//			theTrack->SetTrackStatus( fStopAndKill );
 	}
 	// check if it is alive
   //  if( theTrack->GetTrackStatus() != fAlive ) { return; }
@@ -121,6 +121,22 @@ TPCSteppingAction::UserSteppingAction( const G4Step* theStep )
 		}
 	}
 	if( particleName == "gamma" ) { 
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	if( particleName == "e-" ) { 
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	if( particleName == "e+" ) { 
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	if( particleName == "nu_mu" ) { 
+		theTrack->SetTrackStatus( fStopAndKill );
+		return; 
+	}
+	if( particleName == "anti_nu_mu" ) { 
 		theTrack->SetTrackStatus( fStopAndKill );
 		return; 
 	}

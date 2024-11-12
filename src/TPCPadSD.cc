@@ -26,6 +26,9 @@ namespace
 {
   const auto& gConf = ConfMan::GetInstance();
   const auto& gGeom = DCGeomMan::GetInstance();
+	const Double_t sigma_dedx_p[5] = {5.46764, 8.47708, -4.44913, 229.07, -6.63587};
+	const Double_t sigma_dedx_pi[5] = {4.24777, -0.484695, 0.297915, 20.2996, -13.4064};
+	const Double_t sigma_dedx_k[5] = {9.82967, -9.5835, 4.16533, 81.4433, -7.71084};
 }
 
 //_____________________________________________________________________________
@@ -140,7 +143,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   if(hitx < (-hitz+deadlayer) && hitx > (-hitz-deadlayer  ))    return false;
   //////////end dead layer
   //TargetHolder
-	if(hity > - 30 and abs(hitx )< 15.1 and abs(hitz -m_target_z + 6) < 10.1 ) return false;//Target Holder. A bit smaller than real, since patricles that did not pass through pad center can also make hits. 
+//	if(hity > - 30 and abs(hitx )< 15.1 and abs(hitz -m_target_z + 6) < 10.1 ) return false;//Target Holder. A bit smaller than real, since patricles that did not pass through pad center can also make hits. 
 	//6mm Offset given...
   if( m_gem_discharge > 0 ){
     if( m_gem_discharge == 1 ){
@@ -398,7 +401,9 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   G4int iPad = padHelper::findPadID(hitz, hitx);
   G4int iLay= padHelper::getLayerID(iPad);
   G4int iRow= padHelper::getRowID(iPad);
-  
+
+//	G4cout<<"Hit Layer = "<<iLay<<"Pid = "<<pid<<G4endl;;
+
 	G4double PadLen = padHelper::getLength(iLay);
 	G4ThreeVector PadPos(hitx,0,hitz - m_center_z); 
 	G4ThreeVector MomT(mom.x(),0,mom.z());	
@@ -511,29 +516,29 @@ TPCPadSD::TPCdEdx(Double_t mass/*MeV/c2*/, Double_t beta){
   Double_t delta = DensityEffectCorrection(TMath::Sqrt(beta2*gamma2), density_effect_par);
   Double_t dedx = constant*Z*Z/beta2*(0.5*TMath::Log(2*me*beta2*gamma2*Wmax*MeVToeV*MeVToeV/I2) - beta2 - 0.5*delta);
 	
-	G4double conversion_factor = 11073.3;
+	G4double conversion_factor = 12171.3; //HypTPC's ADC to <dE/dx>
   return conversion_factor*dedx;
 
 }
 double
 TPCPadSD::TPCdEdxSig(Double_t mass/*MeV/c2*/, Double_t mom){
-	double par[3]={0,0,0} ;
+	double par[5]={0,0,0,0,0} ;
 	if(mass < 0.2){//pion;
-		par[0] = 7.792;
-		par[1] =	-8.704;
-		par[2] = 4.477;
+		for(int i=0;i<5;++i){
+			par[i]=sigma_dedx_pi[i];
+		}
 	}
 	else if(mass > 0.7){//proton or heavier;
-		par[0] = 33.92;
-		par[1] = -26.24;
-		par[2] = 6.259; 
+		for(int i=0;i<5;++i){
+			par[i]=sigma_dedx_p[i];
+		}
 	}
 	else {//Kaon -> temp value
-		par[0] = 7.792;
-		par[1] =	-8.704;
-		par[2] = 4.477;
+		for(int i=0;i<5;++i){
+			par[i]=sigma_dedx_k[i];
+		}
 	}
-	double value = par[0]+par[1]*mom+par[2]*mom*mom;
+	double value = par[0]+par[1]*mom+par[2]*mom*mom + par[3]*exp(par[4]*mom);
 	return value;
 }
 G4double

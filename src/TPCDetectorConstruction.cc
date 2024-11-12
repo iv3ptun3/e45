@@ -965,7 +965,7 @@ TPCDetectorConstruction::ConstructHypTPC( void )
     //  G4Box* TargetSolid = new G4Box("target", 1.5*cm,0.25*cm,0.5*cm);
     G4double Target_r = gSize.Get( "Target", ThreeVector::X );
     // G4double Target_y = gSize.Get( "Target", ThreeVector::Y );
-    G4double Target_z = gSize.Get( "Target", ThreeVector::Z );
+    G4double Target_z = gSize.Get( "Target", ThreeVector::Z )*0.5;
     target_solid = new G4Tubs( "TargetSolid", 0.*mm,
 			       Target_r*mm,Target_z*mm, 0., 360*deg );
     //  G4Box* TargetSolid = new G4Box("target", 1.*cm,0.25*cm,1.*cm);
@@ -1023,10 +1023,16 @@ TPCDetectorConstruction::ConstructHypTPC( void )
 					  zPlane, rInner, rOuter );
     auto target_w_vp1 = new G4UnionSolid("Target_w_VP1",target_solid,vp_solid,nullptr,G4ThreeVector(0,0,-target_size.z()-vp_th/2));
     auto target_w_vp2 = new G4UnionSolid("Target_w_VP1",target_w_vp1,vp_solid,nullptr,G4ThreeVector(0,0,target_size.z()+vp_th/2));
-		
-    G4ThreeVector Empty_Volume_Dim(32*mm,22*mm,22*mm);
-    if(BeamData)Empty_Volume_Dim *= 2;
-		auto Empty_volume = new G4Box("hollow",Empty_Volume_Dim.x()/2,Empty_Volume_Dim.y()/2,Empty_Volume_Dim.z()/2);
+    G4VSolid* Empty_volume = nullptr; 
+    if(m_experiment == 42){
+      G4ThreeVector Empty_Volume_Dim = G4ThreeVector( target_size.x()+2*mm, target_size.y()+2*mm, target_size.z()+2*mm );  
+		  Empty_volume = new G4Box("hollow",Empty_Volume_Dim.x()/2,Empty_Volume_Dim.y()/2,Empty_Volume_Dim.z()/2);
+    }
+    else if (m_experiment == 27 or m_experiment == 45){
+      G4double Target_r = gSize.Get( "Target", ThreeVector::X );
+      Empty_volume = new G4Tubs("hollow",0,(Target_r+15.3)*mm,200.1*mm,0,360*deg);
+    }
+//    if(BeamData)Empty_Volume_Dim *= 2;
 		
 		auto pos = target_pos;
     pos.rotateX( 90.*deg );

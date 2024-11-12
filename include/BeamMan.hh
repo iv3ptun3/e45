@@ -56,6 +56,7 @@ struct MMVertex
 	vector<double>xtgtHS;
 	vector<double>ytgtHS;
 	vector<double>ztgtHS;
+
 	vector<double>xoutK18;
 	vector<double>youtK18;
 	vector<double>uoutK18;
@@ -64,13 +65,15 @@ struct MMVertex
 	vector<vector<double>> layerK18;
 	vector<vector<double>> wireK18;
 	vector<vector<double>> localhitposK18;
+	
 	G4int ntKurama;
-	vector<vector<double>>xvpKurama;
+  vector<vector<double>>xvpKurama;
 	vector<vector<double>>yvpKurama;
 	vector<vector<double>>zvpKurama;
 	vector<double>xtgtKurama;
 	vector<double>ytgtKurama;
-	vector<double>xout;
+	
+  vector<double>xout;
 	vector<double>yout;
 	vector<double>zout;
 	vector<double>pxout;
@@ -134,6 +137,7 @@ private:
   G4bool        m_is_k18=0;
   G4bool        m_is_kurama=0;
   G4bool        m_is_missmassXi=0;
+  G4bool        m_is_missmassXi1530=0;
   G4bool        m_is_TPCXi=0;
   G4bool        m_is_KpUniform=0;
   G4bool        m_is_LL_BE=0;
@@ -158,6 +162,7 @@ public:
   G4bool               IsK18( void ) const { return m_is_k18; }
   G4bool               IsKurama( void ) const { return m_is_kurama; }
   G4bool               IsMissMassXi( void ) const { return m_is_missmassXi; }
+  G4bool               IsMissMassXi1530( void ) const { return m_is_missmassXi1530; }
   G4bool               IsReconXi( void ) const { return m_is_TPCXi; }
   G4bool               IsKpUniform( void ) const { return m_is_KpUniform; } 
   G4bool               IsLL_BE( void ) const { return m_is_LL_BE; }

@@ -1712,6 +1712,19 @@ TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		auto SmearingVector =
 			GetSmearingVector(sh_pos,mom,par_y,par_t);
 
+//Resolution Modification
+#if 0
+		if(abs(particle)> 1000){//Baryon
+			G4ThreeVector Temp(SmearingVector.x(),SmearingVector.y()*0.75,SmearingVector.z());
+			SmearingVector = Temp;
+		}
+		else{
+			double res_scale = 1.25;
+			if(iLay<10)res_scale = 1.5;
+			G4ThreeVector Temp(res_scale * SmearingVector.x(),SmearingVector.y(),res_scale * SmearingVector.z());
+			SmearingVector = Temp;
+		}
+#endif
 		auto ResVector =
 			GetResVector(sh_pos,mom,par_y,par_t);
 		compx = ResVector.mag();

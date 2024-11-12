@@ -129,6 +129,7 @@ public:
   void     GenerateProtonBeamthrough( G4Event* anEvent ); //#938
   void     GenerateDedxSingle( G4Event* anEvent ); //#99
 	void		 GenerateKuramaPKmKpXi(G4Event* anEvent);//181321;
+	void		 GenerateKuramaPKmKpXi1530(G4Event* anEvent);//181530;
   void     GenerateTPCXiKmKp(G4Event* anEvent);//1001321
 
   // E07

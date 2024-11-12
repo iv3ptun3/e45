@@ -144,6 +144,10 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
     	G4int eventID = anEvent->GetEventID();
 			*m_mm_vert = gBeam.GetVertex(eventID);
 		}
+    else if (gBeam.IsMissMassXi1530()){
+      G4int eventID = anEvent->GetEventID();
+      *m_mm_vert = gBeam.GetVertex(eventID);
+    }
     else if (gBeam.IsReconXi()){
       G4int eventID = anEvent->GetEventID();
 //      *m_mm_vert = gBeam.GetVertex(eventID);
@@ -297,6 +301,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   case 1115: GenerateLambda( anEvent ); break;
  	case 181321:GenerateKuramaPKmKpXi( anEvent );	break; 
 	case 1001321:GenerateTPCXiKmKp(anEvent); break;
+ 	case 181530:GenerateKuramaPKmKpXi1530( anEvent );	break; 
   case -4930: GenerateKaonMinus( anEvent ); break;
   case 1811161116: GenerateKmKpLL_BE( anEvent ); break;
   default:
@@ -737,9 +742,9 @@ TPCPrimaryGeneratorAction::GenerateUniformKaonPlus( G4Event* anEvent )
 
   //  G4double ratio=G4RandFlat::shoot(0.,1.);
   //  ratio = 0.1;
-	vtx=0;vty=0;
   int vtz_i = vtz;
-	vtz = 4 * (vtz_i/4);
+//	vtx=0;vty=0;
+//	vtz = 4 * (vtz_i/4);
 	// pi- //
   //Energy_p=sqrt(pow(mom_p,2)+pow(m_PionMinus->GetPDGMass()/GeV,2));
   m_particle_gun->SetParticleDefinition(m_KaonPlus);
@@ -2269,16 +2274,27 @@ TPCPrimaryGeneratorAction::GenerateJamInput_Randphi( G4Event* anEvent )
 //_____________________________________________________________________________
 void
 TPCPrimaryGeneratorAction::GenerateIncInput( G4Event* anEvent )
-{
+{//INC Input Generator
   static const auto particleTable = G4ParticleTable::GetParticleTable();
   if( !m_inc )
     return;
   gAnaMan.SetIncID( m_inc->ich );
   gAnaMan.SetPrimaryBeam( m_inc->bpx, m_inc->bpy, m_inc->bpz );
   gAnaMan.SetNumberOfPrimaryParticle( m_inc->np );
+  double vtx = G4RandGauss::shoot( 0, 2.3*CLHEP::cm );
+  double vtz = G4RandFlat::shoot(-4*CLHEP::cm, 4*CLHEP::cm);
+  bool acpt = false;
+  while(!acpt){
+    double rad = hypot(vtx,vtz);
+    if(rad < 4 * CLHEP::cm) acpt = true;
+    else{
+      vtx = G4RandGauss::shoot( 0, 2.3*CLHEP::cm );
+      vtz = G4RandFlat::shoot(-4*CLHEP::cm, 4*CLHEP::cm);
+    }
+  }
   for( G4int i=0; i<m_inc->np; ++i ){
     auto particle = particleTable->FindParticle( m_inc->pid[i] );
-    G4ThreeVector x( m_target_pos.x(), m_target_pos.y(), m_target_pos.z() );
+    G4ThreeVector x( m_target_pos.x()+vtx, m_target_pos.y(), m_target_pos.z()+vtz );
     G4ThreeVector p( m_inc->px[i]*GeV, m_inc->py[i]*GeV, m_inc->pz[i]*GeV );
     m_particle_gun->SetParticleDefinition( particle );
     m_particle_gun->SetParticleMomentumDirection( p );
@@ -5222,6 +5238,75 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
   m_particle_gun->GeneratePrimaryVertex( anEvent );
 
 }
+//181530//
+void
+TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi1530( G4Event* anEvent ){
+	
+	
+	bool FermiMotion = gConf.Get<G4bool>("FermiMotion");
+  static const G4int KaonMinusID = m_KaonMinus->GetPDGEncoding();
+  static const G4int KaonPlusID = m_KaonPlus->GetPDGEncoding();
+  static const G4int Xi1530MinusID = m_Xi1530Minus->GetPDGEncoding();
+  
+	
+	static const G4double KaonPlusMass = m_KaonPlus->GetPDGMass()/CLHEP::GeV;
+  static const G4double Xi1530MinusMass = m_Xi1530Minus->GetPDGMass()/CLHEP::GeV;
+	auto MomKm=	m_mm_vert->Moms[0];	
+	auto MomKp=	m_mm_vert->Moms[1];	
+	auto MomXi1530=	m_mm_vert->Moms[2];
+  gAnaMan.SetMMVertex(m_mm_vert);
+	double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+	double KmEnergy = hypot(KaonPlusMass,MomKm.mag()) - KaonPlusMass;
+	double KpEnergy = hypot(KaonPlusMass,MomKp.mag()) - KaonPlusMass;
+	double Xi1530Energy = hypot(Xi1530MinusMass,MomXi1530.mag()) - Xi1530MinusMass;
+	
+	
+	G4double dx = G4RandFlat::shoot(-15,15);
+	G4double dy = G4RandFlat::shoot(-25,25);
+	double ex = m_mm_vert->x;
+	double ey = m_mm_vert->y;
+	if(abs(ex<15)) dx = ex;
+	if(abs(ey<25)) dy = ey;
+	G4double dz = G4RandFlat::shoot(-153,-133);
+	G4ThreeVector gen_pos(dx,dy,dz);
+/*
+	MomKp.rotateZ(phi);
+	MomKm.rotateZ(phi);
+	MomXi.rotateZ(phi);
+*/
+	gTrackBuffer.SetTrack(1,0,-321,gen_pos,MomKm);	
+	MomKm = - MomKm;
+	gTrackBuffer.SetTrack(2,0,321,gen_pos,MomKp);	
+	gTrackBuffer.SetTrack(3,0,3314,gen_pos,MomXi1530);	
+	double cos_th = G4RandFlat::shoot(-1,1);
+  phi = G4RandFlat::shoot(-acos(-1),acos(-1));
+  double spin_x = sin(phi)*sqrt(1-cos_th*cos_th);
+  double spin_y = cos(phi)*sqrt(1-cos_th*cos_th);
+  double spin_z = cos_th;
+  G4ThreeVector SpinXi(spin_x,spin_y,spin_z);
+  gTrackBuffer.SetPolarity(SpinXi,0);//Random polarization for Xi, since Xi1530 decay parameters are unknown.
+	gAnaMan.SetNumberOfPrimaryParticle( 3 );
+	gAnaMan.SetPrimaryParticle(0,MomKm,KaonPlusMass,KaonMinusID);
+	gAnaMan.SetPrimaryParticle(1,MomKp,KaonPlusMass,KaonPlusID);
+	gAnaMan.SetPrimaryParticle(2,MomXi1530,Xi1530MinusMass,Xi1530MinusID);
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
+	m_particle_gun->SetParticleEnergy(KmEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKm );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	m_particle_gun->SetParticleDefinition( m_sKaonPlus );
+	m_particle_gun->SetParticleEnergy(KpEnergy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomKp );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+	
+	m_particle_gun->SetParticleDefinition( m_Xi1530Minus );
+	m_particle_gun->SetParticleEnergy(Xi1530Energy * GeV);
+	m_particle_gun->SetParticlePosition(gen_pos );
+	m_particle_gun->SetParticleMomentumDirection(MomXi1530 );
+  m_particle_gun->GeneratePrimaryVertex( anEvent );
+
+}
 //1001321//
 void
 TPCPrimaryGeneratorAction::GenerateTPCXiKmKp(G4Event* anEvent){
@@ -5252,7 +5337,7 @@ TPCPrimaryGeneratorAction::GenerateTPCXiKmKp(G4Event* anEvent){
 	MomXi.rotateZ(phi);
 */
 	gTrackBuffer.SetTrack(1,0,-321,gen_pos,MomKm);	
-	MomKm = - MomKm;
+	MomKm = - MomKm;//Km is Kp shot from target to upstream side.
 	gTrackBuffer.SetTrack(2,0,321,gen_pos,MomKp);	
 	gTrackBuffer.SetTrack(3,0,3312,gen_pos,MomXi);	
 	auto SpinXi = MomKm.cross(MomXi);

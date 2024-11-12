@@ -114,7 +114,8 @@ void TPCPolarizedDecayChannel::LoadPolarityMomentum(){
 	MomVector = gTrackBuffer.GetMomentum(order);
 //	G4cout<<*parent_name<<" Polarization P = "<<Polarization<<G4endl;
 //	G4cout<<"Debug:: "<<*parent_name<<" Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
-	if(abs(Polarization) >1.01 or isnan(Polarization)){
+//	if(abs(Polarization) >1.01 or isnan(Polarization)){
+	if(isnan(Polarization)){
 		G4cout<<"Warning! "<<*parent_name<<" Polarization unphysical! Mom = "<<Form("(%g,%g,%g)",MomVector.x(),MomVector.y(),MomVector.z()) <<" P = "<<Polarization<<G4endl;
 		Polarization = 0;
 	}
@@ -148,7 +149,7 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	if(nitr >= 10){
 		G4cout<<"Warning! "<<*parent_name<<" PxM is not set properly! Mom = "<<Form("(%g,%g,%g)",MomOrg.x(),MomOrg.y(),MomOrg.z()) <<" P = "<<Polarity<<G4endl;
 	}
-	PxM = PxM*(1./PxM.mag());
+//	PxM = PxM*(1./PxM.mag());
 	auto MxPxM =MomD.cross(PxM);
 	auto SpinDaughter =( (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM) * 1./(1 + Alpha * Polarization * cos(Theta));
 	auto SpinDaughter_org = SpinDaughter;
@@ -157,6 +158,7 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	gTrackBuffer.SetPolarity(SpinDaughter,order+1);
 	gTrackBuffer.SetPolarization(PolDaughter,order+1);
 	if(abs(PolDaughter) >1.01 or isnan(PolDaughter)){
+//	if( isnan(PolDaughter)){
 		auto Px=gTrackBuffer.GetMomentumOfTrack_x();
 		auto Py=gTrackBuffer.GetMomentumOfTrack_y();
 		auto Pz=gTrackBuffer.GetMomentumOfTrack_z();
@@ -199,11 +201,22 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 		G4ThreeVector TVKm(Kmx,Kmy,Kmz);
 		G4ThreeVector TVKp(Kpx,Kpy,Kpz);
 		G4ThreeVector Vtx(Vpx,Vpy,Vpz);
-
+//	SpinDaughter =( (Alpha+Polarization*cos(Theta))*MomD + Polarization*Beta*PxM + Polarization*Gamma * MxPxM) * 1./(1 + Alpha * Polarization * cos(Theta));
+		G4cout<<"Polarization = "<<Polarization<<G4endl;
 		G4cout<<"Warning! Unphysical Polarization "<<*parent_name<<G4endl;
-		G4cout<<Form("Polarity : (%g,%g,%g)",Polarity.x(),Polarity.y(),Polarity.z())<<G4endl;
+		G4cout<<"Order = "<<order<<G4endl;
+		G4cout<<"CosTheta = "<<cos(Theta)<<G4endl;
+		G4cout<<Form("Alpha,Beta,Gamma = (%g,%g,%g)",Alpha,Beta,Gamma)<<G4endl;
+		G4cout<<Form("Polarity : (%g,%g,%g),Mag = %g",Polarity.x(),Polarity.y(),Polarity.z(),Polarity.mag())<<G4endl;
+		G4cout<<Form("SpinDaughter : (%g,%g,%g),Mag = %g",SpinDaughter_org.x(),SpinDaughter_org.y(),SpinDaughter_org.z(),SpinDaughter_org.mag())<<G4endl;
 		G4cout<<Form("PKm=(%g,%g,%g)",TVKm.x(),TVKm.y(),TVKm.z())<<G4endl;
 		G4cout<<Form("PKp=(%g,%g,%g)",TVKp.x(),TVKp.y(),TVKp.z())<<G4endl;
+		G4cout<<"MomD = "<<MomD<<"Mag = "<<MomD.mag()<<G4endl;
+		G4cout<<"PxM = "<<PxM<<"Mag = "<<PxM.mag()<<G4endl;
+		G4cout<<"MxPxM = "<<MxPxM<<"Mag = "<<MxPxM.mag()<<G4endl;
+		G4cout<<"MomD * PxM = "<<MomD.dot(PxM)<<G4endl;
+		G4cout<<"MomD * MxPxM = "<<MomD.dot(MxPxM)<<G4endl;
+		G4cout<<"PxM * MxPxM = "<<PxM.dot(MxPxM)<<G4endl;
 		G4cout<<Form("ProdVert=(%g,%g,%g)",Vtx.x(),Vtx.y(),Vtx.z())<<G4endl;
 		G4cout<<Form("XiDVert=(%g,%g,%g)",VtxXiDecay.x(),VtxXiDecay.y(),VtxXiDecay.z())<<G4endl;
 		G4cout<<Form("LdDVert=(%g,%g,%g)",VtxLdDecay.x(),VtxLdDecay.y(),VtxLdDecay.z())<<G4endl;
