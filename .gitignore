@@ -10,6 +10,7 @@
 *.swp
 *.root
 *.sh
+param/*.conf
 backup/
 build/
 bin/
@@ -24,4 +25,3 @@ param/conf*
 param/k18hs*
 !.gitkeep
 .vscode/settings.json 
-*.sh
