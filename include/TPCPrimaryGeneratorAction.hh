@@ -52,6 +52,7 @@ private:
   G4ParticleDefinition* m_Sigma1385R;
   G4ParticleDefinition* m_XiMinus;
   G4ParticleDefinition* m_Xi1530Minus;
+  G4ParticleDefinition* m_XiZero;
   G4ParticleDefinition* m_PionPlus;
   G4ParticleDefinition* m_PionMinus;
   G4ParticleDefinition* m_PionZero;
@@ -172,6 +173,8 @@ public:
   void     GenerateLambda( G4Event* anEvent ); //#-1115
   void     GenerateKaonMinus( G4Event* anEvent ); //#-4930
   void     GenerateKmKpLL_BE( G4Event* anEvent ); //#1811161116
+  void     GenerateTPCXi0nUniform(G4Event* anEvent);
+  void     GenerateTPCLLUniform(G4Event* anEvent);
 
 	double   RandSin(void);
 };
