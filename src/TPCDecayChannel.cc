@@ -19,8 +19,7 @@ TPCPolarizedDecayChannel
 				G4String Daughter2Name
 				){
 	order = Order;
-	Alpha = DecayParameter[0];
-	double Angle = DecayParameter[1]*TMath::DegToRad();
+	Alpha = DecayParameter[0]; double Angle = DecayParameter[1]*TMath::DegToRad();
 	Beta = sqrt(1-Alpha*Alpha)*sin(Angle);
 	Gamma = sqrt(1-Alpha*Alpha)*cos(Angle);
 	Initialize(ParentName,BR,Alpha,
@@ -70,7 +69,7 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 	double py = P_d*sin(Theta)*sin(Phi);
 	double pz = P_d*cos(Theta);
 	auto Zaxis = Polarity*(1./Polarity.mag()); 
-	auto Xaxis = MomVector.cross(Polarity);
+	auto Xaxis = Polarity.cross(MomVector);
 	int nitr = 0;
 	while((isnan(Xaxis.mag()) or Xaxis.mag()==0 )and nitr < 10){
 		G4cout<<"Warning! "<<*parent_name<<"Momentum and Polarization is numerically parallel! Mom = "<<MomVector <<" Pol = "<<Polarity<<G4endl;	
@@ -78,7 +77,7 @@ TPCPolarizedDecayChannel::DecayIt(G4double ParentMas){
 		double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
 		double theta = acos(G4RandFlat::shoot(-1,1));
 		auto RandDir = G4ThreeVector(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta));
-		Xaxis = -MomVector.cross(RandDir);//If polarization is numerically equal to momentum, Xaxis will be randomly set, perpendicular to momentum. 
+		Xaxis = RandDir.cross(MomVector);//If polarization is numerically equal to momentum, Xaxis will be randomly set, perpendicular to momentum. 
 		nitr++;
 	}
 	if(nitr >= 10){
@@ -135,7 +134,7 @@ void TPCPolarizedDecayChannel::SavePolarityMomentum(G4ThreeVector MomD){
 	auto MomOrg = MomD;
 	MomD = MomD*(1./MomD.mag());
 	auto PolM = Polarity*(1./Polarity.mag());
-	auto PxM = MomD.cross(PolM);
+	auto PxM = PolM.cross(MomD);
 	int nitr=0;
 	while((isnan(PxM.mag()) or PxM.mag()==0) and nitr < 10){
 		G4cout<<"Warning! "<<*parent_name<<" PxM is not set properly! Mom = "<<Form("(%g,%g,%g)",MomOrg.x(),MomOrg.y(),MomOrg.z()) <<" P = "<<Polarity<<G4endl;	

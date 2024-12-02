@@ -30,10 +30,10 @@ namespace
 	auto& gTrackBuffer = TPCTrackBuffer::GetInstance();
 	//TTree* tree;
 	TTree* TPC_g;
-	const auto& ResParamInnerLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Inner layers
-	const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, true); //B=1 T, Outer layers
-	const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Inner layers
-	const auto& ResParamOuterLayerHSOff = gTPC.TPCResolutionParams(false, true); //B=0, Outer layers
+	const auto& ResParamInnerLayerHSOn = gTPC.TPCResolutionParams(true, true); //B=1 T, Inner layers
+	const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Outer layers
+	const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, true); //B=0, Inner layers
+	const auto& ResParamOuterLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Outer layers
 	const auto& DiscardData = gConf.Get<G4bool> ("DiscardData");
 	// 	const ng& Matrix_2D  = gConf.Get<G4String> ("MTX2D");
 }
