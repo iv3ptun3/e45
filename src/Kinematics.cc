@@ -12,7 +12,6 @@
 
 namespace Kinematics
 {
-
 const G4double b = 1.62 * CLHEP::GeV * CLHEP::fermi / CLHEP::hbarc;
 static int gNumOfTracks;
 static std::vector<double> gX0;
@@ -262,4 +261,26 @@ G4ThreeVector FermiGasMomentum(double p_f){
   G4ThreeVector dir = SphericalRandom();
   return p * dir;
 }
+
+G4ThreeVector RotateAlongBeam(G4ThreeVector Beam, G4ThreeVector Vect, G4double phi){
+	G4double BeamMag = Beam.mag();
+	auto z_Beam = Beam* (1./BeamMag);
+	auto y_Beam = z_Beam.cross(Vect);
+	y_Beam = y_Beam * (1./y_Beam.mag());
+	auto x_Beam = y_Beam.cross(z_Beam);
+	
+	auto Pz_Beam = Vect * z_Beam;
+	auto Pt_Beam = Vect * x_Beam;//X axis is defined as the transverse component direction. 
+
+	auto x_rot = x_Beam * cos(phi) + y_Beam * sin(phi);
+	auto y_rot = -x_Beam * sin(phi) + y_Beam * cos(phi);
+
+	auto Pt_rot = Pt_Beam * x_rot; 
+	auto Pz_rot = Pz_Beam * z_Beam;
+
+	auto P_rot = Pt_rot + Pz_rot;
+
+	return P_rot;
+}
+
 }

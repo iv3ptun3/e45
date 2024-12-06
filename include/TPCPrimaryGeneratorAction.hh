@@ -39,7 +39,8 @@ private:
   G4double              m_beam_p0;
   JamInfo*              m_jam;
   IncInfo*              m_inc;
-  G4ParticleDefinition* m_Neutron;
+	std::vector<double>   rand_cont;
+	G4ParticleDefinition* m_Neutron;
   G4ParticleDefinition* m_Proton;
   G4ParticleDefinition* m_AntiProton;
   G4ParticleDefinition* m_Lambda;

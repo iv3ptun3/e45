@@ -164,13 +164,18 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
       static const auto ProtonMass = m_Proton->GetPDGMass()/CLHEP::GeV;
       static const auto LambdaMass = m_Lambda->GetPDGMass()/CLHEP::GeV;
       while(selecting){
-      	G4int eventID = anEvent->GetEventID();
+				rand_cont.clear();
+				G4int eventID = anEvent->GetEventID();
 	*m_kmkpl =  gBeam.GetKmKpL();
 	*m_kmkpl2 = gBeam.GetKmKpL();
 	G4ThreeVector TVKm = m_kmkpl->Moms[0];
 	G4ThreeVector TVKp = m_kmkpl->Moms[1];
 	G4ThreeVector TVL1 = m_kmkpl->Moms[2];
 	G4ThreeVector TVL2 = m_kmkpl2->Moms[2];
+	auto phi1 = G4RandFlat::shoot(0.,2.*acos(-1)); 
+	auto phi2 = G4RandFlat::shoot(0.,2.*acos(-1)); 
+	TVL1 = Kinematics::RotateAlongBeam(TVKm,TVL1,phi1); 
+	TVL2 = Kinematics::RotateAlongBeam(TVKm,TVL2,phi2); 
 	cnt++;
 	if(TVL1.mag()==TVL2.mag())continue;
 	G4LorentzVector LVKm(TVKm,hypot(TVKm.mag(),KaonMass));
@@ -181,6 +186,8 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
 	auto BeExcitation = (LVKm+LV12C - LVKp - LVL1-LVL2).m() - m10Be;
 	if(abs(BeExcitation) < 0.05) {
 	  selecting = false;
+  	rand_cont.push_back(phi1);
+  	rand_cont.push_back(phi2);
 	}
       }
     }
@@ -5712,12 +5719,13 @@ TPCPrimaryGeneratorAction::GenerateKmKpLL_BE( G4Event* anEvent ){
 	G4ThreeVector TVKp = m_kmkpl->Moms[1];
 	G4ThreeVector TVL1 = m_kmkpl->Moms[2];
 	G4ThreeVector TVL2 = m_kmkpl2->Moms[2];
-	G4cout<<"LL Selected: "<<G4endl;
+	auto phi1 = rand_cont.at(0);
+	auto phi2 = rand_cont.at(1);
+	TVL1 = Kinematics::RotateAlongBeam(TVKm,TVL1,phi1); 
+	TVL2 = Kinematics::RotateAlongBeam(TVKm,TVL2,phi2); 
 	G4LorentzVector LVL1(TVL1,hypot(TVL1.mag(),LambdaMass));
 	G4LorentzVector LVL2(TVL2,hypot(TVL2.mag(),LambdaMass));
 	auto LL = LVL1+LVL2;
-	G4cout<<"L1 = "<<TVL1<<", L2 = "<<TVL2<<G4endl;
-	G4cout<<"CM = "<<LL.m()<<G4endl;
 	double EKm = hypot(KaonMass,TVKm.mag()) - KaonMass;
 	double EKp = hypot(KaonMass,TVKp.mag()) - KaonMass;
 	double EL1 = hypot(LambdaMass,TVL1.mag()) - LambdaMass;

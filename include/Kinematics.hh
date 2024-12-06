@@ -19,11 +19,13 @@ namespace Kinematics
 	G4ThreeVector MultitrackVertex(int ntrack, double *x0, double *y0,
 			    double *u0, double *v0);
 
+	G4ThreeVector RotateAlongBeam(G4ThreeVector Beam, G4ThreeVector Vect, G4double phi);
   inline G4String ClassName( void )
   {
     static G4String s_name("Kinematics");
     return s_name;
   }
+
 }
 
 #endif
