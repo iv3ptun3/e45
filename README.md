@@ -9,8 +9,8 @@ K1.8 geant4 simulation tool.
 
 This tool is developed on the platform of KEKCC, Scientific Linux 6.10.
 - g++ (GCC) 4.8.5
-- ROOT 6.16.00
-- Geant4 10.4.3-mt
+- ROOT 6.32.04
+- Geant4 11.2.2
 
 
 
@@ -19,12 +19,11 @@ This tool is developed on the platform of KEKCC, Scientific Linux 6.10.
 Environment variables should be set.
 
 ```shell
-module load git/2260
 export G4WORKDIR=$HOME/work/geant4
 export PATH=$G4WORKDIR/bin/Linux-g++:$PATH
-. /sw/packages/root/6.20.08/bin/thisroot.sh
-. /sw/packages/geant4/10.4.3-mt/bin/geant4.sh
-. /sw/packages/geant4/10.4.3-mt/share/Geant4-10.4.3/geant4make/geant4make.sh
+. /sw/packages/root/6.32.04/bin/thisroot.sh
+. /sw/packages/geant4/11.2.2/bin/geant4.sh
+. /sw/packages/geant4/11.2.2/share/Geant4-10.4.3/geant4make/geant4make.sh
 ```
 
 then
