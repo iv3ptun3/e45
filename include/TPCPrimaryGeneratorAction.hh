@@ -99,6 +99,8 @@ public:
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateIncInput( G4Event* anEvent );
   void     GenerateIncInputRandVtx( G4Event* anEvent );
+  void     GenerateKKReactionWithExternalInputRandVtx( G4Event* anEvent );
+  void     GenerateKPReactionWithExternalInputRandVtx( G4Event* anEvent );
   void     GenerateJamInput_Randphi( G4Event* anEvent );
   void     GenerateLL_fromXiP( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
