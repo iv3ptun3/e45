@@ -26,6 +26,10 @@ struct IncInfo
   Double_t bpx; // [GeV/c]
   Double_t bpy; // [GeV/c]
   Double_t bpz; // [GeV/c]
+  // Kp
+  Double_t kppx; // [GeV/c]
+  Double_t kppy; // [GeV/c]
+  Double_t kppz; // [GeV/c]
   // fs
   Int_t np;
   Int_t pid[MaxHits];

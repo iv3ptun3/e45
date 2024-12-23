@@ -87,6 +87,10 @@ IncMan::Initialize( void )
   m_tree->SetBranchAddress( "bpx", &m_event->bpx );
   m_tree->SetBranchAddress( "bpy", &m_event->bpy );
   m_tree->SetBranchAddress( "bpz", &m_event->bpz );
+  // beam
+  m_tree->SetBranchAddress( "kppx", &m_event->kppx );
+  m_tree->SetBranchAddress( "kppy", &m_event->kppy );
+  m_tree->SetBranchAddress( "kppz", &m_event->kppz );
   // event
   m_tree->SetBranchAddress( "np", &m_event->np );
   m_tree->SetBranchAddress( "pid", m_event->pid );
@@ -100,6 +104,9 @@ IncMan::Initialize( void )
   m_tree->SetBranchStatus( "bpx", true );
   m_tree->SetBranchStatus( "bpy", true );
   m_tree->SetBranchStatus( "bpz", true );
+  m_tree->SetBranchStatus( "kppx", true );
+  m_tree->SetBranchStatus( "kppy", true );
+  m_tree->SetBranchStatus( "kppz", true );
 
   m_tree->SetBranchStatus( "np", true );
   m_tree->SetBranchStatus( "pid", true );
@@ -133,20 +140,20 @@ IncMan::Get( Int_t i ) const
 {
   auto curr_file = gFile;
   m_file->cd();
-	while(1){
-		bool good = 1;
-		if(i>=m_n_event)i=0;
-  	m_tree->GetEntry( i );
-  	for(int ip=0;ip<m_event->np;++ip){
-			if(isnan(m_event->px[ip]))good = 0;
-			if(isnan(m_event->py[ip]))good = 0;
-			if(isnan(m_event->pz[ip]))good = 0;
-		}
-		if(good)break;
-		G4cout<<"Warning! broken events! "<<i<<" -> "<<i+1<<G4endl;
-		++i;
-	}
-	if( curr_file )
+  while(1){
+    bool good = 1;
+    if(i>=m_n_event)i=0;
+    m_tree->GetEntry( i );
+    for(int ip=0;ip<m_event->np;++ip){
+      if(isnan(m_event->px[ip]))good = 0;
+      if(isnan(m_event->py[ip]))good = 0;
+      if(isnan(m_event->pz[ip]))good = 0;
+    }
+    if(good)break;
+    G4cout<<"Warning! broken events! "<<i<<" -> "<<i+1<<G4endl;
+    ++i;
+  }
+  if( curr_file )
     curr_file->cd();
   return m_event;
 }
