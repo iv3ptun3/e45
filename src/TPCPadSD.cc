@@ -408,7 +408,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 	G4ThreeVector PadPos(hitx,0,hitz - m_center_z); 
 	G4ThreeVector MomT(mom.x(),0,mom.z());	
 	G4double alpha = PadPos.theta()-MomT.theta();
-	G4double PathT = PadLen * 1./cos(alpha);
+	G4double PathT = PadLen * 1./abs(cos(alpha));
 	G4double Pitch = mom.y()/MomT.mag();
 	G4double Path = PathT * sqrt(1+Pitch*Pitch);
 	slength = Path;
@@ -421,7 +421,11 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 	if(edepSig / edepMean < 0.01 or edepSig/edepMean > 0.5)edepSig = 0.2*edepMean;
 	G4double edep = G4RandGauss::shoot(edepMean,edepSig);
 	if(edep <0.1* edepMean)edep = 0.1*edepMean;
-
+	if(edep<0){
+		G4cout<<"Error! Edep = "<<edep<<G4endl;
+		G4cout<<"Mass = "<<mass<<", Mom = "<<mom<<", path = "<<Path<<G4endl;
+		G4cout<<"EdepMean = "<<edepMean<<", Sig = "<<edepSig<<G4endl;
+	}
 	int ncl = TPCClusterSize(mom.mag(),mass,iLay);
 #ifdef DEBUG
   
