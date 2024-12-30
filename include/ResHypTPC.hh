@@ -103,9 +103,9 @@ public:
 G4double GetTransverseRes(G4double y);
 //const G4double ResHypTPC::y_resolution = 0.5;
 
-G4double GetVerticalRes(G4double y, G4double* par);
+G4double GetVerticalRes(G4double y, G4double dz, G4double de, G4double* par);
 
 G4double GetHorizontalRes(G4double t,G4double y, G4double* par);
-G4ThreeVector GetResVector(G4ThreeVector pos,G4ThreeVector mom, G4double* par_y, G4double* par_t);
-G4ThreeVector GetSmearingVector(G4ThreeVector pos,G4ThreeVector mom, G4double* par_y, G4double* par_t);
+G4ThreeVector GetResVector(G4ThreeVector pos,G4ThreeVector mom, G4double de,G4double* par_y, G4double* par_t);
+G4ThreeVector GetSmearingVector(G4ThreeVector pos,G4ThreeVector mom, G4double de, G4double* par_y, G4double* par_t);
 #endif

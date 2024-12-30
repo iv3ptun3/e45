@@ -44,6 +44,7 @@ struct CounterData
   G4int ntrk;
   G4double resoX;
   G4int trackID;
+  G4int ncl;
   G4int particleID;
   G4double time;
   G4double beta;
@@ -284,6 +285,7 @@ struct Event
   Int_t iPadtpc[MaxTrack];      // number of pad 
   Int_t laytpc[MaxTrack];      // number of pad layer
   Int_t rowtpc[MaxTrack];      // number of pad raw
+  Int_t ncltpc[MaxTrack];      // number of cluster
   Double_t toftpc[MaxTrack];   // tof
   Int_t parentID[MaxTrack];      // parent id
   Double_t cir_r[MaxTrack];   // fit radius
@@ -684,7 +686,7 @@ public:
 		   G4double vtxenetpc2 );
   void SetBH2Data( const VHitInfo* hit );
   void SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
-		       G4ThreeVector mom, G4int track, G4int particle,
+		       G4ThreeVector mom, G4int track, G4int particle, G4int ncl,
 		       G4int iLay, G4int iRow, G4double beta, G4double edep,
 		       G4int parentid, G4double tlength, G4double slength );
   void SetFermiMomentum( const G4ThreeVector& p );

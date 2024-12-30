@@ -13,7 +13,7 @@ class TPCPadHit : public G4VHit
 {
 public:
   TPCPadHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-	     G4int tid, G4int pid,
+	     G4int tid, G4int pid, G4int nCl,
 	     G4int ilay, G4int irow,
 	     G4double b, G4double ed, G4int parentid, G4double Length,
 	     G4double Mass, G4int Charge,
@@ -27,6 +27,7 @@ private:
   G4double tof;
   G4int trackID;
   G4int particleID;
+  G4int ncl;
   G4int iLay;
   G4int iRow;
   G4double beta;
@@ -61,9 +62,9 @@ public:
   G4double GetTOF() const { return tof; }
   G4int GetTrackID() const { return trackID; }
   G4int GetParticleID() const { return particleID; }
+  G4int GetClusterSize() const { return ncl; }
   G4int GetPadLay() const { return iLay; }
   G4int GetPadRow() const { return iRow; }
-  void SetEdep(G4double aedep) { edep = aedep; }
   G4double GetEdep() const { return edep; }
   G4double GetBeta() const { return beta; }
   G4double GetMass() const { return mass; }
@@ -72,7 +73,8 @@ public:
   G4int GetParentID_pid() const { return parentID_pid; }
   G4double GettLength() const { return Length; }
   G4double GetsLength() const { return SLength; }
-
+  void SetEdep(G4double aedep) { edep = aedep; }
+  void SetClusterSize(G4int nCl) { ncl = nCl; }
   // methods
   virtual void Draw();
   virtual void Print();

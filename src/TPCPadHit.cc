@@ -8,7 +8,7 @@ G4Allocator<TPCPadHit> TPCPadHitAllocator;
 
 //_____________________________________________________________________________
 TPCPadHit::TPCPadHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
-		      G4int tid, G4int pid,
+		      G4int tid, G4int pid, G4int nCl,
 		      G4int ilay, G4int irow, G4double Beta, G4double Ed,
 		      G4int Parentid,
 		      G4double tlength, G4double Mass, G4int Charge,
@@ -16,7 +16,7 @@ TPCPadHit::TPCPadHit( G4ThreeVector& axyz, G4ThreeVector& apxyz, G4double t,
 		      G4double avtxene, G4double slength,
 		      G4int Parentid_pid )
   : xyz(axyz), pxyz(apxyz), tof(t), trackID(tid), particleID(pid),
-    iLay(ilay),iRow(irow), beta(Beta),edep(Ed), parentID(Parentid),
+    ncl(nCl),iLay(ilay),iRow(irow), beta(Beta),edep(Ed), parentID(Parentid),
     Length(tlength), mass(Mass), charge(Charge), vtxmome(Vtxmom),
     vtxposi(Vtxpos), vtxene(avtxene), SLength(slength),
     parentID_pid(Parentid_pid)

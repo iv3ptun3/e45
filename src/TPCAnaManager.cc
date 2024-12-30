@@ -34,6 +34,12 @@ namespace
 	const auto& ResParamOuterLayerHSOn = gTPC.TPCResolutionParams(true, false); //B=1 T, Outer layers
 	const auto& ResParamInnerLayerHSOff = gTPC.TPCResolutionParams(false, true); //B=0, Inner layers
 	const auto& ResParamOuterLayerHSOff = gTPC.TPCResolutionParams(false, false); //B=0, Outer layers
+	
+	const auto& ResClParamInnerLayerHSOn = gTPC.TPCResolutionParamsCl(true, true); //B=1 T, Inner layers
+	const auto& ResClParamOuterLayerHSOn = gTPC.TPCResolutionParamsCl(true, false); //B=1 T, Outer layers
+	const auto& ResClParamInnerLayerHSOff = gTPC.TPCResolutionParamsCl(false, true); //B=0, Inner layers
+	const auto& ResClParamOuterLayerHSOff = gTPC.TPCResolutionParamsCl(false, false); //B=0, Outer layers
+
 	const auto& DiscardData = gConf.Get<G4bool> ("DiscardData");
 	// 	const ng& Matrix_2D  = gConf.Get<G4String> ("MTX2D");
 }
@@ -120,6 +126,7 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch("ntrk",event.ntrk,"ntrk[nhittpc]/I");
 	TPC_g->Branch("ititpc",event.ititpc,"ititpc[nhittpc]/I");
 	TPC_g->Branch("idtpc",event.idtpc,"idtpc[nhittpc]/I");
+	TPC_g->Branch("ncltpc",event.ncltpc,"ncltpc[nhittpc]/I");
 	TPC_g->Branch("xtpc",event.xtpc,"xtpc[nhittpc]/D");//after smeared by resolution
 	TPC_g->Branch("ytpc",event.ytpc,"ytpc[nhittpc]/D");//after smeared by resolution
 	TPC_g->Branch("ztpc",event.ztpc,"ztpc[nhittpc]/D");//after smeared by resolution
@@ -1086,6 +1093,7 @@ TPCAnaManager::BeginOfEventAction( void )
 
 		event.ititpc[i] = -1;
 		event.idtpc[i] = -1;
+		event.ncltpc[i] = -1;
 		event.iPadtpc[i] = -1;
 		event.laytpc[i] = -1;
 		event.rowtpc[i] = -1;
@@ -1236,6 +1244,7 @@ TPCAnaManager::EndOfEventAction( void )
 						pow(counterData[i].mom[2], 2))/CLHEP::GeV;
 				event.ititpc[event.nhittpc] = counterData[i].trackID;
 				event.idtpc[event.nhittpc] = counterData[i].particleID;
+				event.ncltpc[event.nhittpc] = counterData[i].ncl;
 				event.laytpc[event.nhittpc] = counterData[i].iLay;
 
 				event.rowtpc[event.nhittpc] = counterData[i].iRow;
@@ -1635,7 +1644,7 @@ TPCAnaManager::SetBH2Data( const VHitInfo* hit )
 	void
 TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		G4ThreeVector mom,
-		G4int track, G4int particle,
+		G4int track, G4int particle, G4int ncl,
 		G4int iLay,  G4int iRow, G4double beta,
 		G4double edep, G4int parentid,
 		G4double tlength, G4double slength )
@@ -1677,6 +1686,7 @@ TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		counterData[hitnum].beta = beta;
 		counterData[hitnum].dedx = edep/slength;
 		counterData[hitnum].edep = edep;
+		counterData[hitnum].ncl = ncl;
 		counterData[hitnum].slength = slength;
 		counterData[hitnum].tlength = tlength;
 
@@ -1698,19 +1708,29 @@ TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		}
 		std::vector<double>ResPar;
 		if(iLay < 10){
-			ResPar = ResParamInnerLayerHSOn;
+			if(ncl==1){
+				ResPar = ResParamInnerLayerHSOn;
+			}
+			else{
+				ResPar = ResClParamInnerLayerHSOn;
+			}
 		}
 		else{
-			ResPar = ResParamOuterLayerHSOn;
+			if(ncl==1){
+				ResPar = ResParamOuterLayerHSOn;
+			}
+			else{
+				ResPar = ResClParamOuterLayerHSOn;
+			}
 		}
 		double par_t[6]={
 			ResPar[0],ResPar[1],ResPar[2],ResPar[3],ResPar[4],ResPar[5]};
-		double par_y[4] = {
-			ResPar[6],ResPar[1],ResPar[7],ResPar[8]};
+		double par_y[6] = {
+			ResPar[6],ResPar[7],ResPar[9],ResPar[9],ResPar[10],ResPar[11]};
 		// G4double compy=0.;
 		G4double compx=0.;
 		auto SmearingVector =
-			GetSmearingVector(sh_pos,mom,par_y,par_t);
+			GetSmearingVector(sh_pos,mom,edep,par_y,par_t);
 
 //Resolution Modification
 #if 0
@@ -1726,7 +1746,7 @@ TPCAnaManager::SetCounterData( G4int ntrk, G4double time, G4ThreeVector pos,
 		}
 #endif
 		auto ResVector =
-			GetResVector(sh_pos,mom,par_y,par_t);
+			GetResVector(sh_pos,mom,edep,par_y,par_t);
 		compx = ResVector.mag();
 		/*
 			 compx = GetTransverseRes(sh_y);

@@ -32,6 +32,7 @@ enum EPadParameter
   NPadParameter
 };
 
+
 //for clustering
 static const Int_t MaxRowDifTPC = 2;
 //for helix tracking
@@ -1346,5 +1347,45 @@ inline Bool_t Dead(Int_t layer, Int_t row){
   Int_t padID = GetPadId(layer, row);
   return Dead(padID);
 }
+
+static const Double_t ClusterSizeInner[2][10] ={
+  {0.12912,0.12912,0.129121,0.164862,0.211372,0.256798,0.33125,0.315186,0.27439,0.303371},//proton
+  {0.274143,0.550639,0.683333,0.683333,0.683333,0.683333,0.683333,0.683333,0.683333,0.683333}//pion
+  //0.0 - 0.1 , 0.1 - 0.2, ... 0.9 - 1.0 GeV/c
+};
+static const Double_t ClusterSizeOuter[2][10] ={
+  {0.285714,0.285714,0.326683,0.280962,0.243775,0.234132,0.217313,0.256798,0.293478,0.285319},//proton
+  {0.257669,0.348881,0.308642,0.308642,0.308642,0.308642,0.308642,0.308642,0.308642,0.308642}//pion
+  //0.0 - 0.1 , 0.1 - 0.2, ... 0.9 - 1.0 GeV/c
+};
+
+inline Double_t GetClSize1Prob(double mom, double mass, int layer){       
+    bool inner = false;                                               
+    if(layer < 10) inner = true;                                      
+    int pidflag = 0;
+    if(mass<500) pidflag = 0;  //MeV/c2                                   
+    else pidflag = 1;                                                 
+    int mom_flag = (int)(mom/100);     //MeV/c                               
+    double prob = 0;
+    if(mom_flag > 9){
+      mom_flag = 9;
+      if(inner){                                                      
+        prob = ClusterSizeInner[pidflag][mom_flag];                   
+      }
+      else{
+        prob = ClusterSizeOuter[pidflag][mom_flag];
+      }
+    }  
+    else{
+      double resi = (mom )/100 - mom_flag;                            
+      if(inner){
+        prob = ClusterSizeInner[pidflag][mom_flag]*(1-resi) + ClusterSizeInner[pidflag][mom_flag+1]*resi; 
+      }
+      else{
+        prob = ClusterSizeOuter[pidflag][mom_flag]*(1-resi) + ClusterSizeOuter[pidflag][mom_flag+1]*resi;
+      }
+    }  
+    return prob; 
+  }
 }
 #endif

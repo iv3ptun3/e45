@@ -26,9 +26,9 @@ namespace
 {
   const auto& gConf = ConfMan::GetInstance();
   const auto& gGeom = DCGeomMan::GetInstance();
-	const Double_t sigma_dedx_p[5] = {5.46764, 8.47708, -4.44913, 229.07, -6.63587};
-	const Double_t sigma_dedx_pi[5] = {4.24777, -0.484695, 0.297915, 20.2996, -13.4064};
-	const Double_t sigma_dedx_k[5] = {9.82967, -9.5835, 4.16533, 81.4433, -7.71084};
+  const Double_t sigma_dedx_p[5] = {5.46764, 8.47708, -4.44913, 229.07, -6.63587};
+  const Double_t sigma_dedx_pi[5] = {4.24777, -0.484695, 0.297915, 20.2996, -13.4064};
+  const Double_t sigma_dedx_k[5] = {9.82967, -9.5835, 4.16533, 81.4433, -7.71084};
 }
 
 //_____________________________________________________________________________
@@ -421,6 +421,8 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 	if(edepSig / edepMean < 0.01 or edepSig/edepMean > 0.5)edepSig = 0.2*edepMean;
 	G4double edep = G4RandGauss::shoot(edepMean,edepSig);
 	if(edep <0.1* edepMean)edep = 0.1*edepMean;
+
+	int ncl = TPCClusterSize(mom.mag(),mass,iLay);
 #ifdef DEBUG
   
   //for test 
@@ -467,7 +469,7 @@ TPCPadSD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
 
   //  sscanf(name,"PadPV%d",&iLay);
   sscanf(name,"PadPV%d",&iLay_copyNo);
-  TPCPadHit* ahit= new TPCPadHit(pos, mom, tof, tid, pid, iLay, iRow, beta, edep,parentID,tlength, mass, charge, VertexPosition, VertexMomentum, VertexEnergy,slength, parentID_pid );
+  TPCPadHit* ahit= new TPCPadHit(pos, mom, tof, tid, pid, ncl, iLay, iRow, beta, edep,parentID,tlength, mass, charge, VertexPosition, VertexMomentum, VertexEnergy,slength, parentID_pid );
 
   hitsCollection-> insert(ahit);
   return true;
@@ -555,6 +557,14 @@ TPCPadSD::DensityEffectCorrection(Double_t betagamma, Double_t *par){
 
   return delta;
 
+}
+//_____________________________________________________________________________
+G4int
+TPCPadSD::TPCClusterSize(G4double mom, G4double mass , G4int layer){
+	double prob = padHelper::GetClSize1Prob(mom,mass,layer);	
+	G4double mc = G4RandGauss::shoot(0,1);
+	if(mc < prob) return 1;
+	else return 2;
 }
 //_____________________________________________________________________________
 void

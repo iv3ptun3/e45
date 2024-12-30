@@ -50,6 +50,10 @@ private:
   std::vector<Double_t> m_Res_HSON_Outer;
   std::vector<Double_t> m_Res_HSOFF_Inner;
   std::vector<Double_t> m_Res_HSOFF_Outer;
+  std::vector<Double_t> m_ResCl_HSON_Inner;
+  std::vector<Double_t> m_ResCl_HSON_Outer;
+  std::vector<Double_t> m_ResCl_HSOFF_Inner;
+  std::vector<Double_t> m_ResCl_HSOFF_Outer;
 
 public:
   Bool_t Initialize();
@@ -63,6 +67,7 @@ private:
 
 public:
   static const std::vector<Double_t>& TPCResolutionParams(Bool_t HSOn, Bool_t Inner);
+  static const std::vector<Double_t>& TPCResolutionParamsCl(Bool_t HSOn, Bool_t Inner);
 
 };
 
@@ -89,8 +94,15 @@ TPCParamMan::TPCResolutionParams(Bool_t HSOn, Bool_t Inner)
   if(!HSOn&&Inner) return GetInstance().m_Res_HSOFF_Inner;
   if(!HSOn&&!Inner) return GetInstance().m_Res_HSOFF_Outer;
   if(HSOn&&Inner) return GetInstance().m_Res_HSON_Inner;
-  //if(HSOn&&!Inner) return GetInstance().m_Res_HSON_Outer;
   return GetInstance().m_Res_HSON_Outer;
+}
+inline const std::vector<Double_t>&
+TPCParamMan::TPCResolutionParamsCl(Bool_t HSOn, Bool_t Inner)
+{
+  if(!HSOn&&Inner) return GetInstance().m_ResCl_HSOFF_Inner;
+  if(!HSOn&&!Inner) return GetInstance().m_ResCl_HSOFF_Outer;
+  if(HSOn&&Inner) return GetInstance().m_ResCl_HSON_Inner;
+  return GetInstance().m_ResCl_HSON_Outer;
 }
 
 #endif
