@@ -98,9 +98,7 @@ public:
   void     GenerateUniformProton_P_Multi( G4Event* anEvent );
   void     GenerateJamInput( G4Event* anEvent );
   void     GenerateIncInput( G4Event* anEvent );
-  void     GenerateIncInputRandVtx( G4Event* anEvent );
-  void     GenerateKKReactionWithExternalInputRandVtx( G4Event* anEvent );
-  void     GenerateKPReactionWithExternalInputRandVtx( G4Event* anEvent );
+  void     GenerateIncInput_Vertex( G4Event* anEvent );
   void     GenerateJamInput_Randphi( G4Event* anEvent );
   void     GenerateLL_fromXiP( G4Event* anEvent );
   void     GenerateHdibaryonNonReso( G4Event* anEvent );
@@ -179,6 +177,8 @@ public:
   void     GenerateKmKpLL_BE( G4Event* anEvent ); //#1811161116
   void     GenerateTPCXi0nUniform(G4Event* anEvent);
   void     GenerateTPCLLUniform(G4Event* anEvent);
+
+  void     GenerateAccidentals( int nAccidentals ,G4Event* anEvent); //Not intended for stand-alone use
 
 	double   RandSin(void);
 };

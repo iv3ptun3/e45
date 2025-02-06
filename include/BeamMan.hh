@@ -128,11 +128,15 @@ private:
   typedef std::vector<KmKpL> KmKpLArray;
   G4bool        m_is_ready;
   G4String      m_file_name;
+  G4String      m_accidental_name;
   TFile*        m_file;
+  TFile*        m_accidental_file;
   ParamArray    m_param_array;
+  ParamArray    m_accidental_array;
   MMArray    		m_mm_array;
   KmKpLArray    m_kmkpl_array;
   G4int         m_n_param;
+  G4int         m_n_accidental;
   G4bool        m_is_vi; // true:VI or false:VO
   G4bool        m_is_k18=0;
   G4bool        m_is_kurama=0;
@@ -150,6 +154,7 @@ private:
 public:
   const BeamInfo&      Get( void ) const;
   const BeamInfo&      Get( G4int iev ) const;
+  const BeamInfo&      GetAccidental( void ) const;
   const MMVertex&      GetVertex( void ) const;
   const MMVertex&      GetVertex( G4int iev ) const;
   const KmKpL         GetKmKpL( void ) const; 
@@ -157,7 +162,7 @@ public:
   G4double             GetPrimaryZ( void ) const { return m_primary_z; }
   const G4ThreeVector& GetVIPosition( void ) const { return m_vi_pos; }
   G4bool               Initialize( void );
-  G4bool               Initialize( const G4String& filename );
+  G4bool               Initialize( const G4String& filename ,const G4String& accname = "" );
   G4bool               IsReady( void ) const { return m_is_ready; }
   G4bool               IsK18( void ) const { return m_is_k18; }
   G4bool               IsKurama( void ) const { return m_is_kurama; }

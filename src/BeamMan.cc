@@ -194,7 +194,7 @@ BeamMan::Initialize(void)
 	m_is_vi = (gConf.Get<G4int>("Generator") == 10);
 	if (abs(generator) == 135 or abs(generator) == 493 or abs(generator) == 938)
 	{
-		m_is_k18 = 1;
+//		m_is_k18 = 1;
 		G4cout << "Generating K18 Beam" << G4endl;
 	}
 	if (abs(generator) == 100)
@@ -795,6 +795,9 @@ BeamMan::Initialize(void)
 	G4cout << "Closing files" << G4endl;
 	m_file->Close();
 	G4cout << "File Closed" << G4endl;
+	
+	
+	
 	if(m_is_TPCXi or m_is_missmassXi or m_is_missmassXi1530){
 		G4cout<<"Number of seeds: "<<m_mm_array.size()<<G4endl;
 	}
@@ -803,15 +806,55 @@ BeamMan::Initialize(void)
 	}
 	m_n_param = m_param_array.size();
 	m_is_ready = true;
+	
+
+  if (m_accidental_name.empty()){
 	return true;
+  }
+  else{
+	m_accidental_file = new TFile(m_accidental_name);
+	TTree* tree_acc = (TTree*)m_accidental_file->Get("k18track");
+	tree_acc->SetBranchAddress("ntK18", &ntBeam);
+	tree_acc->SetBranchAddress("xtgtHS", xout);
+	tree_acc->SetBranchAddress("ytgtHS", yout);
+	tree_acc->SetBranchAddress("utgtHS", uout);
+	tree_acc->SetBranchAddress("vtgtHS", vout);
+	tree_acc->SetBranchAddress("pHS", pBeam);
+	int entries_acc = tree_acc->GetEntries();
+	G4cout << "Accidental events = " << entries_acc << G4endl;
+	BeamInfo accidental;
+	double prop = abs(m_target_z - (-250))+ 20;
+	for( int iev=0;iev < entries_acc;++iev){
+		tree_acc->GetEntry(iev);
+		if(iev % 100000 == 0) G4cout<<"Reading Accidental Events "<<iev<<" / "<<entries_acc<<G4endl;
+		if(ntBeam != 1) continue;
+		double mom = pBeam[0];
+		double radi = mom * 1000 / 0.3; // mm
+		double dth = prop / radi;	
+		double u = uout[0] + dth,v = vout[0];
+		accidental.u = u;// bending due to B field
+		accidental.x = xout[0] - (u + uout[0])/2 *prop;// at the enterance of the TPC	
+		double y_rand = G4RandFlat::shoot(-300,300);
+		accidental.y = yout[0] + y_rand;
+		accidental.z = m_target_z - prop; // just outside the TPC. accidental should not hit the HS Magnet.
+		accidental.v = vout[0];
+		G4ThreeVector p(pBeam[0] * accidental.u, pBeam[0] * vout[0], pBeam[0]/sqrt(u*u + v*v + 1));
+		accidental.p = p;
+		m_accidental_array.push_back(accidental);
+	}
+	m_n_accidental = m_accidental_array.size();	
+	return true;
+  }
+	
   }
 
   //_____________________________________________________________________________
   G4bool
-    BeamMan::Initialize(const G4String &filename)
+    BeamMan::Initialize(const G4String &filename, const G4String &accidental_name)
   {
     m_file_name = filename;
-    return Initialize();
+	m_accidental_name = accidental_name;
+	return Initialize();
   }
 
   //_____________________________________________________________________________
@@ -874,4 +917,10 @@ BeamMan::Initialize(void)
   void BeamMan::GetHitProfile(double &x, double &y) const
   {
     HitProfile->GetRandom2(x, y);
+  }
+
+  const BeamInfo &
+    BeamMan::GetAccidental(void) const
+  {
+    return m_accidental_array.at(G4RandFlat::shootInt(m_n_accidental));
   }

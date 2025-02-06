@@ -17,7 +17,7 @@ static std::map<TString, TH1*> hmap;
 static std::map<TString, TH2*> hmap2d;
 
 //_____________________________________________________________________________
-static const G4int MaxHits    = 500;
+static const G4int MaxHits    = 2000;
 static const G4int MaxHitsTPC = 500;
 static const G4int MaxPrimaryParticle = 10;
 
@@ -131,6 +131,7 @@ struct Event
   Int_t HitNum_p;
   //  int tpctrNum_p;
 
+	bool Accepted;
 	int NumberOfTracks;
 	int PIDOfTrack[1000];
 	int ParentIDOfTrack[1000];
@@ -510,6 +511,23 @@ struct Event
   Double_t pzTgtVtxVp[MaxHits];
   Double_t eTgtVtxVp[MaxHits];
 
+  Int_t nhHSVp;
+  Int_t tidHSVp[MaxHits];
+  Int_t pidHSVp[MaxHits];
+  Int_t didHSVp[MaxHits];
+  Int_t prtHSVp[MaxHits];
+  Int_t qHSVp[MaxHits];
+  Double_t massHSVp[MaxHits];
+  Double_t xHSVp[MaxHits];
+  Double_t yHSVp[MaxHits];
+  Double_t zHSVp[MaxHits];
+  Double_t pxHSVp[MaxHits];
+  Double_t pyHSVp[MaxHits];
+  Double_t pzHSVp[MaxHits];
+  Double_t ppHSVp[MaxHits];
+  Double_t deHSVp[MaxHits];
+  Double_t tHSVp[MaxHits];
+
 	// VP
   Int_t nhVp;
   Int_t tidVp[MaxHits];
@@ -696,6 +714,7 @@ public:
   void SetSCHData( const VHitInfo* hit );
   void SetSDCData( const VHitInfo* hit );
   void SetBVHData( const VHitInfo* hit );
+  void SetHSVPData( const VHitInfo* hit );
   void SetVPData( const VHitInfo* hit );
   void SetTargetVPData( const VHitInfo* hit );
   void SetWCData( const VHitInfo* hit );

@@ -55,9 +55,9 @@ TPCAnaManager::TPCAnaManager( void )
 	event.pb = new TVector3;
 	TPC_g->Branch( "evnum", &event.evnum, "evnum/I" );
 	TPC_g->Branch( "pb", "TVector3", event.pb );
-	TPC_g->Branch( "nhPrm", &event.nhPrm, "nhPrm/I" );
 	TPC_g->Branch( "data_runnum", &event.data_runnum, "data_runnum/I" );
 	TPC_g->Branch( "data_evnum", &event.data_evnum, "data_evnum/I" );
+	TPC_g->Branch( "Accepted", &event.Accepted, "Accepted/O");
 	TPC_g->Branch( "NumberOfTracks",&event.NumberOfTracks, "NumberOfTracks/I" );
 	TPC_g->Branch( "PIDOfTrack",event.PIDOfTrack, "PIDOfTrack[1000]/I" );
 	TPC_g->Branch( "ParentIDOfTrack",event.ParentIDOfTrack, "ParentIDOfTrack[1000]/I" );
@@ -69,6 +69,7 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch( "MomentumOfTrack_y",event.MomentumOfTrack_y, "MomentumOfTrack_y[1000]/D" );
 	TPC_g->Branch( "MomentumOfTrack_z",event.MomentumOfTrack_z, "MomentumOfTrack_z[1000]/D" );
 	TPC_g->Branch( "trigpat", event.trigpat, "trigpat[32]/I" );
+	TPC_g->Branch( "nhPrm", &event.nhPrm, "nhPrm/I" );
 	TPC_g->Branch( "pidPrm", event.pidPrm, "pidPrm[nhPrm]/I" );
 	TPC_g->Branch( "xPrm", event.xPrm, "xPrm[nhPrm]/D" );
 	TPC_g->Branch( "yPrm", event.yPrm, "yPrm[nhPrm]/D" );
@@ -385,6 +386,23 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch( "vtyBvh", event.vtyBvh, "vtyBvh[nhBvh]/D" );
 	TPC_g->Branch( "vtzBvh", event.vtzBvh, "vtzBvh[nhBvh]/D" );
 	TPC_g->Branch( "lengthBvh", event.lengthBvh, "lengthBvh[nhBvh]/D" );
+	// HSVP
+	TPC_g->Branch( "nhHSVp", &event.nhHSVp, "nhHSVp/I" );
+	TPC_g->Branch( "tidHSVp", event.tidHSVp, "tidHSVp[nhHSVp]/I" );
+	TPC_g->Branch( "pidHSVp", event.pidHSVp, "pidHSVp[nhHSVp]/I" );
+	TPC_g->Branch( "didHSVp", event.didHSVp, "didHSVp[nhHSVp]/I" );
+	TPC_g->Branch( "prtHSVp", event.prtHSVp, "prtHSVp[nhHSVp]/I" );
+	TPC_g->Branch( "qHSVp", event.qHSVp, "qHSVp[nhHSVp]/I" );
+	TPC_g->Branch( "massHSVp", event.massHSVp, "massHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "xHSVp", event.xHSVp, "xHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "yHSVp", event.yHSVp, "yHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "zHSVp", event.zHSVp, "zHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "pxHSVp", event.pxHSVp, "pxHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "pyHSVp", event.pyHSVp, "pyHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "pzHSVp", event.pzHSVp, "pzHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "ppHSVp", event.ppHSVp, "ppHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "deHSVp", event.deHSVp, "deHSVp[nhHSVp]/D" );
+	TPC_g->Branch( "tHSVp", event.tHSVp, "tHSVp[nhHSVp]/D" );
 	// VP
 	TPC_g->Branch( "nhVp", &event.nhVp, "nhVp/I" );
 	TPC_g->Branch( "tidVp", event.tidVp, "tidVp[nhVp]/I" );
@@ -752,6 +770,7 @@ TPCAnaManager::BeginOfEventAction( void )
 	event.nhLac = 0;
 	event.nhWc = 0;
 	event.nhBvh = 0;
+	event.nhHSVp = 0;
 	event.nhVp = 0;
 	event.nhTgtVp = 0;
 	for( G4int i=0; i<MaxHits; ++i ){
@@ -960,6 +979,23 @@ TPCAnaManager::BeginOfEventAction( void )
 		event.pyTgtVtxVp[i] = -9999;
 		event.pzTgtVtxVp[i] = -9999;
 
+		// HSVP
+		event.tidHSVp[i] = -9999;
+		event.pidHSVp[i] = -9999;
+		event.didHSVp[i] = -9999;
+		event.prtHSVp[i] = -9999;
+		event.qHSVp[i] = -9999;
+		event.massHSVp[i] = -9999.;
+		event.xHSVp[i] = -9999.;
+		event.yHSVp[i] = -9999.;
+		event.zHSVp[i] = -9999.;
+		event.pxHSVp[i] = -9999.;
+		event.pyHSVp[i] = -9999.;
+		event.pzHSVp[i] = -9999.;
+		event.ppHSVp[i] = -9999.;
+		event.deHSVp[i] = -9999.;
+		event.tHSVp[i] = -9999.;
+
 		// VP
 		event.tidVp[i] = -9999;
 		event.pidVp[i] = -9999;
@@ -1134,7 +1170,7 @@ TPCAnaManager::EndOfEventAction( void )
 	event.evnum++;
 	auto Mat2D = MatrixReader::Mat2D;
 
-	if(tpctrNum>9){
+	if(tpctrNum>50){
 		G4cout<<"Error--> over the number of tracks in the TPC:"<<tpctrNum<<G4endl;
 	}
 	//Fill Primary Infomation for E27
@@ -1146,6 +1182,7 @@ TPCAnaManager::EndOfEventAction( void )
 		event.theta_CM = primaryInfo.theta_CM;
 		event.mm = CLHEP::mm;
 	}
+	event.Accepted = 0;
 	for(int it=0;it<1000;++it){
 		event.NumberOfTracks = gTrackBuffer.GetNumberOfTracks();
 		event.PIDOfTrack[it] = gTrackBuffer.GetPIDOfTrack()[it];
@@ -1328,29 +1365,6 @@ TPCAnaManager::EndOfEventAction( void )
 
 
 	}//trigger parts
-	if(DiscardData){
-		event.Clear();//Clears real data only
-	}
-	else{
-		TPC_g->Fill();
-		if(event.evnum %100==0) TPC_g->Write("",TObject::kOverwrite);
-		event.Clear();
-	}
-	event.pb->SetXYZ( 0., 0., 0. );
-	event.nhPrm = 0;
-	for( Int_t i=0; i<MaxPrimaryParticle; ++i ){
-		event.pidPrm[i] = -9999;
-		event.xPrm[i] = -9999.;
-		event.yPrm[i] = -9999.;
-		event.zPrm[i] = -9999.;
-		event.pxPrm[i] = -9999.;
-		event.pyPrm[i] = -9999.;
-		event.pzPrm[i] = -9999.;
-		event.ppPrm[i] = -9999.;
-		event.mPrm[i] = -9999.;
-		event.thetaPrm[i] = -9999.;
-		event.phiPrm[i] = -9999.;
-	}
 	bool Trig = false;
 	bool SDC = false;
 	int nhSdc1=0;
@@ -1575,6 +1589,7 @@ TPCAnaManager::EndOfEventAction( void )
 
 
 	if(Trig and SDC){
+		event.Accepted = 1;
 		HA0->Fill(pkangle,pk);
 		HA1->Fill(pkth,pk);
 		HA2->Fill(pkth,pkph);
@@ -1610,6 +1625,29 @@ TPCAnaManager::EndOfEventAction( void )
 				}
 			}
 		}
+	}
+	if(DiscardData){
+		event.Clear();//Clears real data only
+	}
+	else{
+		TPC_g->Fill();
+		if(event.evnum %100==0) TPC_g->Write("",TObject::kOverwrite);
+		event.Clear();
+	}
+	event.pb->SetXYZ( 0., 0., 0. );
+	event.nhPrm = 0;
+	for( Int_t i=0; i<MaxPrimaryParticle; ++i ){
+		event.pidPrm[i] = -9999;
+		event.xPrm[i] = -9999.;
+		event.yPrm[i] = -9999.;
+		event.zPrm[i] = -9999.;
+		event.pxPrm[i] = -9999.;
+		event.pyPrm[i] = -9999.;
+		event.pzPrm[i] = -9999.;
+		event.ppPrm[i] = -9999.;
+		event.mPrm[i] = -9999.;
+		event.thetaPrm[i] = -9999.;
+		event.phiPrm[i] = -9999.;
 	}
 
 	return 0;
@@ -2028,6 +2066,30 @@ TPCAnaManager::SetTargetVPData( const VHitInfo* hit)
 		event.pyTgtVtxVp[i] = hit->GetVertexMomentum().y();
 		event.pzTgtVtxVp[i] = hit->GetVertexMomentum().z();
 		event.nhTgtVp++;
+	}
+}
+//_____________________________________________________________________________
+	void
+TPCAnaManager::SetHSVPData( const VHitInfo* hit )
+{
+	if( event.nhHSVp >= MaxHits){
+		G4cerr << FUNC_NAME << " too much nhit " << event.nhHSVp << G4endl;
+	} else {
+		Int_t i = event.nhHSVp;
+		event.tidHSVp[i] = hit->GetTrackID();
+		event.pidHSVp[i] = hit->GetParticleID();
+		event.didHSVp[i] = hit->GetDetectorID();
+		event.prtHSVp[i] = hit->GetParentID();
+		event.xHSVp[i] = hit->GetPosition().x();
+		event.yHSVp[i] = hit->GetPosition().y();
+		event.zHSVp[i] = hit->GetPosition().z();
+		event.pxHSVp[i] = hit->GetMomentum().x();
+		event.pyHSVp[i] = hit->GetMomentum().y();
+		event.pzHSVp[i] = hit->GetMomentum().z();
+		event.ppHSVp[i] = hit->GetMomentum().mag();
+		event.deHSVp[i] = hit->GetEnergyDeposit();
+		event.tHSVp[i] = hit->GetTime();
+		event.nhHSVp++;
 	}
 }
 

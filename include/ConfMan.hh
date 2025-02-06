@@ -44,6 +44,7 @@ public:
   static const T& Get( const G4String& key );
   G4bool    Initialize( void );
   G4bool    Initialize( const G4String& file_name );
+  G4bool    Initialize( const G4String& file_name ,const G4String& file_name2 );
   G4bool    InitializeHistograms( void );
   G4bool    InitializeParameterFiles( void );
   template <typename T>
