@@ -9,6 +9,7 @@
 #include <G4ParticleDefinition.hh>
 #include <G4UImanager.hh>
 #include <G4IonConstructor.hh>
+#include <G4Poisson.hh>
 #include <Randomize.hh>
 
 #include "TMath.h"
@@ -5299,8 +5300,7 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
   m_particle_gun->GeneratePrimaryVertex( anEvent );
 
   double n_Accidental = gConf.Get<G4double>("nAccidental");
-  TRandom3 rand;
-  int nAccidental = rand.Poisson(n_Accidental);
+  int nAccidental = G4Poisson(n_Accidental);
   GenerateAccidentals(nAccidental,anEvent);
 
 
