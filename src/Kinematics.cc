@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cstdio>
 
+#include <TF1.h>
 #include <TF2.h>
 #include "FuncName.hh"
 #include <TMath.h>
@@ -262,6 +263,25 @@ G4ThreeVector FermiGasMomentum(double p_f){
   return p * dir;
 }
 
+G4ThreeVector FermiEmphiricalMomentum(){
+	//A gaussian function with exponential tail. 1+ Tanh was used insted of step function to implement tail structure
+	//Fermi momentum data based on:
+	//Patsyuk, M., Kahlbow, J., Laskaris, G. et al. Unperturbed inverse kinematics nucleon knockout measurements with a carbon beam. Nat. Phys. 17, 693–699 (2021). https://doi.org/10.1038/s41567-021-01193-4
+  TF1 func_emph("func","[0]*exp(-(x-[1])*(x-[1])/[2]/[2]) + [3]*exp(-x/[4]) * 0.5*(1 + tanh((x-[5])/[6]))");
+	double pars[7] = {
+		46.0615,
+		0.173212,
+		0.0907045,
+		58.7525,
+		0.145068,
+		0.0845702,
+		0.0370511
+	};
+	func_emph.SetParameters(pars);
+	double p = func_emph.GetRandom(0);
+  G4ThreeVector dir = SphericalRandom();
+  return p * dir;
+}
 G4ThreeVector RotateAlongBeam(G4ThreeVector Beam, G4ThreeVector Vect, G4double phi){
 	G4double BeamMag = Beam.mag();
 	auto z_Beam = Beam* (1./BeamMag);

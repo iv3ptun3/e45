@@ -16,6 +16,7 @@ namespace Kinematics
   G4double      Legendre( G4int order, G4double x );
   G4ThreeVector SphericalRandom( void );
   G4ThreeVector FermiGasMomentum(double p_f = 250);//MeV
+  G4ThreeVector FermiEmphiricalMomentum();//MeV
 	G4ThreeVector MultitrackVertex(int ntrack, double *x0, double *y0,
 			    double *u0, double *v0);
 

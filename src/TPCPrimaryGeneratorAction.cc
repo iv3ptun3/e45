@@ -5247,7 +5247,8 @@ TPCPrimaryGeneratorAction::GenerateKuramaPKmKpXi( G4Event* anEvent ){
 	auto MomKm=	m_mm_vert->Moms[0];
 	auto MomKp=	m_mm_vert->Moms[1];
 	auto MomXi=	m_mm_vert->Moms[2];
-	if(FermiMotion) MomXi += Kinematics::FermiGasMomentum(250 * XiMinusMass / (XiMinusMass + KaonPlusMass))/CLHEP::GeV;
+//	if(FermiMotion) MomXi += Kinematics::FermiGasMomentum(250 * XiMinusMass / (XiMinusMass + KaonPlusMass))/CLHEP::GeV;
+	if(FermiMotion) MomXi += Kinematics::FermiEmphiricalMomentum() * XiMinusMass / (XiMinusMass + KaonPlusMass)/CLHEP::GeV;
   gAnaMan.SetMMVertex(m_mm_vert);
 	double phi = G4RandFlat::shoot(-acos(-1),acos(-1));
 	double KmEnergy = hypot(KaonPlusMass,MomKm.mag()) - KaonPlusMass;
