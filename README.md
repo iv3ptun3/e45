@@ -7,9 +7,9 @@ K1.8 geant4 simulation tool.
 
 ## Platform
 
-This tool is developed on the platform of local in MacOS, Scientific Linux 6.10.
-- g++ (GCC) 4.8.5
-- ROOT 6.32.04
+This tool is developed on the platform of local in MacOS(arm64)
+- clang++
+- ROOT 6.32.08
 - Geant4 11.2.2
 
 
