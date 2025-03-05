@@ -102,7 +102,7 @@ DCGeomRecord::ClassName( void )
 
 //______________________________________________________________________________
 struct DCGeomRecordComp
-  : public std::binary_function <DCGeomRecord*, DCGeomRecord*, Bool_t>
+  : public std::__binary_function <DCGeomRecord*, DCGeomRecord*, Bool_t>
 {
   Bool_t operator()( const DCGeomRecord* const p1,
 		     const DCGeomRecord* const p2 ) const

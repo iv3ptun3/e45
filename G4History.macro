@@ -1,16 +1,25 @@
 /run/verbose 2
-/vis/scene/create
-/vis/open OGLIX
-/vis/sceneHandler/create OGLIX
-/vis/sceneHandler/attach
-/vis/viewer/create ! ! 600
+/tracking/verbose 1
+/vis/open OGL 600x600-0+0
+/vis/sceneHandler/create OGL
+/vis/viewer/create ! ! 600x600-0+0
 /vis/viewer/refresh
-/vis/scene/notifyHandlers
-/vis/viewer/flush
-/vis/viewer/refresh viewer-0
-/vis/viewer/update viewer-0
+/vis/viewer/set/viewpointThetaPhi 90 180
+/vis/drawVolume
+/vis/scene/create
+/vis/scene/add/volume world -1 -1 none m 0 0 0 0 0 0
+/vis/sceneHandler/attach
+/vis/scene/add/trajectories
 /tracking/storeTrajectory 1
+/vis/scene/notifyHandlers
 /vis/scene/endOfEventAction accumulate
-/run/beamOn 10
-/vis/scene/notifyHandlers scene-0
-/control/execute prerun1.mac
+/vis/viewer/set/style wireframe
+/vis/viewer/refresh
+/vis/scene/add/trajectories
+/tracking/storeTrajectory 1
+/vis/scene/notifyHandlers
+/vis/scene/add/hits
+/vis/scene/notifyHandlers
+/vis/viewer/set/autoRefresh true
+/vis/viewer/refresh
+/vis/verbose 2

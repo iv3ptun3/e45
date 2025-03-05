@@ -48,19 +48,6 @@ TPCBH2SD::ProcessHits( G4Step* aStep, G4TouchableHistory* /* ROhist */ )
   if( Definition->GetPDGCharge() == 0. )
     return false;
 
-  // if( particleName == "e-" )
-  //   return false;
-  // if( particleName == "e+" )
-  //   return false;
-  // if( particleName != "kaon+" )
-  //   return false;
-  // if( particleName != "pi-" && particleName != "pi+" )
-  //   return false;
-  // if( particleName != "pi+" && particleName != "pi-" &&
-  //     particleName != "proton" )
-  //   return false;
-  // if( particleType == "lepton" )
-  //   return false;
 
   m_hits_collection->insert( new TPCBH2Hit( SensitiveDetectorName, aStep ) );
 

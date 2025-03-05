@@ -18,13 +18,31 @@ all: lib bin
 
 include $(G4INSTALL)/config/binmake.gmk
 
-SOFLAGS		+= -shared
-ROOTLIBS	:= $(shell root-config --libs)
-ROOTCFLAGS	:= $(shell root-config --cflags)
-ROOTGLIBS	:= $(shell root-config --glibs)
+SOFLAGS		:= -shared
+
+# changed by hjb
+ROOTCFLAGS := $(shell root-config --cflags)
+ROOTINCLUDE := -I/opt/homebrew/Cellar/root/6.32.08/include/root
+ROOTGLIBS    := $(shell root-config --glibs)
+
+CXX         := clang++
+CXXFLAGS    += -std=c++17 -stdlib=libc++ -pthread -arch arm64
+CXXFLAGS    += -Wall -Wextra
+CPPFLAGS    += $(ROOTINCLUDE)
+
+LDFLAGS     += -L/opt/homebrew/Cellar/root/6.32.08/lib/root \
+           -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint \
+           -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lMinuit
+# LDFLAGS     += -L/opt/homebrew/Cellar/root/6.32.08/lib/root -lMinuit2
+LDFLAGS     += $(ROOTGLIBS)
+
+#ROOTLIBS	:= $(shell root-config --libs)
+
+#ROOTCFLAGS	:= $(shell root-config --cflags)
+#ROOTGLIBS	:= $(shell root-config --glibs)
 # CXXFLAGS	+= -DDEBUG
-CXXFLAGS	+= $(ROOTCFLAGS)
-CPPFLAGS	+= $(ROOTCFLAGS)
+#CXXFLAGS	+= $(ROOTCFLAGS)
+#CPPFLAGS	+= $(ROOTCFLAGS)
 
 # CERN_ROOT = /sw
 # CLIB = -L$(CERN_ROOT)/lib -lpawlib -lgraflib -lgrafX11 \
@@ -35,7 +53,7 @@ FC = gfortran -m32
 FFLAGS +=  -c ./include
 
 LDLIBS   += $(ROOTLIBS)
-LDLIBS   += "-lMinuit"
+
 ##LDLIBS +=$(CLIB)
 #ifndef G4INSTALL
 #  G4INSTALL = ../

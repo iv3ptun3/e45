@@ -3,7 +3,7 @@
 #  date: 2019.06.18
 #  note:
 #    FF is +1200.0mm from VO.
-#    VI is -170.0mm from a surface of Q10
+#    VI is -170.0mm from a surface of Q10   
 #    VO is +170.0mm from a surface of Q13
 #    the origin of KURAMA coordinate is the center of KURAMA.
 #    KURAMA-X is +150.0mm from beam axis. (E07)

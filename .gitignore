@@ -25,3 +25,5 @@ param/conf*
 param/k18hs*
 !.gitkeep
 .vscode/settings.json 
+param/ShsFieldMap_20210526_Extrapolated
+param/ShsFieldMap_20210526_Adjusted

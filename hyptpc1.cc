@@ -5,6 +5,8 @@
 #include <G4UIterminal.hh>
 #include <G4UItcsh.hh>
 #include <QGSP_BERT.hh>
+#include <G4VisExecutive.hh>
+#include <G4UIExecutive.hh>
 
 #include <TFile.h>
 
@@ -15,11 +17,6 @@
 #include "TPCRunAction.hh"
 #include "TPCEventAction.hh"
 #include "TPCSteppingAction.hh"
-
-#ifdef G4VIS_USE
-#include "TPCVisManager.hh"
-//#include "G4VisExecutive.hh"
-#endif
 
 enum EArgv { kProcess, kConfFile, kOutputName, kG4Macro, kArgc };
 
@@ -51,22 +48,12 @@ main( int argc, char** argv )
   runManager->SetUserAction( new TPCSteppingAction );
   runManager->SetUserAction( new TPCEventAction );
 
-#ifdef G4VIS_USE
-  auto visManager = new TPCVisManager;
-  // auto visManager = new G4VisExecutive;
+  // added by hjb
+  auto visManager = new G4VisExecutive;
+  visManager->SetVerboseLevel(0);
   visManager->Initialize();
-# if 0
-  auto traj = new G4TrajectoryDrawByCharge;
-  const G4Colour Invisible( 0., 0., 0., 0. );
-  traj->Set( G4TrajectoryDrawByCharge::Charge::Neutral, Invisible );
-  // traj->Set( G4TrajectoryDrawByCharge::Charge::Negative, G4Colour::Blue() );
-  // traj->Set( G4TrajectoryDrawByCharge::Charge::Positive, G4Colour::Red() );
-  visManager->RegisterModel( traj );
-# endif
-#endif
 
   runManager->Initialize();
-
   auto uiManager = G4UImanager::GetUIpointer();
 
   if( gConf.Get<G4bool>( "EVDISP" ) )
@@ -74,11 +61,10 @@ main( int argc, char** argv )
 
   // interactive session, if no arguments given
   if( argc == kArgc-1 ) {
-    auto tcsh = new G4UItcsh( "HypTPC(%s)[%/][%h]: " );
-    auto session = new G4UIterminal( tcsh );
-    tcsh->SetLsColor( GREEN, CYAN );
-    session->SessionStart();
-    delete session;
+    G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+    uiManager->ApplyCommand("/control/execute g4macro/init_vis.mac");
+    ui->SessionStart();
+    delete ui;
   }
   // batch mode
   else if( argc == kArgc ) {
@@ -90,10 +76,10 @@ main( int argc, char** argv )
   gFile->Write();
   gFile->Close();
 
-#ifdef G4VIS_USE
+
   delete visManager;
-#endif
   delete runManager;
+  
   G4cout << "finished" << G4endl;
   return EXIT_SUCCESS;
 }
