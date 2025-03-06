@@ -29,8 +29,8 @@ export PATH=$G4WORKDIR/bin/Darwin-clang:$PATH
 then
 
 ```shell
-git clone https://github.com/iv3ptun3/e42.git
-cd e42
+git clone https://github.com/iv3ptun3/e45.git
+cd e45
 git checkout main
 make
 ```
