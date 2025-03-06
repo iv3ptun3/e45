@@ -38,7 +38,7 @@ private:
   DCGeomContainer m_container;
   IntList         m_detector_id_map;
   DoubleList      m_global_z_map;
-  DoubleList      m_local_z_map;
+  DoubleList      m_local_z_map;  
 
 public:
   Int_t               CalcWireNumber( Int_t lnum, Double_t position ) const;

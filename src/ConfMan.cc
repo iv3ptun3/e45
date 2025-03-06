@@ -71,7 +71,9 @@ ConfMan::Initialize( void )
     G4cout << " key = "   << std::setw(20) << std::left << key
 	   << " value = " << std::setw(30) << std::left << val
 	   << G4endl;
+
     m_file[key]   = FilePath(val);
+
     m_string[key] = val;
     m_double[key] = std::strtod( val, nullptr );
     m_int[key]    = std::strtol( val, nullptr, 10 );
@@ -129,6 +131,13 @@ ConfMan::FilePath( const G4String& src ) const
   std::ifstream tmp( src );
   if ( tmp.good() )
     return src;
-  else
-    return m_conf_dir + "/" + src;
+
+  if (src[0] == '/')
+    return src;
+
+  if (src.find(m_conf_dir + "/") == 0)
+    return src;
+
+  return m_conf_dir + "/" + src;
+
 }

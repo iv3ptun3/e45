@@ -14,7 +14,7 @@ struct Track;
 using namespace std;
 class VHitInfo;
 static std::map<TString, TH1*> hmap;
-static std::map<TString, TH2*> hmap2d;
+static std::map<TString, TH2*> hmap2d;  
 
 //_____________________________________________________________________________
 static const G4int MaxHits    = 2000;
@@ -269,13 +269,6 @@ struct Event
 
   Double_t timetpc[MaxTrack];    // global time
   Double_t tlengthtpc[MaxTrack];    // global time
-
-
-
-
-
-
-
 	
   Double_t betatpc[MaxTrack];    // beta
 
@@ -308,6 +301,7 @@ struct Event
   Double_t pxTgt[MaxHits];
   Double_t pyTgt[MaxHits];
   Double_t pzTgt[MaxHits];
+  Double_t nhTgtOut[MaxHits];
   Double_t xTgtOut[MaxHits];
   Double_t yTgtOut[MaxHits];
   Double_t zTgtOut[MaxHits];

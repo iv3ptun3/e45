@@ -46,6 +46,8 @@
 #include "TPCTargetVPSD.hh"
 #include "TPCVPSD.hh"
 #include "TPCWCSD.hh"
+#include "TPCVC1SD.hh"
+#include "TPCVC2SD.hh"
 #include "padHelper.hh"
 
 namespace
@@ -120,7 +122,7 @@ TPCDetectorConstruction::Construct( void )
 #if 1
   ConstructAreaTent();
 #endif
-#if 1
+#if 1 
   ConstructBC3();
   ConstructBC4();
 #endif
@@ -137,7 +139,7 @@ TPCDetectorConstruction::Construct( void )
   ConstructPVAC2();
   ConstructNBAR();
 #endif
-#if 1
+#if 0 // at E42 1, modified by HeeJeong BYEON
   if( gConf.Get<G4int>("ConstructKurama") ){
     ConstructKuramaMagnet();
     ConstructSDC1();
@@ -150,6 +152,10 @@ TPCDetectorConstruction::Construct( void )
     ConstructLAC();
     ConstructWC();
   }
+#endif
+#if 1
+  ConstructVC1();
+  ConstructVC2();
 #endif
 
   myField->Initialize();
@@ -325,26 +331,38 @@ TPCDetectorConstruction::ConstructMaterials( void )
   m_material_map[name]->AddElement( m_element_map["Oxygen"] , natoms=2 );
   m_material_map[name]->AddElement( m_element_map["Carbon"] , natoms=3 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"] , natoms=3 );
+  
   // Scintillator (Polystyene(C6H5CH=CH2))
   name = "Scintillator";
   m_material_map[name] = new G4Material( name, density=1.032*g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=8 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=8 );
+
+ // EJ-320 added by Heejeong BYEON
+  name = "EJ230";
+  m_material_map[name] = new G4Material( name, density=1.032*g/cm3, nel=2 );
+  m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=9 );
+  m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=10 );
+
+  
   // CH2 Polyethelene
   name = "CH2";
   m_material_map[name] = new G4Material( name, density=1.13*g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Carbon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Hydrogen"], natoms=2 );
+
   // Silica Aerogel for LAC
   name = "SilicaAerogelLAC";
   m_material_map[name] = new G4Material( name, density=0.18 *g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Silicon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
+
   // Quartz (SiO2, crystalline)
   name = "Quartz";
   m_material_map[name] = new G4Material( name, density=2.64 *g/cm3, nel=2 );
   m_material_map[name]->AddElement( m_element_map["Silicon"], natoms=1 );
   m_material_map[name]->AddElement( m_element_map["Oxygen"],  natoms=2 );
+
   // Acrylic for WC
   name = "Acrylic";
   m_material_map[name] = new G4Material( name, density=1.18 *g/cm3, nel=3 );
@@ -548,7 +566,112 @@ TPCDetectorConstruction::ConstructBH2( void )
   edge_segment_lv->SetVisAttributes( G4Colour::Cyan() );
   edge_segment_lv->SetSensitiveDetector( bh2SD );
 }
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructVC1( void )
+{
+  const auto& ra2 = gGeom.GetRotAngle2("VC1") * deg;
+  const auto& half_size = gSize.GetSize("Vc1Seg") * 0.5 * mm;
+  const G4double pitch = gGeom.GetWirePitch("VC1") * mm;
 
+  auto vc1SD = new TPCVC1SD("/VC1");
+  G4SDManager::GetSDMpointer()->AddNewDetector( vc1SD );
+
+  // Mother Volume
+  auto mother_solid = new G4Box( "Vc1MotherSolid",
+                                 half_size.x()*10 + 50.*mm, // 10 segments
+                                 half_size.y() + 50.*mm,
+                                 half_size.z()*2 + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+                                        m_material_map["Air"],
+                                        "Vc1MotherLV" );
+
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+               gGeom.GetGlobalPosition("VC1") );
+  pos.rotateY( m_rotation_angle );
+
+  new G4PVPlacement( rot, pos, mother_lv,
+                     "Vc1MotherPV", m_world_lv, false, 0 );
+
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+
+  // Segment
+  auto segment_solid = new G4Box( "Vc1SegmentSolid",
+                                  half_size.x(),
+                                  half_size.y(),
+                                  half_size.z() );
+  auto segment_lv = new G4LogicalVolume( segment_solid,
+                                         m_material_map["EJ230"],
+                                         "Vc1SegmentLV" );
+
+  // set same segment 
+  for( G4int i=0; i<10; ++i ){
+    pos = G4ThreeVector( ( -10/2 + i + 0.5 ) * pitch, 0.*mm, 0.*mm );
+    new G4PVPlacement( nullptr, pos, segment_lv,
+                       "Vc1SegmentPV", mother_lv, false, i );
+  }
+
+  segment_lv->SetVisAttributes( G4Colour::Cyan() );
+  segment_lv->SetSensitiveDetector( vc1SD );
+}
+
+//_____________________________________________________________________________
+void
+TPCDetectorConstruction::ConstructVC2( void )
+{
+  const auto& ra2 = gGeom.GetRotAngle2("VC2") * deg;
+  const auto& half_size = gSize.GetSize("Vc2Seg") * 0.5 * mm;
+  const G4double pitch = gGeom.GetWirePitch("VC2") * mm;
+
+  auto vc2SD = new TPCVC2SD("/VC2");
+  G4SDManager::GetSDMpointer()->AddNewDetector( vc2SD );
+
+  // Mother Volume
+  auto mother_solid = new G4Box( "Vc2MotherSolid",
+                                 half_size.x()*10 + 50.*mm, // 10 segments
+                                 half_size.y() + 50.*mm,
+                                 half_size.z()*2 + 50.*mm );
+  auto mother_lv = new G4LogicalVolume( mother_solid,
+                                        m_material_map["Air"],
+                                        "Vc2MotherLV" );
+
+  auto rot = new G4RotationMatrix;
+  rot->rotateY( - ra2 - m_rotation_angle );
+
+  auto pos = ( gGeom.GetGlobalPosition("KURAMA") +
+               gGeom.GetGlobalPosition("VC2") );
+  pos.rotateY( m_rotation_angle );
+
+  new G4PVPlacement( rot, pos, mother_lv,
+                     "Vc2MotherPV", m_world_lv, false, 0 );
+
+  mother_lv->SetVisAttributes( G4VisAttributes::GetInvisible() );
+
+  // Segment
+  auto segment_solid = new G4Box( "Vc2SegmentSolid",
+                                  half_size.x(),
+                                  half_size.y(),
+                                  half_size.z() );
+  auto segment_lv = new G4LogicalVolume( segment_solid,
+                                         m_material_map["EJ230"],
+                                         "Vc2SegmentLV" );
+
+  // set same segment 
+  for( G4int i=0; i<10; ++i ){
+    pos = G4ThreeVector( ( -10/2 + i + 0.5 ) * pitch, 0.*mm, 0.*mm );
+    new G4PVPlacement( nullptr, pos, segment_lv,
+                       "Vc2SegmentPV", mother_lv, false, i );
+  }
+
+  segment_lv->SetVisAttributes( G4Colour::Cyan() );
+  segment_lv->SetSensitiveDetector( vc2SD );
+}
+
+
+//_____________________________________________________________________________
 	void
 TPCDetectorConstruction::ConstructBVH( void )
 {
@@ -590,6 +713,7 @@ TPCDetectorConstruction::ConstructBVH( void )
 }
 
 //_____________________________________________________________________________
+
 void
 TPCDetectorConstruction::ConstructFTOF( void )
 {
@@ -2086,7 +2210,6 @@ TPCDetectorConstruction::ConstructKuramaMagnet( void )
 		     0 );
 
   ///coil3
-  //////////////coil3
   G4Box* Coil3_box = new G4Box("Coil3_box",
 			       coil3_size.x(), coil3_size.y(), coil3_size.z() );
   G4LogicalVolume*  Coil3_log = new G4LogicalVolume(Coil3_box, m_material_map["Copper"], "Coil3_log",0,0,0);

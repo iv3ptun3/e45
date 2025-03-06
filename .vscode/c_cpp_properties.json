@@ -5,7 +5,7 @@
             "includePath": [
                 "/opt/homebrew/opt/root/include/root/**",
                 "/Users/hjbyeon/geant4/geant4-v11.2.1-install/include/Geant4/**",
-                "/Users/hjbyeon/work/e42/**"
+                "/Users/hjbyeon/work/e45/**"
             ],
             "defines": [],
             "macFrameworkPath": [

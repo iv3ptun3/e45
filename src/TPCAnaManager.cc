@@ -16,7 +16,7 @@
 #include "TPCSteppingAction.hh"
 #include "FuncName.hh"
 #include "ResHypTPC.hh"
-#include "RungeKuttaTracker.hh"
+#include "RungeKuttaTracker.hh"	
 #include "switch.h"
 #include "track.hh"
 #include "VHitInfo.hh"
@@ -203,6 +203,9 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch( "xTgt", event.xTgt, "xTgt[nhTgt]/D" );
 	TPC_g->Branch( "yTgt", event.yTgt, "yTgt[nhTgt]/D" );
 	TPC_g->Branch( "zTgt", event.zTgt, "zTgt[nhTgt]/D" );
+
+	TPC_g->Branch("nhTgtOut", &event.nhTgtOut, "nhTgtOut/I");
+	
 	TPC_g->Branch( "xTgtOut", event.xTgtOut, "xTgtOut[nhTgtOut]/D" );
 	TPC_g->Branch( "yTgtOut", event.yTgtOut, "yTgtOut[nhTgtOut]/D" );
 	TPC_g->Branch( "zTgtOut", event.zTgtOut, "zTgtOut[nhTgtOut]/D" );
@@ -211,6 +214,13 @@ TPCAnaManager::TPCAnaManager( void )
 	TPC_g->Branch( "vtxTgt", event.vtxTgt, "vtxTgt[nhTgt]/D" );
 	TPC_g->Branch( "vtyTgt", event.vtyTgt, "vtyTgt[nhTgt]/D" );
 	TPC_g->Branch( "vtzTgt", event.vtzTgt, "vtzTgt[nhTgt]/D" );
+
+	//added by heejeong byeon
+	/*
+	TPC_g->Branch("nhTgtOut", &event.nhTgtOut, "nhTgtOut/I");
+	TPC_g->Branch("Xiflag", &event.Xiflag, "Xiflag/I");
+	*/
+
 	// HTOF
 	TPC_g->Branch( "nhHtof", &event.nhHtof, "nhHtof/I" );
 	TPC_g->Branch( "tidHtof", event.tidHtof, "tidHtof[nhHtof]/I" );

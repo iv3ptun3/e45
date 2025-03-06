@@ -72,7 +72,7 @@ TPCPrimaryGeneratorAction::TPCPrimaryGeneratorAction( void )
     m_particle_gun( new G4ParticleGun ),
     m_target_pos( gGeom.GetGlobalPosition( "SHSTarget" )*mm ),
     m_target_size( gSize.GetSize( "Target" )*mm ),
-    m_e45target_size( gSize.GetSize( "E45Target" )*mm ),
+    //m_e45target_size( gSize.GetSize( "E45Target" )*mm ),
     m_beam( new BeamInfo ),
     m_mm_vert( new MMVertex),
 		m_kmkpl( new KmKpL),
@@ -306,7 +306,7 @@ TPCPrimaryGeneratorAction::GeneratePrimaries( G4Event* anEvent )
   // case 3103: GenerateKKppJAMInputK0(anEvent,t1); break;
   // case 3104: GenerateKKppJAMInputK0bar(anEvent,t1); break;
   case 4501: GenerateE45ElasticPionPlus( anEvent ); break;
-  case 4502: GenerateE45ElasticPionMinus( anEvent ); break;
+  case 4502: GenerateE45ElasticPionMinus( anEvent ); break; // pin
   case -1321: GenerateXiMinus( anEvent ); break;
   case 1115: GenerateLambda( anEvent ); break;
  	case 181321:GenerateKuramaPKmKpXi( anEvent );	break;

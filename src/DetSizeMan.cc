@@ -53,8 +53,18 @@ DetSizeMan::Initialize( void )
     }
     m_param_map[key] = param_array;
   }
+  
+  /*
+  for (auto &entry : m_param_map)
+  {
+      for (G4double val : entry.second)
+          G4cout << val << " ";
+      G4cout << G4endl;
+  }
+*/
 
   m_is_ready = true;
+
   return true;
 }
 
@@ -75,12 +85,12 @@ DetSizeMan::Get( const G4String& key, G4int i ) const
 
   PIterator itr = m_param_map.find(key);
 
-  if( itr==m_param_map.end() ||
-      i+1 > (G4int)itr->second.size() ){
-    throw std::invalid_argument( std::string(FUNC_NAME+" No such key : "+key) );
-  }
+  if (itr == m_param_map.end() || i + 1 > (G4int)itr->second.size())
+    {
+        return 0.0; 
+    }
 
-  return itr->second.at(i);
+    return itr->second.at(i);
 }
 
 //_____________________________________________________________________________

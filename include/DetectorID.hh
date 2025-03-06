@@ -32,6 +32,8 @@ const Int_t NumOfSegSCH  = 64;
 const Int_t NumOfSegTOF  = 24;
 const Int_t NumOfSegLAC  = 30;
 const Int_t NumOfSegWC   = 20;
+const Int_t NumOfSegVC1 = 10; // added by HeeJeong BYEON
+const Int_t NumOfSegVC2 = 60; // added by HeeJeong BYEON
 
 // Misc _______________________________________________________________________
 const Int_t DetIdTrig      =  21;

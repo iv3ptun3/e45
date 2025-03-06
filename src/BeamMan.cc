@@ -110,7 +110,7 @@ namespace
   TTreeReaderValue<double> *KFXiPz = nullptr;
 
   TTreeReaderValue<bool> *XiFlight = nullptr;
-  TTreeReaderValue<bool> *Xiflag = nullptr;
+  //TTreeReaderValue<bool> *Xiflag = nullptr;
   TTreeReaderValue<bool> *Lflag = nullptr;
   TTreeReaderValue<bool> *LLflag = nullptr;
 
@@ -194,7 +194,7 @@ BeamMan::Initialize(void)
 	m_is_vi = (gConf.Get<G4int>("Generator") == 10);
 	if (abs(generator) == 135 or abs(generator) == 493 or abs(generator) == 938)
 	{
-//		m_is_k18 = 1;
+	//		m_is_k18 = 1;
 		G4cout << "Generating K18 Beam" << G4endl;
 	}
 	if (abs(generator) == 100)
@@ -400,14 +400,16 @@ BeamMan::Initialize(void)
 	    //		KFXiPz = new TTreeReaderValue<double>(*reader,"KFXimom_z");
 
 	    //		XiFlight = new TTreeReaderValue<bool>(*reader,"XiFlight");
-	    Xiflag = new TTreeReaderValue<bool>(*reader, "Xiflag");
+	    //Xiflag = new TTreeReaderValue<bool>(*reader, "Xiflag");
 
+		/*
 	    xiprodvtx_x = new TTreeReaderValue<double>(*reader, "KFXiProductionVtx_x");
 	    xiprodvtx_y = new TTreeReaderValue<double>(*reader, "KFXiProductionVtx_y");
 	    xiprodvtx_z = new TTreeReaderValue<double>(*reader, "KFXiProductionVtx_z");
 	    xiprodmom_x = new TTreeReaderValue<double>(*reader, "KFXiProductionVtxMom_x");
 	    xiprodmom_y = new TTreeReaderValue<double>(*reader, "KFXiProductionVtxMom_y");
 	    xiprodmom_z = new TTreeReaderValue<double>(*reader, "KFXiProductionVtxMom_z");
+		*/
 	  }
 	else if (m_is_LL_BE)
 	  {
@@ -435,7 +437,7 @@ BeamMan::Initialize(void)
 	
 		Lflag = new TTreeReaderValue<bool>(*reader, "Lflag");
 		LLflag = new TTreeReaderValue<bool>(*reader, "LLflag");
-		Xiflag = new TTreeReaderValue<bool>(*reader, "Xiflag");
+		//Xiflag = new TTreeReaderValue<bool>(*reader, "Xiflag");
 		KFDecaysMom_x = new TTreeReaderValue<vector<double> >(*reader, "KFDecaysMom_x");	
 		KFDecaysMom_y = new TTreeReaderValue<vector<double> >(*reader, "KFDecaysMom_y");	
 		KFDecaysMom_z = new TTreeReaderValue<vector<double> >(*reader, "KFDecaysMom_z");	
@@ -697,8 +699,8 @@ BeamMan::Initialize(void)
 			double mm = (*MissMass)->at(0);
 			if (abs(mm - 1.321) > 0.1)
 				continue;
-			if(!**Xiflag)
-				continue;
+			//if(!**Xiflag)
+			//	continue;
 			if(isnan(**xiprodvtx_z) or **xiprodvtx_z==0)
 				continue; 
 			double ub = (*ubTPC)->at(0);
@@ -744,7 +746,7 @@ BeamMan::Initialize(void)
 	      if ((*pTPCKurama)->at(0) == 0) continue;
 	      if ((*qTPCKurama)->at(0) <0) continue;
 	      if((*Kflag)->at(0) == 0) continue;
-	      if(!**Lflag or **LLflag or **Xiflag) continue;
+	      if(!**Lflag or **LLflag) continue;	//**Xiflag
 	      double vx = (*xbTPC)->at(0);
 	      double vy = (*ybTPC)->at(0);
 	      if(abs(vx)>15) continue;

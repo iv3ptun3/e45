@@ -11,7 +11,7 @@ typedef G4ThreeVector ThreeVector;
 
 //_____________________________________________________________________________
 class DCGeomRecord
-{
+{ 
 public:
   static TString ClassName( void );
   DCGeomRecord( Int_t id, const TString& name,

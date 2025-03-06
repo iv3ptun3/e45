@@ -11,7 +11,7 @@
 
 class G4Element;
 class G4Material;
-class G4LogicalVolume;
+class G4LogicalVolume;  
 class G4PVPlacement;
 class TPCSDCSD;
 
@@ -59,6 +59,9 @@ private:
   void ConstructShsMagnet( void );
   void ConstructTarget( void );
   void ConstructWC( void );
+
+  void ConstructVC1( void );    // added by HeeJeong BYEON
+  void ConstructVC2( void );    // added by HeeJeong BYEON
 
 private:
   virtual G4VPhysicalVolume* Construct( void );

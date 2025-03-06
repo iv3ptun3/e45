@@ -18,7 +18,7 @@
 DCGeomMan::DCGeomMan( void )
   : m_is_ready(false),
     m_file_name(),
-    m_container(),
+    m_container(),  
     m_detector_id_map(),
     m_global_z_map(),
     m_local_z_map()
@@ -312,6 +312,7 @@ DCGeomMan::Initialize( void )
     Double_t gx, gy, gz, ta, ra1, ra2, l, res, w0, dd, ofs;
     if( iss >> id >> name >> gx >> gy >> gz >> ta >> ra1 >> ra2
 	>> l >> res >> w0 >> dd >> ofs ){
+
       DCGeomRecord* record =
 	new DCGeomRecord( id, name, gx, gy, gz, ta, ra1, ra2,
 			  l, res, w0, dd, ofs );
@@ -342,9 +343,11 @@ DCGeomMan::GetDetectorIDList( void ) const
 {
   std::vector<Int_t> vlist;
   vlist.reserve( m_container.size() );
+
   DCGeomIterator itr, end=m_container.end();
   for( itr=m_container.begin(); itr!=end; ++itr ){
     vlist.push_back( itr->first );
+
   }
 
   return vlist;

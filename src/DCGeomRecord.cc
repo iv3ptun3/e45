@@ -21,7 +21,7 @@ namespace
 //_____________________________________________________________________________
 DCGeomRecord::DCGeomRecord( Int_t id, const TString& name,
 			    Double_t x, Double_t y, Double_t z, Double_t ta,
-			    Double_t ra1, Double_t ra2, Double_t length,
+			    Double_t ra1, Double_t ra2, Double_t length,  
 			    Double_t resol,
 			    Double_t w0, Double_t dd, Double_t ofs )
   : m_id(id), m_name(name), m_pos(x,y,z), m_tilt_angle(ta),
