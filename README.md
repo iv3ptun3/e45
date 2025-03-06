@@ -63,5 +63,6 @@ Or scp from kek.cc
 ln -s /group/had/sks/E42/software/param/BEAM/* param/BEAM/
 ln -s /group/had/sks/E42/software/param/JAM/* param/JAM/
 ln -s /group/had/sks/E42/software/fieldmap .
+ln -s /group/had/sks/Users/kangbm/CH2 param/REALBEAM_CH2 
 ```
 
