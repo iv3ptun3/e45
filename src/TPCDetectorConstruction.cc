@@ -631,7 +631,7 @@ TPCDetectorConstruction::ConstructVC2( void )
 
   // Mother Volume
   auto mother_solid = new G4Box( "Vc2MotherSolid",
-                                 half_size.x()*10 + 50.*mm, // 10 segments
+                                 half_size.x()*60 + 50.*mm, // 60 segments
                                  half_size.y() + 50.*mm,
                                  half_size.z()*2 + 50.*mm );
   auto mother_lv = new G4LogicalVolume( mother_solid,
@@ -660,8 +660,8 @@ TPCDetectorConstruction::ConstructVC2( void )
                                          "Vc2SegmentLV" );
 
   // set same segment 
-  for( G4int i=0; i<10; ++i ){
-    pos = G4ThreeVector( ( -10/2 + i + 0.5 ) * pitch, 0.*mm, 0.*mm );
+  for( G4int i=0; i<60; ++i ){
+    pos = G4ThreeVector( ( -60/2 + i + 0.5 ) * pitch, 0.*mm, 0.*mm );
     new G4PVPlacement( nullptr, pos, segment_lv,
                        "Vc2SegmentPV", mother_lv, false, i );
   }
